@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Sistem Pelaporan Imunisasi & BIAS — Puskesmas Melata (v5.0 - Detail Laporan Per Vaksin)</title>
+  <title>Sistem Pelaporan Imunisasi & BIAS — Puskesmas Melata (v5.3 - BIAS Multi-Kelas Dual Download)</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -116,7 +116,8 @@
     /* Grid */
     .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--gap)}
     @media (max-width:900px){.grid{grid-template-columns:1fr}}
-    .form-row{display:flex;gap:10px}
+    
+    /* Form specifics */
     .form-group{margin-bottom:12px;display:flex;flex-direction:column}
     label{font-weight:600;color:#114670;margin-bottom:6px;font-size:0.95rem}
     input[type="text"], input[type="month"], select, textarea, input[type="file"]{
@@ -125,6 +126,10 @@
     }
     select:focus,input:focus,textarea:focus{box-shadow:0 4px 12px rgba(3,102,214,0.08);border-color:var(--primary)}
     textarea{min-height:80px;resize:vertical}
+    
+    /* BIAS specific layout for Sasaran/Capaian */
+    .form-row{display:flex;gap:10px}
+    .form-row .form-group{flex:1}
 
     .inline{display:flex;gap:10px;align-items:center}
     .muted{color:var(--muted);font-size:0.9rem}
@@ -174,6 +179,25 @@
         font-weight: 700;
         background: #fff5e6;
     }
+    
+    /* Enhancement for the dynamic class input block (The "pop up" appearance) */
+    .class-input-block {
+        border: 2px solid var(--accent) !important; /* Prominent border */
+        box-shadow: 0 4px 12px rgba(0, 64, 128, 0.1) !important; /* Slight shadow */
+        background: #f0f8ff !important; /* Light blue background */
+        transition: all 0.3s ease;
+    }
+    .class-input-block h4 {
+        color: var(--primary) !important; 
+        border-left: 5px solid var(--primary-dark);
+        padding-left: 10px;
+        font-size: 1.1rem !important;
+    }
+    .class-input-block .bias-vac-row {
+        margin-top: 5px; /* Add slight separation */
+        padding-top: 5px;
+        border-top: 1px dashed #c0d8f0;
+    }
 
     /* Tiny responsive */
     @media (max-width:520px){
@@ -188,6 +212,29 @@
         padding: 8px 10px;
         font-size: 0.9rem;
       }
+      .grid{grid-template-columns:1fr; gap: 12px;}
+      .form-row{flex-direction: column; gap:0;}
+      .form-row .form-group{margin-bottom:8px;}
+    }
+    
+    /* Specific adjustment for mobile layout in BIAS */
+    @media (max-width:520px) {
+        /* Adjusting the vaccine row display on small screens */
+        .class-input-block .form-row:not(.bias-vac-row) {
+            flex-direction: row; /* Keep metadata row somewhat compact if possible */
+            flex-wrap: wrap;
+        }
+        .class-input-block .form-row:not(.bias-vac-row) .form-group {
+            flex: 1 1 45%; /* Two items per row max */
+            min-width: unset;
+        }
+        /* Make vaccine inputs stack */
+        .class-input-block .bias-vac-row {
+             flex-direction: column;
+        }
+        .class-input-block .bias-vac-row .form-group {
+             width: 100% !important;
+        }
     }
   </style>
 </head>
@@ -199,7 +246,7 @@
         <div class="logo"><i class="fas fa-syringe" style="font-size:18px;color:#fff"></i></div>
         <div>
           Sistem Pelaporan Imunisasi & BIAS<br>
-          <span style="font-weight:500;font-size:0.85rem;opacity:0.9">Puskesmas Melata (v5.0 - Detail Laporan Per Vaksin)</span>
+          <span style="font-weight:500;font-size:0.85rem;opacity:0.9">Puskesmas Melata (v5.3 - BIAS Multi-Kelas Dual Download)</span>
         </div>
       </div>
 
@@ -224,7 +271,7 @@
     <section id="imunisasi" class="tab-panel">
       <div class="card">
         <h2>Input Data Imunisasi</h2>
-        <p class="lead">Masukkan capaian imunisasi per desa untuk periode yang dipilih. (Dropdown 0–50)</p>
+        <p class="lead">Masukkan capaian imunisasi per desa untuk periode yang dipilih.</p>
 
         <form id="imunForm" onsubmit="downloadImun(event)">
           <div class="grid">
@@ -251,15 +298,19 @@
                 <label for="periode_imun">Periode (Bulan/Tahun)</label>
                 <input type="month" id="periode_imun" name="periode_imun" required>
               </div>
+              
+              <div class="card" style="padding:10px;background:#e3f2fd;border:1px solid #90caf9">
+                <p style="margin:0;font-size:0.9rem;color:#1e88e5;font-weight:600;"><i class="fab fa-whatsapp"></i> Silahkan kirim file laporan yang sudah didownload ke nomor 081549177303 (TRI)</p>
+              </div>
             </div>
 
             <div>
               <div class="form-group">
                 <label>Petunjuk</label>
-                <div class="small">Isi jumlah capaian untuk masing-masing vaksin dan jenis kelamin. Gunakan tombol Download CSV di bawah.</div>
+                <div class="small">Isi jumlah capaian untuk masing-masing vaksin dan jenis kelamin. Sasaran 0-50.</div>
               </div>
-              <div class="card" style="padding:10px;background:#e3f2fd;border:1px solid #90caf9">
-                <p style="margin:0;font-size:0.9rem;color:#1e88e5;font-weight:600;"><i class="fab fa-whatsapp"></i> Silahkan kirim file laporan yang sudah didownload ke nomor 081549177303 (TRI)</p>
+               <div class="card" style="padding:10px;background:#fffde7;border:1px solid #ffeb3b">
+                <p style="margin:0;font-size:0.9rem;color:#fbc02d;font-weight:600;">⚠️ Pastikan input **Periode** (Bulan/Tahun) sudah terisi sebelum klik "Download CSV".</p>
               </div>
             </div>
           </div>
@@ -277,104 +328,47 @@
 
     <section id="bias" class="tab-panel" style="display:none">
       <div class="card">
-        <h2>Form BIAS (Pendataan Sekolah)</h2>
-        <p class="lead">Hanya masukkan 1 laporan per kelas. Filter Kelas SD/MIS hanya 1, 2, 5, 6. Filter Kelas SMP/MTS hanya 9.</p>
+        <h2>Form BIAS (Pendataan Sekolah Multi-Kelas)</h2>
+        <p class="lead">Pilih nama sekolah. Gunakan tombol **Tambah Input Kelas** untuk memasukkan data setiap kelas yang dilaporkan.</p>
 
         <form id="biasForm" onsubmit="downloadBias(event)">
           <div class="grid">
+            
             <div>
               <div class="form-group">
                 <label for="sekolah">Nama Sekolah</label>
-                <input id="sekolah" name="sekolah" type="text" placeholder="Contoh: SDN Melata 01" required>
-              </div>
-
-              <div class="form-group">
-                <label for="kelas">Kelas</label>
-                <select id="kelas" name="kelas" required onchange="onChangeKelas()">
-                  <option value="">-- Pilih Kelas --</option>
-                  <option value="1">1 (SD/MIS)</option>
-                  <option value="2">2 (SD/MIS)</option>
-                  <option value="5">5 (SD/MIS)</option>
-                  <option value="6">6 (SD/MIS)</option>
-                  <option value="9">9 (SMP/MTS)</option>
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label for="sasaran_l">Sasaran Laki-laki</label>
-                <select id="sasaran_l" name="sasaran_l" required class="bias-number"></select>
-              </div>
-
-              <div class="form-group">
-                <label for="sasaran_p">Sasaran Perempuan</label>
-                <select id="sasaran_p" name="sasaran_p" required class="bias-number"></select>
-              </div>
-            </div>
-
-            <div>
-              <div class="form-group">
-                <label for="mr_l">MR (Laki)</label>
-                <select id="mr_l" name="mr_l" class="bias-number"></select>
-              </div>
-
-              <div class="form-group">
-                <label for="mr_p">MR (P)</label>
-                <select id="mr_p" name="mr_p" class="bias-number"></select>
-              </div>
-
-              <div class="form-group">
-                <label for="dt_l">DT (L)</label>
-                <select id="dt_l" name="dt_l" class="bias-number"></select>
-              </div>
-
-              <div class="form-group">
-                <label for="dt_p">DT (P)</label>
-                <select id="dt_p" name="dt_p" class="bias-number"></select>
-              </div>
-            </div>
-          </div>
-
-          <hr class="sep">
-
-          <div class="grid">
-            <div>
-              <div class="form-group">
-                <label for="td_l">Td (L)</label>
-                <select id="td_l" name="td_l" class="bias-number"></select>
-              </div>
-              <div class="form-group">
-                <label for="td_p">Td (P)</label>
-                <select id="td_p" name="td_p" class="bias-number"></select>
+                <select id="sekolah" name="sekolah" required onchange="onChangeSekolah()">
+                  <option value="">-- Pilih Sekolah --</option>
+                  </select>
               </div>
               
-              <div class="form-group" id="hpvLGroup" style="display:none">
-                <label for="hpv_l">HPV (Laki-laki) <span class="small" style="color:#004080; display:inline; font-weight:400;">(Kelas 5,6,9)</span></label>
-                <select id="hpv_l" name="hpv_l" class="bias-number"></select>
-              </div>
-              <div class="form-group" id="hpvGroup" style="display:none">
-                <label for="hpv_p">HPV (Perempuan) <span class="small" style="color:#FF7F50; display:inline; font-weight:400;">(Kelas 5,6,9 - Prioritas)</span></label>
-                <select id="hpv_p" name="hpv_p" class="bias-number"></select>
-              </div>
-              </div>
-
-            <div>
-              <div class="form-group">
-                <label for="dropout">Drop Out</label>
-                <select id="dropout" name="dropout" class="bias-number"></select>
-              </div>
-
-              <div class="form-group">
-                <label for="keterangan">Keterangan (opsional)</label>
+              <div class="form-group" style="margin-top:20px;">
+                <label for="keterangan">Keterangan (opsional - berlaku untuk semua kelas)</label>
                 <textarea id="keterangan" name="keterangan" placeholder="Catatan tambahan..."></textarea>
               </div>
-              <div class="card" style="padding:10px;background:#e3f2fd;border:1px solid #90caf9">
-                <p style="margin:0;font-size:0.9rem;color:#1e88e5;font-weight:600;"><i class="fab fa-whatsapp"></i> Silahkan kirim file laporan yang sudah didownload ke nomor 081549177303 (TRI)</p>
-              </div>
-            </div>
-          </div>
 
-          <div class="actions">
-            <button type="submit" class="btn btn-primary"><i class="fas fa-download"></i> Download CSV BIAS</button>
+              <div class="card" style="padding:10px;background:#e3f2fd;border:1px solid #90caf9; margin-top:20px;">
+                <p style="margin:0;font-size:0.9rem;color:#1e88e5;font-weight:600;"><i class="fab fa-whatsapp"></i> Silahkan kirim **kedua file (CSV dan JSON)** laporan yang sudah didownload ke nomor 081549177303 (TRI)</p>
+              </div>
+              
+            </div>
+
+            <div style="padding-left:0;">
+              <h3 style="margin:0 0 10px 0; font-size:1.1rem; color:var(--accent);">Input Data Kelas (Sasaran & Capaian)</h3>
+              
+              <div id="biasClassReportsContainer">
+                <p class="muted">Pilih sekolah di samping kiri untuk mengaktifkan input kelas.</p>
+              </div>
+
+              <div style="margin-top:15px; border-top:1px dashed #ddd; padding-top:15px;">
+                 <button type="button" id="addBiasClassButton" class="btn btn-info" onclick="addNewClassInput()" disabled style="opacity:0.5">
+                    <i class="fas fa-plus-circle"></i> Tambah Input Kelas
+                </button>
+              </div>
+              
+            </div>
+          </div> <div class="actions" style="margin-top:20px; border-top:1px solid #eee; padding-top:15px; justify-content:flex-start;">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-download"></i> Download CSV & JSON BIAS</button>
           </div>
         </form>
       </div>
@@ -548,13 +542,58 @@
     const BIAS_STORAGE_KEY = 'puskesmasMelata_biasReports';
     let sessionImportedFiles = new Set(); 
     
-    // List of all possible BIAS vaccines for data storage initialization
     const BIAS_VACCINES = ['MR', 'DT', 'Td', 'HPV'];
+    
+    // NEW: School Data and Class Map
+    const SCHOOL_DATA = {
+        // SD
+        'SD NEGERI MELATA': 'SD', 'SD NEGERI NANUAH': 'SD', 'SD NEGERI TOPALAN': 'SD', 
+        'SD NEGERI BATU AMPAR': 'SD', 'SD NEGERI LUBUK HIJU': 'SD', 'SD NEGERI BUKIT MAKMUR': 'SD',
+        'SD NEGERI BUKIT RAYA': 'SD', 'SD NEGERI MODANG MAS': 'SD', 'SD NEGERI MUKTI MANUNGGAL': 'SD',
+        'SD NEGERI SUMBER JAYA': 'SD', 'SD NEGERI BUKIT HARUM': 'SD', 'SD SWASTA TANJUNG SAWIT ABADI': 'SD',
+        // MIS
+        'MIS RAUDHATUL ULUM': 'SD', // Treat MIS as SD for class levels (1-6)
+        // SMP
+        'SMP NEGERI 1 MENTHOBI RAYA': 'SMP', 'SMP NEGERI 2 MENTHOBI RAYA': 'SMP', 
+        'SMP NEGERI 3 MENTHOBI RAYA': 'SMP', 'SMP NEGERI 4 MENTHOBI RAYA': 'SMP', 
+        'SMP NEGERI 5 MENTHOBI RAYA': 'SMP', 'SMP NEGERI SATU ATAP 6 MENTHOBI RAYA': 'SMP',
+        'SMP ISLAM AT-TANWIR': 'SMP',
+        // MTS
+        'MTS RAUDHATUL ULUM': 'SMP', // Treat MTS as SMP for class levels (7-9)
+        // SMA/SMK
+        'SMA NEGERI 1 MENTHOBI RAYA': 'SMA',
+        'SMK NEGERI 1 MENTHOBI RAYA': 'SMA' // Treat SMA/SMK as 'SMA' for class levels (10-12)
+    };
+
+    const CLASS_MAP = {
+        'SD': [1, 2, 3, 4, 5, 6],
+        'SMP': [7, 8, 9],
+        'SMA': [10, 11, 12]
+    };
+    
+    // Fixed order of schools requested by the user
+    const SCHOOL_ORDER = [
+        'SD NEGERI MELATA', 'SD NEGERI NANUAH', 'SD NEGERI TOPALAN', 
+        'SD NEGERI BATU AMPAR', 'SD NEGERI LUBUK HIJU', 'SD NEGERI BUKIT MAKMUR',
+        'SD NEGERI BUKIT RAYA', 'SD NEGERI MODANG MAS', 'SD NEGERI MUKTI MANUNGGAL',
+        'SD NEGERI SUMBER JAYA', 'SD NEGERI BUKIT HARUM', 'MIS RAUDHATUL ULUM',
+        'SD SWASTA TANJUNG SAWIT ABADI', 
+        'SMP NEGERI 1 MENTHOBI RAYA', 'SMP NEGERI 2 MENTHOBI RAYA', 
+        'SMP NEGERI 3 MENTHOBI RAYA', 'SMP NEGERI 4 MENTHOBI RAYA', 
+        'SMP NEGERI 5 MENTHOBI RAYA', 'SMP NEGERI SATU ATAP 6 MENTHOBI RAYA',
+        'SMP ISLAM AT-TANWIR', 'MTS RAUDHATUL ULUM', 
+        'SMA NEGERI 1 MENTHOBI RAYA', 'SMK NEGERI 1 MENTHOBI RAYA'
+    ];
+
+    
+    // New global counter for unique class input IDs
+    let classInputCounter = 0;
 
     // Init: create selects
     document.addEventListener('DOMContentLoaded', () => {
       initImunVaksinSections();
-      fillSelects();
+      fillImunSelects(); 
+      initBiasDropdowns(); // Initialize BIAS dropdowns
       // Auto-open Kumulatif if URL hash is present, otherwise default to imunisasi
       const initialTab = window.location.hash.substring(1) || 'imunisasi';
       openTab(initialTab);
@@ -618,9 +657,8 @@
       return text.toLowerCase().replace(/\s+/g,'_').replace(/[\/]/g,'').replace(/[^a-z0-9_]/g,'');
     }
 
-    // Fill selects ranges: imun-number 0-50, bias-number 0-200
-    function fillSelects(){
-      // imunisasi 0-50
+    // Fill selects ranges for IMUNISASI (0-50)
+    function fillImunSelects(){
       const imunSelects = document.querySelectorAll('.imun-number');
       imunSelects.forEach(s => {
         s.innerHTML = '<option value="" disabled selected>-- Pilih Jumlah --</option>';
@@ -628,77 +666,269 @@
           s.innerHTML += `<option value="${i}">${i}</option>`;
         }
       });
+    }
 
-      // bias 0-200
-      const biasSelects = document.querySelectorAll('.bias-number');
-      biasSelects.forEach(s => {
-        s.innerHTML = '<option value="" disabled selected>-- Pilih Jumlah --</option>';
-        for(let i=0;i<=200;i++){
-          s.innerHTML += `<option value="${i}">${i}</option>`;
+    // Fill selects ranges for BIAS (0-200) in a specific block
+    function fillSelectsInBlock(blockId) {
+        const block = document.getElementById(`block_${blockId}`);
+        if (!block) return;
+        
+        const biasSelects = block.querySelectorAll('.bias-number');
+        biasSelects.forEach(s => {
+            s.innerHTML = '<option value="" disabled selected>-- Pilih Jumlah --</option>';
+            for(let i=0;i<=200;i++){
+                s.innerHTML += `<option value="${i}">${i}</option>`;
+            }
+            // Set default value for optional/vaccine fields to 0 
+            if (s.id.startsWith('dropout_') || s.id.startsWith('mr_') || s.id.startsWith('dt_') || s.id.startsWith('td_') || s.id.startsWith('hpv_')) {
+                 s.value = '0';
+            }
+        });
+    }
+    
+    // Initialize BIAS Sekolah Dropdown using fixed order
+    function initBiasDropdowns() {
+        const sekolahSelect = document.getElementById('sekolah');
+        const sortedSchools = SCHOOL_ORDER; 
+        
+        sekolahSelect.innerHTML = '<option value="">-- Pilih Sekolah --</option>';
+        sortedSchools.forEach(school => {
+            sekolahSelect.innerHTML += `<option value="${school}">${school}</option>`;
+        });
+        
+        // Disable the add button initially
+        const addButton = document.getElementById('addBiasClassButton');
+        addButton.disabled = true;
+        addButton.style.opacity = 0.5;
+    }
+
+    // Handle school selection (clears and initializes first class block)
+    function onChangeSekolah() {
+        const sekolah = document.getElementById('sekolah').value;
+        const classContainer = document.getElementById('biasClassReportsContainer');
+        const schoolType = SCHOOL_DATA[sekolah];
+        const addButton = document.getElementById('addBiasClassButton');
+        
+        // Clear all existing class input blocks if the school changes
+        classContainer.innerHTML = '<p class="muted">Pilih sekolah di samping kiri untuk mengaktifkan input kelas.</p>'; 
+        classInputCounter = 0;
+        
+        if (schoolType) {
+            // Remove the initial muted message
+            classContainer.innerHTML = ''; 
+            // Automatically add the first class input block when a school is selected
+            addNewClassInput(schoolType); 
+            addButton.disabled = false;
+            addButton.style.opacity = 1;
+        } else {
+            addButton.disabled = true;
+            addButton.style.opacity = 0.5;
         }
-      });
-      // Set default value for optional fields to 0 
-      const dropoutSelect = document.getElementById('dropout');
-      if (dropoutSelect) dropoutSelect.value = '0';
     }
 
-    // ===== BIAS: show HPV only for kelas 5,6,9 (Diperbarui) =====
-    function onChangeKelas(){
-      const k = document.getElementById('kelas').value;
-      const hpvGroup = document.getElementById('hpvGroup'); // HPV Perempuan
-      const hpvLGroup = document.getElementById('hpvLGroup'); // HPV Laki-laki
-      const isHpvClass = k === '5' || k === '6' || k === '9';
-      
-      const requiredVacs = getRequiredVacs(k);
-
-      // Helper function to set display/value
-      function setVacInputState(id, isRequired) {
-          const select = document.getElementById(id);
-          if (!select) return;
-
-          const group = select.closest('.form-group');
-          if (group) {
-              const vacCode = id.split('_')[0].toUpperCase();
-              
-              // Special case: HPV visibility
-              if (vacCode === 'HPV') {
-                  group.style.display = isHpvClass ? 'block' : 'none';
-              } 
-              
-              // Set value based on requirement
-              if (isRequired) {
-                  select.required = true;
-                  select.value = ''; // Enforce selection
-              } else {
-                  select.required = false;
-                  select.value = '0'; // Set to 0 if not required/relevant
-              }
-          }
-      }
-
-      // Check MR, DT, Td
-      setVacInputState('mr_l', requiredVacs.includes('MR'));
-      setVacInputState('mr_p', requiredVacs.includes('MR'));
-      setVacInputState('dt_l', requiredVacs.includes('DT'));
-      setVacInputState('dt_p', requiredVacs.includes('DT'));
-      setVacInputState('td_l', requiredVacs.includes('Td'));
-      setVacInputState('td_p', requiredVacs.includes('Td'));
-
-      // Check HPV
-      setVacInputState('hpv_l', isHpvClass); // HPV is required if class is 5, 6, or 9
-      setVacInputState('hpv_p', isHpvClass); // HPV is required if class is 5, 6, or 9
+    // Function to populate class dropdown in a specific block (now simplified)
+    function populateClassSelect(selectElement, schoolType) {
+        selectElement.innerHTML = '<option value="" disabled selected>-- Pilih Kelas --</option>';
+        const classes = CLASS_MAP[schoolType] || [];
+        classes.forEach(cls => {
+            // Only show the number
+            selectElement.innerHTML += `<option value="${cls}">${cls}</option>`;
+        });
     }
 
-    function getRequiredVacs(k){
-      const kNum = parseInt(k);
-      if (kNum === 1 || kNum === 2) return ['MR', 'DT'];
-      if (kNum === 5 || kNum === 6) return ['Td', 'HPV']; 
-      if (kNum === 9) return ['Td', 'HPV']; 
-      return [];
+    // Function to generate the HTML structure for a single class input block
+    function createClassInputHtml(schoolType, blockId) {
+        // Use data-block-id for easy targeting in onChangeClassInput
+        return `
+            <div class="card class-input-block" id="block_${blockId}" style="margin-bottom:15px; padding:15px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; padding-bottom:10px; border-bottom:1px solid #c0d8f0;">
+                    <h4 style="margin:0; font-weight:700;">Data Kelas Baru</h4>
+                    <button type="button" class="btn btn-danger" onclick="removeClassInput(${blockId})" style="padding:4px 8px; font-size:0.8rem;"><i class="fas fa-times"></i> Hapus</button>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group" style="flex:1.5">
+                        <label for="kelas_${blockId}">Kelas</label>
+                        <select id="kelas_${blockId}" name="kelas_${blockId}" required 
+                                data-school-type="${schoolType}" 
+                                data-block-id="${blockId}"
+                                onchange="onChangeClassInput(this)">
+                            </select>
+                    </div>
+                    <div class="form-group" style="flex:1">
+                        <label for="sasaran_l_${blockId}">Sasaran L</label>
+                        <select id="sasaran_l_${blockId}" name="sasaran_l_${blockId}" required class="bias-number"></select>
+                    </div>
+                    <div class="form-group" style="flex:1">
+                        <label for="sasaran_p_${blockId}">Sasaran P</label>
+                        <select id="sasaran_p_${blockId}" name="sasaran_p_${blockId}" required class="bias-number"></select>
+                    </div>
+                    <div class="form-group" style="flex:1.5">
+                        <label for="dropout_${blockId}">Drop Out</label>
+                        <select id="dropout_${blockId}" name="dropout_${blockId}" class="bias-number"></select>
+                    </div>
+                </div>
+
+                <hr class="sep" style="margin:12px 0; background:#c0d8f0">
+                <h5 style="margin:0 0 10px 0; font-size:0.95rem; color:var(--accent);">Capaian Vaksin</h5>
+
+                <div id="mrRow_${blockId}" class="form-row bias-vac-row" data-vaccine="MR" style="display:none">
+                    <div class="form-group" style="flex:unset; min-width:100px; width:auto; justify-content:center;">
+                        <label style="color:var(--accent); font-weight:700;">MR</label>
+                    </div>
+                    <div class="form-group">
+                      <label for="mr_l_${blockId}">Laki-laki</label>
+                      <select id="mr_l_${blockId}" name="mr_l_${blockId}" class="bias-number"></select>
+                    </div>
+                    <div class="form-group">
+                      <label for="mr_p_${blockId}">Perempuan</label>
+                      <select id="mr_p_${blockId}" name="mr_p_${blockId}" class="bias-number"></select>
+                    </div>
+                </div>
+                
+                <div id="dtRow_${blockId}" class="form-row bias-vac-row" data-vaccine="DT" style="display:none">
+                    <div class="form-group" style="flex:unset; min-width:100px; width:auto; justify-content:center;">
+                        <label style="color:var(--accent); font-weight:700;">DT</label>
+                    </div>
+                    <div class="form-group">
+                      <label for="dt_l_${blockId}">Laki-laki</label>
+                      <select id="dt_l_${blockId}" name="dt_l_${blockId}" class="bias-number"></select>
+                    </div>
+                    <div class="form-group">
+                      <label for="dt_p_${blockId}">Perempuan</label>
+                      <select id="dt_p_${blockId}" name="dt_p_${blockId}" class="bias-number"></select>
+                    </div>
+                </div>
+                
+                <div id="tdRow_${blockId}" class="form-row bias-vac-row" data-vaccine="Td" style="display:none">
+                    <div class="form-group" style="flex:unset; min-width:100px; width:auto; justify-content:center;">
+                        <label style="color:var(--accent); font-weight:700;">Td</label>
+                    </div>
+                    <div class="form-group">
+                      <label for="td_l_${blockId}">Laki-laki</label>
+                      <select id="td_l_${blockId}" name="td_l_${blockId}" class="bias-number"></select>
+                    </div>
+                    <div class="form-group">
+                      <label for="td_p_${blockId}">Perempuan</label>
+                      <select id="td_p_${blockId}" name="td_p_${blockId}" class="bias-number"></select>
+                    </div>
+                </div>
+                
+                <div id="hpvRow_${blockId}" class="form-row bias-vac-row" data-vaccine="HPV" style="display:none">
+                    <div class="form-group" style="flex:unset; min-width:100px; width:auto; justify-content:center;">
+                        <label style="color:var(--primary); font-weight:700;">HPV</label>
+                    </div>
+                    <div class="form-group">
+                      <label for="hpv_l_${blockId}">Laki-laki</label>
+                      <select id="hpv_l_${blockId}" name="hpv_l_${blockId}" class="bias-number"></select>
+                    </div>
+                    <div class="form-group">
+                      <label for="hpv_p_${blockId}">Perempuan</label>
+                      <select id="hpv_p_${blockId}" name="hpv_p_${blockId}" class="bias-number"></select>
+                    </div>
+                </div>
+            </div>
+        `;
     }
 
+    function updateBlockTitles() {
+        const blocks = document.querySelectorAll('.class-input-block');
+        blocks.forEach((block, index) => {
+            const titleElement = block.querySelector('h4');
+            if (titleElement) {
+                titleElement.textContent = `Data Kelas #${index + 1}`;
+            }
+        });
+    }
 
-    // ===== Download & Save Functions (Diperbarui untuk Storage) =====
+    function addNewClassInput() {
+        const sekolah = document.getElementById('sekolah').value;
+        if (!sekolah) {
+            alert('Mohon pilih Nama Sekolah terlebih dahulu.');
+            return;
+        }
+        const schoolType = SCHOOL_DATA[sekolah];
+        
+        classInputCounter++;
+        const blockId = classInputCounter;
+        const container = document.getElementById('biasClassReportsContainer');
+        
+        // Insert the new HTML block
+        container.insertAdjacentHTML('beforeend', createClassInputHtml(schoolType, blockId));
+        
+        // Populate the dropdowns within the new block
+        fillSelectsInBlock(blockId);
+        
+        // Populate the specific class dropdown
+        const classSelect = document.getElementById(`kelas_${blockId}`);
+        if (classSelect) {
+            populateClassSelect(classSelect, schoolType);
+        }
+        
+        // Update titles after insertion
+        updateBlockTitles();
+
+        // Scroll to the new input block
+        document.getElementById(`block_${blockId}`).scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
+
+    function removeClassInput(blockId) {
+        if(confirm('Yakin ingin menghapus input data kelas ini?')){
+            const block = document.getElementById(`block_${blockId}`);
+            if(block) block.remove();
+            
+            // Update titles after removal
+            updateBlockTitles();
+
+            const remainingBlocks = document.querySelectorAll('.class-input-block').length;
+            if (remainingBlocks === 0) {
+                 // If no blocks remain, re-trigger school change to reset the input area
+                 document.getElementById('biasClassReportsContainer').innerHTML = '<p class="muted">Pilih sekolah di samping kiri untuk mengaktifkan input kelas.</p>';
+            }
+        }
+    }
+
+    // Handles vaccine visibility/default values based on class selection in a specific block
+    function onChangeClassInput(selectElement) {
+        const blockId = selectElement.getAttribute('data-block-id');
+        const k = selectElement.value;
+        const block = document.getElementById(`block_${blockId}`);
+        if (!block) return;
+        
+        const kNum = parseInt(k);
+        
+        // BIAS Rules:
+        const isMRorDTClass = kNum === 1 || kNum === 2; // MR/DT: Class 1, 2
+        const isTdorHPVClass = kNum === 5 || kNum === 6 || kNum === 9; // Td/HPV: Class 5, 6, 9
+
+        // Helper function to set display/value for a specific vaccine row
+        function setVacInputState(vacPrefix, isRequired) {
+            const rowElement = block.querySelector(`#${vacPrefix}Row_${blockId}`);
+            if (!rowElement) return;
+
+            rowElement.style.display = isRequired ? 'flex' : 'none'; 
+
+            const lSelect = block.querySelector(`#${vacPrefix}_l_${blockId}`);
+            const pSelect = block.querySelector(`#${vacPrefix}_p_${blockId}`);
+
+            if (!isRequired) {
+                if (lSelect) lSelect.value = '0';
+                if (pSelect) pSelect.value = '0';
+            } else {
+                 // If required, ensure it's not set to 0 to prompt user input
+                 if (lSelect && lSelect.value === '0') lSelect.value = '';
+                 if (pSelect && pSelect.value === '0') pSelect.value = '';
+            }
+        }
+
+        // Apply rules
+        setVacInputState('mr', isMRorDTClass);
+        setVacInputState('dt', isMRorDTClass);
+        setVacInputState('td', isTdorHPVClass);
+        setVacInputState('hpv', isTdorHPVClass);
+    }
+
+    // ===== Download & Save Functions (Diperbarui untuk Multi-Kelas + JSON) =====
     function cleanInt(val) {
         if (typeof val !== 'string' && typeof val !== 'number') return 0;
         const cleaned = String(val).replace(/[^0-9]/g, '');
@@ -769,77 +999,134 @@
       downloadBlobCSV(csv, filename);
       lastImunFile = filename;
       alert(`✅ Berhasil mengunduh: ${filename}. Data laporan telah disimpan secara lokal. Silahkan kirim file ini ke 081549177303 (TRI).`);
+      form.reset();
+      fillImunSelects(); 
     }
 
     function downloadBias(e){
-      e.preventDefault();
-      const form = document.getElementById('biasForm');
-      if(!form.checkValidity()){
-        form.reportValidity();
-        alert('Mohon lengkapi semua data BIAS.');
-        return;
-      }
+        e.preventDefault();
+        const form = document.getElementById('biasForm');
+        // Simple form validation check for the school selector
+        const sekolah = document.getElementById('sekolah').value;
+        const keterangan = document.getElementById('keterangan').value;
+        const classBlocks = document.querySelectorAll('.class-input-block');
+        const tanggalLaporan = new Date().toISOString().slice(0,10); 
 
-      const fd = new FormData(form);
-      const sekolah = fd.get('sekolah');
-      const kelas = fd.get('kelas');
-      const tanggalLaporan = new Date().toISOString().slice(0,10); // YYYY-MM-DD format
-      
-      const isHpvClass = (kelas === '5' || kelas === '6' || kelas === '9');
-      const requiredVacs = getRequiredVacs(kelas);
-      
-      const hpv_l_val = isHpvClass ? cleanInt(fd.get('hpv_l') || 0) : 0; 
-      const hpv_p_val = isHpvClass ? cleanInt(fd.get('hpv_p') || 0) : 0; 
-      
-      const data = {
-        Sasaran_L: cleanInt(fd.get('sasaran_l') || 0), 
-        Sasaran_P: cleanInt(fd.get('sasaran_p') || 0),
-        MR_L: requiredVacs.includes('MR') ? cleanInt(fd.get('mr_l') || 0) : 0,
-        MR_P: requiredVacs.includes('MR') ? cleanInt(fd.get('mr_p') || 0) : 0,
-        DT_L: requiredVacs.includes('DT') ? cleanInt(fd.get('dt_l') || 0) : 0,
-        DT_P: requiredVacs.includes('DT') ? cleanInt(fd.get('dt_p') || 0) : 0,
-        Td_L: requiredVacs.includes('Td') ? cleanInt(fd.get('td_l') || 0) : 0,
-        Td_P: requiredVacs.includes('Td') ? cleanInt(fd.get('td_p') || 0) : 0,
-        HPV_L: hpv_l_val, 
-        HPV_P: hpv_p_val, 
-        DropOut: cleanInt(fd.get('dropout') || 0), 
-        Keterangan: fd.get('keterangan') || ''
-      };
+        if (!sekolah) {
+            alert('Mohon pilih Nama Sekolah terlebih dahulu.');
+            return;
+        }
 
-      // Ensure all required fields (if visible) are filled for validation check
-      if (data.Sasaran_L === 0 && data.Sasaran_P === 0 && (data.MR_L + data.MR_P + data.DT_L + data.DT_P + data.Td_L + data.Td_P + data.HPV_L + data.HPV_P) === 0) {
-        alert('Laporan tidak disimpan. Mohon isi minimal salah satu Sasaran atau Capaian Vaksin.');
-        return;
-      }
+        if(classBlocks.length === 0){
+            alert('Mohon tambahkan minimal satu input Kelas menggunakan tombol "Tambah Input Kelas".');
+            return;
+        }
 
-      const reportToSave = {
-          id: Date.now(),
-          sekolah: sekolah,
-          kelas: kelas,
-          tanggal: tanggalLaporan, 
-          data: data
-      };
-      saveToStorage(BIAS_STORAGE_KEY, reportToSave);
+        let reportsToSave = [];
+        let csvContent = '';
+        const header = 'Nama Sekolah;Kelas;Tanggal;Sasaran_L;Sasaran_P;MR_L;MR_P;DT_L;DT_P;Td_L;Td_P;HPV_L;HPV_P;DropOut;Keterangan\n'; 
+        csvContent += header;
+        let totalClassesReported = 0;
 
+        let isValid = true;
+        classBlocks.forEach(block => {
+            const blockId = block.id.replace('block_', '');
+            
+            // Validate required fields within the block
+            const kelasSelect = document.getElementById(`kelas_${blockId}`);
+            const sasaranLSelect = document.getElementById(`sasaran_l_${blockId}`);
+            const sasaranPSelect = document.getElementById(`sasaran_p_${blockId}`);
 
-      // Generate CSV Row
-      const cols = [
-        sekolah, kelas, tanggalLaporan,
-        data.Sasaran_L, data.Sasaran_P,
-        data.MR_L, data.MR_P,
-        data.DT_L, data.DT_P,
-        data.Td_L, data.Td_P,
-        data.HPV_L, data.HPV_P, 
-        data.DropOut, data.Keterangan
-      ];
+            if (!kelasSelect.value || !sasaranLSelect.value || !sasaranPSelect.value) {
+                isValid = false;
+                // Highlight block for user if possible
+                block.style.border = '2px solid var(--danger)';
+                block.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else {
+                 block.style.border = '2px solid var(--accent)'; // Reset border to the "success" color
+            }
 
-      let csv = 'Nama Sekolah;Kelas;Tanggal;Sasaran_L;Sasaran_P;MR_L;MR_P;DT_L;DT_P;Td_L;Td_P;HPV_L;HPV_P;DropOut;Keterangan\n'; 
-      csv += cols.map(c => `"${String(c).replace(/"/g,'""')}"`).join(';') + '\n';
+            if (!isValid) return; // Stop processing and show alert outside loop
 
-      const filename = `Laporan_BIAS_${tanggalLaporan.replace(/-/g,'')}_${sekolah.replace(/\s+/g,'_')}.csv`;
-      downloadBlobCSV(csv, filename);
-      lastBiasFile = filename;
-      alert(`✅ Berhasil mengunduh laporan BIAS untuk Kelas ${kelas}. File: ${filename}. Data laporan telah disimpan secara lokal. Silahkan kirim file ini ke 081549177303 (TRI).`);
+            const kelas = kelasSelect.value;
+            const kNum = parseInt(kelas);
+            const isMRorDTClass = kNum === 1 || kNum === 2;
+            const isTdorHPVClass = kNum === 5 || kNum === 6 || kNum === 9;
+
+            const data = {
+                Sasaran_L: cleanInt(sasaranLSelect.value), 
+                Sasaran_P: cleanInt(sasaranPSelect.value),
+                DropOut: cleanInt(document.getElementById(`dropout_${blockId}`).value), 
+                
+                MR_L: isMRorDTClass ? cleanInt(document.getElementById(`mr_l_${blockId}`).value) : 0,
+                MR_P: isMRorDTClass ? cleanInt(document.getElementById(`mr_p_${blockId}`).value) : 0,
+                
+                DT_L: isMRorDTClass ? cleanInt(document.getElementById(`dt_l_${blockId}`).value) : 0,
+                DT_P: isMRorDTClass ? cleanInt(document.getElementById(`dt_p_${blockId}`).value) : 0,
+                
+                Td_L: isTdorHPVClass ? cleanInt(document.getElementById(`td_l_${blockId}`).value) : 0,
+                Td_P: isTdorHPVClass ? cleanInt(document.getElementById(`td_p_${blockId}`).value) : 0,
+                
+                HPV_L: isTdorHPVClass ? cleanInt(document.getElementById(`hpv_l_${blockId}`).value) : 0, 
+                HPV_P: isTdorHPVClass ? cleanInt(document.getElementById(`hpv_p_${blockId}`).value) : 0,
+                
+                Keterangan: keterangan || ''
+            };
+            
+            // NOTE: Generate unique ID for each class report even if they are submitted together
+            const reportToSave = {
+                id: Date.now() + Math.floor(Math.random() * 1000) + totalClassesReported, 
+                sekolah: sekolah,
+                kelas: kelas,
+                tanggal: tanggalLaporan, 
+                data: data
+            };
+            reportsToSave.push(reportToSave);
+            totalClassesReported++;
+
+            // Generate CSV Row 
+            const cols = [
+                sekolah, kelas, tanggalLaporan,
+                data.Sasaran_L, data.Sasaran_P,
+                data.MR_L, data.MR_P,
+                data.DT_L, data.DT_P,
+                data.Td_L, data.Td_P,
+                data.HPV_L, data.HPV_P, 
+                data.DropOut, data.Keterangan
+            ];
+
+            csvContent += cols.map(c => `"${String(c).replace(/"/g,'""')}"`).join(';') + '\n';
+        });
+        
+        if (!isValid) {
+            alert('Mohon lengkapi semua field yang wajib diisi (Kelas, Sasaran L, Sasaran P) pada setiap input Kelas yang ditambahkan. Input yang bermasalah ditandai dengan border merah.');
+            return;
+        }
+
+        if (totalClassesReported === 0) {
+            alert('Tidak ada data kelas yang valid untuk dilaporkan. Mohon isi data Sasaran untuk minimal satu kelas.');
+            return;
+        }
+        
+        // 1. Save all reports to storage
+        reportsToSave.forEach(report => saveToStorage(BIAS_STORAGE_KEY, report));
+        
+        // 2. Download CSV File
+        const csvFilename = `Laporan_BIAS_CSV_${tanggalLaporan.replace(/-/g,'')}_${sekolah.replace(/\s+/g,'_')}.csv`;
+        downloadBlobCSV(csvContent, csvFilename);
+
+        // 3. Download JSON File
+        const jsonContent = JSON.stringify(reportsToSave, null, 2);
+        const jsonFilename = `Laporan_BIAS_JSON_${tanggalLaporan.replace(/-/g,'')}_${sekolah.replace(/\s+/g,'_')}.json`;
+        downloadBlobJSON(jsonContent, jsonFilename);
+
+        lastBiasFile = csvFilename; 
+        
+        alert(`✅ Berhasil mengunduh ${totalClassesReported} laporan BIAS untuk sekolah ${sekolah}. \nFile CSV: ${csvFilename} \nFile JSON: ${jsonFilename} \n\nData laporan telah disimpan secara lokal. Silahkan kirim **kedua file (CSV dan JSON)** ini ke 081549177303 (TRI).`);
+        
+        // Reset form fields after successful download/save
+        form.reset();
+        onChangeSekolah(); // Re-trigger to reset controls
     }
 
 
@@ -889,7 +1176,7 @@
         const dataToExport = {
             imunReports: getFromStorage(IMUN_STORAGE_KEY),
             biasReports: getFromStorage(BIAS_STORAGE_KEY),
-            version: '5.0 - JSON Database'
+            version: '5.3 - JSON Database'
         };
         
         const jsonContent = JSON.stringify(dataToExport, null, 2); 
@@ -911,7 +1198,7 @@
         });
     }
 
-    // ===== DATABASE IMPORT FUNCTION =====
+    // ===== DATABASE IMPORT FUNCTION (Tetap) =====
     async function startImport() {
         const fileInput = document.getElementById('importFile');
         const statusDiv = document.getElementById('importStatus');
@@ -1027,7 +1314,7 @@
     }
 
 
-    // ===== REPORT FILTER & SELECTIVE DELETION FUNCTIONS (V5.0) =====
+    // ===== REPORT FILTER & SELECTIVE DELETION FUNCTIONS (V5.1) =====
     
     // Function to populate the dropdown filters for both display and deletion
     function setupReportFilters() {
@@ -1173,7 +1460,7 @@
         displayKumulatif(); 
     }
     
-    // Function to display specific filtered reports (V5.0: Enhanced Detail View)
+    // Function to display specific filtered reports (V5.1: Enhanced Detail View)
     function displayDetailedReports() {
         const periodFilter = document.getElementById('filter_periode').value;
         const desaFilter = document.getElementById('filter_desa').value;
@@ -1342,7 +1629,7 @@
     }
 
 
-    // ===== KUMULATIF CALCULATION AND DISPLAY (Dihapus Monthly Detail) =====
+    // ===== KUMULATIF CALCULATION AND DISPLAY (V5.1) =====
 
     function displayKumulatif(){
         const imunReports = getFromStorage(IMUN_STORAGE_KEY);
@@ -1479,8 +1766,6 @@
             </table>
         `;
         
-        // **(Bagian Detail Kumulatif per Bulan Dihapus Sesuai Permintaan)**
-
         container.innerHTML += html;
     }
   </script>

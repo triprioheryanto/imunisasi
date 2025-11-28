@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Sistem Pelaporan Imunisasi & BIAS — Puskesmas Melata (v5.0 - Detail Laporan Per Vaksin)</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <style>
+    :root{
+      --primary:#FF7F50; /* coral */
+      --primary-dark:#FF6347;
+      --accent:#004080; /* navy */
+      --bg:#e6eef4;
+      --card:#ffffff;
+      --muted:#6b7280;
+      --success:#16a34a;
+      --danger:#dc2626;
+      --radius:12px;
+      --gap:16px;
+    }
+    *{box-sizing:border-box}
+    body{
+      font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      margin:0;
+      background:linear-gradient(180deg, #f5f9fc 0%, var(--bg) 100%);
+      color:#1f2937;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-osx-smoothing:grayscale;
+      padding-bottom:40px;
+    }
+
+    /* Header */
+    header.app-header{
+      background:linear-gradient(90deg,var(--accent), #0066b3);
+      color: #fff;
+      min-height: 80px; 
+      padding: 0 20px;
+      display:flex;
+      flex-direction: column; 
+      align-items: flex-start; 
+      justify-content: center;
+      gap:0;
+      box-shadow:0 6px 18px rgba(2,6,23,0.12);
+      position:sticky;
+      top:0;
+      z-index:50;
+    }
+    .brand-row{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      padding: 18px 0;
+    }
+    .brand {
+      display:flex;align-items:center;gap:12px;font-weight:700;font-size:1.1rem;
+    }
+    .brand .logo{
+      width:44px;height:44px;border-radius:10px;background:var(--primary);display:flex;align-items:center;justify-content:center;
+      box-shadow:0 6px 14px rgba(255,127,80,0.18);
+    }
+    
+    /* Navigasi Tabs di dalam Header */
+    .app-nav-tabs{
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      padding: 0 0 0 0;
+      overflow-x: auto; 
+      padding-bottom: 5px; 
+    }
+    .app-nav-tabs .tab{
+      flex-shrink: 0; 
+      color: #c9e0f6;
+      background: transparent;
+      border: 0;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      opacity: 0.9;
+      transition: opacity 0.2s, background 0.2s, color 0.2s;
+    }
+    /* Style untuk tab AKTIF */
+    .app-nav-tabs .tab.active{
+      background: var(--card);
+      color: var(--accent);
+      box-shadow: 0 0 12px rgba(2,6,23,0.15);
+      opacity: 1;
+      font-weight: 700;
+      border-radius: 6px 6px 0 0;
+    }
+    .app-nav-tabs .tab:hover:not(.active){
+      opacity: 1;
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    /* Layout */
+    .wrap{max-width:1100px;margin:18px auto;padding:0 18px;}
+    .tabs{display: none;} 
+    
+    /* Card */
+    .card{
+      background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:0 8px 20px rgba(2,6,23,0.06);
+      margin-bottom:18px;
+    }
+    h2{margin:0 0 12px 0;color:var(--accent);font-size:1.25rem}
+    p.lead{margin:0 0 16px 0;color:var(--muted)}
+
+    /* Grid */
+    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--gap)}
+    @media (max-width:900px){.grid{grid-template-columns:1fr}}
+    .form-row{display:flex;gap:10px}
+    .form-group{margin-bottom:12px;display:flex;flex-direction:column}
+    label{font-weight:600;color:#114670;margin-bottom:6px;font-size:0.95rem}
+    input[type="text"], input[type="month"], select, textarea, input[type="file"]{
+      padding:10px 12px;border-radius:8px;border:1px solid #d7e6f6;background:#fbfdff;font-size:0.95rem;
+      outline:none;transition:box-shadow 0.15s,border-color 0.15s;
+    }
+    select:focus,input:focus,textarea:focus{box-shadow:0 4px 12px rgba(3,102,214,0.08);border-color:var(--primary)}
+    textarea{min-height:80px;resize:vertical}
+
+    .inline{display:flex;gap:10px;align-items:center}
+    .muted{color:var(--muted);font-size:0.9rem}
+
+    /* Action buttons */
+    .actions{display:flex;gap:10px;justify-content:flex-end;align-items:center;margin-top:8px}
+    .btn{
+      padding:10px 14px;border-radius:10px;border:0;font-weight:700;cursor:pointer;display:inline-flex;gap:8px;align-items:center;
+      box-shadow:0 6px 16px rgba(2,6,23,0.06);
+      transition:transform 0.2s, background 0.2s;
+    }
+    .btn-primary{background:var(--primary);color:#fff}
+    .btn-primary:hover{background:var(--primary-dark);transform:translateY(-2px)}
+    .btn-ghost{background:transparent;border:1px solid #d0e6fb;color:var(--accent)}
+    .btn-info{background:#0099ff;color:#fff} 
+    .btn-info:hover{background:#007acc;transform:translateY(-2px)}
+    .btn-danger{background:var(--danger);color:#fff}
+    .btn-danger:hover{background:#c0392b;transform:translateY(-2px)}
+
+
+    /* small helper */
+    .small{font-size:0.85rem;color:var(--muted)}
+    hr.sep{border:0;height:1px;margin:18px 0;border-radius:6px;background:linear-gradient(90deg,transparent,#dfeefb,transparent)}
+
+    /* Export panel */
+    .export-grid{display:flex;gap:12px;flex-wrap:wrap}
+    .export-card{flex:1;min-width:220px;padding:14px;border-radius:10px;background:linear-gradient(180deg,#fbfdff,#f7fbff);box-shadow:0 6px 18px rgba(2,6,23,0.04)}
+    .label-pill{display:inline-block;padding:6px 10px;border-radius:999px;background:#f0f7ff;color:var(--accent);font-weight:700;font-size:0.85rem}
+    
+    /* Kumulatif Table Styling */
+    .kumulatif-table td, .kumulatif-table th {
+        border: 1px solid #e0e7ee;
+        padding: 8px;
+        text-align: left;
+    }
+    .kumulatif-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+        margin-top: 10px;
+    }
+    .kumulatif-table thead tr {
+        background: #f0f7ff;
+        text-align: left;
+    }
+    .kumulatif-table tfoot td {
+        font-weight: 700;
+        background: #fff5e6;
+    }
+
+    /* Tiny responsive */
+    @media (max-width:520px){
+      header.app-header{padding:12px}
+      .brand{font-size:0.98rem}
+      /* Adjust nav tab on smaller screens */
+      .app-nav-tabs{
+        gap: 6px;
+        flex-wrap: nowrap; 
+      }
+      .app-nav-tabs .tab{
+        padding: 8px 10px;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="app-header">
+    <div class="brand-row">
+      <div class="brand">
+        <div class="logo"><i class="fas fa-syringe" style="font-size:18px;color:#fff"></i></div>
+        <div>
+          Sistem Pelaporan Imunisasi & BIAS<br>
+          <span style="font-weight:500;font-size:0.85rem;opacity:0.9">Puskesmas Melata (v5.0 - Detail Laporan Per Vaksin)</span>
+        </div>
+      </div>
+
+      <div class="header-actions inline">
+        <div class="small">2025</div>
+        <button class="btn btn-ghost" onclick="document.getElementById('helpModal').style.display='flex'">
+          <i class="fas fa-circle-info"></i> Bantuan
+        </button>
+      </div>
+    </div>
+
+    <div class="app-nav-tabs"> 
+      <button class="tab active" data-tab="imunisasi" onclick="switchTab(event)"> <i class="fas fa-syringe"></i> IMUNISASI</button>
+      <button class="tab" data-tab="bias" onclick="switchTab(event)"><i class="fas fa-school"></i> BIAS</button>
+      <button class="tab" data-tab="export" onclick="switchTab(event)"><i class="fas fa-file-export"></i> EKSPOR</button>
+      <button class="tab" data-tab="import" onclick="switchTab(event)"><i class="fas fa-upload"></i> IMPORT</button>
+      <button class="tab" data-tab="kumulatif" onclick="switchTab(event)"><i class="fas fa-chart-line"></i> KUMULATIF</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section id="imunisasi" class="tab-panel">
+      <div class="card">
+        <h2>Input Data Imunisasi</h2>
+        <p class="lead">Masukkan capaian imunisasi per desa untuk periode yang dipilih. (Dropdown 0–50)</p>
+
+        <form id="imunForm" onsubmit="downloadImun(event)">
+          <div class="grid">
+            <div>
+              <div class="form-group">
+                <label for="desa_imun">Pilih Desa</label>
+                <select id="desa_imun" name="desa_imun" required>
+                  <option value="">-- Pilih Desa --</option>
+                  <option value="melata">Melata</option>
+                  <option value="nanuah">Nanuah</option>
+                  <option value="topalan">Topalan</option>
+                  <option value="batu_ampar">Batu Ampar</option>
+                  <option value="lubuk_hiju">Lubuk Hiju</option>
+                  <option value="bukit_makmur">Bukit Makmur</option>
+                  <option value="bukit_raya">Bukit Raya</option>
+                  <option value="modang_mas">Modang Mas</option>
+                  <option value="mukti_manunggal">Mukti Manunggal</option>
+                  <option value="sumber_jaya">Sumber Jaya</option>
+                  <option value="bukit_harum">Bukit Harum</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="periode_imun">Periode (Bulan/Tahun)</label>
+                <input type="month" id="periode_imun" name="periode_imun" required>
+              </div>
+            </div>
+
+            <div>
+              <div class="form-group">
+                <label>Petunjuk</label>
+                <div class="small">Isi jumlah capaian untuk masing-masing vaksin dan jenis kelamin. Gunakan tombol Download CSV di bawah.</div>
+              </div>
+              <div class="card" style="padding:10px;background:#e3f2fd;border:1px solid #90caf9">
+                <p style="margin:0;font-size:0.9rem;color:#1e88e5;font-weight:600;"><i class="fab fa-whatsapp"></i> Silahkan kirim file laporan yang sudah didownload ke nomor 081549177303 (TRI)</p>
+              </div>
+            </div>
+          </div>
+
+          <hr class="sep">
+
+          <div id="vaksinContainer"></div>
+
+          <div class="actions">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-download"></i> Download CSV Imunisasi</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section id="bias" class="tab-panel" style="display:none">
+      <div class="card">
+        <h2>Form BIAS (Pendataan Sekolah)</h2>
+        <p class="lead">Hanya masukkan 1 laporan per kelas. Filter Kelas SD/MIS hanya 1, 2, 5, 6. Filter Kelas SMP/MTS hanya 9.</p>
+
+        <form id="biasForm" onsubmit="downloadBias(event)">
+          <div class="grid">
+            <div>
+              <div class="form-group">
+                <label for="sekolah">Nama Sekolah</label>
+                <input id="sekolah" name="sekolah" type="text" placeholder="Contoh: SDN Melata 01" required>
+              </div>
+
+              <div class="form-group">
+                <label for="kelas">Kelas</label>
+                <select id="kelas" name="kelas" required onchange="onChangeKelas()">
+                  <option value="">-- Pilih Kelas --</option>
+                  <option value="1">1 (SD/MIS)</option>
+                  <option value="2">2 (SD/MIS)</option>
+                  <option value="5">5 (SD/MIS)</option>
+                  <option value="6">6 (SD/MIS)</option>
+                  <option value="9">9 (SMP/MTS)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="sasaran_l">Sasaran Laki-laki</label>
+                <select id="sasaran_l" name="sasaran_l" required class="bias-number"></select>
+              </div>
+
+              <div class="form-group">
+                <label for="sasaran_p">Sasaran Perempuan</label>
+                <select id="sasaran_p" name="sasaran_p" required class="bias-number"></select>
+              </div>
+            </div>
+
+            <div>
+              <div class="form-group">
+                <label for="mr_l">MR (Laki)</label>
+                <select id="mr_l" name="mr_l" class="bias-number"></select>
+              </div>
+
+              <div class="form-group">
+                <label for="mr_p">MR (P)</label>
+                <select id="mr_p" name="mr_p" class="bias-number"></select>
+              </div>
+
+              <div class="form-group">
+                <label for="dt_l">DT (L)</label>
+                <select id="dt_l" name="dt_l" class="bias-number"></select>
+              </div>
+
+              <div class="form-group">
+                <label for="dt_p">DT (P)</label>
+                <select id="dt_p" name="dt_p" class="bias-number"></select>
+              </div>
+            </div>
+          </div>
+
+          <hr class="sep">
+
+          <div class="grid">
+            <div>
+              <div class="form-group">
+                <label for="td_l">Td (L)</label>
+                <select id="td_l" name="td_l" class="bias-number"></select>
+              </div>
+              <div class="form-group">
+                <label for="td_p">Td (P)</label>
+                <select id="td_p" name="td_p" class="bias-number"></select>
+              </div>
+              
+              <div class="form-group" id="hpvLGroup" style="display:none">
+                <label for="hpv_l">HPV (Laki-laki) <span class="small" style="color:#004080; display:inline; font-weight:400;">(Kelas 5,6,9)</span></label>
+                <select id="hpv_l" name="hpv_l" class="bias-number"></select>
+              </div>
+              <div class="form-group" id="hpvGroup" style="display:none">
+                <label for="hpv_p">HPV (Perempuan) <span class="small" style="color:#FF7F50; display:inline; font-weight:400;">(Kelas 5,6,9 - Prioritas)</span></label>
+                <select id="hpv_p" name="hpv_p" class="bias-number"></select>
+              </div>
+              </div>
+
+            <div>
+              <div class="form-group">
+                <label for="dropout">Drop Out</label>
+                <select id="dropout" name="dropout" class="bias-number"></select>
+              </div>
+
+              <div class="form-group">
+                <label for="keterangan">Keterangan (opsional)</label>
+                <textarea id="keterangan" name="keterangan" placeholder="Catatan tambahan..."></textarea>
+              </div>
+              <div class="card" style="padding:10px;background:#e3f2fd;border:1px solid #90caf9">
+                <p style="margin:0;font-size:0.9rem;color:#1e88e5;font-weight:600;"><i class="fab fa-whatsapp"></i> Silahkan kirim file laporan yang sudah didownload ke nomor 081549177303 (TRI)</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-download"></i> Download CSV BIAS</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section id="export" class="tab-panel" style="display:none">
+      <div class="card">
+        <h2>Export Data</h2>
+        <p class="lead">Panel cepat untuk mengunduh ulang laporan CSV terakhir atau mencadangkan seluruh database.</p>
+
+        <div class="export-grid">
+          <div class="export-card">
+            <div class="label-pill">Imunisasi</div>
+            <div class="small" style="margin-top:8px">Unduh laporan Imunisasi berdasarkan input terakhir (Hanya pengingat nama file).</div>
+            <div style="margin-top:12px" class="actions">
+              <button class="btn btn-primary" onclick="downloadLast('imunisasi')"><i class="fas fa-file-csv"></i> File Imunisasi Terakhir</button>
+            </div>
+          </div>
+
+          <div class="export-card">
+            <div class="label-pill">BIAS</div>
+            <div class="small" style="margin-top:8px">Unduh laporan BIAS berdasarkan input terakhir (Hanya pengingat nama file).</div>
+            <div style="margin-top:12px" class="actions">
+              <button class="btn btn-primary" onclick="downloadLast('bias')"><i class="fas fa-file-csv"></i> File BIAS Terakhir</button>
+            </div>
+          </div>
+          
+          <div class="export-card" style="flex:100%">
+            <div class="label-pill" style="background:#0099ff;color:#fff"><i class="fas fa-database"></i> Database JSON</div>
+            <div style="margin-top:8px">
+                <p class="small" style="margin:0 0 10px 0;">
+                    Gunakan fitur ini untuk membuat cadangan atau memindahkan seluruh database laporan **(.json)** ke perangkat lain. **Direkomendasikan!**
+                </p>
+                <button class="btn btn-info" onclick="exportDatabase()"><i class="fas fa-cloud-download"></i> Export Seluruh Database (.json)</button>
+            </div>
+          </div>
+
+          <div class="export-card" style="flex:100%">
+            <div class="label-pill" style="background:#0099ff;color:#fff">Instruksi Kirim</div>
+            <p style="margin:8px 0 0 0;font-size:0.9rem;color:var(--accent);font-weight:600;">
+              Setelah file CSV/JSON diunduh, **silahkan kirim file laporan tersebut** ke nomor: 
+              <br>
+              <i class="fab fa-whatsapp"></i> **081549177303 (TRI)**
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <section id="import" class="tab-panel" style="display:none">
+        <div class="card">
+          <h2><i class="fas fa-upload"></i> Import Database Laporan</h2>
+          <p class="lead">Pilih **satu atau lebih** file database **(.json)** yang sebelumnya telah Anda export untuk memuat datanya ke browser ini.</p>
+
+          <div class="form-group">
+            <label for="importFile">Pilih File Database (.json)</label>
+            <input type="file" id="importFile" accept=".json,.txt" multiple style="padding:10px 12px;border:1px solid #ddd">
+          </div>
+          
+          <div id="importStatus" class="small" style="margin-top:10px;color:var(--muted)"></div>
+
+          <div class="actions" style="justify-content:flex-start">
+            <button class="btn btn-primary" onclick="startImport()"><i class="fas fa-upload"></i> Mulai Import & Gabungkan Data</button>
+          </div>
+
+          <hr class="sep">
+          
+          <div class="card" style="padding:10px;background:#ffebee;border:1px solid #f44336">
+            <p style="margin:0;font-size:0.9rem;color:#d32f2f;font-weight:600;"><i class="fas fa-exclamation-triangle"></i> **PERHATIAN:** Proses import akan **menggabungkan** data dari file **.json** dengan data yang sudah ada di browser ini. Laporan yang memiliki ID yang sama (timestamp) akan dilewati secara otomatis.</p>
+          </div>
+        </div>
+    </section>
+    
+    <section id="kumulatif" class="tab-panel" style="display:none">
+      <div class="card">
+        <h2><i class="fas fa-chart-line"></i> Hasil Kumulatif Imunisasi dan BIAS</h2>
+        <p class="lead">Menampilkan total capaian dan rincian per bulan dari seluruh laporan yang tersimpan di browser ini.</p>
+
+        <div class="actions" style="justify-content:flex-start">
+          <button class="btn btn-info" onclick="displayKumulatif()"><i class="fas fa-calculator"></i> Hitung Ulang & Muat Data</button>
+          <button class="btn btn-ghost" onclick="clearAllData()"><i class="fas fa-trash"></i> Hapus Semua Data Lokal</button>
+        </div>
+        
+        <hr class="sep">
+        
+        <div class="card" style="margin-top:20px; background:#f5fef7; border:1px solid #c8e6c9">
+            <h3><i class="fas fa-search"></i> Lihat Laporan Spesifik (Per Desa/Sekolah)</h3>
+            <p class="small">Pilih kriteria di bawah untuk menampilkan laporan spesifik yang cocok. (Kosongkan filter untuk melihat semua laporan yang tersedia).</p>
+
+            <div class="grid" style="grid-template-columns:repeat(3,1fr)">
+                <div class="form-group">
+                    <label for="filter_periode">Filter Bulan/Periode (Imun/BIAS)</label>
+                    <select id="filter_periode" style="width:100%"><option value="">-- Semua Bulan --</option></select>
+                </div>
+                <div class="form-group">
+                    <label for="filter_desa">Filter Desa (Imunisasi)</label>
+                    <select id="filter_desa" style="width:100%"><option value="">-- Semua Desa --</option></select>
+                </div>
+                <div class="form-group">
+                    <label for="filter_sekolah">Filter Sekolah (BIAS)</label>
+                    <select id="filter_sekolah" style="width:100%"><option value="">-- Semua Sekolah --</option></select>
+                </div>
+            </div>
+
+            <div class="actions" style="justify-content:flex-start; margin-top:5px">
+                <button class="btn btn-primary" onclick="displayDetailedReports()">
+                    <i class="fas fa-eye"></i> Tampilkan Laporan Spesifik
+                </button>
+            </div>
+        </div>
+        
+        <div id="detailedReportList" style="margin-top:20px">
+            <p class="muted">Gunakan panel filter di atas dan klik **"Tampilkan Laporan Spesifik"** untuk melihat rincian laporan yang tersimpan.</p>
+        </div>
+        <div id="kumulatifContent">
+          <p class="muted">Klik tombol "Hitung Ulang & Muat Data" untuk menampilkan hasil kumulatif dari semua laporan yang tersimpan.</p>
+        </div>
+
+        <div class="card" style="margin-top:20px; background:#fffbfb; border:1px solid #ffcccc">
+            <h3><i class="fas fa-trash-alt"></i> Hapus Data Selektif</h3>
+            <p class="small">Pilih filter di bawah untuk menghapus laporan secara permanen. Laporan akan dihapus jika cocok dengan **SEMUA** kriteria yang dipilih.</p>
+
+            <div class="grid" style="grid-template-columns:repeat(3,1fr)">
+                <div class="form-group">
+                    <label for="delete_periode">Filter Bulan/Periode (Imun/BIAS)</label>
+                    <select id="delete_periode" style="width:100%"><option value="">-- Semua Bulan --</option></select>
+                </div>
+                <div class="form-group">
+                    <label for="delete_desa">Filter Desa (Imunisasi)</label>
+                    <select id="delete_desa" style="width:100%"><option value="">-- Semua Desa --</option></select>
+                </div>
+                <div class="form-group">
+                    <label for="delete_sekolah">Filter Sekolah (BIAS)</label>
+                    <select id="delete_sekolah" style="width:100%"><option value="">-- Semua Sekolah --</option></select>
+                </div>
+            </div>
+
+            <div class="actions" style="justify-content:flex-start; margin-top:5px">
+                <button class="btn" style="background:var(--danger); color:#fff" onclick="performSelectiveDeletion()">
+                    <i class="fas fa-skull-crossbones"></i> Hapus Data Yang Dipilih Secara Permanen
+                </button>
+            </div>
+        </div>
+        </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    &copy; 2025 Sistem Pelaporan Data Imunisasi & BIAS — Dibuat oleh: tri prio heryanto
+  </footer>
+
+  <div id="helpModal" style="display:none;position:fixed;inset:0;background:rgba(2,6,23,0.5);z-index:60;align-items:center;justify-content:center">
+    <div style="background:#fff;padding:18px;border-radius:12px;max-width:700px;margin:20px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h3 style="margin:0">Bantuan</h3>
+        <button class="btn btn-ghost" onclick="document.getElementById('helpModal').style.display='none'">Tutup</button>
+      </div>
+      <hr>
+      <p class="small">Tab <strong>IMUNISASI</strong> dan <strong>BIAS</strong> digunakan untuk input data. Tab <strong>EKSPOR</strong> untuk mencadangkan database atau mengunduh ulang file CSV. Tab <strong>IMPORT</strong> untuk memindahkan database antar perangkat menggunakan file **JSON**. Tab <strong>KUMULATIF</strong> menampilkan total penjumlahan **yang dikelompokkan per bulan** dari semua laporan yang telah Anda simpan.</p>
+      <p class="small" style="margin-top:10px">Setelah mengunduh file CSV/JSON, silahkan kirim file laporan tersebut ke nomor <i class="fab fa-whatsapp"></i> **081549177303 (TRI)**.</p>
+    </div>
+  </div>
+
+  <script>
+    // ===== Global settings dan Storage Keys =====
+    let lastImunFile = null;
+    let lastBiasFile = null;
+    const IMUN_STORAGE_KEY = 'puskesmasMelata_imunReports';
+    const BIAS_STORAGE_KEY = 'puskesmasMelata_biasReports';
+    let sessionImportedFiles = new Set(); 
+    
+    // List of all possible BIAS vaccines for data storage initialization
+    const BIAS_VACCINES = ['MR', 'DT', 'Td', 'HPV'];
+
+    // Init: create selects
+    document.addEventListener('DOMContentLoaded', () => {
+      initImunVaksinSections();
+      fillSelects();
+      // Auto-open Kumulatif if URL hash is present, otherwise default to imunisasi
+      const initialTab = window.location.hash.substring(1) || 'imunisasi';
+      openTab(initialTab);
+    });
+
+    // ===== Tab & View Management =====
+    function switchTab(e){
+      const target = e.currentTarget.getAttribute('data-tab');
+      openTab(target);
+    }
+    
+    function openTab(tabId){
+      document.querySelectorAll('.app-nav-tabs .tab').forEach(t=>t.classList.remove('active'));
+      const btn = Array.from(document.querySelectorAll('.app-nav-tabs .tab')).find(b=>b.getAttribute('data-tab')===tabId);
+      if(btn) btn.classList.add('active');
+      document.querySelectorAll('.tab-panel').forEach(p => p.style.display='none');
+      const panel = document.getElementById(tabId);
+      if (panel) panel.style.display = 'block';
+      
+      // Auto-display for kumulatif tab
+      if (tabId === 'kumulatif') {
+          displayKumulatif();
+      }
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+
+    // ===== Imunisasi dynamic sections (Tetap) =====
+    const imunFields = [
+      "BCG/Polio1","DPT1/Polio2","DPT2/Polio3","DPT3/Polio4",
+      "PCV1","PCV2","PCV3",
+      "ROTA1","ROTA2","ROTA3",
+      "IPV1","IPV2",
+      "MR","MR2","DPT4"
+    ];
+
+    function initImunVaksinSections(){
+      const container = document.getElementById('vaksinContainer');
+      container.innerHTML = '';
+      imunFields.forEach(field => {
+        const section = document.createElement('div');
+        section.className = 'card';
+        section.style.marginBottom = '12px';
+        section.innerHTML = `
+          <h3 style="margin:0 0 8px 0;font-size:1rem;color:var(--accent)">${field}</h3>
+          <div class="grid">
+            <div>
+              <label style="font-weight:600;margin-bottom:6px;">Jumlah (${field}) - Laki-Laki</label>
+              <select name="${slugify(field)}_l" class="imun-number" required></select>
+            </div>
+            <div>
+              <label style="font-weight:600;margin-bottom:6px;">Jumlah (${field}) - Perempuan</label>
+              <select name="${slugify(field)}_p" class="imun-number" required></select>
+            </div>
+          </div>
+        `;
+        container.appendChild(section);
+      });
+    }
+
+    function slugify(text){
+      return text.toLowerCase().replace(/\s+/g,'_').replace(/[\/]/g,'').replace(/[^a-z0-9_]/g,'');
+    }
+
+    // Fill selects ranges: imun-number 0-50, bias-number 0-200
+    function fillSelects(){
+      // imunisasi 0-50
+      const imunSelects = document.querySelectorAll('.imun-number');
+      imunSelects.forEach(s => {
+        s.innerHTML = '<option value="" disabled selected>-- Pilih Jumlah --</option>';
+        for(let i=0;i<=50;i++){
+          s.innerHTML += `<option value="${i}">${i}</option>`;
+        }
+      });
+
+      // bias 0-200
+      const biasSelects = document.querySelectorAll('.bias-number');
+      biasSelects.forEach(s => {
+        s.innerHTML = '<option value="" disabled selected>-- Pilih Jumlah --</option>';
+        for(let i=0;i<=200;i++){
+          s.innerHTML += `<option value="${i}">${i}</option>`;
+        }
+      });
+      // Set default value for optional fields to 0 
+      const dropoutSelect = document.getElementById('dropout');
+      if (dropoutSelect) dropoutSelect.value = '0';
+    }
+
+    // ===== BIAS: show HPV only for kelas 5,6,9 (Diperbarui) =====
+    function onChangeKelas(){
+      const k = document.getElementById('kelas').value;
+      const hpvGroup = document.getElementById('hpvGroup'); // HPV Perempuan
+      const hpvLGroup = document.getElementById('hpvLGroup'); // HPV Laki-laki
+      const isHpvClass = k === '5' || k === '6' || k === '9';
+      
+      const requiredVacs = getRequiredVacs(k);
+
+      // Helper function to set display/value
+      function setVacInputState(id, isRequired) {
+          const select = document.getElementById(id);
+          if (!select) return;
+
+          const group = select.closest('.form-group');
+          if (group) {
+              const vacCode = id.split('_')[0].toUpperCase();
+              
+              // Special case: HPV visibility
+              if (vacCode === 'HPV') {
+                  group.style.display = isHpvClass ? 'block' : 'none';
+              } 
+              
+              // Set value based on requirement
+              if (isRequired) {
+                  select.required = true;
+                  select.value = ''; // Enforce selection
+              } else {
+                  select.required = false;
+                  select.value = '0'; // Set to 0 if not required/relevant
+              }
+          }
+      }
+
+      // Check MR, DT, Td
+      setVacInputState('mr_l', requiredVacs.includes('MR'));
+      setVacInputState('mr_p', requiredVacs.includes('MR'));
+      setVacInputState('dt_l', requiredVacs.includes('DT'));
+      setVacInputState('dt_p', requiredVacs.includes('DT'));
+      setVacInputState('td_l', requiredVacs.includes('Td'));
+      setVacInputState('td_p', requiredVacs.includes('Td'));
+
+      // Check HPV
+      setVacInputState('hpv_l', isHpvClass); // HPV is required if class is 5, 6, or 9
+      setVacInputState('hpv_p', isHpvClass); // HPV is required if class is 5, 6, or 9
+    }
+
+    function getRequiredVacs(k){
+      const kNum = parseInt(k);
+      if (kNum === 1 || kNum === 2) return ['MR', 'DT'];
+      if (kNum === 5 || kNum === 6) return ['Td', 'HPV']; 
+      if (kNum === 9) return ['Td', 'HPV']; 
+      return [];
+    }
+
+
+    // ===== Download & Save Functions (Diperbarui untuk Storage) =====
+    function cleanInt(val) {
+        if (typeof val !== 'string' && typeof val !== 'number') return 0;
+        const cleaned = String(val).replace(/[^0-9]/g, '');
+        return parseInt(cleaned) || 0; 
+    }
+
+    // util: download blob CSV (Tetap)
+    function downloadBlobCSV(content, filename){
+      const bom = "\uFEFF";
+      const blob = new Blob([bom + content], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // util: download blob JSON (Tetap)
+    function downloadBlobJSON(content, filename){
+      const blob = new Blob([content], { type: 'application/json;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+    
+    function downloadImun(e){
+      e.preventDefault();
+      const form = document.getElementById('imunForm');
+      if(!form.checkValidity()){
+        form.reportValidity();
+        alert('Mohon lengkapi semua data Imunisasi.');
+        return;
+      }
+
+      const fd = new FormData(form);
+      const desa = fd.get('desa_imun');
+      const desaText = document.querySelector('#desa_imun').selectedOptions[0].text;
+      const periode = fd.get('periode_imun') || '';
+      const periodeFmt = periode.replace('-','');
+
+      let csv = 'Desa;Periode;Jenis Imunisasi;Jenis Kelamin;Jumlah\n';
+      const dataToSave = {
+        id: Date.now(),
+        desa: desaText,
+        periode: periode, // YYYY-MM format
+        data: {} 
+      };
+
+      imunFields.forEach(field=>{
+        const keyL = `${slugify(field)}_l`;
+        const keyP = `${slugify(field)}_p`;
+        const valL = cleanInt(fd.get(keyL) || 0);
+        const valP = cleanInt(fd.get(keyP) || 0);
+        
+        csv += `${desaText};${periode};"${field}";"Laki-laki";${valL}\n`;
+        csv += `${desaText};${periode};"${field}";"Perempuan";${valP}\n`;
+        
+        dataToSave.data[field] = { L: valL, P: valP };
+      });
+      
+      saveToStorage(IMUN_STORAGE_KEY, dataToSave);
+
+      const filename = `Laporan_Imunisasi_${periodeFmt}_${desa.replace(/\s+/g,'_')}.csv`;
+      downloadBlobCSV(csv, filename);
+      lastImunFile = filename;
+      alert(`✅ Berhasil mengunduh: ${filename}. Data laporan telah disimpan secara lokal. Silahkan kirim file ini ke 081549177303 (TRI).`);
+    }
+
+    function downloadBias(e){
+      e.preventDefault();
+      const form = document.getElementById('biasForm');
+      if(!form.checkValidity()){
+        form.reportValidity();
+        alert('Mohon lengkapi semua data BIAS.');
+        return;
+      }
+
+      const fd = new FormData(form);
+      const sekolah = fd.get('sekolah');
+      const kelas = fd.get('kelas');
+      const tanggalLaporan = new Date().toISOString().slice(0,10); // YYYY-MM-DD format
+      
+      const isHpvClass = (kelas === '5' || kelas === '6' || kelas === '9');
+      const requiredVacs = getRequiredVacs(kelas);
+      
+      const hpv_l_val = isHpvClass ? cleanInt(fd.get('hpv_l') || 0) : 0; 
+      const hpv_p_val = isHpvClass ? cleanInt(fd.get('hpv_p') || 0) : 0; 
+      
+      const data = {
+        Sasaran_L: cleanInt(fd.get('sasaran_l') || 0), 
+        Sasaran_P: cleanInt(fd.get('sasaran_p') || 0),
+        MR_L: requiredVacs.includes('MR') ? cleanInt(fd.get('mr_l') || 0) : 0,
+        MR_P: requiredVacs.includes('MR') ? cleanInt(fd.get('mr_p') || 0) : 0,
+        DT_L: requiredVacs.includes('DT') ? cleanInt(fd.get('dt_l') || 0) : 0,
+        DT_P: requiredVacs.includes('DT') ? cleanInt(fd.get('dt_p') || 0) : 0,
+        Td_L: requiredVacs.includes('Td') ? cleanInt(fd.get('td_l') || 0) : 0,
+        Td_P: requiredVacs.includes('Td') ? cleanInt(fd.get('td_p') || 0) : 0,
+        HPV_L: hpv_l_val, 
+        HPV_P: hpv_p_val, 
+        DropOut: cleanInt(fd.get('dropout') || 0), 
+        Keterangan: fd.get('keterangan') || ''
+      };
+
+      // Ensure all required fields (if visible) are filled for validation check
+      if (data.Sasaran_L === 0 && data.Sasaran_P === 0 && (data.MR_L + data.MR_P + data.DT_L + data.DT_P + data.Td_L + data.Td_P + data.HPV_L + data.HPV_P) === 0) {
+        alert('Laporan tidak disimpan. Mohon isi minimal salah satu Sasaran atau Capaian Vaksin.');
+        return;
+      }
+
+      const reportToSave = {
+          id: Date.now(),
+          sekolah: sekolah,
+          kelas: kelas,
+          tanggal: tanggalLaporan, 
+          data: data
+      };
+      saveToStorage(BIAS_STORAGE_KEY, reportToSave);
+
+
+      // Generate CSV Row
+      const cols = [
+        sekolah, kelas, tanggalLaporan,
+        data.Sasaran_L, data.Sasaran_P,
+        data.MR_L, data.MR_P,
+        data.DT_L, data.DT_P,
+        data.Td_L, data.Td_P,
+        data.HPV_L, data.HPV_P, 
+        data.DropOut, data.Keterangan
+      ];
+
+      let csv = 'Nama Sekolah;Kelas;Tanggal;Sasaran_L;Sasaran_P;MR_L;MR_P;DT_L;DT_P;Td_L;Td_P;HPV_L;HPV_P;DropOut;Keterangan\n'; 
+      csv += cols.map(c => `"${String(c).replace(/"/g,'""')}"`).join(';') + '\n';
+
+      const filename = `Laporan_BIAS_${tanggalLaporan.replace(/-/g,'')}_${sekolah.replace(/\s+/g,'_')}.csv`;
+      downloadBlobCSV(csv, filename);
+      lastBiasFile = filename;
+      alert(`✅ Berhasil mengunduh laporan BIAS untuk Kelas ${kelas}. File: ${filename}. Data laporan telah disimpan secara lokal. Silahkan kirim file ini ke 081549177303 (TRI).`);
+    }
+
+
+    // ===== STORAGE UTILITY FUNCTIONS =====
+    function getFromStorage(key){
+      try {
+        const data = localStorage.getItem(key);
+        return data ? JSON.parse(data) : [];
+      } catch(e){
+        console.error(`Error loading data from ${key}:`, e);
+        return [];
+      }
+    }
+
+    function saveToStorage(key, newData){
+      let reports = getFromStorage(key);
+      if (!newData.id) {
+        newData.id = Date.now(); 
+      }
+      reports.push(newData);
+      localStorage.setItem(key, JSON.stringify(reports));
+    }
+
+    function clearAllData(){
+      if(confirm('Yakin ingin menghapus semua data laporan Imunisasi dan BIAS yang tersimpan di browser ini? Tindakan ini tidak dapat dibatalkan.')){
+          localStorage.removeItem(IMUN_STORAGE_KEY);
+          localStorage.removeItem(BIAS_STORAGE_KEY);
+          alert('Semua data laporan telah dihapus dari penyimpanan lokal browser.');
+          sessionImportedFiles = new Set(); 
+          displayKumulatif(); 
+      }
+    }
+
+    // ===== Export tab: download last files (Tetap) =====
+    function downloadLast(type){
+      if(type==='imunisasi'){
+        if(!lastImunFile){ alert('Belum ada file Imunisasi yang diunduh pada sesi ini.'); return; }
+        alert(`File CSV terakhir Imunisasi: ${lastImunFile}\nIni hanya pengingat nama file. Untuk mengunduh ulang, silakan isi form Imunisasi dan klik Download.`);
+      } else {
+        if(!lastBiasFile){ alert('Belum ada file BIAS yang diunduh pada sesi ini.'); return; }
+        alert(`File CSV terakhir BIAS: ${lastBiasFile}\nIni hanya pengingat nama file. Untuk mengunduh ulang, silakan isi form BIAS dan klik Download.`);
+      }
+    }
+
+    // ===== DATABASE EXPORT FUNCTION (JSON) =====
+    function exportDatabase() {
+        const dataToExport = {
+            imunReports: getFromStorage(IMUN_STORAGE_KEY),
+            biasReports: getFromStorage(BIAS_STORAGE_KEY),
+            version: '5.0 - JSON Database'
+        };
+        
+        const jsonContent = JSON.stringify(dataToExport, null, 2); 
+
+        const filename = `Database_Pelaporan_PuskesmasMelata_${new Date().toISOString().slice(0, 10).replace(/-/g, '')}.json`;
+        
+        downloadBlobJSON(jsonContent, filename);
+
+        alert(`✅ Berhasil mengekspor seluruh database. File: ${filename}`);
+    }
+    
+    // Helper function for reading file content using Promises/async-await
+    function readFileContent(file) {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (event) => resolve(event.target.result);
+            reader.onerror = () => resolve(null);
+            reader.readAsText(file);
+        });
+    }
+
+    // ===== DATABASE IMPORT FUNCTION =====
+    async function startImport() {
+        const fileInput = document.getElementById('importFile');
+        const statusDiv = document.getElementById('importStatus');
+        statusDiv.textContent = '';
+        
+        if (fileInput.files.length === 0) {
+            statusDiv.textContent = '❌ Pilih minimal satu file Database (.json) terlebih dahulu.';
+            statusDiv.style.color = 'var(--danger)';
+            return;
+        }
+
+        const files = Array.from(fileInput.files);
+        let totalImportedImun = 0;
+        let totalImportedBias = 0;
+        let totalProcessed = 0;
+        let fileStatusMessages = [];
+        statusDiv.textContent = `Memproses ${files.length} file... Harap tunggu.`;
+
+        for (const file of files) {
+            if (sessionImportedFiles.has(file.name)) {
+                const confirmReplace = confirm(`File "${file.name}" sudah diproses dalam sesi ini. Apakah Anda yakin ingin memprosesnya lagi (Mengganti/Menggabungkan ulang)?`);
+                if (!confirmReplace) {
+                    fileStatusMessages.push(`⏩ File "${file.name}" dilewati (duplikat dalam sesi).`);
+                    continue;
+                }
+            }
+
+            const jsonContent = await readFileContent(file);
+            if (!jsonContent) {
+                fileStatusMessages.push(`❌ File "${file.name}" gagal dibaca.`);
+                continue;
+            }
+
+            try {
+                const importedData = JSON.parse(jsonContent);
+
+                if (!importedData || (!importedData.imunReports && !importedData.biasReports)) {
+                     fileStatusMessages.push(`❌ File "${file.name}": Format JSON tidak valid atau kosong (tidak ditemukan imunReports/biasReports).`);
+                     continue;
+                }
+
+                const importedImunCount = importedData.imunReports ? mergeData(IMUN_STORAGE_KEY, importedData.imunReports) : 0;
+                const importedBiasCount = importedData.biasReports ? mergeData(BIAS_STORAGE_KEY, importedData.biasReports) : 0;
+
+                totalImportedImun += importedImunCount;
+                totalImportedBias += importedBiasCount;
+                totalProcessed++;
+                sessionImportedFiles.add(file.name); 
+                
+                fileStatusMessages.push(`✅ File "${file.name}": Imunisasi +${importedImunCount}, BIAS +${importedBiasCount}.`);
+
+            } catch (e) {
+                fileStatusMessages.push(`❌ File "${file.name}": Gagal memproses data. File mungkin bukan file Database (.json) yang valid. Error: ${e.message}`);
+                console.error(`Error processing file ${file.name}:`, e);
+            }
+        }
+        
+        // Final Status Display
+        if (totalProcessed > 0) {
+            statusDiv.innerHTML = `
+                ✅ **Import Selesai!** Berhasil memproses **${totalProcessed} file**.
+                <br>
+                Total gabungan: Imunisasi **+${totalImportedImun}** laporan, BIAS **+${totalImportedBias}** laporan.
+                <button class="btn btn-info" style="margin-left:10px;padding:5px 10px;font-size:0.8rem;border-radius:6px" onclick="openTab('kumulatif')">Lihat Hasil Kumulatif</button>
+                <div style="margin-top:10px; padding:10px; border:1px solid #eee; border-radius:6px; background:#f9f9f9; max-height:150px; overflow-y:auto;">
+                    ${fileStatusMessages.join('<br>')}
+                </div>
+            `;
+            statusDiv.style.color = 'var(--success)';
+            if (document.getElementById('kumulatif').style.display === 'block') {
+                 displayKumulatif();
+            }
+        } else {
+            statusDiv.textContent = '❌ Tidak ada file yang berhasil diproses.';
+            statusDiv.style.color = 'var(--danger)';
+        }
+        
+        fileInput.value = ''; // Clear file input
+    }
+
+    function mergeData(key, newDataArray) {
+        let currentData = getFromStorage(key);
+        let initialCount = currentData.length;
+        
+        const existingIds = new Set(currentData.map(item => item.id));
+        
+        newDataArray.forEach(newItem => {
+            if (newItem.id && !existingIds.has(newItem.id)) {
+                // Data validation/cleaning for numeric values
+                if(key === IMUN_STORAGE_KEY) {
+                    if(newItem.data && typeof newItem.data === 'object') {
+                        for(const [vaksin, data] of Object.entries(newItem.data)) {
+                            data.L = cleanInt((data.L || 0).toString());
+                            data.P = cleanInt((data.P || 0).toString());
+                        }
+                    }
+                } else if (key === BIAS_STORAGE_KEY) {
+                     if(newItem.data && typeof newItem.data === 'object') {
+                         for(const [field, value] of Object.entries(newItem.data)) {
+                            if (field !== 'Keterangan') {
+                                 newItem.data[field] = cleanInt((value || 0).toString());
+                            }
+                        }
+                    }
+                }
+                currentData.push(newItem);
+            }
+        });
+
+        localStorage.setItem(key, JSON.stringify(currentData));
+        
+        return currentData.length - initialCount;
+    }
+
+
+    // ===== REPORT FILTER & SELECTIVE DELETION FUNCTIONS (V5.0) =====
+    
+    // Function to populate the dropdown filters for both display and deletion
+    function setupReportFilters() {
+        const imunReports = getFromStorage(IMUN_STORAGE_KEY);
+        const biasReports = getFromStorage(BIAS_STORAGE_KEY);
+
+        // --- Collect Unique Data ---
+        const allPeriods = new Set();
+        const allDesa = new Set();
+        const allSekolah = new Set();
+        
+        imunReports.forEach(r => { 
+            if (r.periode) allPeriods.add(r.periode); 
+            if (r.desa) allDesa.add(r.desa);
+        });
+        biasReports.forEach(r => { 
+            const rawDate = r.tanggal;
+            const periode = (rawDate && typeof rawDate === 'string' && rawDate.length >= 7) ? rawDate.substring(0, 7) : null;
+            if (periode) allPeriods.add(periode);
+            if (r.sekolah) allSekolah.add(r.sekolah);
+        });
+
+        const sortedPeriods = Array.from(allPeriods).sort().reverse(); 
+        const sortedDesa = Array.from(allDesa).sort();
+        const sortedSekolah = Array.from(allSekolah).sort();
+
+        // --- Populate Dropdowns ---
+        function populateSelect(id, items, displayFunc) {
+            const select = document.getElementById(id);
+            if (!select) return;
+            select.innerHTML = '<option value="">-- Semua --</option>'; // Unified placeholder
+            items.forEach(item => {
+                select.innerHTML += `<option value="${item}">${displayFunc ? displayFunc(item) : item}</option>`;
+            });
+        }
+
+        const periodDisplay = (p) => new Date(p + '-01').toLocaleDateString('id-ID', { year: 'numeric', month: 'long' });
+
+        // Deletion filters
+        populateSelect('delete_periode', sortedPeriods, periodDisplay);
+        populateSelect('delete_desa', sortedDesa);
+        populateSelect('delete_sekolah', sortedSekolah);
+        
+        // New display filters
+        populateSelect('filter_periode', sortedPeriods, periodDisplay);
+        populateSelect('filter_desa', sortedDesa);
+        populateSelect('filter_sekolah', sortedSekolah);
+    }
+
+    // Function to execute the selective deletion
+    function performSelectiveDeletion() {
+        const periodFilter = document.getElementById('delete_periode').value;
+        const desaFilter = document.getElementById('delete_desa').value;
+        const sekolahFilter = document.getElementById('delete_sekolah').value;
+
+        if (!periodFilter && !desaFilter && !sekolahFilter) {
+            alert('Mohon pilih minimal satu filter (Bulan, Desa, atau Sekolah) untuk melakukan penghapusan selektif.');
+            return;
+        }
+        
+        // Confirmation text construction
+        const confirmationText = [];
+        if (periodFilter) confirmationText.push(`Bulan/Periode: ${new Date(periodFilter + '-01').toLocaleDateString('id-ID', { year: 'numeric', month: 'long' })}`);
+        if (desaFilter) confirmationText.push(`Desa Imunisasi: ${desaFilter}`);
+        if (sekolahFilter) confirmationText.push(`Sekolah BIAS: ${sekolahFilter}`);
+
+        if (!confirm(`Yakin ingin MENGHAPUS PERMANEN semua laporan yang cocok dengan kriteria berikut?\n\n- ${confirmationText.join('\n- ')}\n\nTindakan ini tidak dapat dibatalkan.`)) {
+            return;
+        }
+
+        let deletedImunCount = 0;
+        let deletedBiasCount = 0;
+
+        // --- Imunisasi Deletion ---
+        let imunReports = getFromStorage(IMUN_STORAGE_KEY);
+        const newImunReports = imunReports.filter(report => {
+            let matchesDeletionCriteria = true;
+            
+            if (periodFilter && report.periode !== periodFilter) {
+                matchesDeletionCriteria = false;
+            }
+
+            if (desaFilter && report.desa !== desaFilter) {
+                matchesDeletionCriteria = false;
+            }
+            
+            // NOTE: Do not delete Imun reports if only Sekolah filter is set
+            if (sekolahFilter && !desaFilter && !periodFilter) {
+                 matchesDeletionCriteria = false; 
+            } else if (sekolahFilter) {
+                 // Prevent deletion if both Desa and Sekolah are set, as they are mutually exclusive in reports
+                 matchesDeletionCriteria = false; 
+            }
+
+            return !matchesDeletionCriteria; 
+        });
+
+        deletedImunCount = imunReports.length - newImunReports.length;
+        if (deletedImunCount > 0) {
+            localStorage.setItem(IMUN_STORAGE_KEY, JSON.stringify(newImunReports));
+        }
+
+
+        // --- BIAS Deletion ---
+        let biasReports = getFromStorage(BIAS_STORAGE_KEY);
+        const newBiasReports = biasReports.filter(report => {
+            let matchesDeletionCriteria = true;
+            
+            const rawDate = report.tanggal;
+            const reportPeriode = (rawDate && typeof rawDate === 'string' && rawDate.length >= 7) ? rawDate.substring(0, 7) : null;
+            
+            if (periodFilter && reportPeriode !== periodFilter) {
+                matchesDeletionCriteria = false;
+            }
+            
+            if (sekolahFilter && report.sekolah !== sekolahFilter) {
+                matchesDeletionCriteria = false;
+            }
+            
+            // NOTE: Do not delete BIAS reports if only Desa filter is set
+             if (desaFilter && !sekolahFilter && !periodFilter) {
+                 matchesDeletionCriteria = false; 
+            } else if (desaFilter) {
+                 // Prevent deletion if both Desa and Sekolah are set
+                 matchesDeletionCriteria = false; 
+            }
+
+            return !matchesDeletionCriteria; 
+        });
+
+        deletedBiasCount = biasReports.length - newBiasReports.length;
+        if (deletedBiasCount > 0) {
+            localStorage.setItem(BIAS_STORAGE_KEY, JSON.stringify(newBiasReports));
+        }
+
+        // --- Final result ---
+        alert(`✅ Penghapusan Selesai!\n\n- ${deletedImunCount} laporan Imunisasi terhapus.\n- ${deletedBiasCount} laporan BIAS terhapus.\n\nKlik OK untuk memuat ulang hasil kumulatif.`);
+        
+        // Reset filters and display results
+        document.getElementById('delete_periode').value = '';
+        document.getElementById('delete_desa').value = '';
+        document.getElementById('delete_sekolah').value = '';
+        displayKumulatif(); 
+    }
+    
+    // Function to display specific filtered reports (V5.0: Enhanced Detail View)
+    function displayDetailedReports() {
+        const periodFilter = document.getElementById('filter_periode').value;
+        const desaFilter = document.getElementById('filter_desa').value;
+        const sekolahFilter = document.getElementById('filter_sekolah').value;
+        const container = document.getElementById('detailedReportList');
+
+        // Clear previous results
+        container.innerHTML = '';
+        
+        // Display current filter status
+        if (!periodFilter && !desaFilter && !sekolahFilter) {
+            container.innerHTML = `<p class="muted" style="padding:10px 0;">Menampilkan **Semua Laporan** yang tersimpan di penyimpanan lokal.</p>`;
+        } else {
+            const filtersText = [];
+            if (periodFilter) filtersText.push(`Bulan: ${new Date(periodFilter + '-01').toLocaleDateString('id-ID', { year: 'numeric', month: 'long' })}`);
+            if (desaFilter) filtersText.push(`Desa: ${desaFilter}`);
+            if (sekolahFilter) filtersText.push(`Sekolah: ${sekolahFilter}`);
+            container.innerHTML = `<p class="muted" style="padding:10px 0;">Menampilkan laporan yang cocok dengan filter: <strong>${filtersText.join(' | ')}</strong>.</p>`;
+        }
+
+        const imunReports = getFromStorage(IMUN_STORAGE_KEY);
+        const biasReports = getFromStorage(BIAS_STORAGE_KEY);
+        
+        // --- Filter Imunisasi Reports ---
+        const filteredImun = imunReports.filter(report => {
+            let match = true;
+            if (periodFilter && report.periode !== periodFilter) match = false;
+            if (desaFilter && report.desa !== desaFilter) match = false;
+            if (sekolahFilter) match = false; // Imunisasi cannot match school filter
+            return match;
+        });
+
+        // --- Filter BIAS Reports ---
+        const filteredBias = biasReports.filter(report => {
+            let match = true;
+            const rawDate = report.tanggal;
+            const reportPeriode = (rawDate && typeof rawDate === 'string' && rawDate.length >= 7) ? rawDate.substring(0, 7) : null;
+                
+            if (periodFilter && reportPeriode !== periodFilter) match = false;
+            if (desaFilter) match = false; // BIAS cannot match village filter
+            if (sekolahFilter && report.sekolah !== sekolahFilter) match = false;
+            return match;
+        });
+        
+        let reportListHtml = '';
+
+        // --- Display Imunisasi Results ---
+        if (filteredImun.length > 0) {
+            reportListHtml += `<h4 style="margin:15px 0 5px 0; color:var(--success);"><i class="fas fa-syringe"></i> Laporan Imunisasi (${filteredImun.length} laporan)</h4>`;
+            reportListHtml += `
+                <table class="kumulatif-table" style="font-size:0.9rem; margin-bottom:20px;">
+                    <thead>
+                        <tr>
+                            <th style="width:100%;">Rincian Laporan Imunisasi (Vaksin, Laki-laki, Perempuan)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            filteredImun.forEach(report => {
+                const periodeFmt = new Date(report.periode + '-01').toLocaleDateString('id-ID', { month: 'short', year: 'numeric' });
+                const totalL = Object.values(report.data).reduce((sum, v) => sum + v.L, 0);
+                const totalP = Object.values(report.data).reduce((sum, v) => sum + v.P, 0);
+
+                const vacDetails = imunFields.map(vac => {
+                    const data = report.data[vac] || { L: 0, P: 0 };
+                    return `<div style="display:flex; justify-content:space-between; margin-bottom:2px; padding:2px 0; border-bottom:1px dotted #f0f0f0;">
+                                <span style="font-weight:400; flex-basis:60%;">${vac}</span>
+                                <span style="flex-basis:20%; text-align:right; font-weight:600; color:#004080;">${data.L}</span>
+                                <span style="flex-basis:20%; text-align:right; font-weight:600; color:#FF7F50;">${data.P}</span>
+                            </div>`;
+                }).join('');
+
+                reportListHtml += `
+                    <tr style="background:#f7fcf9; border-top:2px solid var(--success)">
+                        <td colspan="1" style="font-weight:700;">
+                            <i class="fas fa-location-dot"></i> ${report.desa} &bull; ${periodeFmt} 
+                            <span style="font-size:0.75rem; color:var(--muted); float:right;">ID: ${report.id}</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="1" style="padding: 10px 20px;">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-weight:700; border-bottom:2px solid #ddd; padding-bottom:3px; background:#e0f2f1; padding:5px 10px; border-radius:4px;">
+                                <span style="flex-basis:60%;">Jenis Vaksin</span>
+                                <span style="flex-basis:20%; text-align:right;">Laki-laki</span>
+                                <span style="flex-basis:20%; text-align:right;">Perempuan</span>
+                            </div>
+                            <div style="max-height: 250px; overflow-y: auto; padding-right:10px;">
+                                ${vacDetails}
+                            </div>
+                            <p style="margin:10px 0 0 0; font-weight:700; text-align:right; border-top:1px solid #ddd; padding-top:5px;">
+                                Total L: ${totalL} | Total P: ${totalP} | Grand Total: ${totalL + totalP} dosis
+                            </p>
+                        </td>
+                    </tr>
+                `;
+            });
+            reportListHtml += `</tbody></table>`;
+        }
+
+        // --- Display BIAS Results ---
+        if (filteredBias.length > 0) {
+            reportListHtml += `<h4 style="margin:15px 0 5px 0; color:var(--accent);"><i class="fas fa-school"></i> Laporan BIAS (${filteredBias.length} laporan)</h4>`;
+            reportListHtml += `
+                <table class="kumulatif-table" style="font-size:0.9rem; margin-bottom:20px;">
+                    <thead>
+                        <tr>
+                            <th style="width:100%">Rincian Laporan BIAS (Sasaran, Capaian & Jenis Kelamin)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            filteredBias.forEach(report => {
+                const data = report.data;
+                const totalSasaran = data.Sasaran_L + data.Sasaran_P;
+                let totalCapaian = 0;
+
+                const vacDetails = BIAS_VACCINES.map(vac => {
+                    const L = data[`${vac}_L`] || 0;
+                    const P = data[`${vac}_P`] || 0;
+                    totalCapaian += (L + P);
+                    return `<div style="display:flex; justify-content:space-between; margin-bottom:2px; padding:2px 0; border-bottom:1px dotted #f0f0f0;">
+                                <span style="font-weight:400; flex-basis:60%;">${vac}</span>
+                                <span style="flex-basis:20%; text-align:right; font-weight:600; color:#004080;">${L}</span>
+                                <span style="flex-basis:20%; text-align:right; font-weight:600; color:#FF7F50;">${P}</span>
+                            </div>`;
+                }).join('');
+
+                reportListHtml += `
+                    <tr style="background:#f7fcf9; border-top:2px solid var(--accent)">
+                        <td colspan="1" style="font-weight:700;">
+                            <i class="fas fa-school"></i> ${report.sekolah} (Kls ${report.kelas}) &bull; ${report.tanggal} 
+                            <span style="font-size:0.75rem; color:var(--muted); float:right;">ID: ${report.id}</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="1" style="padding: 10px 20px;">
+                            <p style="margin:0 0 5px 0; font-weight:700; color:var(--primary); background:#e3f2fd; padding:5px 10px; border-radius:4px; border-bottom:1px solid #90caf9;">
+                                SASARAN: L ${data.Sasaran_L} | P ${data.Sasaran_P} (Total: ${totalSasaran}) &bull; Drop Out: ${data.DropOut}
+                            </p>
+                            <div style="display:flex; justify-content:space-between; margin-top:10px; margin-bottom:5px; font-weight:700; border-bottom:2px solid #ddd; padding-bottom:3px; background:#f0f7ff; padding:5px 10px; border-radius:4px;">
+                                <span style="flex-basis:60%;">Jenis Vaksin BIAS</span>
+                                <span style="flex-basis:20%; text-align:right;">Laki-laki</span>
+                                <span style="flex-basis:20%; text-align:right;">Perempuan</span>
+                            </div>
+                            <div style="max-height: 250px; overflow-y: auto; padding-right:10px;">
+                                ${vacDetails}
+                            </div>
+                            <p style="margin:10px 0 0 0; font-weight:700; text-align:right; border-top:1px solid #ddd; padding-top:5px;">
+                                TOTAL CAPAIAN VAKSIN BIAS: ${totalCapaian} dosis
+                            </p>
+                            ${report.data.Keterangan ? `<p class="small" style="margin-top:10px; color:var(--muted); border-top:1px dashed #eee; padding-top:5px;">Catatan: ${report.data.Keterangan}</p>` : ''}
+                        </td>
+                    </tr>
+                `;
+            });
+            reportListHtml += `</tbody></table>`;
+        }
+        
+        if (filteredImun.length === 0 && filteredBias.length === 0) {
+            reportListHtml += `<p class="muted" style="margin-top:10px; padding:15px; border:1px dashed #ccc; border-radius:8px;">Tidak ditemukan laporan yang cocok dengan kriteria filter yang dipilih.</p>`;
+        }
+        
+        container.innerHTML += reportListHtml;
+    }
+
+
+    // ===== KUMULATIF CALCULATION AND DISPLAY (Dihapus Monthly Detail) =====
+
+    function displayKumulatif(){
+        const imunReports = getFromStorage(IMUN_STORAGE_KEY);
+        const biasReports = getFromStorage(BIAS_STORAGE_KEY);
+        const container = document.getElementById('kumulatifContent');
+        
+        setupReportFilters(); 
+        
+        if (imunReports.length === 0 && biasReports.length === 0) {
+            container.innerHTML = '<p class="muted">Belum ada laporan yang tersimpan di browser ini. Silakan input data di tab IMUNISASI atau BIAS, lalu klik "Download CSV" untuk menyimpan data, atau gunakan tab IMPORT untuk memuat database.</p>';
+            document.getElementById('detailedReportList').innerHTML = '<p class="muted">Gunakan panel filter di atas dan klik **"Tampilkan Laporan Spesifik"** untuk melihat rincian laporan yang tersimpan.</p>';
+            return;
+        }
+        
+        // Clear old content only, keep the filters and detail list section
+        container.innerHTML = '';
+        
+        // --- 1. Grand Total Calculation ---
+        let imunKumulatif = {};
+        imunReports.forEach(report => {
+            for(const [vaksin, data] of Object.entries(report.data)){
+                if(!imunKumulatif[vaksin]){ imunKumulatif[vaksin] = { L: 0, P: 0 }; }
+                imunKumulatif[vaksin].L += data.L;
+                imunKumulatif[vaksin].P += data.P;
+            }
+        });
+
+        let biasKumulatif = { Sasaran_L: 0, Sasaran_P: 0, MR_L: 0, MR_P: 0, DT_L: 0, DT_P: 0, Td_L: 0, Td_P: 0, HPV_L: 0, HPV_P: 0, DropOut: 0 };
+        const biasSumKeys = ['Sasaran_L', 'Sasaran_P', 'MR_L', 'MR_P', 'DT_L', 'DT_P', 'Td_L', 'Td_P', 'HPV_L', 'HPV_P', 'DropOut'];
+        
+        biasReports.forEach(report => {
+             biasSumKeys.forEach(key => {
+                const val = report.data[key] || 0;
+                if(typeof val === 'number'){ biasKumulatif[key] += val; }
+            });
+        });
+
+
+        // --- 2. Display Grand Total ---
+        let html = `<p class="small">Data Grand Total berasal dari **${imunReports.length} laporan Imunisasi** dan **${biasReports.length} laporan BIAS** yang tersimpan di browser ini.</p>`;
+        
+        // Grand Total Imunisasi
+        html += `
+            <h3 style="margin:16px 0 8px 0;font-size:1.1rem;color:var(--primary)">Grand Total Kumulatif Imunisasi (Total Keseluruhan)</h3>
+            <p class="muted small" style="margin-top:-10px">Total keseluruhan capaian imunisasi per jenis vaksin sampai saat ini.</p>
+            <table class="kumulatif-table">
+                <thead>
+                    <tr>
+                        <th style="width:50%">Vaksin</th>
+                        <th>Laki-Laki (L)</th>
+                        <th>Perempuan (P)</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+        let grandTotalImun = 0;
+        for(const [vaksin, data] of Object.entries(imunKumulatif)){
+            const total = data.L + data.P;
+            grandTotalImun += total;
+            html += `
+                <tr>
+                    <td style="font-weight:600">${vaksin}</td>
+                    <td>${data.L}</td>
+                    <td>${data.P}</td>
+                    <td style="font-weight:700">${total}</td>
+                </tr>
+            `;
+        }
+        html += `
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3" style="text-align:right;">GRAND TOTAL CAPAIAN IMUNISASI:</td>
+                    <td>${grandTotalImun}</td>
+                </tr>
+            </tfoot>
+            </table>
+        `;
+
+        // Grand Total BIAS
+        html += `
+            <h3 style="margin:20px 0 8px 0;font-size:1.1rem;color:var(--primary)">Grand Total Kumulatif BIAS (Total Keseluruhan)</h3>
+            <p class="muted small" style="margin-top:-10px">Total keseluruhan Sasaran, Drop Out, dan Capaian BIAS sampai saat ini.</p>
+            <table class="kumulatif-table">
+                <thead>
+                    <tr>
+                        <th style="width:50%">Jenis Data</th>
+                        <th>Total Laki-Laki</th>
+                        <th>Total Perempuan</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+
+        const biasDisplay = [
+            { label: 'MR', L_key: 'MR_L', P_key: 'MR_P' },
+            { label: 'DT', L_key: 'DT_L', P_key: 'DT_P' },
+            { label: 'Td', L_key: 'Td_L', P_key: 'Td_P' },
+            { label: 'HPV', L_key: 'HPV_L', P_key: 'HPV_P' }
+        ];
+
+        let totalCapaianBias = 0;
+        biasDisplay.forEach(item => {
+            const L = biasKumulatif[item.L_key];
+            const P = biasKumulatif[item.P_key];
+            totalCapaianBias += (L + P);
+            html += `
+                <tr>
+                    <td style="font-weight:600">${item.label}</td>
+                    <td>${L}</td>
+                    <td>${P}</td>
+                </tr>
+            `;
+        });
+        
+        html += `
+            <tr>
+                <td style="font-weight:600; background:#fcfcfc">Total Sasaran</td>
+                <td>${biasKumulatif.Sasaran_L}</td>
+                <td>${biasKumulatif.Sasaran_P}</td>
+            </tr>
+            <tr>
+                <td style="font-weight:600; background:#fcfcfc">Total Drop Out</td>
+                <td colspan="2" style="font-weight:700; background:#fcfcfc">${biasKumulatif.DropOut}</td>
+            </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="2" style="text-align:right;">GRAND TOTAL CAPAIAN BIAS:</td>
+                    <td>${totalCapaianBias}</td>
+                </tr>
+            </tfoot>
+            </table>
+        `;
+        
+        // **(Bagian Detail Kumulatif per Bulan Dihapus Sesuai Permintaan)**
+
+        container.innerHTML += html;
+    }
+  </script>
+</body>
+</html>

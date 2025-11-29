@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Sistem Pelaporan Imunisasi & BIAS — Puskesmas Melata (v6.5 - Compact Cumulative)</title>
+  <title>Sistem Pelaporan Imunisasi & BIAS — Puskesmas Melata (v6.6 - Bottom Actions)</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -339,7 +339,7 @@
         <div class="logo"><i class="fas fa-syringe" style="font-size:20px;color:#fff"></i></div>
         <div>
           Sistem Pelaporan Imunisasi & BIAS<br>
-          <span class="brand-title-small">Puskesmas Melata (v6.5 - Compact Cumulative)</span>
+          <span class="brand-title-small">Puskesmas Melata (v6.6 - Bottom Actions)</span>
         </div>
       </div>
 
@@ -542,11 +542,6 @@
         <h2><i class="fas fa-chart-line"></i> Hasil Kumulatif Imunisasi dan BIAS</h2>
         <p class="lead">Menampilkan total capaian dan rincian per bulan dari seluruh laporan yang tersimpan di browser ini.</p>
 
-        <div class="actions" style="justify-content:flex-start">
-          <button class="btn btn-info" onclick="displayKumulatif()"><i class="fas fa-calculator"></i> Hitung Ulang & Muat Data</button>
-          <button class="btn btn-danger" onclick="clearAllData()"><i class="fas fa-trash"></i> Hapus Semua Data Lokal</button>
-        </div>
-        
         <hr class="sep">
         
         <div class="card" style="background:#f5fef7; border:1px solid #c8e6c9">
@@ -595,7 +590,7 @@
             </p>
         </div>
         <div id="kumulatifContent">
-          <p class="muted">Klik tombol "Hitung Ulang & Muat Data" untuk menampilkan hasil kumulatif dari semua laporan yang tersimpan.</p>
+          <p class="muted">Klik tombol "Hitung Ulang & Muat Data" di bagian bawah untuk menampilkan hasil kumulatif dari semua laporan yang tersimpan.</p>
         </div>
 
         <div class="card" style="margin-top:20px; background:#fffbfb; border:1px solid #ffcccc">
@@ -618,12 +613,20 @@
             </div>
 
             <div class="actions" style="justify-content:flex-start; margin-top:5px">
+                 <button class="btn btn-info" onclick="displayKumulatif()"><i class="fas fa-calculator"></i> Hitung Ulang & Muat Data</button>
+                 
                 <button class="btn" style="background:var(--danger); color:#fff" onclick="performSelectiveDeletion()">
                     <i class="fas fa-skull-crossbones"></i> Hapus Data Yang Dipilih Secara Permanen
                 </button>
             </div>
         </div>
+        <div class="actions" style="justify-content:flex-start; margin-top:20px;">
+            <button class="btn" style="background:var(--danger); color:#fff" onclick="clearAllData()">
+                <i class="fas fa-skull-crossbones"></i> Hapus Semua Data Lokal (Permanen)
+            </button>
         </div>
+
+      </div>
     </section>
 
   </main>
@@ -1259,7 +1262,7 @@
         const dataToExport = {
             imunReports: getFromStorage(IMUN_STORAGE_KEY),
             biasReports: getFromStorage(BIAS_STORAGE_KEY),
-            version: '6.5 - JSON Database'
+            version: '6.6 - JSON Database'
         };
         
         const jsonContent = JSON.stringify(dataToExport, null, 2); 

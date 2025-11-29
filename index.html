@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Sistem Pelaporan Imunisasi & BIAS — Puskesmas Melata (v6.1)</title>
+  <title>Sistem Pelaporan Imunisasi & BIAS — Puskesmas Melata (v6.2 - Kumulatif CSV)</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -280,7 +280,7 @@
         <div class="logo"><i class="fas fa-syringe" style="font-size:20px;color:#fff"></i></div>
         <div>
           Sistem Pelaporan Imunisasi & BIAS<br>
-          <span class="brand-title-small">Puskesmas Melata (v6.1 - Tampilan Baru & CSV Only)</span>
+          <span class="brand-title-small">Puskesmas Melata (v6.2 - Kumulatif CSV)</span>
         </div>
       </div>
 
@@ -325,7 +325,8 @@
                   <option value="mukti_manunggal">Mukti Manunggal</option>
                   <option value="sumber_jaya">Sumber Jaya</option>
                   <option value="bukit_harum">Bukit Harum</option>
-                  <option value="pt_tsa">PT. TSA</option> </select>
+                  <option value="pt_tsa">PT. TSA</option>
+                </select>
               </div>
 
               <div class="form-group">
@@ -517,6 +518,22 @@
         
         <div id="detailedReportList" style="margin-top:20px">
             <p class="muted">Gunakan panel filter di atas dan klik **"Tampilkan Laporan Spesifik"** untuk melihat rincian laporan yang tersimpan.</p>
+        </div>
+        <div class="card" style="margin-top:20px; background:#f7fcf9; border:1px solid var(--accent)">
+            <h3><i class="fas fa-file-csv"></i> Opsi Download CSV Kumulatif</h3>
+            <p class="small">Pilih jenis data CSV yang akan diunduh.</p>
+            
+            <div class="actions" style="justify-content:flex-start; margin-top:15px">
+                <button class="btn btn-primary" onclick="downloadFilteredReportsCSV()">
+                    <i class="fas fa-download"></i> Download CSV Laporan Spesifik (Sesuai Filter)
+                </button>
+                <button class="btn btn-info" onclick="downloadMonthlyTotalsCSV()">
+                    <i class="fas fa-download"></i> Download CSV Total Per Bulan
+                </button>
+            </div>
+            <p class="small" style="margin-top:10px; color:var(--muted)">
+                *Download Laporan Spesifik akan menggunakan filter Desa/Sekolah/Bulan yang saat ini dipilih di atas.
+            </p>
         </div>
         <div id="kumulatifContent">
           <p class="muted">Klik tombol "Hitung Ulang & Muat Data" untuk menampilkan hasil kumulatif dari semua laporan yang tersimpan.</p>
@@ -1182,7 +1199,7 @@
         const dataToExport = {
             imunReports: getFromStorage(IMUN_STORAGE_KEY),
             biasReports: getFromStorage(BIAS_STORAGE_KEY),
-            version: '6.1 - JSON Database'
+            version: '6.2 - JSON Database'
         };
         
         const jsonContent = JSON.stringify(dataToExport, null, 2); 
@@ -1566,12 +1583,19 @@
                 const totalSasaran = data.Sasaran_L + data.Sasaran_P;
                 let totalCapaian = 0;
 
-                const vacDetails = BIAS_VACCINES.map(vac => {
-                    const L = data[`${vac}_L`] || 0;
-                    const P = data[`${vac}_P`] || 0;
+                const biasDisplay = [
+                    { label: 'MR', L_key: 'MR_L', P_key: 'MR_P' },
+                    { label: 'DT', L_key: 'DT_L', P_key: 'DT_P' },
+                    { label: 'Td', L_key: 'Td_L', P_key: 'Td_P' },
+                    { label: 'HPV', L_key: 'HPV_L', P_key: 'HPV_P' }
+                ];
+
+                const vacDetails = biasDisplay.map(item => {
+                    const L = data[item.L_key] || 0;
+                    const P = data[item.P_key] || 0;
                     totalCapaian += (L + P);
                     return `<div style="display:flex; justify-content:space-between; margin-bottom:2px; padding:2px 0; border-bottom:1px dotted #f0f0f0;">
-                                <span style="font-weight:400; flex-basis:60%;">${vac}</span>
+                                <span style="font-weight:400; flex-basis:60%;">${item.label}</span>
                                 <span style="flex-basis:20%; text-align:right; font-weight:600; color:#004080;">${L}</span>
                                 <span style="flex-basis:20%; text-align:right; font-weight:600; color:#FF6347;">${P}</span>
                             </div>`;
@@ -1615,8 +1639,236 @@
         container.innerHTML += reportListHtml;
     }
 
+    // ===== KUMULATIF DOWNLOAD FUNCTIONS (NEW) =====
+    
+    // Helper function to aggregate all reports by month (YYYY-MM)
+    function aggregateMonthlyData(imunReports, biasReports) {
+        const monthlyData = {}; // Key: YYYY-MM
+        
+        // --- Aggregate Imunisasi ---
+        imunReports.forEach(report => {
+            const key = report.periode; // YYYY-MM
+            if (!key) return;
 
-    // ===== KUMULATIF CALCULATION AND DISPLAY (Tetap) =====
+            if (!monthlyData[key]) {
+                monthlyData[key] = {
+                    periode: key,
+                    imun: {}, // Imunisasi data per vaccine
+                    bias: { Sasaran_L: 0, Sasaran_P: 0, MR_L: 0, MR_P: 0, DT_L: 0, DT_P: 0, Td_L: 0, Td_P: 0, HPV_L: 0, HPV_P: 0, DropOut: 0 }
+                };
+            }
+
+            for (const [vaksin, data] of Object.entries(report.data)){
+                if (!monthlyData[key].imun[vaksin]) {
+                    monthlyData[key].imun[vaksin] = { L: 0, P: 0 };
+                }
+                monthlyData[key].imun[vaksin].L += data.L;
+                monthlyData[key].imun[vaksin].P += data.P;
+            }
+        });
+
+        // --- Aggregate BIAS ---
+        const biasSumKeys = ['Sasaran_L', 'Sasaran_P', 'MR_L', 'MR_P', 'DT_L', 'DT_P', 'Td_L', 'Td_P', 'HPV_L', 'HPV_P', 'DropOut'];
+        
+        biasReports.forEach(report => {
+            const rawDate = report.tanggal;
+            const key = (rawDate && typeof rawDate === 'string' && rawDate.length >= 7) ? rawDate.substring(0, 7) : null;
+            if (!key) return;
+
+            if (!monthlyData[key]) {
+                 monthlyData[key] = {
+                    periode: key,
+                    imun: {},
+                    bias: { Sasaran_L: 0, Sasaran_P: 0, MR_L: 0, MR_P: 0, DT_L: 0, DT_P: 0, Td_L: 0, Td_P: 0, HPV_L: 0, HPV_P: 0, DropOut: 0 }
+                };
+            }
+            
+            biasSumKeys.forEach(sumKey => {
+                const val = report.data[sumKey] || 0;
+                if (typeof val === 'number') {
+                    monthlyData[key].bias[sumKey] += val;
+                }
+            });
+        });
+
+        // Sort by period (oldest to newest)
+        const sortedKeys = Object.keys(monthlyData).sort();
+        return sortedKeys.map(key => monthlyData[key]);
+    }
+
+    // New: Download CSV for Filtered Reports (Raw Data)
+    function downloadFilteredReportsCSV() {
+        const periodFilter = document.getElementById('filter_periode').value;
+        const desaFilter = document.getElementById('filter_desa').value;
+        const sekolahFilter = document.getElementById('filter_sekolah').value;
+        
+        const imunReports = getFromStorage(IMUN_STORAGE_KEY);
+        const biasReports = getFromStorage(BIAS_STORAGE_KEY);
+        
+        // --- Filter Logic (Re-used from displayDetailedReports) ---
+        const filteredImun = imunReports.filter(report => {
+            let match = true;
+            if (periodFilter && report.periode !== periodFilter) match = false;
+            if (desaFilter && report.desa !== desaFilter) match = false;
+            if (sekolahFilter) match = false; 
+            return match;
+        });
+
+        const filteredBias = biasReports.filter(report => {
+            let match = true;
+            const rawDate = report.tanggal;
+            const reportPeriode = (rawDate && typeof rawDate === 'string' && rawDate.length >= 7) ? rawDate.substring(0, 7) : null;
+                
+            if (periodFilter && reportPeriode !== periodFilter) match = false;
+            if (desaFilter) match = false; 
+            if (sekolahFilter && report.sekolah !== sekolahFilter) match = false;
+            return match;
+        });
+        // --- End Filter Logic ---
+
+        if (filteredImun.length === 0 && filteredBias.length === 0) {
+            alert('Tidak ada laporan yang cocok dengan kriteria filter yang dipilih untuk diunduh.');
+            return;
+        }
+
+        let csvContent = '';
+        const dateStamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+        let filename = `Laporan_Spesifik_${dateStamp}.csv`;
+        
+        // Header Info
+        csvContent += `"Laporan Spesifik - Puskesmas Melata"\n`;
+        csvContent += `"Filter Bulan";"${periodFilter || 'SEMUA'}"\n`;
+        csvContent += `"Filter Desa";"${desaFilter || 'SEMUA'}"\n`;
+        csvContent += `"Filter Sekolah";"${sekolahFilter || 'SEMUA'}"\n`;
+        csvContent += `\n`;
+        
+        // --- 1. Imunisasi CSV Section ---
+        if (filteredImun.length > 0) {
+            csvContent += `"--------------------";"DATA IMUNISASI (RAW REPORT) - Total ${filteredImun.length} Laporan";"--------------------"\n`;
+            const imunHeader = `ID;Desa;Periode;Jenis Imunisasi;Laki-laki;Perempuan\n`;
+            csvContent += imunHeader;
+            
+            filteredImun.forEach(report => {
+                const id = report.id;
+                const desa = report.desa;
+                const periode = report.periode;
+                
+                imunFields.forEach(field => {
+                    const data = report.data[field] || { L: 0, P: 0 };
+                    // Ensure that the values are treated as numbers in the CSV
+                    csvContent += `${id};"${desa}";${periode};"${field}";${data.L};${data.P}\n`;
+                });
+            });
+            csvContent += `\n`;
+        }
+
+        // --- 2. BIAS CSV Section ---
+        if (filteredBias.length > 0) {
+            csvContent += `"--------------------";"DATA BIAS (RAW REPORT) - Total ${filteredBias.length} Laporan";"--------------------"\n`;
+            const biasHeader = `ID;Nama Sekolah;Kelas;Tanggal;Sasaran_L;Sasaran_P;DropOut;MR_L;MR_P;DT_L;DT_P;Td_L;Td_P;HPV_L;HPV_P;Keterangan\n`;
+            csvContent += biasHeader;
+
+            filteredBias.forEach(report => {
+                const data = report.data;
+                const cols = [
+                    report.id, report.sekolah, report.kelas, report.tanggal,
+                    data.Sasaran_L, data.Sasaran_P, data.DropOut,
+                    data.MR_L, data.MR_P,
+                    data.DT_L, data.DT_P,
+                    data.Td_L, data.Td_P,
+                    data.HPV_L, data.HPV_P, 
+                    `"${(data.Keterangan || '').replace(/"/g,'""')}"`
+                ];
+                // Manually join with semicolon, skipping quote for numbers but keeping for strings if necessary (handled by using "" around the column value)
+                csvContent += cols.map(c => (typeof c === 'number' || (typeof c === 'string' && c.startsWith('"') && c.endsWith('"'))) ? c : `"${String(c).replace(/"/g,'""')}"`).join(';') + '\n';
+            });
+            csvContent += `\n`;
+        }
+        
+        downloadBlobCSV(csvContent, filename);
+        alert(`✅ Berhasil mengunduh file CSV Laporan Spesifik: ${filename}`);
+    }
+
+    // New: Download CSV for Monthly Totals
+    function downloadMonthlyTotalsCSV() {
+        const imunReports = getFromStorage(IMUN_STORAGE_KEY);
+        const biasReports = getFromStorage(BIAS_STORAGE_KEY);
+        
+        if (imunReports.length === 0 && biasReports.length === 0) {
+            alert('Tidak ada laporan yang tersimpan untuk dibuatkan total per bulan.');
+            return;
+        }
+
+        const monthlyTotals = aggregateMonthlyData(imunReports, biasReports);
+        
+        // CSV Content Generation
+        let csvContent = '';
+        const dateStamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+        let filename = `Total_Bulanan_Kumulatif_${dateStamp}.csv`;
+
+        csvContent += `"Total Kumulatif Imunisasi dan BIAS Per Bulan - Puskesmas Melata"\n`;
+        csvContent += `\n`;
+
+        // --- 1. BIAS Monthly Total Header ---
+        const biasHeader = [
+            'Periode (YYYY-MM)',
+            'Sasaran_L', 'Sasaran_P', 'Total_Sasaran',
+            'DropOut', 
+            'MR_L', 'MR_P', 'Total_MR',
+            'DT_L', 'DT_P', 'Total_DT',
+            'Td_L', 'Td_P', 'Total_Td',
+            'HPV_L', 'HPV_P', 'Total_HPV'
+        ];
+        csvContent += `;"DATA BIAS BULANAN";\n`;
+        csvContent += biasHeader.join(';') + '\n';
+        
+        // --- 2. BIAS Monthly Total Rows ---
+        monthlyTotals.forEach(month => {
+            const data = month.bias;
+            const totalSasaran = data.Sasaran_L + data.Sasaran_P;
+            const totalMR = data.MR_L + data.MR_P;
+            const totalDT = data.DT_L + data.DT_P;
+            const totalTd = data.Td_L + data.Td_P;
+            const totalHPV = data.HPV_L + data.HPV_P;
+            
+            const row = [
+                month.periode, 
+                data.Sasaran_L, data.Sasaran_P, totalSasaran,
+                data.DropOut,
+                data.MR_L, data.MR_P, totalMR,
+                data.DT_L, data.DT_P, totalDT,
+                data.Td_L, data.Td_P, totalTd,
+                data.HPV_L, data.HPV_P, totalHPV
+            ];
+            csvContent += row.join(';') + '\n';
+        });
+        csvContent += `\n`;
+        
+        // --- 3. Imunisasi Monthly Total Header ---
+        const imunHeaderVaksin = imunFields.map(v => [`${v}_L`, `${v}_P`, `Total_${slugify(v)}`]).flat();
+        const imunHeader = ['Periode (YYYY-MM)', ...imunHeaderVaksin];
+        csvContent += `;"DATA IMUNISASI BULANAN";\n`;
+        csvContent += imunHeader.join(';') + '\n';
+
+        // --- 4. Imunisasi Monthly Total Rows ---
+        monthlyTotals.forEach(month => {
+            let row = [month.periode];
+            
+            imunFields.forEach(vaksin => {
+                const data = month.imun[vaksin] || { L: 0, P: 0 };
+                const total = data.L + data.P;
+                row.push(data.L, data.P, total);
+            });
+            
+            csvContent += row.join(';') + '\n';
+        });
+
+        downloadBlobCSV(csvContent, filename);
+        alert(`✅ Berhasil mengunduh file CSV Total Per Bulan: ${filename}`);
+    }
+
+
+    // ===== KUMULATIF CALCULATION AND DISPLAY (UPDATED to include Monthly Breakdown) =====
 
     function displayKumulatif(){
         const imunReports = getFromStorage(IMUN_STORAGE_KEY);
@@ -1751,7 +2003,96 @@
             </tfoot>
             </table>
         `;
-        
+
+        // --- 3. Per Month Breakdown ---
+        const monthlyTotals = aggregateMonthlyData(imunReports, biasReports);
+
+        if (monthlyTotals.length > 0) {
+            html += `
+                <h3 style="margin:30px 0 8px 0;font-size:1.3rem;color:var(--accent)"><i class="fas fa-calendar-alt"></i> Rincian Kumulatif Per Bulan</h3>
+                <p class="muted small" style="margin-top:-10px">Total keseluruhan capaian Imunisasi dan BIAS per bulan yang dilaporkan.</p>
+            `;
+
+            // Display newest first
+            monthlyTotals.slice().reverse().forEach(month => { 
+                const monthYear = new Date(month.periode + '-01').toLocaleDateString('id-ID', { year: 'numeric', month: 'long' });
+                
+                // --- Monthly Imunisasi Table ---
+                const imunData = month.imun;
+                let totalMonthlyImun = 0;
+                let imunRows = '';
+                // Ensure correct order
+                imunFields.forEach(vaksin => { 
+                    const data = imunData[vaksin] || { L: 0, P: 0 };
+                    const total = data.L + data.P;
+                    totalMonthlyImun += total;
+                    imunRows += `
+                        <tr>
+                            <td style="font-weight:600">${vaksin}</td>
+                            <td>${data.L}</td>
+                            <td>${data.P}</td>
+                            <td style="font-weight:700">${total}</td>
+                        </tr>
+                    `;
+                });
+
+                // --- Monthly BIAS Table ---
+                const biasData = month.bias;
+                let totalMonthlyBias = 0;
+                let biasRows = '';
+
+                biasDisplay.forEach(item => {
+                    const L = biasData[item.L_key];
+                    const P = biasData[item.P_key];
+                    totalMonthlyBias += (L + P);
+                    biasRows += `
+                        <tr>
+                            <td style="font-weight:600">${item.label}</td>
+                            <td>${L}</td>
+                            <td>${P}</td>
+                            <td style="font-weight:700">${L + P}</td>
+                        </tr>
+                    `;
+                });
+                
+                // Combine display for the month
+                html += `
+                    <div class="card" style="margin-top:15px; border:2px solid var(--accent-light); padding:20px; background:#f0f8ff;">
+                        <h4 style="margin:0 0 15px 0; color:var(--accent); font-size:1.2rem;">
+                            <i class="fas fa-calendar-day"></i> Laporan Bulan: ${monthYear}
+                        </h4>
+                        
+                        <div class="grid" style="grid-template-columns:repeat(2,1fr); gap:20px;">
+                            <div>
+                                <h5 style="margin:0 0 10px 0; color:var(--primary); font-size:1rem;"><i class="fas fa-syringe"></i> Total Imunisasi (${totalMonthlyImun} dosis)</h5>
+                                <table class="kumulatif-table" style="margin-top:0; font-size:0.9rem;">
+                                    <thead><tr><th>Vaksin</th><th>L</th><th>P</th><th>Total</th></tr></thead>
+                                    <tbody>${imunRows}</tbody>
+                                    <tfoot><tr><td colspan="3" style="text-align:right;">Total Capaian:</td><td>${totalMonthlyImun}</td></tr></tfoot>
+                                </table>
+                            </div>
+                            <div>
+                                <h5 style="margin:0 0 10px 0; color:var(--primary); font-size:1rem;"><i class="fas fa-school"></i> Total BIAS (${totalMonthlyBias} dosis)</h5>
+                                <table class="kumulatif-table" style="margin-top:0; font-size:0.9rem;">
+                                    <thead><tr><th>Vaksin</th><th>L</th><th>P</th><th>Total</th></tr></thead>
+                                    <tbody>${biasRows}</tbody>
+                                    <tfoot><tr><td colspan="3" style="text-align:right;">Total Capaian:</td><td>${totalMonthlyBias}</td></tr></tfoot>
+                                </table>
+                                
+                                <p style="margin:10px 0 0 0; font-weight:700; color:var(--accent); font-size:0.95rem; border-top:1px dashed #ccc; padding-top:10px;">
+                                    Sasaran BIAS: L ${biasData.Sasaran_L} | P ${biasData.Sasaran_P} (Total: ${biasData.Sasaran_L + biasData.Sasaran_P})
+                                </p>
+                                 <p style="margin:5px 0 0 0; font-weight:700; color:var(--danger); font-size:0.95rem;">
+                                    Drop Out: ${biasData.DropOut}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+
         container.innerHTML += html;
     }
   </script>

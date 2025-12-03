@@ -1,0 +1,320 @@
+:root{
+  /* New Colors based on Coral theme */
+  --primary:#FF6347; /* Tomato/Vibrant Coral */
+  --primary-light:#FF8866;
+  --accent:#004080; /* Navy Blue */
+  --accent-light:#0066b3;
+  --bg:#f8f9fa; /* Very light gray/white background */
+  --card:#ffffff;
+  --muted:#6c757d;
+  --success:#198754;
+  --danger:#dc3545;
+  --info:#0d6efd;
+  --radius:10px;
+  --gap:18px;
+  --shadow-subtle:0 2px 8px rgba(0,0,0,0.05);
+  --shadow-card:0 10px 30px rgba(0,0,0,0.08);
+}
+*{box-sizing:border-box}
+body{
+  font-family:'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  margin:0;
+  background:var(--bg);
+  color:#212529;
+  -webkit-font-smoothing:antialiased;
+  padding-bottom:50px;
+}
+
+/* Header */
+header.app-header{
+  background:linear-gradient(90deg,var(--accent), var(--accent-light));
+  color: #fff;
+  min-height: 90px; 
+  padding: 0 20px;
+  display:flex;
+  flex-direction: column; 
+  align-items: center; 
+  box-shadow:0 8px 20px rgba(0, 0, 0, 0.2);
+  position:sticky;
+  top:0;
+  z-index:1000;
+}
+.brand-row{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1100px; /* Constrain width */
+  padding: 15px 0 0 0;
+}
+.brand {
+  display:flex;align-items:center;gap:15px;font-weight:700;font-size:1.2rem;
+}
+.brand .logo{
+  width:48px;height:48px;border-radius:12px;background:var(--primary);display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 10px rgba(255, 99, 71, 0.4);
+}
+.brand-title-small {
+    font-weight:500;font-size:0.8rem;opacity:0.9;
+}
+
+/* Navigasi Tabs */
+.app-nav-tabs{
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  max-width: 1100px; /* Constrain width */
+  padding: 0 0 0 0;
+  margin-top: 10px;
+  overflow-x: auto; 
+}
+.app-nav-tabs .tab{
+  flex-shrink: 0; 
+  color: #c9e0f6;
+  background: transparent;
+  border: 0;
+  padding: 10px 18px;
+  border-radius: var(--radius) var(--radius) 0 0;
+  cursor: pointer;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  opacity: 0.8;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
+  border-bottom: 3px solid transparent;
+}
+/* Style untuk tab AKTIF */
+.app-nav-tabs .tab.active{
+  background: var(--card);
+  color: var(--accent);
+  opacity: 1;
+  font-weight: 700;
+  border-bottom: 3px solid var(--primary);
+  box-shadow: var(--shadow-subtle);
+}
+.app-nav-tabs .tab:hover:not(.active){
+  opacity: 1;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Layout */
+.wrap{max-width:1100px;margin:25px auto;padding:0 20px;}
+.tabs{display: none;} 
+
+/* Card */
+.card{
+  background:var(--card);border-radius:var(--radius);padding:25px;
+  box-shadow:var(--shadow-card);
+  margin-bottom:var(--gap);
+  border: 1px solid #e9ecef;
+}
+h2{margin:0 0 15px 0;color:var(--accent);font-size:1.5rem}
+p.lead{margin:0 0 20px 0;color:var(--muted);font-size:1.1rem}
+
+/* Grid */
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--gap)}
+@media (max-width:900px){.grid{grid-template-columns:1fr}}
+
+/* Form specifics */
+.form-group{margin-bottom:15px;display:flex;flex-direction:column}
+label{font-weight:600;color:var(--accent);margin-bottom:8px;font-size:1rem}
+input[type="text"], input[type="month"], select, textarea, input[type="file"]{
+  padding:12px 15px;border-radius:8px;border:1px solid #ced4da;background:#fefefe;font-size:1rem;
+  outline:none;transition:all 0.2s ease;
+}
+select:focus,input:focus,textarea:focus{box-shadow:0 0 0 3px rgba(255, 99, 71, 0.25);border-color:var(--primary)}
+textarea{min-height:100px;resize:vertical}
+
+/* BIAS specific layout for Sasaran/Capaian */
+.form-row{display:flex;gap:12px}
+.form-row .form-group{flex:1}
+
+.inline{display:flex;gap:10px;align-items:center}
+.muted{color:var(--muted);font-size:0.95rem}
+
+/* Action buttons */
+.actions{display:flex;gap:12px;justify-content:flex-end;align-items:center;margin-top:15px}
+.btn{
+  padding:12px 20px;border-radius:8px;border:0;font-weight:600;cursor:pointer;display:inline-flex;gap:8px;align-items:center;
+  box-shadow:var(--shadow-subtle);
+  transition:transform 0.2s, background 0.2s, box-shadow 0.2s;
+}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-light);transform:translateY(-1px);box-shadow:0 4px 15px rgba(255, 99, 71, 0.3);}
+.btn-ghost{background:transparent;border:1px solid #ced4da;color:var(--accent)}
+.btn-ghost:hover{background:#f8f9fa; transform:translateY(-1px);}
+.btn-info{background:var(--info);color:#fff} 
+.btn-info:hover{background:#0b5ed7;transform:translateY(-1px);box-shadow:0 4px 15px rgba(13, 110, 253, 0.3);}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-danger:hover{background:#bb2d3b;transform:translateY(-1px);box-shadow:0 4px 15px rgba(220, 53, 69, 0.3);}
+
+
+/* small helper */
+.small{font-size:0.9rem;color:var(--muted)}
+hr.sep{border:0;height:1px;margin:20px 0;border-radius:6px;background:linear-gradient(90deg,transparent,#dee2e6,transparent)}
+
+/* Export panel */
+.export-grid{display:flex;gap:var(--gap);flex-wrap:wrap}
+.export-card{flex:1;min-width:280px;padding:20px;border-radius:var(--radius);background:linear-gradient(180deg,#f9fcfd,#f5f8fb);box-shadow:var(--shadow-subtle); border: 1px solid #eaf2f8;}
+.label-pill{display:inline-block;padding:8px 14px;border-radius:999px;background:#e9f4ff;color:var(--accent);font-weight:700;font-size:0.9rem}
+
+/* Kumulatif Table Styling - Reduced size for elegance */
+.kumulatif-table td, .kumulatif-table th {
+    border: 1px solid #e9ecef;
+    padding: 8px 10px; /* Default padding for main totals */
+    text-align: left;
+    font-size: 0.9rem; /* Default font size for main totals */
+}
+.kumulatif-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem; 
+    margin-top: 8px; /* Reduced margin */
+}
+.kumulatif-table thead tr {
+    background: #f1f6fa;
+    text-align: left;
+    color: var(--accent);
+}
+.kumulatif-table tfoot td {
+    font-weight: 700;
+    background: #fef4e6;
+    color: var(--primary);
+}
+
+/* General Kumulatif Section Appearance */
+#kumulatif h2 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+#kumulatif .lead {
+    margin-bottom: 10px;
+}
+#kumulatif hr.sep {
+    margin: 15px 0;
+}
+
+/* Refinement for Grand Total headings */
+#kumulatifContent h3 {
+    font-size: 1.3rem; /* Compact size */
+    font-weight: 700;
+    margin-top: 15px; 
+    padding-bottom: 3px;
+    border-bottom: 2px solid var(--primary);
+    display: inline-block; /* Elegant border effect */
+}
+
+/* Specific styling for the monthly breakdown cards (Laporan Bulan) - COMPACT V6.5 */
+.monthly-report-card {
+    border: 1px solid #d4e3f4 !important; /* Softer border */
+    background: #f7f9fc !important; /* Softer background */
+    padding: 12px !important; /* REDUCED padding from 15px */
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-subtle);
+    margin-top: 10px; /* REDUCED margin from 15px */
+}
+.monthly-report-card h4 {
+    font-size: 1.05rem !important; /* SLIGHTLY REDUCED heading size from 1.1rem */
+    padding-bottom: 5px; /* REDUCED padding from 8px */
+    margin-bottom: 8px !important; /* REDUCED margin from 10px */
+    border-bottom: 1px dashed #c0d8f0;
+}
+.monthly-report-card h5 {
+    font-size: 0.9rem !important; /* REDUCED sub-heading size from 0.95rem */
+    margin: 0 0 5px 0 !important;
+}
+.monthly-report-card .kumulatif-table {
+    font-size: 0.8rem; /* HEAVILY REDUCED table font inside monthly card from 0.85rem */
+}
+.monthly-report-card .kumulatif-table td, .monthly-report-card .kumulatif-table th {
+    padding: 4px 6px; /* HEAVILY REDUCED padding from 8px 10px */
+}
+.monthly-report-card .form-group p {
+    font-weight: 500; 
+    font-size: 0.85rem; /* SMALLER text for totals/DO */
+}
+
+/* Enhancement for the dynamic class input block (The "pop up" appearance) */
+.class-input-block {
+    border: 2px solid var(--accent-light) !important; 
+    box-shadow: 0 4px 15px rgba(0, 64, 128, 0.15) !important; 
+    background: #f0f8ff !important; 
+    transition: all 0.3s ease;
+    padding: 20px !important;
+}
+.class-input-block h4 {
+    color: var(--primary) !important; 
+    border-left: 4px solid var(--primary);
+    padding-left: 12px;
+    font-size: 1.2rem !important;
+    margin-bottom: 0 !important;
+}
+.class-input-block .bias-vac-row {
+    margin-top: 10px; 
+    padding-top: 10px;
+    border-top: 1px dashed #c0d8f0;
+}
+.class-input-block .bias-vac-row .form-group label {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* Custom Alert Boxes (Imunisasi/BIAS Info) */
+.alert-box {
+    padding: 15px;
+    border-radius: var(--radius);
+    margin-top: var(--gap);
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+.alert-info {
+    background: #e3f2fd;
+    border: 1px solid #90caf9;
+    color: #1e88e5;
+}
+.alert-warning {
+    background: #fffde7;
+    border: 1px solid #ffeb3b;
+    color: #fbc02d;
+}
+
+/* Filter Card Refinement */
+#kumulatif .card:has(h3 i.fa-search) {
+    padding: 15px 20px; /* Reduced padding */
+    margin-bottom: 15px;
+}
+
+/* Footer */
+.site-footer {
+    text-align: center;
+    margin-top: 40px;
+    padding: 15px 0;
+    color: var(--muted);
+    font-size: 0.85rem;
+    border-top: 1px solid #eee;
+}
+
+/* Responsive Adjustments */
+@media (max-width:520px){
+  header.app-header{padding:12px; min-height: unset;}
+  .brand-row{padding: 10px 0 0 0;}
+  .brand{font-size:1rem; gap: 8px;}
+  .brand .logo{width:38px; height:38px;}
+  .brand-title-small{font-size:0.75rem;}
+  .app-nav-tabs{
+    gap: 6px;
+    flex-wrap: nowrap; 
+    margin-top: 5px;
+  }
+  .app-nav-tabs .tab{
+    padding: 8px 10px;
+    font-size: 0.85rem;
+  }
+  .wrap{padding:0 15px; margin: 15px auto;}
+  .grid{grid-template-columns:1fr; gap: 15px;}
+  .form-row{flex-direction: column; gap:0;}
+  .form-row .form-group{margin-bottom:10px;}
+}

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Sistem Pelaporan Imunisasi & BIAS — Cloud</title>
+  <title>Sistem Pelaporan Imunisasi & BIAS — Puskesmas Melata</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <link rel="stylesheet" href="style.css">
@@ -16,7 +16,7 @@
         <div class="logo"><i class="fas fa-syringe"></i></div>
         <div>
           Sistem Pelaporan Imunisasi & BIAS<br>
-          <span class="brand-title-small">Puskesmas Melata (Versi Cloud)</span>
+          <span class="brand-title-small">Puskesmas Melata (Cloud Version)</span>
         </div>
       </div>
     </div>
@@ -34,9 +34,32 @@
         <h3><i class="fas fa-edit"></i> Input Laporan Imunisasi</h3>
         <form id="imunForm">
           <div class="form-grid">
-            <div class="form-group"><label>Bulan</label><input type="month" id="imunMonth" required></div>
-            <div class="form-group"><label>Nama Desa</label><input type="text" id="imunDesa" required></div>
+            <div class="form-group">
+              <label>Bulan Pelaporan</label>
+              <input type="month" id="imunMonth" required>
+            </div>
+            <div class="form-group">
+              <label>Kecamatan</label>
+              <select id="imunKecamatan" required>
+                <option value="">-- Pilih Kecamatan --</option>
+                <option value="Bulik">1. Kecamatan Bulik</option>
+                <option value="Sematu Jaya">2. Kecamatan Sematu Jaya</option>
+                <option value="Menthobi Raya">3. Kecamatan Menthobi Raya</option>
+                <option value="Bulik Timur">4. Kecamatan Bulik Timur</option>
+                <option value="Lamandau">5. Kecamatan Lamandau</option>
+                <option value="Belantikan Raya">6. Kecamatan Belantikan Raya</option>
+                <option value="Delang">7. Kecamatan Delang</option>
+                <option value="Batang Kawa">8. Kecamatan Batang Kawa</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Nama Desa</label>
+              <select id="imunDesa" required>
+                <option value="">-- Pilih Desa --</option>
+              </select>
+            </div>
           </div>
+          <hr>
           <div id="imunFields" class="vaccine-grid"></div>
           <div class="bottom-actions">
             <button type="submit" class="btn btn-primary"><i class="fas fa-cloud-upload-alt"></i> Simpan ke Cloud & CSV</button>
@@ -51,10 +74,7 @@
         <form id="biasForm">
           <div class="form-grid">
             <div class="form-group"><label>Bulan</label><input type="month" id="biasMonth" required></div>
-            <div class="form-group">
-              <label>Pilih Sekolah</label>
-              <select id="biasSchool" required></select>
-            </div>
+            <div class="form-group"><label>Sekolah</label><select id="biasSchool" required></select></div>
           </div>
           <div id="biasClassesContainer"></div>
           <div class="bottom-actions">
@@ -65,11 +85,11 @@
     </section>
 
     <section id="kumulatif" class="tab-content">
-        <div class="card">
-            <h3><i class="fas fa-info-circle"></i> Info</h3>
-            <p>Data yang Anda input otomatis tersimpan di Cloud Firebase.</p>
-        </div>
-        <div id="kumulatifResult"></div>
+      <div class="card">
+        <h3><i class="fas fa-database"></i> Status Database Cloud</h3>
+        <p>Semua data yang Anda simpan otomatis terkirim ke Firebase.</p>
+        <div id="statusCloud"></div>
+      </div>
     </section>
   </main>
 

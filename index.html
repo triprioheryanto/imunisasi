@@ -3,332 +3,76 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Sistem Pelaporan Imunisasi & BIAS — Puskesmas Melata (v6.6 - Bottom Actions)</title>
-
+  <title>Sistem Pelaporan Imunisasi & BIAS — Cloud</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  
   <link rel="stylesheet" href="style.css">
-  
 </head>
 <body>
 
   <header class="app-header">
     <div class="brand-row">
       <div class="brand">
-        <div class="logo"><i class="fas fa-syringe" style="font-size:20px;color:#fff"></i></div>
+        <div class="logo"><i class="fas fa-syringe"></i></div>
         <div>
           Sistem Pelaporan Imunisasi & BIAS<br>
-          <span class="brand-title-small">Puskesmas Melata (v6.6 - Bottom Actions)</span>
+          <span class="brand-title-small">Puskesmas Melata (Versi Cloud)</span>
         </div>
       </div>
-
-      <div class="header-actions inline">
-        <div class="small">2025</div>
-        <button class="btn btn-ghost" onclick="document.getElementById('helpModal').style.display='flex'">
-          <i class="fas fa-circle-info"></i> Bantuan
-        </button>
-      </div>
-    </div>
-
-    <div class="app-nav-tabs"> 
-      <button class="tab active" data-tab="imunisasi" onclick="switchTab(event)"> <i class="fas fa-syringe"></i> IMUNISASI</button>
-      <button class="tab" data-tab="bias" onclick="switchTab(event)"><i class="fas fa-school"></i> BIAS</button>
-      <button class="tab" data-tab="export" onclick="switchTab(event)"><i class="fas fa-file-export"></i> EKSPOR</button>
-      <button class="tab" data-tab="import" onclick="switchTab(event)"><i class="fas fa-upload"></i> IMPORT</button>
-      <button class="tab" data-tab="kumulatif" onclick="switchTab(event)"><i class="fas fa-chart-line"></i> KUMULATIF</button>
     </div>
   </header>
 
-  <main class="wrap">
-    <section id="imunisasi" class="tab-panel">
+  <nav class="main-nav">
+    <button class="nav-btn active" onclick="switchTab('imunisasi')"><i class="fas fa-baby"></i><span>IMUNISASI</span></button>
+    <button class="nav-btn" onclick="switchTab('bias')"><i class="fas fa-school"></i><span>BIAS</span></button>
+    <button class="nav-btn" onclick="switchTab('kumulatif')"><i class="fas fa-chart-line"></i><span>KUMULATIF</span></button>
+  </nav>
+
+  <main class="container">
+    <section id="imunisasi" class="tab-content active">
       <div class="card">
-        <h2>Input Data Imunisasi</h2>
-        <p class="lead">Masukkan capaian imunisasi per desa untuk periode yang dipilih.</p>
-
-        <form id="imunForm" onsubmit="downloadImun(event)">
-          <div class="grid">
-            <div>
-              <div class="form-group">
-                <label for="desa_imun">Pilih Desa</label>
-                <select id="desa_imun" name="desa_imun" required>
-                  <option value="">-- Pilih Desa --</option>
-                  <option value="melata">Melata</option>
-                  <option value="nanuah">Nanuah</option>
-                  <option value="topalan">Topalan</option>
-                  <option value="batu_ampar">Batu Ampar</option>
-                  <option value="lubuk_hiju">Lubuk Hiju</option>
-                  <option value="bukit_makmur">Bukit Makmur</option>
-                  <option value="bukit_raya">Bukit Raya</option>
-                  <option value="modang_mas">Modang Mas</option>
-                  <option value="mukti_manunggal">Mukti Manunggal</option>
-                  <option value="sumber_jaya">Sumber Jaya</option>
-                  <option value="bukit_harum">Bukit Harum</option>
-                  <option value="pt_tsa">PT. TSA</option>
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label for="periode_imun">Periode (Bulan/Tahun)</label>
-                <input type="month" id="periode_imun" name="periode_imun" required>
-              </div>
-              
-              <div class="alert-box alert-info">
-                <p style="margin:0;"><i class="fab fa-whatsapp"></i> Silahkan kirim **file CSV** laporan yang sudah didownload ke nomor 081549177303 (TRI)</p>
-              </div>
-            </div>
-
-            <div>
-              <div class="form-group">
-                <label>Petunjuk</label>
-                <div class="small">Isi jumlah capaian untuk masing-masing vaksin dan jenis kelamin. Sasaran 0-50.</div>
-              </div>
-               <div class="alert-box alert-warning">
-                <p style="margin:0;"><i class="fas fa-exclamation-triangle"></i> Pastikan input **Periode** (Bulan/Tahun) sudah terisi sebelum klik "Download CSV".</p>
-              </div>
-            </div>
+        <h3><i class="fas fa-edit"></i> Input Laporan Imunisasi</h3>
+        <form id="imunForm">
+          <div class="form-grid">
+            <div class="form-group"><label>Bulan</label><input type="month" id="imunMonth" required></div>
+            <div class="form-group"><label>Nama Desa</label><input type="text" id="imunDesa" required></div>
           </div>
-
-          <hr class="sep">
-
-          <div id="vaksinContainer"></div>
-
-          <div class="actions">
-            <button type="submit" class="btn btn-primary"><i class="fas fa-download"></i> Download CSV Imunisasi</button>
+          <div id="imunFields" class="vaccine-grid"></div>
+          <div class="bottom-actions">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-cloud-upload-alt"></i> Simpan ke Cloud & CSV</button>
           </div>
         </form>
       </div>
     </section>
 
-    <section id="bias" class="tab-panel" style="display:none">
+    <section id="bias" class="tab-content">
       <div class="card">
-        <h2>Form BIAS (Pendataan Sekolah Multi-Kelas)</h2>
-        <p class="lead">Pilih nama sekolah. Gunakan tombol **Tambah Input Kelas** untuk memasukkan data setiap kelas yang dilaporkan.</p>
-
-        <form id="biasForm" onsubmit="downloadBias(event)">
-          <div class="grid">
-            
-            <div>
-              <div class="form-group">
-                <label for="sekolah">Nama Sekolah</label>
-                <select id="sekolah" name="sekolah" required onchange="onChangeSekolah()">
-                  <option value="">-- Pilih Sekolah --</option>
-                  </select>
-              </div>
-              
-              <div class="form-group" style="margin-top:20px;">
-                <label for="keterangan">Keterangan (opsional - berlaku untuk semua kelas)</label>
-                <textarea id="keterangan" name="keterangan" placeholder="Catatan tambahan..."></textarea>
-              </div>
-
-              <div class="alert-box alert-info">
-                <p style="margin:0;"><i class="fab fa-whatsapp"></i> Silahkan kirim **file CSV** laporan yang sudah didownload ke nomor 081549177303 (TRI)</p>
-              </div>
-              
+        <h3><i class="fas fa-edit"></i> Input Laporan BIAS</h3>
+        <form id="biasForm">
+          <div class="form-grid">
+            <div class="form-group"><label>Bulan</label><input type="month" id="biasMonth" required></div>
+            <div class="form-group">
+              <label>Pilih Sekolah</label>
+              <select id="biasSchool" required></select>
             </div>
-
-            <div style="padding-left:0;">
-              <h3 style="margin:0 0 15px 0; font-size:1.2rem; color:var(--accent);">Input Data Kelas (Sasaran & Capaian)</h3>
-              
-              <div id="biasClassReportsContainer">
-                <p class="muted">Pilih sekolah di samping kiri untuk mengaktifkan input kelas.</p>
-              </div>
-
-              <div style="margin-top:20px; border-top:1px dashed #ddd; padding-top:15px;">
-                 <button type="button" id="addBiasClassButton" class="btn btn-info" onclick="addNewClassInput()" disabled style="opacity:0.5">
-                    <i class="fas fa-plus-circle"></i> Tambah Input Kelas
-                </button>
-              </div>
-              
-            </div>
-          </div> <div class="actions" style="margin-top:25px; border-top:1px solid #eee; padding-top:20px; justify-content:flex-start;">
-            <button type="submit" class="btn btn-primary"><i class="fas fa-download"></i> Download CSV BIAS</button>
+          </div>
+          <div id="biasClassesContainer"></div>
+          <div class="bottom-actions">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-cloud-upload-alt"></i> Simpan ke Cloud & CSV</button>
           </div>
         </form>
       </div>
     </section>
 
-    <section id="export" class="tab-panel" style="display:none">
-      <div class="card">
-        <h2>Export Data</h2>
-        <p class="lead">Panel cepat untuk mengunduh ulang laporan CSV terakhir atau mencadangkan seluruh database.</p>
-
-        <div class="export-grid">
-          <div class="export-card">
-            <div class="label-pill">Imunisasi</div>
-            <div class="small" style="margin-top:8px">Unduh laporan Imunisasi berdasarkan input terakhir (Hanya pengingat nama file).</div>
-            <div style="margin-top:12px" class="actions">
-              <button class="btn btn-primary" onclick="downloadLast('imunisasi')"><i class="fas fa-file-csv"></i> File Imunisasi Terakhir</button>
-            </div>
-          </div>
-
-          <div class="export-card">
-            <div class="label-pill">BIAS</div>
-            <div class="small" style="margin-top:8px">Unduh laporan BIAS berdasarkan input terakhir (Hanya pengingat nama file).</div>
-            <div style="margin-top:12px" class="actions">
-              <button class="btn btn-primary" onclick="downloadLast('bias')"><i class="fas fa-file-csv"></i> File BIAS Terakhir</button>
-            </div>
-          </div>
-          
-          <div class="export-card" style="flex:100%">
-            <div class="label-pill" style="background:var(--info);color:#fff"><i class="fas fa-database"></i> Database JSON</div>
-            <div style="margin-top:8px">
-                <p class="small" style="margin:0 0 10px 0;">
-                    Gunakan fitur ini untuk membuat cadangan atau memindahkan seluruh database laporan **(.json)** ke perangkat lain. **Direkomendasikan!**
-                </p>
-                <button class="btn btn-info" onclick="exportDatabase()"><i class="fas fa-cloud-download"></i> Export Seluruh Database (.json)</button>
-            </div>
-          </div>
-
-          <div class="export-card" style="flex:100%">
-            <div class="label-pill" style="background:var(--primary);color:#fff">Instruksi Kirim</div>
-            <p style="margin:8px 0 0 0;font-size:0.95rem;color:var(--accent);font-weight:600;">
-              Setelah file CSV diunduh, **silahkan kirim file laporan tersebut** ke nomor: 
-              <br>
-              <i class="fab fa-whatsapp"></i> **081549177303 (TRI)**
-            </p>
-          </div>
-
-        </div>
-      </div>
-    </section>
-
-    <section id="import" class="tab-panel" style="display:none">
+    <section id="kumulatif" class="tab-content">
         <div class="card">
-          <h2><i class="fas fa-upload"></i> Import Database Laporan</h2>
-          <p class="lead">Pilih **satu atau lebih** file database **(.json)** yang sebelumnya telah Anda export untuk memuat datanya ke browser ini.</p>
-
-          <div class="form-group">
-            <label for="importFile">Pilih File Database (.json)</label>
-            <input type="file" id="importFile" accept=".json,.txt" multiple style="padding:12px 15px;border:1px solid #ced4da">
-          </div>
-          
-          <div id="importStatus" class="small" style="margin-top:15px;color:var(--muted)"></div>
-
-          <div class="actions" style="justify-content:flex-start">
-            <button class="btn btn-primary" onclick="startImport()"><i class="fas fa-upload"></i> Mulai Import & Gabungkan Data</button>
-          </div>
-
-          <hr class="sep">
-          
-          <div class="alert-box" style="background:#ffebee;border:1px solid #f44336; color:#d32f2f">
-            <p style="margin:0;"><i class="fas fa-exclamation-triangle"></i> **PERHATIAN:** Proses import akan **menggabungkan** data dari file **.json** dengan data yang sudah ada di browser ini. Laporan yang memiliki ID yang sama (timestamp) akan dilewati secara otomatis.</p>
-          </div>
+            <h3><i class="fas fa-info-circle"></i> Info</h3>
+            <p>Data yang Anda input otomatis tersimpan di Cloud Firebase.</p>
         </div>
+        <div id="kumulatifResult"></div>
     </section>
-    
-    <section id="kumulatif" class="tab-panel" style="display:none">
-      <div class="card">
-        <h2><i class="fas fa-chart-line"></i> Hasil Kumulatif Imunisasi dan BIAS</h2>
-        <p class="lead">Menampilkan total capaian dan rincian per bulan dari seluruh laporan yang tersimpan di browser ini.</p>
-
-        <hr class="sep">
-        
-        <div class="card" style="background:#f5fef7; border:1px solid #c8e6c9">
-            <h3><i class="fas fa-search"></i> Lihat Laporan Spesifik (Per Desa/Sekolah)</h3>
-            <p class="small">Pilih kriteria di bawah untuk menampilkan laporan spesifik yang cocok. (Kosongkan filter untuk melihat semua laporan yang tersedia).</p>
-
-            <div class="grid" style="grid-template-columns:repeat(3,1fr)">
-                <div class="form-group">
-                    <label for="filter_periode">Filter Bulan/Periode (Imun/BIAS)</label>
-                    <select id="filter_periode" style="width:100%"><option value="">-- Semua Bulan --</option></select>
-                </div>
-                <div class="form-group">
-                    <label for="filter_desa">Filter Desa (Imunisasi)</label>
-                    <select id="filter_desa" style="width:100%"><option value="">-- Semua Desa --</option></select>
-                </div>
-                <div class="form-group">
-                    <label for="filter_sekolah">Filter Sekolah (BIAS)</label>
-                    <select id="filter_sekolah" style="width:100%"><option value="">-- Semua Sekolah --</option></select>
-                </div>
-            </div>
-
-            <div class="actions" style="justify-content:flex-start; margin-top:5px">
-                <button class="btn btn-primary" onclick="displayDetailedReports()">
-                    <i class="fas fa-eye"></i> Tampilkan Laporan Spesifik
-                </button>
-            </div>
-        </div>
-        
-        <div id="detailedReportList" style="margin-top:20px">
-            <p class="muted">Gunakan panel filter di atas dan klik **"Tampilkan Laporan Spesifik"** untuk melihat rincian laporan yang tersimpan.</p>
-        </div>
-        <div class="card" style="margin-top:20px; background:#f7fcf9; border:1px solid var(--accent)">
-            <h3><i class="fas fa-file-csv"></i> Opsi Download CSV Kumulatif</h3>
-            <p class="small">Pilih jenis data CSV yang akan diunduh.</p>
-            
-            <div class="actions" style="justify-content:flex-start; margin-top:15px">
-                <button class="btn btn-primary" onclick="downloadFilteredReportsCSV()">
-                    <i class="fas fa-download"></i> Download CSV Laporan Spesifik (Sesuai Filter)
-                </button>
-                <button class="btn btn-info" onclick="downloadMonthlyTotalsCSV()">
-                    <i class="fas fa-download"></i> Download CSV Total Per Bulan
-                </button>
-            </div>
-            <p class="small" style="margin-top:10px; color:var(--muted)">
-                *Download Laporan Spesifik akan menggunakan filter Desa/Sekolah/Bulan yang saat ini dipilih di atas.
-            </p>
-        </div>
-        <div id="kumulatifContent">
-          <p class="muted">Klik tombol "Hitung Ulang & Muat Data" di bagian bawah untuk menampilkan hasil kumulatif dari semua laporan yang tersimpan.</p>
-        </div>
-
-        <div class="card" style="margin-top:20px; background:#fffbfb; border:1px solid #ffcccc">
-            <h3><i class="fas fa-trash-alt"></i> Hapus Data Selektif</h3>
-            <p class="small">Pilih filter di bawah untuk menghapus laporan secara permanen. Laporan akan dihapus jika cocok dengan **SEMUA** kriteria yang dipilih.</p>
-
-            <div class="grid" style="grid-template-columns:repeat(3,1fr)">
-                <div class="form-group">
-                    <label for="delete_periode">Filter Bulan/Periode (Imun/BIAS)</label>
-                    <select id="delete_periode" style="width:100%"><option value="">-- Semua Bulan --</option></select>
-                </div>
-                <div class="form-group">
-                    <label for="delete_desa">Filter Desa (Imunisasi)</label>
-                    <select id="delete_desa" style="width:100%"><option value="">-- Semua Desa --</option></select>
-                </div>
-                <div class="form-group">
-                    <label for="delete_sekolah">Filter Sekolah (BIAS)</label>
-                    <select id="delete_sekolah" style="width:100%"><option value="">-- Semua Sekolah --</option></select>
-                </div>
-            </div>
-
-            <div class="actions" style="justify-content:flex-start; margin-top:5px">
-                 <button class="btn btn-info" onclick="displayKumulatif()"><i class="fas fa-calculator"></i> Hitung Ulang & Muat Data</button>
-                 
-                <button class="btn" style="background:var(--danger); color:#fff" onclick="performSelectiveDeletion()">
-                    <i class="fas fa-skull-crossbones"></i> Hapus Data Yang Dipilih Secara Permanen
-                </button>
-            </div>
-        </div>
-        <div class="actions" style="justify-content:flex-start; margin-top:20px;">
-            <button class="btn" style="background:var(--danger); color:#fff" onclick="clearAllData()">
-                <i class="fas fa-skull-crossbones"></i> Hapus Semua Data Lokal (Permanen)
-            </button>
-        </div>
-
-      </div>
-    </section>
-
   </main>
 
-  <footer class="site-footer">
-    &copy; 2025 Sistem Pelaporan Data Imunisasi & BIAS — Dibuat oleh: tri prio heryanto
-  </footer>
-
-  <div id="helpModal" style="display:none;position:fixed;inset:0;background:rgba(2,6,23,0.5);z-index:60;align-items:center;justify-content:center">
-    <div style="background:#fff;padding:25px;border-radius:12px;max-width:700px;margin:20px">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <h3 style="margin:0; color:var(--accent);"><i class="fas fa-circle-info"></i> Bantuan</h3>
-        <button class="btn btn-ghost" onclick="document.getElementById('helpModal').style.display='none'">Tutup</button>
-      </div>
-      <hr>
-      <p class="small">Tab <strong>IMUNISASI</strong> dan <strong>BIAS</strong> digunakan untuk input data. Tab <strong>EKSPOR</strong> untuk mencadangkan database atau mengunduh ulang file CSV. Tab <strong>IMPORT</strong> untuk memindahkan database antar perangkat menggunakan file **JSON**. Tab <strong>KUMULATIF</strong> menampilkan total penjumlahan **yang dikelompokkan per bulan** dari semua laporan yang telah Anda simpan.</p>
-      <p class="small" style="margin-top:10px">Setelah mengunduh file CSV, silahkan kirim file laporan tersebut ke nomor <i class="fab fa-whatsapp"></i> **081549177303 (TRI)**.</p>
-    </div>
-  </div>
-
-  <script src="script.js"></script>
-  
-  <script type="module" src="firebase-init.js"></script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>

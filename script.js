@@ -1,263 +1,94 @@
-// script.js
-
-// =========================================================================
-// FIREBASE IMPORTS
-// =========================================================================
 import { db } from './firebase-init.js';
-import { collection, addDoc, getDocs, query, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/12.6.1/firebase-firestore.js";
+import { ref, push, set } from "https://www.gstatic.com/firebasejs/12.6.1/firebase-database.js";
 
-
-// =========================================================================
-// GLOBAL SETTINGS & DATA KONSTANTA
-// =========================================================================
-let lastImunFile = null;
-let lastBiasFile = null;
-// Keys kini berfungsi sebagai nama Koleksi di Firestore
-const IMUN_COLLECTION_NAME = 'imunReports'; 
-const BIAS_COLLECTION_NAME = 'biasReports'; 
-let sessionImportedFiles = new Set(); 
-
-// Data Vaksin dan Sekolah (diambil dari snippet Anda)
-const IMUN_VACCINES = ['BCG', 'POLIO-1', 'POLIO-2', 'POLIO-3', 'POLIO-4', 'DPT-HB-HIB-1', 'DPT-HB-HIB-2', 'DPT-HB-HIB-3', 'CAMPAK/MR'];
+const VACCINES = ['HB0 <24 Jam', 'BCG', 'Polio 1', 'DPT-HB-Hib 1', 'Polio 2', 'DPT-HB-Hib 2', 'Polio 3', 'PCV 1', 'DPT-HB-Hib 3', 'Polio 4', 'PCV 2', 'IPV 1', 'IPV 2', 'Campak Rubella', 'PCV 3', 'DPT-HB-Hib (Lanjutan)', 'Campak Rubella (Lanjutan)'];
 const BIAS_VACCINES = ['MR', 'DT', 'Td', 'HPV'];
-const SCHOOL_DATA = {
-    'SD NEGERI MELATA': 'SD', 'SD NEGERI NANUAH': 'SD', 'SD NEGERI TOPALAN': 'SD', 
-    'SD NEGERI BATU AMPAR': 'SD', 'SD NEGERI LUBUK HIJU': 'SD', 'SD NEGERI BUKIT MAKMUR': 'SD',
-    'SD NEGERI BUKIT RAYA': 'SD', 'SD NEGERI MODANG MAS': 'SD', 'SD NEGERI MUKTI MANUNGGAL': 'SD',
-    'SD NEGERI SUMBER JAYA': 'SD', 'SD NEGERI BUKIT HARUM': 'SD', 'SDS TSA': 'SD',
-    'MIS RAUDHATUL ULUM': 'SD', 
-    'SMP NEGERI 1 MENTHOBI RAYA': 'SMP', 'SMP NEGERI 2 MENTHOBI RAYA': 'SMP', 
-    'SMP NEGERI 3 MENTHOBI RAYA': 'SMP', 'MTSS RAUDHATUL ULUM': 'SMP'
-};
+const SCHOOL_DATA = {'SD NEGERI MELATA': 'SD', 'SD NEGERI NANUAH': 'SD', 'SD NEGERI TOPALAN': 'SD', 'SD NEGERI BATU AMPAR': 'SD', 'SD NEGERI LUBUK HIJU': 'SD', 'SD NEGERI BUKIT MAKMUR': 'SD', 'SD NEGERI BUKIT RAYA': 'SD', 'SD NEGERI MODANG MAS': 'SD', 'SD NEGERI MUKTI MANUNGGAL': 'SD', 'SD NEGERI SUMBER JAYA': 'SD', 'SD NEGERI BUKIT HARUM': 'SD', 'SDS TSA': 'SD', 'MIS RAUDHATUL ULUM': 'SD', 'SMP NEGERI 1 MENTHOBI RAYA': 'SMP'};
 
-// Variabel untuk menyimpan data yang dimuat dari Firestore
-let imunReports = [];
-let biasReports = [];
-
-// =========================================================================
-// FIREBASE FIRESTORE DATA FUNCTIONS (SINKRONISASI ONLINE)
-// =========================================================================
-
-/**
- * Menyimpan data laporan baru ke Firestore (Fungsi SINKRONISASI WRITE).
- * @param {string} collectionName - Nama koleksi Firestore.
- * @param {object} data - Objek data laporan.
- */
-async function saveReportToFirestore(collectionName, data) {
+// Fungsi Kirim ke Firebase
+async function pushToCloud(folder, data) {
     try {
-        const docRef = await addDoc(collection(db, collectionName), {
+        const dbRef = ref(db, folder);
+        const newPostRef = push(dbRef);
+        await set(newPostRef, {
             ...data,
-            timestamp: new Date().toISOString() // Simpan waktu pengiriman
+            waktu_input: new Date().toLocaleString('id-ID')
         });
-        showAlert(`Laporan berhasil **dikirim** secara online. ID Dokumen: ${docRef.id}`, 'success');
         return true;
-    } catch (error) {
-        console.error(`Error menyimpan data ke ${collectionName}: `, error);
-        showAlert(`Gagal mengirim data ke Firestore: ${error.message}. Periksa koneksi dan Firebase Rules Anda.`, 'danger');
+    } catch (e) {
+        console.error("Error Cloud:", e);
         return false;
     }
 }
 
-/**
- * Mengambil semua data laporan dari Firestore (Fungsi SINKRONISASI READ).
- * @param {string} collectionName - Nama koleksi Firestore.
- * @returns {Array} - Array objek laporan.
- */
-async function loadReportsFromFirestore(collectionName) {
-    const reports = [];
-    try {
-        // Mengambil semua dokumen, diurutkan berdasarkan bulan atau tanggal laporan
-        const q = query(collection(db, collectionName), orderBy("bulan")); // Asumsi field 'bulan' ada
-        const querySnapshot = await getDocs(q);
-        
-        querySnapshot.forEach((doc) => {
-            // Menambahkan ID dokumen (doc.id) ke dalam objek data
-            reports.push({ id: doc.id, ...doc.data() });
+// Inisialisasi Form Imunisasi
+function initImun() {
+    const container = document.getElementById('imunFields');
+    if(!container) return;
+    VACCINES.forEach(v => {
+        const div = document.createElement('div');
+        div.className = 'vaccine-card';
+        div.innerHTML = `<h4>${v}</h4><div class="row">
+            <input type="number" placeholder="L" data-vac="${v}" data-g="L" value="0">
+            <input type="number" placeholder="P" data-vac="${v}" data-g="P" value="0">
+        </div>`;
+        container.appendChild(div);
+    });
+}
+
+// Handle Simpan Imunisasi
+async function handleImun(e) {
+    e.preventDefault();
+    const month = document.getElementById('imunMonth').value;
+    const desa = document.getElementById('imunDesa').value;
+    const details = [];
+
+    document.querySelectorAll('#imunFields input[data-g="L"]').forEach(input => {
+        const v = input.dataset.vac;
+        const L = parseInt(input.value) || 0;
+        const P = parseInt(document.querySelector(`input[data-vac="${v}"][data-g="P"]`).value) || 0;
+        details.push({ vaksin: v, L, P, Total: L + P });
+    });
+
+    const report = { bulan: month, desa: desa, rincian: details };
+    const success = await pushToCloud('laporan_imunisasi', report);
+    
+    if(success) {
+        alert("Data Imunisasi Terkirim ke Cloud!");
+        downloadCSV(`Imunisasi_${desa}.csv`, report.rincian);
+    }
+}
+
+// Fungsi Download CSV Sederhana
+function downloadCSV(name, data) {
+    let csv = "Vaksin,L,P,Total\n";
+    data.forEach(row => { csv += `${row.vaksin},${row.L},${row.P},${row.Total}\n`; });
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.setAttribute('href', url);
+    a.setAttribute('download', name);
+    a.click();
+}
+
+// Navigasi Tab
+window.switchTab = function(id) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    event.currentTarget.classList.add('active');
+}
+
+// Load Awal
+document.addEventListener('DOMContentLoaded', () => {
+    initImun();
+    const biasSel = document.getElementById('biasSchool');
+    if(biasSel) {
+        Object.keys(SCHOOL_DATA).forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s; opt.innerText = s;
+            biasSel.appendChild(opt);
         });
-        
-        return reports;
-    } catch (error) {
-        console.error(`Error memuat data dari ${collectionName}: `, error);
-        showAlert(`Gagal memuat data dari Firestore: ${error.message}.`, 'danger');
-        return [];
     }
-}
-
-/**
- * Menghapus dokumen laporan dari Firestore.
- */
-async function deleteReportFromFirestore(collectionName, docId) {
-    try {
-        await deleteDoc(doc(db, collectionName, docId));
-        showAlert(`Laporan ID ${docId} berhasil dihapus dari online.`, 'info');
-        // Muat ulang data setelah penghapusan
-        await loadReports();
-    } catch (error) {
-        console.error("Error saat menghapus dokumen: ", error);
-        showAlert(`Gagal menghapus data dari Firestore: ${error.message}`, 'danger');
-    }
-}
-
-// =========================================================================
-// CORE APPLICATION LOGIC (MENGGUNAKAN DATA ONLINE)
-// =========================================================================
-
-/**
- * Fungsi utama untuk memuat data online saat aplikasi dibuka/diperbarui.
- */
-async function loadReports() {
-    // Memuat data secara asinkron
-    imunReports = await loadReportsFromFirestore(IMUN_COLLECTION_NAME);
-    biasReports = await loadReportsFromFirestore(BIAS_COLLECTION_NAME);
-    
-    // Setelah data dimuat, update UI
-    generateKumulatifReport(); 
-    populateExportTables(); 
-}
-
-/**
- * Menyimpan dan Sinkronisasi data laporan baru.
- */
-async function saveReport(reportType, data) {
-    const collectionName = reportType === 'imun' ? IMUN_COLLECTION_NAME : BIAS_COLLECTION_NAME;
-    
-    const success = await saveReportToFirestore(collectionName, data);
-    
-    if (success) {
-        await loadReports(); // Muat ulang data setelah sukses disimpan
-    }
-}
-
-// =========================================================================
-// FORM HANDLERS
-// =========================================================================
-
-function handleImunFormSubmit(event) {
-    event.preventDefault();
-    
-    // --- Logika Validasi dan Pengambilan Data ---
-    const form = event.target;
-    const data = {
-        tipe: 'Imunisasi',
-        tglLaporan: form['imun-tgl-laporan'].value,
-        kecamatan: form['imun-kecamatan'].value,
-        desa: form['imun-desa'].value,
-        // Asumsi struktur input data vaksin adalah L dan P
-    };
-
-    IMUN_VACCINES.forEach(v => {
-        data[`${v}_L`] = parseInt(form[`imun-${v}-L`].value) || 0;
-        data[`${v}_P`] = parseInt(form[`imun-${v}-P`].value) || 0;
-    });
-
-    data.bulan = form['imun-bulan'].value; // Ambil bulan untuk kueri/pengurutan
-
-    // Panggil fungsi sinkronisasi
-    saveReport('imun', data);
-    form.reset();
-}
-
-function handleBiasFormSubmit(event) {
-    event.preventDefault();
-    
-    const form = event.target;
-    const data = {
-        tipe: 'BIAS',
-        tglLaporan: form['bias-tgl-laporan'].value,
-        sekolah: form['bias-sekolah'].value,
-        tingkat: SCHOOL_DATA[form['bias-sekolah'].value] || 'Lain',
-    };
-
-    BIAS_VACCINES.forEach(v => {
-        data[`${v}_L`] = parseInt(form[`bias-${v}-L`].value) || 0;
-        data[`${v}_P`] = parseInt(form[`bias-${v}-P`].value) || 0;
-    });
-
-    data.bulan = form['bias-bulan'].value;
-
-    saveReport('bias', data);
-    form.reset();
-}
-
-// =========================================================================
-// UI & UTILITY FUNCTIONS (Skeleton)
-// =========================================================================
-
-function showAlert(message, type) {
-    const alertBox = document.getElementById('app-alerts');
-    alertBox.innerHTML = `<div class="alert-box alert-${type}">${message}</div>`;
-    setTimeout(() => alertBox.innerHTML = '', 7000);
-}
-
-function showTab(tabId) {
-    // Fungsi untuk mengontrol tampilan tab
-    document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
-    document.getElementById(`tab-content-${tabId}`).style.display = 'block';
-    
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelector(`.tab-btn[data-tab="${tabId}"]`).classList.add('active');
-
-    // Khusus untuk tab kumulatif, pastikan laporan terbaru di-generate
-    if (tabId === 'kumulatif') {
-        generateKumulatifReport();
-    } else if (tabId === 'export') {
-        populateExportTables();
-    }
-}
-
-function generateKumulatifReport() {
-    // --- Logika Perhitungan Kumulatif (Hanya Sederhana untuk Ilustrasi) ---
-    
-    const imunCountEl = document.getElementById('kumulatif-imun-count');
-    const biasCountEl = document.getElementById('kumulatif-bias-count');
-
-    if (imunCountEl) imunCountEl.innerHTML = `Total Imunisasi: **${imunReports.length} Laporan** (Data Online)`;
-    if (biasCountEl) biasCountEl.innerHTML = `Total BIAS: **${biasReports.length} Laporan** (Data Online)`;
-    
-    // --- Lanjutkan logika perhitungan kumulatif, pengelompokan per bulan, dll. ---
-    // Di sini Anda akan menggunakan data di variabel 'imunReports' dan 'biasReports'
-}
-
-function populateExportTables() {
-    // Membuat tabel yang menampilkan data imunReports dan biasReports,
-    // termasuk tombol Hapus yang memanggil confirmDeleteReport(type, id)
-    // Gunakan 'report.id' dari Firestore untuk identifikasi.
-    
-    const imunTableBody = document.querySelector('#export-imun-table tbody');
-    if (imunTableBody) {
-        imunTableBody.innerHTML = imunReports.map(report => `
-            <tr>
-                <td>${report.tglLaporan}</td>
-                <td>${report.desa}</td>
-                <td>...</td>
-                <td>
-                    <button class="btn btn-danger btn-sm" onclick="confirmDeleteReport('imun', '${report.id}')">Hapus</button>
-                </td>
-            </tr>
-        `).join('');
-    }
-}
-
-function confirmDeleteReport(reportType, docId) {
-    const collectionName = reportType === 'imun' ? IMUN_COLLECTION_NAME : BIAS_COLLECTION_NAME;
-    if (confirm(`Anda yakin ingin menghapus laporan ID ${docId}? Tindakan ini akan menghapus data dari Firestore (Online) dan tidak dapat dibatalkan.`)) {
-        deleteReportFromFirestore(collectionName, docId);
-    }
-}
-
-
-// =========================================================================
-// ENTRY POINT (Inisialisasi)
-// =========================================================================
-
-window.onload = async () => {
-    // Inisialisasi Event Listeners
-    document.getElementById('imun-form').addEventListener('submit', handleImunFormSubmit);
-    document.getElementById('bias-form').addEventListener('submit', handleBiasFormSubmit);
-
-    // Muat data dari Firestore saat aplikasi dimulai
-    await loadReports();
-    
-    // Tampilkan tab Kumulatif saat pertama kali dibuka
-    showTab('kumulatif'); 
-};
+    document.getElementById('imunForm').addEventListener('submit', handleImun);
+});

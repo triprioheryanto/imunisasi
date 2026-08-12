@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Sistem Pelaporan Imunisasi & BIAS — Puskesmas Melata (Cloud Version)</title>
+  <title>Sistem Pelaporan Imunisasi & BIAS — Puskesmas Melata (Firebase Cloud)</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -190,21 +190,6 @@
         color: var(--primary);
     }
 
-    .monthly-report-card {
-        border: 1px solid #d4e3f4 !important;
-        background: #f7f9fc !important;
-        padding: 12px !important;
-        border-radius: var(--radius);
-        box-shadow: var(--shadow-subtle);
-        margin-top: 10px;
-    }
-    .monthly-report-card h4 {
-        font-size: 1.05rem !important;
-        padding-bottom: 5px;
-        margin-bottom: 8px !important;
-        border-bottom: 1px dashed #c0d8f0;
-    }
-
     .class-input-block {
         border: 2px solid var(--accent-light) !important; 
         box-shadow: 0 4px 15px rgba(0, 64, 128, 0.15) !important; 
@@ -239,6 +224,19 @@
         font-size: 0.85rem;
         border-top: 1px solid #eee;
     }
+
+    @media (max-width:520px){
+      header.app-header{padding:12px; min-height: unset;}
+      .brand-row{padding: 10px 0 0 0;}
+      .brand{font-size:1rem; gap: 8px;}
+      .brand .logo{width:38px; height:38px;}
+      .brand-title-small{font-size:0.75rem;}
+      .app-nav-tabs{gap: 6px; flex-wrap: nowrap; margin-top: 5px;}
+      .app-nav-tabs .tab{padding: 8px 10px; font-size: 0.85rem;}
+      .wrap{padding:0 15px; margin: 15px auto;}
+      .grid{grid-template-columns:1fr; gap: 15px;}
+      .form-row{flex-direction: column; gap:0;}
+    }
   </style>
 </head>
 <body>
@@ -249,7 +247,7 @@
         <div class="logo"><i class="fas fa-syringe" style="font-size:20px;color:#fff"></i></div>
         <div>
           Sistem Pelaporan Imunisasi & BIAS<br>
-          <span class="brand-title-small">Puskesmas Melata (Firebase Cloud Sync)</span>
+          <span class="brand-title-small">Puskesmas Melata (Firebase Cloud Version)</span>
         </div>
       </div>
 
@@ -275,7 +273,7 @@
     <section id="imunisasi" class="tab-panel">
       <div class="card">
         <h2>Input Data Imunisasi</h2>
-        <p class="lead">Masukkan capaian imunisasi per desa untuk periode yang dipilih. Data otomatis tersimpan ke Firebase Cloud.</p>
+        <p class="lead">Masukkan capaian imunisasi per desa untuk periode yang dipilih.</p>
 
         <form id="imunForm">
           <div class="grid">
@@ -305,7 +303,7 @@
               </div>
               
               <div class="alert-box alert-info">
-                <p style="margin:0;"><i class="fas fa-cloud"></i> Data tersimpan langsung di Firebase Firestore Cloud secara gratis & realtime.</p>
+                <p style="margin:0;"><i class="fas fa-cloud"></i> Data tersimpan otomatis secara aman di Firebase Cloud Firestore.</p>
               </div>
             </div>
 
@@ -315,7 +313,7 @@
                 <div class="small">Isi jumlah capaian untuk masing-masing vaksin dan jenis kelamin. Sasaran 0-50.</div>
               </div>
                <div class="alert-box alert-warning">
-                <p style="margin:0;"><i class="fas fa-exclamation-triangle"></i> Pastikan input **Periode** (Bulan/Tahun) sudah terisi sebelum klik Simpan.</p>
+                <p style="margin:0;"><i class="fas fa-exclamation-triangle"></i> Pastikan **Periode** (Bulan/Tahun) sudah terisi sebelum klik simpan.</p>
               </div>
             </div>
           </div>
@@ -325,7 +323,7 @@
           <div id="vaksinContainer"></div>
 
           <div class="actions">
-            <button type="submit" class="btn btn-primary"><i class="fas fa-cloud-upload-alt"></i> Simpan ke Cloud & CSV</button>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-cloud-upload-alt"></i> Simpan ke Cloud & Unduh CSV</button>
           </div>
         </form>
       </div>
@@ -353,7 +351,7 @@
               </div>
 
               <div class="alert-box alert-info">
-                <p style="margin:0;"><i class="fas fa-cloud"></i> Data BIAS tersimpan secara terpusat di cloud.</p>
+                <p style="margin:0;"><i class="fas fa-cloud"></i> Data BIAS tersimpan otomatis di Cloud Firebase.</p>
               </div>
             </div>
 
@@ -373,7 +371,7 @@
           </div>
 
           <div class="actions" style="margin-top:25px; border-top:1px solid #eee; padding-top:20px; justify-content:flex-start;">
-            <button type="submit" class="btn btn-primary"><i class="fas fa-cloud-upload-alt"></i> Simpan BIAS ke Cloud & CSV</button>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-cloud-upload-alt"></i> Simpan BIAS ke Cloud & Unduh CSV</button>
           </div>
         </form>
       </div>
@@ -387,12 +385,12 @@
 
         <div class="export-grid">
           <div class="export-card" style="flex:100%">
-            <div class="label-pill" style="background:var(--info);color:#fff"><i class="fas fa-database"></i> Backup JSON Cloud</div>
+            <div class="label-pill" style="background:var(--info);color:#fff"><i class="fas fa-database"></i> Database JSON Cloud</div>
             <div style="margin-top:8px">
                 <p class="small" style="margin:0 0 10px 0;">
-                    Unduh seluruh snapshot laporan dari cloud dalam format **.json** sebagai cadangan offline.
+                    Gunakan fitur ini untuk mencadangkan seluruh isi database **(.json)** langsung dari Firebase Cloud.
                 </p>
-                <button class="btn btn-info" id="btnExportDb"><i class="fas fa-cloud-download-alt"></i> Export Database Cloud (.json)</button>
+                <button class="btn btn-info" id="btnExportDb"><i class="fas fa-cloud-download-alt"></i> Export Seluruh Database (.json)</button>
             </div>
           </div>
         </div>
@@ -402,8 +400,8 @@
     <!-- TAB 4: IMPORT -->
     <section id="import" class="tab-panel" style="display:none">
         <div class="card">
-          <h2><i class="fas fa-upload"></i> Import Data ke Cloud</h2>
-          <p class="lead">Pilih file database **(.json)** untuk menyinkronkan data secara masal ke Firebase Cloud Firestore.</p>
+          <h2><i class="fas fa-upload"></i> Import Database Laporan ke Cloud</h2>
+          <p class="lead">Pilih **satu atau lebih** file database **(.json)** yang sebelumnya telah di-export untuk disinkronkan ke Firebase Cloud.</p>
 
           <div class="form-group">
             <label for="importFile">Pilih File Database (.json)</label>
@@ -413,7 +411,7 @@
           <div id="importStatus" class="small" style="margin-top:15px;"></div>
 
           <div class="actions" style="justify-content:flex-start">
-            <button class="btn btn-primary" id="btnStartImport"><i class="fas fa-cloud-upload-alt"></i> Upload & Sync Data ke Cloud</button>
+            <button class="btn btn-primary" id="btnStartImport"><i class="fas fa-cloud-upload-alt"></i> Mulai Import & Sync ke Cloud</button>
           </div>
         </div>
     </section>
@@ -422,38 +420,12 @@
     <section id="kumulatif" class="tab-panel" style="display:none">
       <div class="card">
         <h2><i class="fas fa-chart-line"></i> Hasil Kumulatif Imunisasi dan BIAS (Realtime Cloud)</h2>
-        <p class="lead">Menampilkan total capaian dan rincian per bulan dari seluruh laporan yang tersimpan di Firebase Firestore.</p>
+        <p class="lead">Menampilkan total capaian dan rincian dari seluruh laporan yang tersimpan di Firebase Firestore Cloud.</p>
 
         <hr class="sep">
         
-        <div class="card" style="background:#f5fef7; border:1px solid #c8e6c9">
-            <h3><i class="fas fa-search"></i> Lihat Laporan Spesifik (Per Desa/Sekolah)</h3>
-
-            <div class="grid" style="grid-template-columns:repeat(3,1fr)">
-                <div class="form-group">
-                    <label for="filter_periode">Filter Bulan/Periode</label>
-                    <select id="filter_periode" style="width:100%"><option value="">-- Semua Bulan --</option></select>
-                </div>
-                <div class="form-group">
-                    <label for="filter_desa">Filter Desa (Imunisasi)</label>
-                    <select id="filter_desa" style="width:100%"><option value="">-- Semua Desa --</option></select>
-                </div>
-                <div class="form-group">
-                    <label for="filter_sekolah">Filter Sekolah (BIAS)</label>
-                    <select id="filter_sekolah" style="width:100%"><option value="">-- Semua Sekolah --</option></select>
-                </div>
-            </div>
-
-            <div class="actions" style="justify-content:flex-start; margin-top:5px">
-                <button class="btn btn-primary" id="btnFilterReport">
-                    <i class="fas fa-eye"></i> Tampilkan Laporan Spesifik
-                </button>
-            </div>
-        </div>
-        
-        <div id="detailedReportList" style="margin-top:20px"></div>
         <div id="kumulatifContent">
-          <p class="muted"><i class="fas fa-spinner fa-spin"></i> Memuat data dari Firebase...</p>
+          <p class="muted"><i class="fas fa-spinner fa-spin"></i> Memuat data dari Firebase Cloud...</p>
         </div>
       </div>
     </section>
@@ -471,16 +443,16 @@
         <button class="btn btn-ghost" onclick="document.getElementById('helpModal').style.display='none'">Tutup</button>
       </div>
       <hr>
-      <p class="small">Sistem terhubung langsung ke database <strong>Firebase Firestore Cloud</strong>. Setiap data yang diinput di tab Imunisasi atau BIAS akan tersimpan secara otomatis secara online.</p>
+      <p class="small">Sistem ini terhubung langsung ke **Firebase Cloud Firestore**. Setiap kali Anda memasukkan data di tab **IMUNISASI** atau **BIAS**, data akan langsung tersimpan secara online tanpa perlu server lokal.</p>
     </div>
   </div>
 
-  <!-- SCRIPT MODULE INTEGRASI FIREBASE -->
+  <!-- FIREBASE MODULE SDK v10 (API KEY TELAH DIPERBAIKI) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, doc, setDoc, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, doc, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // Kunci Konfigurasi Firebase Anda
+    // Kunci Konfigurasi Firebase (API Key Valid)
     const firebaseConfig = {
       apiKey: "AIzaSyAAyGTFyAkfua9wazWH6FFkYYmnGFTEh4",
       authDomain: "imunisasi-puskesmas.firebaseapp.com",
@@ -493,7 +465,6 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Global Collections Reference
     const COL_IMUN = "laporan_imunisasi";
     const COL_BIAS = "laporan_bias";
 
@@ -522,7 +493,7 @@
       return text.toLowerCase().replace(/\s+/g,'_').replace(/[\/]/g,'').replace(/[^a-z0-9_]/g,'');
     }
 
-    // --- TAB NAVIGATION ---
+    // Tab Switcher Global
     window.switchTab = function(e){
       const target = e.currentTarget.getAttribute('data-tab');
       document.querySelectorAll('.app-nav-tabs .tab').forEach(t=>t.classList.remove('active'));
@@ -531,9 +502,8 @@
       document.getElementById(target).style.display = 'block';
       if (target === 'kumulatif') displayKumulatif();
       window.scrollTo({top:0,behavior:'smooth'});
-    }
+    };
 
-    // --- INITIALIZATION ---
     document.addEventListener('DOMContentLoaded', () => {
       initImunSections();
       initBiasDropdowns();
@@ -544,7 +514,6 @@
       document.getElementById('addBiasClassButton').addEventListener('click', addNewClassInput);
       document.getElementById('btnExportDb').addEventListener('click', exportDatabase);
       document.getElementById('btnStartImport').addEventListener('click', startImport);
-      document.getElementById('btnFilterReport').addEventListener('click', displayDetailedReports);
     });
 
     function initImunSections(){
@@ -645,7 +614,7 @@
       });
     }
 
-    // --- SAVE IMUNISASI TO FIREBASE ---
+    // Function Simpan Imunisasi ke Firebase
     async function handleSaveImun(e) {
       e.preventDefault();
       const fd = new FormData(e.target);
@@ -670,15 +639,23 @@
 
       try {
         await setDoc(doc(db, COL_IMUN, docId), dataPayload, { merge: true });
-        alert(`✅ Success: Data Imunisasi ${desaText} (${periode}) Berhasil Disimpan ke Firebase Cloud!`);
+        
+        // Buat file CSV lokal sebagai unduhan cadangan
+        let csv = 'Desa;Periode;Jenis Imunisasi;L;P\n';
+        imunFields.forEach(f => {
+          csv += `${desaText};${periode};"${f}";${dataPayload.data[f].L};${dataPayload.data[f].P}\n`;
+        });
+        downloadCSV(csv, `Laporan_Imunisasi_${periode}_${desa}.csv`);
+
+        alert(`✅ Berhasil: Data Imunisasi ${desaText} (${periode}) Tersimpan ke Cloud Firebase & CSV terunduh!`);
         e.target.reset();
         initImunSections();
       } catch (err) {
-        alert("❌ Error menyimpan ke cloud: " + err.message);
+        alert("❌ Gagal menyimpan ke cloud: " + err.message);
       }
     }
 
-    // --- SAVE BIAS TO FIREBASE ---
+    // Function Simpan BIAS ke Firebase
     async function handleSaveBias(e) {
       e.preventDefault();
       const sekolah = document.getElementById('sekolah').value;
@@ -686,7 +663,7 @@
       const classBlocks = document.querySelectorAll('.class-input-block');
 
       if (!sekolah || classBlocks.length === 0) {
-        alert("Lengkapi sekolah dan minimal 1 data kelas.");
+        alert("Pilih sekolah dan masukkan minimal 1 data kelas.");
         return;
       }
 
@@ -712,70 +689,70 @@
             updated_at: new Date().toISOString()
           }, { merge: true });
         }
-        alert(`✅ Success: Laporan BIAS ${sekolah} Berhasil Disimpan ke Firebase!`);
+        alert(`✅ Berhasil: Laporan BIAS ${sekolah} Tersimpan di Cloud Firebase!`);
         e.target.reset();
         onChangeSekolah();
       } catch (err) {
-        alert("❌ Error: " + err.message);
+        alert("❌ Error BIAS: " + err.message);
       }
     }
 
-    // --- LOAD KUMULATIF REALTIME FROM CLOUD ---
+    // Function Load Kumulatif dari Firebase
     async function displayKumulatif() {
       const container = document.getElementById('kumulatifContent');
-      container.innerHTML = '<p class="muted"><i class="fas fa-spinner fa-spin"></i> Menarik data dari Firebase Cloud...</p>';
+      container.innerHTML = '<p class="muted"><i class="fas fa-spinner fa-spin"></i> Menarik data realtime dari Cloud Firebase...</p>';
 
       try {
         const snapImun = await getDocs(collection(db, COL_IMUN));
         const snapBias = await getDocs(collection(db, COL_BIAS));
 
-        let html = `<h3 style="color:var(--primary)"><i class="fas fa-cloud"></i> Status Data Cloud Firestore</h3>`;
-        html += `<p class="small">Tersimpan: <strong>${snapImun.size}</strong> Laporan Imunisasi, <strong>${snapBias.size}</strong> Laporan BIAS.</p><hr class="sep">`;
-
-        let totalImun = 0;
+        let totalDosisImun = 0;
         snapImun.forEach(doc => {
           const d = doc.data();
-          Object.values(d.data || {}).forEach(v => totalImun += (v.L + v.P));
+          Object.values(d.data || {}).forEach(v => totalDosisImun += (v.L + v.P));
         });
 
-        html += `
-          <div class="card" style="background:#f0f8ff;">
-            <h4>Grand Total Capaian Imunisasi Cloud: <span style="color:var(--primary)">${totalImun} Dosis</span></h4>
+        let html = `
+          <div class="card" style="background:#e8f4fd; border:1px solid #b6e0fe;">
+            <h3 style="color:var(--accent); margin-top:0"><i class="fas fa-cloud"></i> Ringkasan Realtime Cloud Database</h3>
+            <p><strong>Total Laporan Imunisasi:</strong> ${snapImun.size} Wilayah/Bulan</p>
+            <p><strong>Total Laporan BIAS:</strong> ${snapBias.size} Kelas/Sekolah</p>
+            <h4 style="color:var(--primary); margin-bottom:0">Total Capaian Imunisasi Terkumpul: ${totalDosisImun} Dosis</h4>
           </div>
         `;
         container.innerHTML = html;
       } catch (err) {
-        container.innerHTML = `<p class="text-danger">Gagal memuat data cloud: ${err.message}</p>`;
+        container.innerHTML = `<p style="color:var(--danger)">Gagal memuat data dari Firebase: ${err.message}</p>`;
       }
     }
 
-    // --- EXPORT CLOUD DATABASE TO JSON ---
+    // Export Database ke JSON
     async function exportDatabase() {
       try {
         const snapImun = await getDocs(collection(db, COL_IMUN));
         const snapBias = await getDocs(collection(db, COL_BIAS));
 
-        const backup = { imunReports: [], biasReports: [], export_date: new Date().toISOString() };
+        const backup = { imunReports: [], biasReports: [], date: new Date().toISOString() };
         snapImun.forEach(d => backup.imunReports.push(d.data()));
         snapBias.forEach(d => backup.biasReports.push(d.data()));
 
         const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = `Backup_Imunisasi_Cloud_${new Date().toISOString().slice(0,10)}.json`;
+        a.download = `Backup_Database_Imunisasi_${new Date().toISOString().slice(0,10)}.json`;
         a.click();
       } catch (err) {
         alert("Gagal Export: " + err.message);
       }
     }
 
-    // --- IMPORT JSON FILE TO CLOUD ---
+    // Import JSON File ke Cloud
     async function startImport() {
       const fileInput = document.getElementById('importFile');
       const status = document.getElementById('importStatus');
       if (!fileInput.files[0]) return alert("Pilih file JSON!");
 
-      status.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Mengunggah ke Firebase Cloud...`;
+      status.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Memproses & Menyinkronkan data ke Cloud...`;
 
       const reader = new FileReader();
       reader.onload = async (e) => {
@@ -790,16 +767,20 @@
               count++;
             }
           }
-          status.innerHTML = `<div class="alert-box alert-info">Berhasil menyinkronkan ${count} record ke Cloud!</div>`;
+          status.innerHTML = `<div class="alert-box alert-info">Berhasil mengunggah ${count} data ke Firebase Cloud!</div>`;
         } catch (err) {
-          status.innerHTML = `<div class="alert-box alert-warning">Error: ${err.message}</div>`;
+          status.innerHTML = `<div class="alert-box alert-warning">Error Import: ${err.message}</div>`;
         }
       };
       reader.readAsText(fileInput.files[0]);
     }
 
-    async function displayDetailedReports() {
-      displayKumulatif();
+    function downloadCSV(content, filename) {
+      const blob = new Blob(["\uFEFF" + content], { type: 'text/csv;charset=utf-8;' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      a.click();
     }
   </script>
 </body>

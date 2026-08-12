@@ -3,96 +3,804 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Sistem Pelaporan Imunisasi & BIAS — Puskesmas Melata</title>
+  <title>Sistem Pelaporan Imunisasi & BIAS — Puskesmas Melata (Cloud Version)</title>
+
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <link rel="stylesheet" href="style.css">
+
+  <style>
+    :root{
+      --primary:#FF6347; 
+      --primary-light:#FF8866;
+      --accent:#004080; 
+      --accent-light:#0066b3;
+      --bg:#f8f9fa; 
+      --card:#ffffff;
+      --muted:#6c757d;
+      --success:#198754;
+      --danger:#dc3545;
+      --info:#0d6efd;
+      --radius:10px;
+      --gap:18px;
+      --shadow-subtle:0 2px 8px rgba(0,0,0,0.05);
+      --shadow-card:0 10px 30px rgba(0,0,0,0.08);
+    }
+    *{box-sizing:border-box}
+    body{
+      font-family:'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      margin:0;
+      background:var(--bg);
+      color:#212529;
+      -webkit-font-smoothing:antialiased;
+      padding-bottom:50px;
+    }
+
+    /* Header */
+    header.app-header{
+      background:linear-gradient(90deg,var(--accent), var(--accent-light));
+      color: #fff;
+      min-height: 90px; 
+      padding: 0 20px;
+      display:flex;
+      flex-direction: column; 
+      align-items: center; 
+      box-shadow:0 8px 20px rgba(0, 0, 0, 0.2);
+      position:sticky;
+      top:0;
+      z-index:1000;
+    }
+    .brand-row{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      max-width: 1100px;
+      padding: 15px 0 0 0;
+    }
+    .brand {
+      display:flex;align-items:center;gap:15px;font-weight:700;font-size:1.2rem;
+    }
+    .brand .logo{
+      width:48px;height:48px;border-radius:12px;background:var(--primary);display:flex;align-items:center;justify-content:center;
+      box-shadow:0 4px 10px rgba(255, 99, 71, 0.4);
+    }
+    .brand-title-small {
+        font-weight:500;font-size:0.8rem;opacity:0.9;
+    }
+    
+    /* Navigasi Tabs */
+    .app-nav-tabs{
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      max-width: 1100px;
+      padding: 0;
+      margin-top: 10px;
+      overflow-x: auto; 
+    }
+    .app-nav-tabs .tab{
+      flex-shrink: 0; 
+      color: #c9e0f6;
+      background: transparent;
+      border: 0;
+      padding: 10px 18px;
+      border-radius: var(--radius) var(--radius) 0 0;
+      cursor: pointer;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      opacity: 0.8;
+      transition: all 0.2s ease;
+      font-size: 0.95rem;
+      border-bottom: 3px solid transparent;
+    }
+    .app-nav-tabs .tab.active{
+      background: var(--card);
+      color: var(--accent);
+      opacity: 1;
+      font-weight: 700;
+      border-bottom: 3px solid var(--primary);
+      box-shadow: var(--shadow-subtle);
+    }
+    .app-nav-tabs .tab:hover:not(.active){
+      opacity: 1;
+      color: #fff;
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    /* Layout */
+    .wrap{max-width:1100px;margin:25px auto;padding:0 20px;}
+    
+    /* Card */
+    .card{
+      background:var(--card);border-radius:var(--radius);padding:25px;
+      box-shadow:var(--shadow-card);
+      margin-bottom:var(--gap);
+      border: 1px solid #e9ecef;
+    }
+    h2{margin:0 0 15px 0;color:var(--accent);font-size:1.5rem}
+    p.lead{margin:0 0 20px 0;color:var(--muted);font-size:1.1rem}
+
+    /* Grid */
+    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--gap)}
+    @media (max-width:900px){.grid{grid-template-columns:1fr}}
+    
+    /* Form specifics */
+    .form-group{margin-bottom:15px;display:flex;flex-direction:column}
+    label{font-weight:600;color:var(--accent);margin-bottom:8px;font-size:1rem}
+    input[type="text"], input[type="month"], select, textarea, input[type="file"]{
+      padding:12px 15px;border-radius:8px;border:1px solid #ced4da;background:#fefefe;font-size:1rem;
+      outline:none;transition:all 0.2s ease;
+    }
+    select:focus,input:focus,textarea:focus{box-shadow:0 0 0 3px rgba(255, 99, 71, 0.25);border-color:var(--primary)}
+    textarea{min-height:100px;resize:vertical}
+    
+    .form-row{display:flex;gap:12px}
+    .form-row .form-group{flex:1}
+
+    .inline{display:flex;gap:10px;align-items:center}
+    .muted{color:var(--muted);font-size:0.95rem}
+
+    /* Action buttons */
+    .actions{display:flex;gap:12px;justify-content:flex-end;align-items:center;margin-top:15px}
+    .btn{
+      padding:12px 20px;border-radius:8px;border:0;font-weight:600;cursor:pointer;display:inline-flex;gap:8px;align-items:center;
+      box-shadow:var(--shadow-subtle);
+      transition:transform 0.2s, background 0.2s, box-shadow 0.2s;
+    }
+    .btn-primary{background:var(--primary);color:#fff}
+    .btn-primary:hover{background:var(--primary-light);transform:translateY(-1px);box-shadow:0 4px 15px rgba(255, 99, 71, 0.3);}
+    .btn-ghost{background:transparent;border:1px solid #ced4da;color:var(--accent)}
+    .btn-ghost:hover{background:#f8f9fa; transform:translateY(-1px);}
+    .btn-info{background:var(--info);color:#fff} 
+    .btn-info:hover{background:#0b5ed7;transform:translateY(-1px);box-shadow:0 4px 15px rgba(13, 110, 253, 0.3);}
+    .btn-danger{background:var(--danger);color:#fff}
+    .btn-danger:hover{background:#bb2d3b;transform:translateY(-1px);box-shadow:0 4px 15px rgba(220, 53, 69, 0.3);}
+
+    .small{font-size:0.9rem;color:var(--muted)}
+    hr.sep{border:0;height:1px;margin:20px 0;border-radius:6px;background:linear-gradient(90deg,transparent,#dee2e6,transparent)}
+
+    /* Export panel */
+    .export-grid{display:flex;gap:var(--gap);flex-wrap:wrap}
+    .export-card{flex:1;min-width:280px;padding:20px;border-radius:var(--radius);background:linear-gradient(180deg,#f9fcfd,#f5f8fb);box-shadow:var(--shadow-subtle); border: 1px solid #eaf2f8;}
+    .label-pill{display:inline-block;padding:8px 14px;border-radius:999px;background:#e9f4ff;color:var(--accent);font-weight:700;font-size:0.9rem}
+    
+    /* Kumulatif Table Styling */
+    .kumulatif-table td, .kumulatif-table th {
+        border: 1px solid #e9ecef;
+        padding: 8px 10px;
+        text-align: left;
+        font-size: 0.9rem;
+    }
+    .kumulatif-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.95rem; 
+        margin-top: 8px;
+    }
+    .kumulatif-table thead tr {
+        background: #f1f6fa;
+        text-align: left;
+        color: var(--accent);
+    }
+    .kumulatif-table tfoot td {
+        font-weight: 700;
+        background: #fef4e6;
+        color: var(--primary);
+    }
+
+    .monthly-report-card {
+        border: 1px solid #d4e3f4 !important;
+        background: #f7f9fc !important;
+        padding: 12px !important;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-subtle);
+        margin-top: 10px;
+    }
+    .monthly-report-card h4 {
+        font-size: 1.05rem !important;
+        padding-bottom: 5px;
+        margin-bottom: 8px !important;
+        border-bottom: 1px dashed #c0d8f0;
+    }
+
+    .class-input-block {
+        border: 2px solid var(--accent-light) !important; 
+        box-shadow: 0 4px 15px rgba(0, 64, 128, 0.15) !important; 
+        background: #f0f8ff !important; 
+        transition: all 0.3s ease;
+        padding: 20px !important;
+    }
+
+    .alert-box {
+        padding: 15px;
+        border-radius: var(--radius);
+        margin-top: var(--gap);
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+    .alert-info {
+        background: #e3f2fd;
+        border: 1px solid #90caf9;
+        color: #1e88e5;
+    }
+    .alert-warning {
+        background: #fffde7;
+        border: 1px solid #ffeb3b;
+        color: #fbc02d;
+    }
+
+    .site-footer {
+        text-align: center;
+        margin-top: 40px;
+        padding: 15px 0;
+        color: var(--muted);
+        font-size: 0.85rem;
+        border-top: 1px solid #eee;
+    }
+  </style>
 </head>
 <body>
 
   <header class="app-header">
     <div class="brand-row">
       <div class="brand">
-        <div class="logo"><i class="fas fa-syringe"></i></div>
+        <div class="logo"><i class="fas fa-syringe" style="font-size:20px;color:#fff"></i></div>
         <div>
           Sistem Pelaporan Imunisasi & BIAS<br>
-          <span class="brand-title-small">Puskesmas Melata (Cloud Version)</span>
+          <span class="brand-title-small">Puskesmas Melata (Firebase Cloud Sync)</span>
         </div>
       </div>
+
+      <div class="header-actions inline">
+        <div class="small">2026</div>
+        <button class="btn btn-ghost" onclick="document.getElementById('helpModal').style.display='flex'">
+          <i class="fas fa-circle-info"></i> Bantuan
+        </button>
+      </div>
+    </div>
+
+    <div class="app-nav-tabs"> 
+      <button class="tab active" data-tab="imunisasi" onclick="switchTab(event)"><i class="fas fa-syringe"></i> IMUNISASI</button>
+      <button class="tab" data-tab="bias" onclick="switchTab(event)"><i class="fas fa-school"></i> BIAS</button>
+      <button class="tab" data-tab="export" onclick="switchTab(event)"><i class="fas fa-file-export"></i> EKSPOR</button>
+      <button class="tab" data-tab="import" onclick="switchTab(event)"><i class="fas fa-upload"></i> IMPORT</button>
+      <button class="tab" data-tab="kumulatif" onclick="switchTab(event)"><i class="fas fa-chart-line"></i> KUMULATIF</button>
     </div>
   </header>
 
-  <nav class="main-nav">
-    <button class="nav-btn active" onclick="switchTab('imunisasi')"><i class="fas fa-baby"></i><span>IMUNISASI</span></button>
-    <button class="nav-btn" onclick="switchTab('bias')"><i class="fas fa-school"></i><span>BIAS</span></button>
-    <button class="nav-btn" onclick="switchTab('kumulatif')"><i class="fas fa-chart-line"></i><span>KUMULATIF</span></button>
-  </nav>
-
-  <main class="container">
-    <section id="imunisasi" class="tab-content active">
+  <main class="wrap">
+    <!-- TAB 1: IMUNISASI -->
+    <section id="imunisasi" class="tab-panel">
       <div class="card">
-        <h3><i class="fas fa-edit"></i> Input Laporan Imunisasi</h3>
+        <h2>Input Data Imunisasi</h2>
+        <p class="lead">Masukkan capaian imunisasi per desa untuk periode yang dipilih. Data otomatis tersimpan ke Firebase Cloud.</p>
+
         <form id="imunForm">
-          <div class="form-grid">
-            <div class="form-group">
-              <label>Bulan Pelaporan</label>
-              <input type="month" id="imunMonth" required>
+          <div class="grid">
+            <div>
+              <div class="form-group">
+                <label for="desa_imun">Pilih Desa</label>
+                <select id="desa_imun" name="desa_imun" required>
+                  <option value="">-- Pilih Desa --</option>
+                  <option value="melata">Melata</option>
+                  <option value="nanuah">Nanuah</option>
+                  <option value="topalan">Topalan</option>
+                  <option value="batu_ampar">Batu Ampar</option>
+                  <option value="lubuk_hiju">Lubuk Hiju</option>
+                  <option value="bukit_makmur">Bukit Makmur</option>
+                  <option value="bukit_raya">Bukit Raya</option>
+                  <option value="modang_mas">Modang Mas</option>
+                  <option value="mukti_manunggal">Mukti Manunggal</option>
+                  <option value="sumber_jaya">Sumber Jaya</option>
+                  <option value="bukit_harum">Bukit Harum</option>
+                  <option value="pt_tsa">PT. TSA</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label for="periode_imun">Periode (Bulan/Tahun)</label>
+                <input type="month" id="periode_imun" name="periode_imun" required>
+              </div>
+              
+              <div class="alert-box alert-info">
+                <p style="margin:0;"><i class="fas fa-cloud"></i> Data tersimpan langsung di Firebase Firestore Cloud secara gratis & realtime.</p>
+              </div>
             </div>
-            <div class="form-group">
-              <label>Kecamatan</label>
-              <select id="imunKecamatan" required>
-                <option value="">-- Pilih Kecamatan --</option>
-                <option value="Bulik">1. Kecamatan Bulik</option>
-                <option value="Sematu Jaya">2. Kecamatan Sematu Jaya</option>
-                <option value="Menthobi Raya">3. Kecamatan Menthobi Raya</option>
-                <option value="Bulik Timur">4. Kecamatan Bulik Timur</option>
-                <option value="Lamandau">5. Kecamatan Lamandau</option>
-                <option value="Belantikan Raya">6. Kecamatan Belantikan Raya</option>
-                <option value="Delang">7. Kecamatan Delang</option>
-                <option value="Batang Kawa">8. Kecamatan Batang Kawa</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Nama Desa</label>
-              <select id="imunDesa" required>
-                <option value="">-- Pilih Desa --</option>
-              </select>
+
+            <div>
+              <div class="form-group">
+                <label>Petunjuk</label>
+                <div class="small">Isi jumlah capaian untuk masing-masing vaksin dan jenis kelamin. Sasaran 0-50.</div>
+              </div>
+               <div class="alert-box alert-warning">
+                <p style="margin:0;"><i class="fas fa-exclamation-triangle"></i> Pastikan input **Periode** (Bulan/Tahun) sudah terisi sebelum klik Simpan.</p>
+              </div>
             </div>
           </div>
-          <hr>
-          <div id="imunFields" class="vaccine-grid"></div>
-          <div class="bottom-actions">
+
+          <hr class="sep">
+
+          <div id="vaksinContainer"></div>
+
+          <div class="actions">
             <button type="submit" class="btn btn-primary"><i class="fas fa-cloud-upload-alt"></i> Simpan ke Cloud & CSV</button>
           </div>
         </form>
       </div>
     </section>
 
-    <section id="bias" class="tab-content">
+    <!-- TAB 2: BIAS -->
+    <section id="bias" class="tab-panel" style="display:none">
       <div class="card">
-        <h3><i class="fas fa-edit"></i> Input Laporan BIAS</h3>
+        <h2>Form BIAS (Pendataan Sekolah Multi-Kelas)</h2>
+        <p class="lead">Pilih nama sekolah. Gunakan tombol **Tambah Input Kelas** untuk memasukkan data setiap kelas yang dilaporkan.</p>
+
         <form id="biasForm">
-          <div class="form-grid">
-            <div class="form-group"><label>Bulan</label><input type="month" id="biasMonth" required></div>
-            <div class="form-group"><label>Sekolah</label><select id="biasSchool" required></select></div>
+          <div class="grid">
+            <div>
+              <div class="form-group">
+                <label for="sekolah">Nama Sekolah</label>
+                <select id="sekolah" name="sekolah" required>
+                  <option value="">-- Pilih Sekolah --</option>
+                </select>
+              </div>
+              
+              <div class="form-group" style="margin-top:20px;">
+                <label for="keterangan">Keterangan (opsional - berlaku untuk semua kelas)</label>
+                <textarea id="keterangan" name="keterangan" placeholder="Catatan tambahan..."></textarea>
+              </div>
+
+              <div class="alert-box alert-info">
+                <p style="margin:0;"><i class="fas fa-cloud"></i> Data BIAS tersimpan secara terpusat di cloud.</p>
+              </div>
+            </div>
+
+            <div>
+              <h3 style="margin:0 0 15px 0; font-size:1.2rem; color:var(--accent);">Input Data Kelas (Sasaran & Capaian)</h3>
+              
+              <div id="biasClassReportsContainer">
+                <p class="muted">Pilih sekolah di samping kiri untuk mengaktifkan input kelas.</p>
+              </div>
+
+              <div style="margin-top:20px; border-top:1px dashed #ddd; padding-top:15px;">
+                 <button type="button" id="addBiasClassButton" class="btn btn-info" disabled style="opacity:0.5">
+                    <i class="fas fa-plus-circle"></i> Tambah Input Kelas
+                </button>
+              </div>
+            </div>
           </div>
-          <div id="biasClassesContainer"></div>
-          <div class="bottom-actions">
-            <button type="submit" class="btn btn-primary"><i class="fas fa-cloud-upload-alt"></i> Simpan ke Cloud & CSV</button>
+
+          <div class="actions" style="margin-top:25px; border-top:1px solid #eee; padding-top:20px; justify-content:flex-start;">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-cloud-upload-alt"></i> Simpan BIAS ke Cloud & CSV</button>
           </div>
         </form>
       </div>
     </section>
 
-    <section id="kumulatif" class="tab-content">
+    <!-- TAB 3: EXPORT -->
+    <section id="export" class="tab-panel" style="display:none">
       <div class="card">
-        <h3><i class="fas fa-database"></i> Status Database Cloud</h3>
-        <p>Semua data yang Anda simpan otomatis terkirim ke Firebase.</p>
-        <div id="statusCloud"></div>
+        <h2>Export Data</h2>
+        <p class="lead">Panel cepat untuk mencadangkan database atau menarik data dari Cloud.</p>
+
+        <div class="export-grid">
+          <div class="export-card" style="flex:100%">
+            <div class="label-pill" style="background:var(--info);color:#fff"><i class="fas fa-database"></i> Backup JSON Cloud</div>
+            <div style="margin-top:8px">
+                <p class="small" style="margin:0 0 10px 0;">
+                    Unduh seluruh snapshot laporan dari cloud dalam format **.json** sebagai cadangan offline.
+                </p>
+                <button class="btn btn-info" id="btnExportDb"><i class="fas fa-cloud-download-alt"></i> Export Database Cloud (.json)</button>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
+
+    <!-- TAB 4: IMPORT -->
+    <section id="import" class="tab-panel" style="display:none">
+        <div class="card">
+          <h2><i class="fas fa-upload"></i> Import Data ke Cloud</h2>
+          <p class="lead">Pilih file database **(.json)** untuk menyinkronkan data secara masal ke Firebase Cloud Firestore.</p>
+
+          <div class="form-group">
+            <label for="importFile">Pilih File Database (.json)</label>
+            <input type="file" id="importFile" accept=".json,.txt" multiple>
+          </div>
+          
+          <div id="importStatus" class="small" style="margin-top:15px;"></div>
+
+          <div class="actions" style="justify-content:flex-start">
+            <button class="btn btn-primary" id="btnStartImport"><i class="fas fa-cloud-upload-alt"></i> Upload & Sync Data ke Cloud</button>
+          </div>
+        </div>
+    </section>
+    
+    <!-- TAB 5: KUMULATIF -->
+    <section id="kumulatif" class="tab-panel" style="display:none">
+      <div class="card">
+        <h2><i class="fas fa-chart-line"></i> Hasil Kumulatif Imunisasi dan BIAS (Realtime Cloud)</h2>
+        <p class="lead">Menampilkan total capaian dan rincian per bulan dari seluruh laporan yang tersimpan di Firebase Firestore.</p>
+
+        <hr class="sep">
+        
+        <div class="card" style="background:#f5fef7; border:1px solid #c8e6c9">
+            <h3><i class="fas fa-search"></i> Lihat Laporan Spesifik (Per Desa/Sekolah)</h3>
+
+            <div class="grid" style="grid-template-columns:repeat(3,1fr)">
+                <div class="form-group">
+                    <label for="filter_periode">Filter Bulan/Periode</label>
+                    <select id="filter_periode" style="width:100%"><option value="">-- Semua Bulan --</option></select>
+                </div>
+                <div class="form-group">
+                    <label for="filter_desa">Filter Desa (Imunisasi)</label>
+                    <select id="filter_desa" style="width:100%"><option value="">-- Semua Desa --</option></select>
+                </div>
+                <div class="form-group">
+                    <label for="filter_sekolah">Filter Sekolah (BIAS)</label>
+                    <select id="filter_sekolah" style="width:100%"><option value="">-- Semua Sekolah --</option></select>
+                </div>
+            </div>
+
+            <div class="actions" style="justify-content:flex-start; margin-top:5px">
+                <button class="btn btn-primary" id="btnFilterReport">
+                    <i class="fas fa-eye"></i> Tampilkan Laporan Spesifik
+                </button>
+            </div>
+        </div>
+        
+        <div id="detailedReportList" style="margin-top:20px"></div>
+        <div id="kumulatifContent">
+          <p class="muted"><i class="fas fa-spinner fa-spin"></i> Memuat data dari Firebase...</p>
+        </div>
+      </div>
+    </section>
+
   </main>
 
-  <script type="module" src="script.js"></script>
+  <footer class="site-footer">
+    &copy; 2026 Sistem Pelaporan Data Imunisasi & BIAS — Firebase Powered
+  </footer>
+
+  <div id="helpModal" style="display:none;position:fixed;inset:0;background:rgba(2,6,23,0.5);z-index:1050;align-items:center;justify-content:center">
+    <div style="background:#fff;padding:25px;border-radius:12px;max-width:700px;margin:20px">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h3 style="margin:0; color:var(--accent);"><i class="fas fa-circle-info"></i> Bantuan</h3>
+        <button class="btn btn-ghost" onclick="document.getElementById('helpModal').style.display='none'">Tutup</button>
+      </div>
+      <hr>
+      <p class="small">Sistem terhubung langsung ke database <strong>Firebase Firestore Cloud</strong>. Setiap data yang diinput di tab Imunisasi atau BIAS akan tersimpan secara otomatis secara online.</p>
+    </div>
+  </div>
+
+  <!-- SCRIPT MODULE INTEGRASI FIREBASE -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, doc, setDoc, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // Kunci Konfigurasi Firebase Anda
+    const firebaseConfig = {
+      apiKey: "AIzaSyAAyGTFyAkfua9wazWH6FFkYYmnGFTEh4",
+      authDomain: "imunisasi-puskesmas.firebaseapp.com",
+      projectId: "imunisasi-puskesmas",
+      storageBucket: "imunisasi-puskesmas.firebasestorage.app",
+      messagingSenderId: "26448709630",
+      appId: "1:26448709630:web:b29b4ed7357b44c876a2af"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Global Collections Reference
+    const COL_IMUN = "laporan_imunisasi";
+    const COL_BIAS = "laporan_bias";
+
+    const imunFields = [
+      "BCG/Polio1","DPT1/Polio2","DPT2/Polio3","DPT3/Polio4",
+      "PCV1","PCV2","PCV3","ROTA1","ROTA2","ROTA3",
+      "IPV1","IPV2","MR","MR2","DPT4"
+    ];
+
+    const SCHOOL_DATA = {
+        'SD NEGERI MELATA': 'SD', 'SD NEGERI NANUAH': 'SD', 'SD NEGERI TOPALAN': 'SD', 
+        'SD NEGERI BATU AMPAR': 'SD', 'SD NEGERI LUBUK HIJU': 'SD', 'SD NEGERI BUKIT MAKMUR': 'SD',
+        'SD NEGERI BUKIT RAYA': 'SD', 'SD NEGERI MODANG MAS': 'SD', 'SD NEGERI MUKTI MANUNGGAL': 'SD',
+        'SD NEGERI SUMBER JAYA': 'SD', 'SD NEGERI BUKIT HARUM': 'SD', 'SD SWASTA TANJUNG SAWIT ABADI': 'SD',
+        'MIS RAUDHATUL ULUM': 'SD', 'SMP NEGERI 1 MENTHOBI RAYA': 'SMP', 'SMP NEGERI 2 MENTHOBI RAYA': 'SMP', 
+        'SMP NEGERI 3 MENTHOBI RAYA': 'SMP', 'SMP NEGERI 4 MENTHOBI RAYA': 'SMP', 
+        'SMP NEGERI 5 MENTHOBI RAYA': 'SMP', 'SMP NEGERI SATU ATAP 6 MENTHOBI RAYA': 'SMP',
+        'SMP ISLAM AT-TANWIR': 'SMP', 'MTS RAUDHATUL ULUM': 'SMP', 'SMA NEGERI 1 MENTHOBI RAYA': 'SMA',
+        'SMK NEGERI 1 MENTHOBI RAYA': 'SMA' 
+    };
+
+    const CLASS_MAP = { 'SD': [1, 2, 3, 4, 5, 6], 'SMP': [7, 8, 9], 'SMA': [10, 11, 12] };
+    let classInputCounter = 0;
+
+    function slugify(text){
+      return text.toLowerCase().replace(/\s+/g,'_').replace(/[\/]/g,'').replace(/[^a-z0-9_]/g,'');
+    }
+
+    // --- TAB NAVIGATION ---
+    window.switchTab = function(e){
+      const target = e.currentTarget.getAttribute('data-tab');
+      document.querySelectorAll('.app-nav-tabs .tab').forEach(t=>t.classList.remove('active'));
+      e.currentTarget.classList.add('active');
+      document.querySelectorAll('.tab-panel').forEach(p => p.style.display='none');
+      document.getElementById(target).style.display = 'block';
+      if (target === 'kumulatif') displayKumulatif();
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+
+    // --- INITIALIZATION ---
+    document.addEventListener('DOMContentLoaded', () => {
+      initImunSections();
+      initBiasDropdowns();
+      
+      document.getElementById('imunForm').addEventListener('submit', handleSaveImun);
+      document.getElementById('biasForm').addEventListener('submit', handleSaveBias);
+      document.getElementById('sekolah').addEventListener('change', onChangeSekolah);
+      document.getElementById('addBiasClassButton').addEventListener('click', addNewClassInput);
+      document.getElementById('btnExportDb').addEventListener('click', exportDatabase);
+      document.getElementById('btnStartImport').addEventListener('click', startImport);
+      document.getElementById('btnFilterReport').addEventListener('click', displayDetailedReports);
+    });
+
+    function initImunSections(){
+      const container = document.getElementById('vaksinContainer');
+      container.innerHTML = '';
+      imunFields.forEach(field => {
+        const section = document.createElement('div');
+        section.className = 'card';
+        section.style.marginBottom = '12px';
+        section.style.padding = '15px';
+        section.innerHTML = `
+          <h3 style="margin:0 0 10px 0;font-size:1.1rem;color:var(--accent); font-weight:700;">${field}</h3>
+          <div class="form-row">
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="font-weight:600;margin-bottom:6px;">Laki-Laki</label>
+              <select name="${slugify(field)}_l" class="imun-number" required></select>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="font-weight:600;margin-bottom:6px;">Perempuan</label>
+              <select name="${slugify(field)}_p" class="imun-number" required></select>
+            </div>
+          </div>
+        `;
+        container.appendChild(section);
+      });
+
+      document.querySelectorAll('.imun-number').forEach(s => {
+        s.innerHTML = '<option value="" disabled selected>-- Pilih --</option>';
+        for(let i=0;i<=50;i++) s.innerHTML += `<option value="${i}">${i}</option>`;
+      });
+    }
+
+    function initBiasDropdowns() {
+      const sekolahSelect = document.getElementById('sekolah');
+      sekolahSelect.innerHTML = '<option value="">-- Pilih Sekolah --</option>';
+      Object.keys(SCHOOL_DATA).forEach(school => {
+        sekolahSelect.innerHTML += `<option value="${school}">${school}</option>`;
+      });
+    }
+
+    function onChangeSekolah() {
+      const sekolah = document.getElementById('sekolah').value;
+      const classContainer = document.getElementById('biasClassReportsContainer');
+      const schoolType = SCHOOL_DATA[sekolah];
+      const addButton = document.getElementById('addBiasClassButton');
+      
+      classContainer.innerHTML = ''; 
+      classInputCounter = 0;
+      
+      if (schoolType) {
+          addNewClassInput(); 
+          addButton.disabled = false;
+          addButton.style.opacity = 1;
+      } else {
+          classContainer.innerHTML = '<p class="muted">Pilih sekolah di samping kiri untuk mengaktifkan input kelas.</p>';
+          addButton.disabled = true;
+          addButton.style.opacity = 0.5;
+      }
+    }
+
+    function addNewClassInput() {
+      const sekolah = document.getElementById('sekolah').value;
+      if (!sekolah) return;
+      const schoolType = SCHOOL_DATA[sekolah];
+      classInputCounter++;
+      
+      const blockId = classInputCounter;
+      const container = document.getElementById('biasClassReportsContainer');
+      
+      const html = `
+        <div class="card class-input-block" id="block_${blockId}" style="margin-bottom:18px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <h4 style="margin:0; font-weight:700; color:var(--primary)">Data Kelas #${blockId}</h4>
+                <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.class-input-block').remove()"><i class="fas fa-times"></i> Hapus</button>
+            </div>
+            <div class="form-row">
+                <div class="form-group" style="flex:1.5">
+                    <label>Kelas</label>
+                    <select id="kelas_${blockId}" required></select>
+                </div>
+                <div class="form-group"><label>Sasaran L</label><select id="sasaran_l_${blockId}" class="bias-num" required></select></div>
+                <div class="form-group"><label>Sasaran P</label><select id="sasaran_p_${blockId}" class="bias-num" required></select></div>
+                <div class="form-group"><label>Drop Out</label><select id="dropout_${blockId}" class="bias-num"></select></div>
+            </div>
+        </div>
+      `;
+      container.insertAdjacentHTML('beforeend', html);
+      
+      const classSel = document.getElementById(`kelas_${blockId}`);
+      classSel.innerHTML = '<option value="" disabled selected>-- Pilih --</option>';
+      CLASS_MAP[schoolType].forEach(c => classSel.innerHTML += `<option value="${c}">${c}</option>`);
+
+      container.querySelectorAll('.bias-num').forEach(s => {
+        if(s.children.length === 0){
+          s.innerHTML = '<option value="0">0</option>';
+          for(let i=1;i<=200;i++) s.innerHTML += `<option value="${i}">${i}</option>`;
+        }
+      });
+    }
+
+    // --- SAVE IMUNISASI TO FIREBASE ---
+    async function handleSaveImun(e) {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const desa = fd.get('desa_imun');
+      const desaText = document.querySelector('#desa_imun').selectedOptions[0].text;
+      const periode = fd.get('periode_imun');
+
+      const dataPayload = {
+        desa: desaText,
+        periode: periode,
+        updated_at: new Date().toISOString(),
+        data: {}
+      };
+
+      imunFields.forEach(field => {
+        const valL = parseInt(fd.get(`${slugify(field)}_l`)) || 0;
+        const valP = parseInt(fd.get(`${slugify(field)}_p`)) || 0;
+        dataPayload.data[field] = { L: valL, P: valP };
+      });
+
+      const docId = `${periode}_${desa}`.replace(/[\s\/]/g, '_').toLowerCase();
+
+      try {
+        await setDoc(doc(db, COL_IMUN, docId), dataPayload, { merge: true });
+        alert(`✅ Success: Data Imunisasi ${desaText} (${periode}) Berhasil Disimpan ke Firebase Cloud!`);
+        e.target.reset();
+        initImunSections();
+      } catch (err) {
+        alert("❌ Error menyimpan ke cloud: " + err.message);
+      }
+    }
+
+    // --- SAVE BIAS TO FIREBASE ---
+    async function handleSaveBias(e) {
+      e.preventDefault();
+      const sekolah = document.getElementById('sekolah').value;
+      const keterangan = document.getElementById('keterangan').value;
+      const classBlocks = document.querySelectorAll('.class-input-block');
+
+      if (!sekolah || classBlocks.length === 0) {
+        alert("Lengkapi sekolah dan minimal 1 data kelas.");
+        return;
+      }
+
+      const tanggal = new Date().toISOString().slice(0,10);
+
+      try {
+        for (let block of classBlocks) {
+          const blockId = block.id.replace('block_', '');
+          const kelas = document.getElementById(`kelas_${blockId}`).value;
+          const sasL = parseInt(document.getElementById(`sasaran_l_${blockId}`).value) || 0;
+          const sasP = parseInt(document.getElementById(`sasaran_p_${blockId}`).value) || 0;
+          const doVal = parseInt(document.getElementById(`dropout_${blockId}`).value) || 0;
+
+          const docId = `${tanggal}_${sekolah}_kls${kelas}`.replace(/[\s\/]/g, '_').toLowerCase();
+          
+          await setDoc(doc(db, COL_BIAS, docId), {
+            sekolah, kelas, tanggal,
+            data: {
+              Sasaran_L: sasL, Sasaran_P: sasP, DropOut: doVal,
+              MR_L: 0, MR_P: 0, DT_L: 0, DT_P: 0, Td_L: 0, Td_P: 0, HPV_L: 0, HPV_P: 0,
+              Keterangan: keterangan
+            },
+            updated_at: new Date().toISOString()
+          }, { merge: true });
+        }
+        alert(`✅ Success: Laporan BIAS ${sekolah} Berhasil Disimpan ke Firebase!`);
+        e.target.reset();
+        onChangeSekolah();
+      } catch (err) {
+        alert("❌ Error: " + err.message);
+      }
+    }
+
+    // --- LOAD KUMULATIF REALTIME FROM CLOUD ---
+    async function displayKumulatif() {
+      const container = document.getElementById('kumulatifContent');
+      container.innerHTML = '<p class="muted"><i class="fas fa-spinner fa-spin"></i> Menarik data dari Firebase Cloud...</p>';
+
+      try {
+        const snapImun = await getDocs(collection(db, COL_IMUN));
+        const snapBias = await getDocs(collection(db, COL_BIAS));
+
+        let html = `<h3 style="color:var(--primary)"><i class="fas fa-cloud"></i> Status Data Cloud Firestore</h3>`;
+        html += `<p class="small">Tersimpan: <strong>${snapImun.size}</strong> Laporan Imunisasi, <strong>${snapBias.size}</strong> Laporan BIAS.</p><hr class="sep">`;
+
+        let totalImun = 0;
+        snapImun.forEach(doc => {
+          const d = doc.data();
+          Object.values(d.data || {}).forEach(v => totalImun += (v.L + v.P));
+        });
+
+        html += `
+          <div class="card" style="background:#f0f8ff;">
+            <h4>Grand Total Capaian Imunisasi Cloud: <span style="color:var(--primary)">${totalImun} Dosis</span></h4>
+          </div>
+        `;
+        container.innerHTML = html;
+      } catch (err) {
+        container.innerHTML = `<p class="text-danger">Gagal memuat data cloud: ${err.message}</p>`;
+      }
+    }
+
+    // --- EXPORT CLOUD DATABASE TO JSON ---
+    async function exportDatabase() {
+      try {
+        const snapImun = await getDocs(collection(db, COL_IMUN));
+        const snapBias = await getDocs(collection(db, COL_BIAS));
+
+        const backup = { imunReports: [], biasReports: [], export_date: new Date().toISOString() };
+        snapImun.forEach(d => backup.imunReports.push(d.data()));
+        snapBias.forEach(d => backup.biasReports.push(d.data()));
+
+        const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `Backup_Imunisasi_Cloud_${new Date().toISOString().slice(0,10)}.json`;
+        a.click();
+      } catch (err) {
+        alert("Gagal Export: " + err.message);
+      }
+    }
+
+    // --- IMPORT JSON FILE TO CLOUD ---
+    async function startImport() {
+      const fileInput = document.getElementById('importFile');
+      const status = document.getElementById('importStatus');
+      if (!fileInput.files[0]) return alert("Pilih file JSON!");
+
+      status.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Mengunggah ke Firebase Cloud...`;
+
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const json = JSON.parse(e.target.result);
+          let count = 0;
+
+          if (json.imunReports) {
+            for (let r of json.imunReports) {
+              const id = `${r.periode}_${r.desa}`.replace(/[\s\/]/g, '_').toLowerCase();
+              await setDoc(doc(db, COL_IMUN, id), r, { merge: true });
+              count++;
+            }
+          }
+          status.innerHTML = `<div class="alert-box alert-info">Berhasil menyinkronkan ${count} record ke Cloud!</div>`;
+        } catch (err) {
+          status.innerHTML = `<div class="alert-box alert-warning">Error: ${err.message}</div>`;
+        }
+      };
+      reader.readAsText(fileInput.files[0]);
+    }
+
+    async function displayDetailedReports() {
+      displayKumulatif();
+    }
+  </script>
 </body>
 </html>

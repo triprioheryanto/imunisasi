@@ -7,6 +7,9 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  
+  <!-- SHEETJS UNTUK GENERATE EXCEL (.XLSX) 2 SHEET CLIENT-SIDE -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <style>
     :root{
@@ -146,7 +149,6 @@
       background: #002b55; color: #e2e8f0; font-size: 0.78rem; font-weight: 600;
     }
 
-    /* Sticky columns untuk navigasi nama anak */
     .kohort-table .sticky-col-1 {
       position: sticky; left: 0; z-index: 10; background: #f8fafc; text-align: left; font-weight: 700; color: var(--accent); min-width: 140px;
     }
@@ -180,6 +182,7 @@
     .btn-ghost { background: transparent; border: 1px solid #ced4da; color: var(--accent); }
     .btn-info { background: var(--info); color: #fff; } 
     .btn-danger { background: var(--danger); color: #fff; }
+    .btn-success { background: var(--success); color: #fff; }
 
     .site-footer { text-align: center; margin-top: 30px; padding: 15px 0; color: var(--muted); font-size: 0.8rem; border-top: 1px solid #eee; }
 
@@ -334,7 +337,6 @@
               <input type="text" id="reg_alamat" placeholder="Contoh: RT 02 / Dusun A" required>
             </div>
 
-            <!-- CHECKBOXES PILIHAN MULTI VAKSIN -->
             <div class="form-group full-width">
               <label style="color:var(--primary); font-size:1.05rem;"><i class="fas fa-check-double"></i> Pilih Jenis Imunisasi Diberikan (Centang yang sesuai)</label>
               
@@ -378,7 +380,6 @@
         </form>
       </div>
 
-      <!-- TABEL MATRIKS KOHORT MEMANJANG -->
       <div class="card">
         <h3><i class="fas fa-table"></i> Register Kohort Imunisasi (Geser ke Kanan <i class="fas fa-arrow-right"></i>)</h3>
         <p class="lead" style="font-size:0.85rem; margin-bottom:10px;">Satu baris untuk satu anak. Kolom jenis vaksin memanjang horizontal.</p>
@@ -441,7 +442,7 @@
     <section id="export" class="tab-panel" style="display:none">
       <div class="card" style="border: 2px solid var(--info);">
         <h2><i class="fas fa-file-export"></i> Ekspor Data Spesifik (Offline Sync)</h2>
-        <p class="lead">Ekspor data register kohort desa/bulan/tahun tertentu dalam bentuk matriks horizontal memanjang.</p>
+        <p class="lead">Ekspor data register kohort desa/bulan/tahun tertentu langsung dalam bentuk **Excel (.xlsx) 2 Sheet**.</p>
 
         <div class="grid">
           <div class="form-group">
@@ -499,7 +500,7 @@
 
         <div class="actions">
           <button class="btn btn-primary" id="btnExportFilteredJSON"><i class="fas fa-download"></i> Ekspor JSON Spesifik</button>
-          <button class="btn btn-info" id="btnExportFilteredCSV"><i class="fas fa-file-csv"></i> Ekspor CSV Matriks (1 Baris Per Anak)</button>
+          <button class="btn btn-success" id="btnExportFilteredExcel"><i class="fas fa-file-excel"></i> Ekspor Excel (.xlsx) 2 Sheet</button>
         </div>
       </div>
 
@@ -514,7 +515,7 @@
     <section id="import" class="tab-panel" style="display:none">
         <div class="card">
           <h2><i class="fas fa-upload"></i> Import Database / File Ekspor ke Cloud</h2>
-          <p class="lead">Gunakan menu ini untuk mengunggah file **JSON** maupun **CSV** hasil ekspor offline ke server cloud saat sudah mendapatkan akses internet.</p>
+          <p class="lead">Gunakan menu ini untuk mengunggah file **JSON** maupun **CSV/Excel** hasil ekspor offline ke server cloud saat sudah mendapatkan akses internet.</p>
           <div class="form-group">
             <label>Pilih File Database (JSON atau CSV)</label>
             <input type="file" id="importFile" accept=".json,.csv" multiple>
@@ -529,8 +530,8 @@
     <!-- TAB 5: KUMULATIF & LAPORAN MATRIKS -->
     <section id="kumulatif" class="tab-panel" style="display:none">
       <div class="card" style="border-left: 5px solid var(--primary);">
-        <h3 style="margin:0 0 8px 0; color:var(--accent)"><i class="fas fa-chart-bar"></i> Laporan Kumulatif Matriks Register (1 Baris Per Anak)</h3>
-        <p class="lead" style="margin-bottom:0">Tampilan dan hasil unduhan CSV disajikan persis memanjang horizontal dengan total rekapan angka di kolom terpisah yang siap diolah dengan rumus spreadsheet.</p>
+        <h3 style="margin:0 0 8px 0; color:var(--accent)"><i class="fas fa-chart-bar"></i> Laporan Kumulatif Matriks Register</h3>
+        <p class="lead" style="margin-bottom:0">Mengunduh laporan otomatis menghasilkan file **Excel (.xlsx) 2 Sheet** (Sheet 1: Matriks Kohort Per Anak, Sheet 2: Rekapan Total Per Vaksin).</p>
       </div>
 
       <div class="card">
@@ -583,7 +584,7 @@
 
         <div class="actions">
           <button class="btn btn-primary" id="btnApplyFilter"><i class="fas fa-search"></i> Hitung Laporan Matriks</button>
-          <button class="btn btn-info" id="btnDownloadCSVFilter"><i class="fas fa-download"></i> Download CSV Kohort Matriks</button>
+          <button class="btn btn-success" id="btnDownloadExcelFilter"><i class="fas fa-file-excel"></i> Download Excel (.xlsx) 2 Sheet</button>
         </div>
       </div>
 
@@ -608,7 +609,7 @@
         <button class="btn btn-ghost" onclick="document.getElementById('helpModal').style.display='none'">Tutup</button>
       </div>
       <hr style="margin: 12px 0;">
-      <p class="lead">Tampilan telah diubah ke format Kohort Matriks: Setiap anak memiliki 1 baris tunggal, dengan kolom vaksin memanjang ke kanan. Download CSV dan Laporan Kumulatif menyajikan data serupa beserta total rekapan pada kolom terpisah.</p>
+      <p class="lead">Laporan yang diunduh langsung berformat Excel (.xlsx) dengan 2 Sheet: Sheet 1 berisi data matriks kohort per anak, dan Sheet 2 berisi rekapan total per vaksin yang mudah diolah.</p>
     </div>
   </div>
 
@@ -630,7 +631,6 @@
     const COL_KOHORT = "register_imunisasi";
     const COL_BIAS = "laporan_bias";
 
-    // URUTAN KANONIKAL KOLOM VAKSIN MATRIKS KOHORT
     const ALL_VAKSIN_KEYS = [
       "HBO (<24 Jam)", "HBO (1-7 Hari)", "BCG", "OPV1", "DPT-HB-Hib1", "OPV2", "PCV1", "Rotavirus1",
       "DPT-HB-Hib2", "OPV3", "PCV2", "Rotavirus2", "DPT-HB-Hib3", "OPV4", "IPV1", "Rotavirus3",
@@ -684,13 +684,13 @@
       document.getElementById('btnStartImport').addEventListener('click', startImport);
 
       document.getElementById('btnApplyFilter').addEventListener('click', loadReviewDetail);
-      document.getElementById('btnDownloadCSVFilter').addEventListener('click', downloadCSVFilter);
+      document.getElementById('btnDownloadExcelFilter').addEventListener('click', downloadExcel2Sheets);
 
       document.getElementById('search_desa_anak').addEventListener('change', populateAnakByDesa);
       document.getElementById('select_anak_registered').addEventListener('change', fillFormWithSelectedAnak);
 
       document.getElementById('btnExportFilteredJSON').addEventListener('click', () => doExportFiltered('json'));
-      document.getElementById('btnExportFilteredCSV').addEventListener('click', () => doExportFiltered('csv'));
+      document.getElementById('btnExportFilteredExcel').addEventListener('click', downloadExcel2Sheets);
 
       initBiasDropdowns();
       loadRecentTransactions();
@@ -750,7 +750,6 @@
       } catch (e) { console.error(e); }
     }
 
-    // SIMPAN KOHORT FORMAT MATRIKS (UPSERT / MERGE DENGAN DOKUMEN ANAK UNIK)
     async function handleSaveKohortMatrix(e) {
       e.preventDefault();
 
@@ -764,7 +763,6 @@
       const namaAnak = document.getElementById('reg_nama_anak').value.trim();
       const desa = document.getElementById('reg_desa').value;
 
-      // ID Unik per Anak
       const uniqueChildId = `${desa}_${namaAnak}_${tglLahir}`.replace(/[\s\/]/g, '_').toLowerCase();
 
       const vaccineDataUpdate = {};
@@ -803,7 +801,6 @@
       } catch (err) { alert("❌ Error: " + err.message); }
     }
 
-    // TAMPILKAN TABEL KOHORT MATRIKS (1 BARIS PER ANAK, KOLOM VAKSIN MEMANJANG KEKANAN)
     async function loadRecentTransactions() {
       const tbody = document.querySelector('#tblRecentTransactions tbody');
       tbody.innerHTML = '<tr><td colspan="29" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Memuat Matriks Kohort...</td></tr>';
@@ -856,7 +853,6 @@
       }
     };
 
-    // TABEL REKAPITULASI KUMULATIF DALAM FORMAT KOHORT MATRIKS + TOTAL REKAPAN KELOMPOK UNTUK RUMUS
     async function loadReviewDetail() {
       const thn = document.getElementById('filter_tahun').value;
       const bln = document.getElementById('filter_bulan').value;
@@ -951,11 +947,11 @@
       } catch (err) { container.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`; }
     }
 
-    // DOWNLOAD CSV KOHORT MATRIKS DENGAN KOLOM TOTAL REKAPAN TERPISAH
-    async function downloadCSVFilter() {
-      const thn = document.getElementById('filter_tahun').value;
-      const bln = document.getElementById('filter_bulan').value;
-      const desaSel = document.getElementById('filter_desa').value;
+    // DOWNLOAD EXCEL (.XLSX) LANGSUNG 2 SHEET
+    async function downloadExcel2Sheets() {
+      const thn = document.getElementById('filter_tahun').value || document.getElementById('exp_filter_tahun').value;
+      const bln = document.getElementById('filter_bulan').value || document.getElementById('exp_filter_bulan').value;
+      const desaSel = document.getElementById('filter_desa').value || document.getElementById('exp_filter_desa').value;
 
       try {
         const snap = await getDocs(collection(db, COL_KOHORT));
@@ -968,44 +964,83 @@
           }
         });
 
-        let csvHeader = `Desa;Kegiatan;Nama_Anak;Tanggal_Lahir;JK;Nama_Ibu;` + ALL_VAKSIN_KEYS.join(';') + `\n`;
-        let csvBody = '';
         const vTotals = {};
         ALL_VAKSIN_KEYS.forEach(v => vTotals[v] = 0);
 
+        // --- SHEET 1: KOHORT MATRIKS PER ANAK ---
+        const sheet1Data = [];
+        
+        // Header Row 1 & 2
+        const headerRow1 = ["Desa", "Kegiatan", "Nama Anak", "Tanggal Lahir", "L/P", "Nama Ibu", "Alamat / RT"];
+        ALL_VAKSIN_KEYS.forEach(v => headerRow1.push(v));
+        sheet1Data.push(headerRow1);
+
+        // Data Rows
         filteredDocs.forEach(d => {
-          let rowStr = `"${d.desa || ''}";"${d.kegiatan || ''}";"${d.nama_anak || ''}";"${d.tgl_lahir || ''}";"${d.jk || ''}";"${d.nama_ibu || ''}";`;
-          let vRow = [];
+          const row = [
+            d.desa || '',
+            d.kegiatan || '',
+            d.nama_anak || '',
+            d.tgl_lahir || '',
+            d.jk || '',
+            d.nama_ibu || '',
+            d.alamat_rt || ''
+          ];
 
           ALL_VAKSIN_KEYS.forEach(vKey => {
             const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
             const val = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
             if (val) {
               vTotals[vKey] += 1;
-              vRow.push(`"${val}"`);
+              row.push(val);
             } else {
-              vRow.push(`"-"`);
+              row.push("-");
             }
           });
 
-          csvBody += rowStr + vRow.join(';') + `\n`;
+          sheet1Data.push(row);
         });
 
-        // Baris Total Rekapan untuk Rumus Spreadsheet
-        let totalRow = `"TOTAL_CAPAIAN_DOSIS";"";"";"";"";"";` + ALL_VAKSIN_KEYS.map(v => vTotals[v]).join(';') + `\n`;
+        // Last Row Total Sheet 1
+        const totalRow1 = ["TOTAL PENERIMA VAKSIN", "", "", "", "", "", ""];
+        ALL_VAKSIN_KEYS.forEach(vKey => {
+          totalRow1.push(vTotals[vKey]);
+        });
+        sheet1Data.push(totalRow1);
 
-        const filename = `Kohort_Matriks_${desaSel}_${bln}_${thn}.csv`;
-        downloadFile("\uFEFF" + csvHeader + csvBody + totalRow, filename, 'text/csv;charset=utf-8;');
-      } catch (err) { alert("Gagal download CSV: " + err.message); }
+
+        // --- SHEET 2: REKAPAN TOTAL VAKSIN ---
+        const sheet2Data = [
+          ["Kategori Usia", "Jenis Imunisasi / Antigen", "Total Penerima (Anak)"]
+        ];
+
+        let totalDosisSemua = 0;
+        ALL_VAKSIN_KEYS.forEach(vKey => {
+          const cat = ALL_VAKSIN_KEYS.indexOf(vKey) < 19 ? "0 - 12 Bulan (Dasar)" : "12 - 24 Bulan (Lanjutan)";
+          const count = vTotals[vKey];
+          totalDosisSemua += count;
+          sheet2Data.push([cat, vKey, count]);
+        });
+
+        sheet2Data.push(["TOTAL KESELURUHAN", "Seluruh Jenis Imunisasi", totalDosisSemua]);
+
+        // GENEREATE EXCEL WORKBOOK MEMAKAI SHEETJS
+        const wb = XLSX.utils.book_new();
+        const ws1 = XLSX.utils.aoa_to_sheet(sheet1Data);
+        const ws2 = XLSX.utils.aoa_to_sheet(sheet2Data);
+
+        XLSX.utils.book_append_sheet(wb, ws1, "Register Kohort Matriks");
+        XLSX.utils.book_append_sheet(wb, ws2, "Rekapan Total Vaksin");
+
+        const filename = `Kohort_Matriks_${desaSel}_${bln}_${thn}.xlsx`;
+        XLSX.writeFile(wb, filename);
+
+      } catch (err) { alert("Gagal download Excel: " + err.message); }
     }
 
     async function doExportFiltered(format) {
-      downloadCSVFilter();
-    }
-
-    function downloadFile(content, filename, type) {
-      const blob = new Blob([content], { type: type });
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; a.click();
+      if (format === 'json') exportDatabase();
+      else downloadExcel2Sheets();
     }
 
     function initBiasDropdowns() {
@@ -1108,7 +1143,8 @@
         const snap = await getDocs(collection(db, COL_KOHORT));
         const backup = { register_imunisasi: [], date: new Date().toISOString() };
         snap.forEach(d => backup.register_imunisasi.push(d.data()));
-        downloadFile(JSON.stringify(backup, null, 2), `Backup_Kohort_Firebase_${new Date().toISOString().slice(0,10)}.json`, 'application/json');
+        const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Backup_Kohort_Firebase_${new Date().toISOString().slice(0,10)}.json`; a.click();
       } catch (err) { alert("Gagal Backup: " + err.message); }
     }
 

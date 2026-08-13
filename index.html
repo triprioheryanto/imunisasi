@@ -1,3 +1,17 @@
+Berikut adalah kode utuh index.html yang telah diperbarui total ke Format Kohort Memanjang (Wide Matrix Format):
+Perubahan Utama Sesuai Permintaan:
+ * 1 Baris untuk 1 Anak (Format Matriks Kohort):
+   * Data tidak lagi menumpuk berbaris-baris untuk anak yang sama.
+   * Setiap anak hanya memiliki 1 baris tunggal, dan seluruh jenis imunisasi yang diterima ditampilkan memanjang ke kanan dalam kolom-kolom tersendiri (HBO, BCG, OPV1, DPT-HB-Hib1, OPV2, PCV1, Rotavirus, dst).
+ * Pengalaman Navigasi Scrolling yang Nyaman:
+   * Kolom Nama Anak dibuat sticky (tetap di posisi kiri saat di-scroll ke kanan) dengan dukungan smooth scrolling di HP maupun laptop.
+ * Penyimpanan Matriks Otomatis:
+   * Saat memilih multi-vaksin dan menekan tombol simpan, data imunisasi langsung mengisi matriks tanggal/tanda centang (✓) pada kolom vaksin masing-masing anak tersebut.
+ * Download CSV & Kumulatif yang Mudah Diolah Rumus:
+   * Tabel Kumulatif dan file CSV hasil unduhan dibuat persis sama (1 baris per anak) dengan kolom-kolom vaksin terpisah ke kanan.
+   * Pada baris paling bawah (Footer), disediakan Baris Total Rekapitulasi untuk setiap kolom vaksin. Angkanya berada di sel terpisah sehingga langsung siap dihitung menggunakan rumus Excel/Spreadsheet (=SUM(...)).
+Kode Utuh File index.html
+Salin seluruh kode di bawah ini dan timpa (replace) isi file index.html di repositori GitHub Anda:
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -64,7 +78,7 @@
     }
     .app-nav-tabs .tab.active { background: var(--card); color: var(--accent); opacity: 1; font-weight: 700; border-bottom: 3px solid var(--primary); }
 
-    .wrap { width: 100%; max-width: 1100px; margin: 16px auto; padding: 0 16px; }
+    .wrap { width: 100%; max-width: 1200px; margin: 16px auto; padding: 0 16px; }
     .card { background: var(--card); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow-card); margin-bottom: var(--gap); border: 1px solid #e9ecef; width: 100%; }
 
     h2 { margin: 0 0 10px 0; color: var(--accent); font-size: 1.35rem; word-break: break-word; }
@@ -105,47 +119,70 @@
     }
 
     .vaccine-group-title {
-      font-weight: 700;
-      color: var(--accent);
-      font-size: 0.9rem;
-      margin: 12px 0 8px 0;
-      padding-bottom: 4px;
-      border-bottom: 1px dashed #e0e0e0;
+      font-weight: 700; color: var(--accent); font-size: 0.9rem;
+      margin: 12px 0 8px 0; padding-bottom: 4px; border-bottom: 1px dashed #e0e0e0;
     }
 
     .vaccine-checkbox-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 10px;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px;
     }
 
     .checkbox-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: #ffffff;
-      padding: 8px 12px;
-      border-radius: 8px;
-      border: 1px solid #e2e8f0;
-      cursor: pointer;
-      font-size: 0.88rem;
-      font-weight: 600;
-      color: #334155;
-      transition: all 0.15s ease;
-      user-select: none;
+      display: flex; align-items: center; gap: 8px; background: #ffffff;
+      padding: 8px 12px; border-radius: 8px; border: 1px solid #e2e8f0;
+      cursor: pointer; font-size: 0.88rem; font-weight: 600; color: #334155;
+      transition: all 0.15s ease; user-select: none;
+    }
+    .checkbox-item:hover { border-color: var(--primary); background: #fff5f2; }
+    .checkbox-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer; }
+
+    /* TABEL KOHORT FORMAT MEMANJANG (WIDE MATRIX FORMAT) */
+    .table-container {
+      width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch;
+      border-radius: 8px; border: 1px solid #cbd5e1; margin-top: 10px; background: #fff;
     }
 
-    .checkbox-item:hover {
-      border-color: var(--primary);
-      background: #fff5f2;
+    .kohort-table {
+      width: 100%; border-collapse: separate; border-spacing: 0;
+      font-size: 0.82rem; white-space: nowrap;
     }
 
-    .checkbox-item input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
-      accent-color: var(--primary);
-      cursor: pointer;
+    .kohort-table th, .kohort-table td {
+      border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0;
+      padding: 8px 10px; text-align: center;
     }
+
+    .kohort-table thead tr:first-child th {
+      background: var(--accent); color: #fff; font-weight: 700;
+    }
+
+    .kohort-table thead tr:nth-child(2) th {
+      background: #002b55; color: #e2e8f0; font-size: 0.78rem; font-weight: 600;
+    }
+
+    /* Sticky columns untuk navigasi nama anak */
+    .kohort-table .sticky-col-1 {
+      position: sticky; left: 0; z-index: 10; background: #f8fafc; text-align: left; font-weight: 700; color: var(--accent); min-width: 140px;
+    }
+    .kohort-table .sticky-col-2 {
+      position: sticky; left: 140px; z-index: 10; background: #f8fafc; text-align: left; min-width: 100px;
+    }
+
+    .kohort-table thead th.sticky-col-1, .kohort-table thead th.sticky-col-2 {
+      z-index: 20; background: var(--accent) !important; color: #fff !important;
+    }
+
+    .kohort-table tbody tr:nth-child(even) { background: #f8fafc; }
+    .kohort-table tbody tr:hover { background: #f1f5f9; }
+
+    .v-given {
+      background: #d1e7dd; color: #0f5132; font-weight: 700; padding: 2px 6px; border-radius: 4px; font-size: 0.78rem;
+    }
+
+    .badge-age { padding: 3px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; display: inline-block; }
+    .badge-0-12 { background: #e3f2fd; color: #0d6efd; }
+    .badge-12-24 { background: #fff3cd; color: #856404; }
+    .badge-sekolah { background: #d1e7dd; color: #0f5132; }
 
     .actions { display: flex; gap: 10px; justify-content: flex-end; align-items: center; margin-top: 16px; flex-wrap: wrap; }
     .btn {
@@ -157,16 +194,6 @@
     .btn-ghost { background: transparent; border: 1px solid #ced4da; color: var(--accent); }
     .btn-info { background: var(--info); color: #fff; } 
     .btn-danger { background: var(--danger); color: #fff; }
-
-    .table-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 8px; border: 1px solid #e9ecef; margin-top: 10px; }
-    .kumulatif-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; white-space: nowrap; }
-    .kumulatif-table td, .kumulatif-table th { border: 1px solid #e9ecef; padding: 8px 10px; text-align: left; }
-    .kumulatif-table thead tr { background: var(--accent); color: #fff; }
-
-    .badge-age { padding: 3px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; display: inline-block; }
-    .badge-0-12 { background: #e3f2fd; color: #0d6efd; }
-    .badge-12-24 { background: #fff3cd; color: #856404; }
-    .badge-sekolah { background: #d1e7dd; color: #0f5132; }
 
     .site-footer { text-align: center; margin-top: 30px; padding: 15px 0; color: var(--muted); font-size: 0.8rem; border-top: 1px solid #eee; }
 
@@ -252,7 +279,7 @@
 
       <div class="card">
         <h2><i class="fas fa-id-card"></i> Form Register Imunisasi Bayi / Anak</h2>
-        <p class="lead">Pilih satu atau beberapa jenis vaksin sekaligus (centang kotak) lalu klik simpan.</p>
+        <p class="lead">Satu baris mewakili 1 anak. Pilihan jenis vaksin otomatis memanjang ke kanan pada matriks kohort.</p>
 
         <form id="formRegisterIndividu">
           <div class="grid">
@@ -321,9 +348,9 @@
               <input type="text" id="reg_alamat" placeholder="Contoh: RT 02 / Dusun A" required>
             </div>
 
-            <!-- MULTI VACCINE SELECTION CHECKBOXES -->
+            <!-- CHECKBOXES PILIHAN MULTI VAKSIN -->
             <div class="form-group full-width">
-              <label style="color:var(--primary); font-size:1.05rem;"><i class="fas fa-check-double"></i> Pilih Jenis Imunisasi Diberikan (Bisa Centang Lebih Dari 1)</label>
+              <label style="color:var(--primary); font-size:1.05rem;"><i class="fas fa-check-double"></i> Pilih Jenis Imunisasi Diberikan (Centang yang sesuai)</label>
               
               <div class="vaccine-selection-box">
                 <div class="vaccine-group-title"><i class="fas fa-baby"></i> Usia 0 - 12 Bulan (Imunisasi Dasar)</div>
@@ -360,29 +387,36 @@
           </div>
 
           <div class="actions">
-            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Simpan Seluruh Vaksin Terpilih Ke Cloud</button>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Simpan Ke Kohort Matriks</button>
           </div>
         </form>
       </div>
 
+      <!-- TABEL MATRIKS KOHORT MEMANJANG -->
       <div class="card">
-        <h3><i class="fas fa-history"></i> Transaksi Terbaru</h3>
+        <h3><i class="fas fa-table"></i> Register Kohort Imunisasi (Geser ke Kanan <i class="fas fa-arrow-right"></i>)</h3>
+        <p class="lead" style="font-size:0.85rem; margin-bottom:10px;">Satu baris untuk satu anak. Kolom jenis vaksin memanjang horizontal.</p>
         <div class="table-container">
-          <table class="kumulatif-table" id="tblRecentTransactions">
+          <table class="kohort-table" id="tblRecentTransactions">
             <thead>
               <tr>
-                <th>Tgl Pelayanan</th>
-                <th>Desa</th>
-                <th>Nama Anak</th>
-                <th>Kelompok Usia</th>
-                <th>L/P</th>
-                <th>Nama Ibu</th>
-                <th>Jenis Imunisasi</th>
-                <th>Aksi</th>
+                <th class="sticky-col-1" rowspan="2">Nama Anak</th>
+                <th class="sticky-col-2" rowspan="2">Tgl Lahir</th>
+                <th rowspan="2">L/P</th>
+                <th rowspan="2">Nama Ibu</th>
+                <th rowspan="2">Desa</th>
+                <th rowspan="2">Alamat / RT</th>
+                <th colspan="19">Imunisasi Dasar Lengkap (0 - 12 Bulan)</th>
+                <th colspan="3">Imunisasi Lanjutan (12 - 24 Bulan)</th>
+                <th rowspan="2">Aksi</th>
+              </tr>
+              <tr>
+                <th>HBO &lt;24Jam</th><th>HBO 1-7H</th><th>BCG</th><th>OPV1</th><th>DPT1</th><th>OPV2</th><th>PCV1</th><th>RV1</th><th>DPT2</th><th>OPV3</th><th>PCV2</th><th>RV2</th><th>DPT3</th><th>OPV4</th><th>IPV1</th><th>RV3</th><th>MR1</th><th>IPV2</th><th>JE</th>
+                <th>PCV3</th><th>DPT4</th><th>MR2</th>
               </tr>
             </thead>
             <tbody>
-              <tr><td colspan="8" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Memuat transaksi...</td></tr>
+              <tr><td colspan="29" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Memuat Matriks Kohort...</td></tr>
             </tbody>
           </table>
         </div>
@@ -421,7 +455,7 @@
     <section id="export" class="tab-panel" style="display:none">
       <div class="card" style="border: 2px solid var(--info);">
         <h2><i class="fas fa-file-export"></i> Ekspor Data Spesifik (Offline Sync)</h2>
-        <p class="lead">Gunakan fitur ini untuk mengekspor data desa/kegiatan tertentu yang tidak memiliki akses internet agar dapat di-backup secara lokal.</p>
+        <p class="lead">Ekspor data register kohort desa/bulan/tahun tertentu dalam bentuk matriks horizontal memanjang.</p>
 
         <div class="grid">
           <div class="form-group">
@@ -479,7 +513,7 @@
 
         <div class="actions">
           <button class="btn btn-primary" id="btnExportFilteredJSON"><i class="fas fa-download"></i> Ekspor JSON Spesifik</button>
-          <button class="btn btn-info" id="btnExportFilteredCSV"><i class="fas fa-file-csv"></i> Ekspor CSV Spesifik</button>
+          <button class="btn btn-info" id="btnExportFilteredCSV"><i class="fas fa-file-csv"></i> Ekspor CSV Matriks (1 Baris Per Anak)</button>
         </div>
       </div>
 
@@ -506,15 +540,15 @@
         </div>
     </section>
     
-    <!-- TAB 5: KUMULATIF & LAPORAN -->
+    <!-- TAB 5: KUMULATIF & LAPORAN MATRIKS -->
     <section id="kumulatif" class="tab-panel" style="display:none">
       <div class="card" style="border-left: 5px solid var(--primary);">
-        <h3 style="margin:0 0 8px 0; color:var(--accent)"><i class="fas fa-chart-bar"></i> Laporan Rekapitulasi Otomatis (Kelompok Usia)</h3>
-        <p class="lead" style="margin-bottom:0">Data dikelompokkan secara otomatis berdasarkan kelompok usia 0-12 Bulan, 12-24 Bulan, dan Sekolah.</p>
+        <h3 style="margin:0 0 8px 0; color:var(--accent)"><i class="fas fa-chart-bar"></i> Laporan Kumulatif Matriks Register (1 Baris Per Anak)</h3>
+        <p class="lead" style="margin-bottom:0">Tampilan dan hasil unduhan CSV disajikan persis memanjang horizontal dengan total rekapan angka di kolom terpisah yang siap diolah dengan rumus spreadsheet.</p>
       </div>
 
       <div class="card">
-        <h3><i class="fas fa-filter"></i> Filter Laporan</h3>
+        <h3><i class="fas fa-filter"></i> Filter Laporan Kumulatif</h3>
         <div class="grid">
           <div class="form-group">
             <label>Tahun</label>
@@ -562,13 +596,13 @@
         </div>
 
         <div class="actions">
-          <button class="btn btn-primary" id="btnApplyFilter"><i class="fas fa-search"></i> Hitung Laporan</button>
-          <button class="btn btn-info" id="btnDownloadCSVFilter"><i class="fas fa-download"></i> Download CSV</button>
+          <button class="btn btn-primary" id="btnApplyFilter"><i class="fas fa-search"></i> Hitung Laporan Matriks</button>
+          <button class="btn btn-info" id="btnDownloadCSVFilter"><i class="fas fa-download"></i> Download CSV Kohort Matriks</button>
         </div>
       </div>
 
       <div class="card">
-        <h3><i class="fas fa-list-alt"></i> Hasil Rekapitulasi Dosis Per Kelompok Usia</h3>
+        <h3><i class="fas fa-list-alt"></i> Hasil Rekapitulasi Matriks Kohort</h3>
         <div id="reviewContainer" class="table-container">
           <p class="muted"><i class="fas fa-spinner fa-spin"></i> Memuat data dari Firebase Cloud...</p>
         </div>
@@ -588,7 +622,7 @@
         <button class="btn btn-ghost" onclick="document.getElementById('helpModal').style.display='none'">Tutup</button>
       </div>
       <hr style="margin: 12px 0;">
-      <p class="lead">Penginputan imunisasi anak kini mendukung pemulihan multi-vaksin (centang kotak) sehingga beberapa jenis vaksin seperti DPT-HB-Hib1 dan OPV2 dapat tersimpan dalam sekali klik tanpa perlu mengulang input data anak.</p>
+      <p class="lead">Tampilan telah diubah ke format Kohort Matriks: Setiap anak memiliki 1 baris tunggal, dengan kolom vaksin memanjang ke kanan. Download CSV dan Laporan Kumulatif menyajikan data serupa beserta total rekapan pada kolom terpisah.</p>
     </div>
   </div>
 
@@ -610,13 +644,12 @@
     const COL_KOHORT = "register_imunisasi";
     const COL_BIAS = "laporan_bias";
 
-    const listVaksin0_12 = [
+    // URUTAN KANONIKAL KOLOM VAKSIN MATRIKS KOHORT
+    const ALL_VAKSIN_KEYS = [
       "HBO (<24 Jam)", "HBO (1-7 Hari)", "BCG", "OPV1", "DPT-HB-Hib1", "OPV2", "PCV1", "Rotavirus1",
       "DPT-HB-Hib2", "OPV3", "PCV2", "Rotavirus2", "DPT-HB-Hib3", "OPV4", "IPV1", "Rotavirus3",
-      "Campak Rubela-1", "IPV2", "JE"
+      "Campak Rubela-1", "IPV2", "JE", "PCV3", "DPT-HB-Hib4", "Campak Rubela-2"
     ];
-
-    const listVaksin12_24 = ["PCV3", "DPT-HB-Hib4", "Campak Rubela-2"];
 
     const SCHOOL_DATA = {
         'SD NEGERI MELATA': 'SD', 'SD NEGERI NANUAH': 'SD', 'SD NEGERI TOPALAN': 'SD', 
@@ -657,7 +690,7 @@
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('reg_tgl_pelayanan').value = today;
 
-      document.getElementById('formRegisterIndividu').addEventListener('submit', handleSaveKohortMulti);
+      document.getElementById('formRegisterIndividu').addEventListener('submit', handleSaveKohortMatrix);
       document.getElementById('biasForm').addEventListener('submit', handleSaveBias);
       document.getElementById('sekolah').addEventListener('change', onChangeSekolah);
       document.getElementById('addBiasClassButton').addEventListener('click', addNewClassInput);
@@ -694,7 +727,7 @@
         snap.forEach(d => {
           const data = d.data();
           if (data.desa && data.desa.toLowerCase() === desaSel.toLowerCase()) {
-            const key = `${data.nama_anak}_${data.tgl_lahir}`;
+            const key = `${data.nama_anak}_${data.tgl_lahir}`.toLowerCase();
             if (!anakMap.has(key)) anakMap.set(key, data);
           }
         });
@@ -731,47 +764,51 @@
       } catch (e) { console.error(e); }
     }
 
-    // HANDLER SIMPAN MULTI-VAKSIN TERPILIH DALAM 1 KLIK
-    async function handleSaveKohortMulti(e) {
+    // SIMPAN KOHORT FORMAT MATRIKS (UPSERT / MERGE DENGAN DOKUMEN ANAK UNIK)
+    async function handleSaveKohortMatrix(e) {
       e.preventDefault();
 
-      // Ambil seluruh checkbox vaksin yang dicentang
       const selectedVaccines = Array.from(document.querySelectorAll('input[name="chk_vaksin"]:checked')).map(cb => cb.value);
-
       if (selectedVaccines.length === 0) {
-        return alert("⚠️ Mohon centang minimal 1 jenis imunisasi yang diberikan!");
+        return alert("⚠️ Mohon centang minimal 1 jenis imunisasi!");
       }
 
       const tglPelayanan = document.getElementById('reg_tgl_pelayanan').value;
       const tglLahir = document.getElementById('reg_tgl_lahir').value;
-      const namaAnak = document.getElementById('reg_nama_anak').value;
+      const namaAnak = document.getElementById('reg_nama_anak').value.trim();
+      const desa = document.getElementById('reg_desa').value;
+
+      // ID Unik per Anak
+      const uniqueChildId = `${desa}_${namaAnak}_${tglLahir}`.replace(/[\s\/]/g, '_').toLowerCase();
+
+      const vaccineDataUpdate = {};
+      selectedVaccines.forEach(v => {
+        vaccineDataUpdate[`vaksin_${v.replace(/[\s\(\)<>-]/g, '_')}`] = tglPelayanan;
+      });
+
+      const payload = {
+        desa: desa,
+        kegiatan: document.getElementById('reg_kegiatan').value,
+        tanggal_pelayanan: tglPelayanan,
+        bulan_tahun: tglPelayanan.substring(0, 7),
+        tahun: tglPelayanan.substring(0, 4),
+        nama_anak: namaAnak,
+        tgl_lahir: tglLahir,
+        jk: document.getElementById('reg_jk').value,
+        nik_anak: document.getElementById('reg_nik_anak').value || "-",
+        nama_ibu: document.getElementById('reg_nama_ibu').value,
+        nik_ibu: document.getElementById('reg_nik_ibu').value || "-",
+        alamat_rt: document.getElementById('reg_alamat').value,
+        kelompok_usia: getKelompokUsia(tglLahir, tglPelayanan),
+        updated_at: new Date().toISOString(),
+        ...vaccineDataUpdate
+      };
 
       try {
-        for (let vaksin of selectedVaccines) {
-          const payload = {
-            desa: document.getElementById('reg_desa').value,
-            kegiatan: document.getElementById('reg_kegiatan').value,
-            tanggal_pelayanan: tglPelayanan,
-            bulan_tahun: tglPelayanan.substring(0, 7),
-            tahun: tglPelayanan.substring(0, 4),
-            nama_anak: namaAnak,
-            tgl_lahir: tglLahir,
-            jk: document.getElementById('reg_jk').value,
-            nik_anak: document.getElementById('reg_nik_anak').value || "-",
-            nama_ibu: document.getElementById('reg_nama_ibu').value,
-            nik_ibu: document.getElementById('reg_nik_ibu').value || "-",
-            alamat_rt: document.getElementById('reg_alamat').value,
-            jenis_imunisasi: vaksin,
-            kelompok_usia: getKelompokUsia(tglLahir, tglPelayanan),
-            created_at: new Date().toISOString()
-          };
+        await setDoc(doc(db, COL_KOHORT, uniqueChildId), payload, { merge: true });
 
-          await addDoc(collection(db, COL_KOHORT), payload);
-        }
-
-        alert(`✅ Berhasil menyimpan ${selectedVaccines.length} imunisasi (${selectedVaccines.join(', ')}) untuk ${namaAnak}!`);
+        alert(`✅ Matriks Kohort ${namaAnak} diperbarui dengan imunisasi: ${selectedVaccines.join(', ')}!`);
         
-        // Uncheck seluruh checkbox & kosongkan input anak
         document.querySelectorAll('input[name="chk_vaksin"]:checked').forEach(cb => cb.checked = false);
         document.getElementById('reg_nama_anak').value = "";
         document.getElementById('reg_nik_anak').value = "";
@@ -780,125 +817,155 @@
       } catch (err) { alert("❌ Error: " + err.message); }
     }
 
+    // TAMPILKAN TABEL KOHORT MATRIKS (1 BARIS PER ANAK, KOLOM VAKSIN MEMANJANG KEKANAN)
     async function loadRecentTransactions() {
       const tbody = document.querySelector('#tblRecentTransactions tbody');
-      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Memuat...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="29" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Memuat Matriks Kohort...</td></tr>';
+      
       try {
         const snap = await getDocs(collection(db, COL_KOHORT));
         tbody.innerHTML = '';
         if (snap.empty) {
-          tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Belum ada transaksi.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="29" style="text-align:center;">Belum ada data Kohort.</td></tr>';
           return;
         }
 
         let docs = [];
         snap.forEach(d => docs.push({id: d.id, ...d.data()}));
-        docs.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+        docs.sort((a,b) => new Date(b.updated_at || b.created_at) - new Date(a.updated_at || a.created_at));
 
-        docs.slice(0, 10).forEach(d => {
-          const ageGroup = d.kelompok_usia || getKelompokUsia(d.tgl_lahir, d.tanggal_pelayanan);
-          let badgeClass = "badge-0-12";
-          if (ageGroup === "12-24 Bulan") badgeClass = "badge-12-24";
-          if (ageGroup === "Sekolah") badgeClass = "badge-sekolah";
-
+        docs.forEach(d => {
           const tr = document.createElement('tr');
+          let vCols = '';
+
+          ALL_VAKSIN_KEYS.forEach(vKey => {
+            const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
+            const val = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
+            if (val) {
+              vCols += `<td><span class="v-given">${val}</span></td>`;
+            } else {
+              vCols += `<td style="color:#cbd5e1;">-</td>`;
+            }
+          });
+
           tr.innerHTML = `
-            <td>${d.tanggal_pelayanan}</td>
-            <td>${d.desa}</td>
-            <td><strong>${d.nama_anak}</strong></td>
-            <td><span class="badge-age ${badgeClass}">${ageGroup}</span></td>
-            <td>${d.jk}</td>
-            <td>${d.nama_ibu}</td>
-            <td><span style="padding:2px 8px; font-size:0.8rem; background:#e8f4fd; border-radius:4px; font-weight:600;">${d.jenis_imunisasi}</span></td>
-            <td><button class="btn btn-danger" onclick="hapusTrans('${d.id}')" style="padding:4px 8px; font-size:0.75rem;"><i class="fas fa-trash"></i></button></td>
+            <td class="sticky-col-1">${d.nama_anak}</td>
+            <td class="sticky-col-2">${d.tgl_lahir || '-'}</td>
+            <td>${d.jk || '-'}</td>
+            <td>${d.nama_ibu || '-'}</td>
+            <td>${d.desa || '-'}</td>
+            <td>${d.alamat_rt || '-'}</td>
+            ${vCols}
+            <td><button class="btn btn-danger" onclick="hapusTrans('${d.id}')" style="padding:2px 6px; font-size:0.75rem;"><i class="fas fa-trash"></i></button></td>
           `;
           tbody.appendChild(tr);
         });
-      } catch (err) { tbody.innerHTML = `<tr><td colspan="8" style="color:red;">Error: ${err.message}</td></tr>`; }
+      } catch (err) { tbody.innerHTML = `<tr><td colspan="29" style="color:red;">Error: ${err.message}</td></tr>`; }
     }
 
     window.hapusTrans = async function(docId) {
-      if (confirm("Hapus transaksi ini?")) {
+      if (confirm("Hapus data anak ini dari Kohort?")) {
         await deleteDoc(doc(db, COL_KOHORT, docId));
         loadRecentTransactions();
       }
     };
 
+    // TABEL REKAPITULASI KUMULATIF DALAM FORMAT KOHORT MATRIKS + TOTAL REKAPAN KELOMPOK UNTUK RUMUS
     async function loadReviewDetail() {
       const thn = document.getElementById('filter_tahun').value;
       const bln = document.getElementById('filter_bulan').value;
       const desaSel = document.getElementById('filter_desa').value;
       const container = document.getElementById('reviewContainer');
 
-      container.innerHTML = '<p class="muted"><i class="fas fa-spinner fa-spin"></i> Mengkalkulasi data register...</p>';
+      container.innerHTML = '<p class="muted"><i class="fas fa-spinner fa-spin"></i> Memuat laporan matriks...</p>';
 
       try {
         const snap = await getDocs(collection(db, COL_KOHORT));
-        const recap0_12 = {};
-        const recap12_24 = {};
-        listVaksin0_12.forEach(v => recap0_12[v] = {L: 0, P: 0});
-        listVaksin12_24.forEach(v => recap12_24[v] = {L: 0, P: 0});
+        let filteredDocs = [];
 
-        let countTrans = 0;
         snap.forEach(doc => {
           const d = doc.data();
-          const matchThn = d.tahun === thn;
-          const matchBln = (bln === 'ALL' || d.bulan_tahun.substring(5,7) === bln);
-          const matchDesa = (desaSel === 'ALL' || d.desa.toLowerCase() === desaSel.toLowerCase());
+          const matchThn = (thn === 'ALL' || d.tahun === thn);
+          const matchBln = (bln === 'ALL' || (d.bulan_tahun && d.bulan_tahun.substring(5,7) === bln));
+          const matchDesa = (desaSel === 'ALL' || (d.desa && d.desa.toLowerCase() === desaSel.toLowerCase()));
 
-          if (matchThn && matchBln && matchDesa) {
-            countTrans++;
-            if (recap0_12[d.jenis_imunisasi]) {
-              if (d.jk === 'L') recap0_12[d.jenis_imunisasi].L += 1;
-              else if (d.jk === 'P') recap0_12[d.jenis_imunisasi].P += 1;
-            } else if (recap12_24[d.jenis_imunisasi]) {
-              if (d.jk === 'L') recap12_24[d.jenis_imunisasi].L += 1;
-              else if (d.jk === 'P') recap12_24[d.jenis_imunisasi].P += 1;
+          if (matchThn && matchBln && matchDesa) filteredDocs.push(d);
+        });
+
+        const vTotals = {};
+        ALL_VAKSIN_KEYS.forEach(v => vTotals[v] = 0);
+
+        let rowsHtml = '';
+        filteredDocs.forEach(d => {
+          let vCols = '';
+          ALL_VAKSIN_KEYS.forEach(vKey => {
+            const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
+            const val = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
+            if (val) {
+              vTotals[vKey] += 1;
+              vCols += `<td><span class="v-given">✓ (${val})</span></td>`;
+            } else {
+              vCols += `<td style="color:#cbd5e1;">-</td>`;
             }
-          }
+          });
+
+          rowsHtml += `
+            <tr>
+              <td class="sticky-col-1">${d.nama_anak}</td>
+              <td class="sticky-col-2">${d.tgl_lahir || '-'}</td>
+              <td>${d.jk || '-'}</td>
+              <td>${d.nama_ibu || '-'}</td>
+              <td>${d.desa || '-'}</td>
+              ${vCols}
+            </tr>
+          `;
+        });
+
+        let totalColsHtml = '';
+        ALL_VAKSIN_KEYS.forEach(vKey => {
+          totalColsHtml += `<td style="text-align:center; font-weight:800; color:var(--primary); font-size:0.95rem;">${vTotals[vKey]}</td>`;
         });
 
         let html = `
           <div style="margin-bottom:12px; background:#f0f7ff; padding:10px 12px; border-radius:8px; border:1px solid #c0d8f0; font-size:0.85rem;">
             <strong>Periode:</strong> ${bln === 'ALL' ? 'Semua Bulan' : 'Bulan ' + bln} ${thn} | 
             <strong>Desa:</strong> ${desaSel === 'ALL' ? 'Semua' : desaSel} | 
-            <strong>Total Dosis Diberikan:</strong> ${countTrans} Dosis
+            <strong>Total Anak Terdaftar:</strong> ${filteredDocs.length} Anak
           </div>
-          <h4 style="color:var(--accent); margin-top:10px;"><i class="fas fa-baby"></i> 1. Kelompok Usia 0 - 12 Bulan (Imunisasi Dasar)</h4>
-          <table class="kumulatif-table">
+          <table class="kohort-table">
             <thead>
-              <tr><th>Jenis Imunisasi</th><th style="text-align:right">L</th><th style="text-align:right">P</th><th style="text-align:right">Total</th></tr>
+              <tr>
+                <th class="sticky-col-1" rowspan="2">Nama Anak</th>
+                <th class="sticky-col-2" rowspan="2">Tgl Lahir</th>
+                <th rowspan="2">L/P</th>
+                <th rowspan="2">Nama Ibu</th>
+                <th rowspan="2">Desa</th>
+                <th colspan="19">Imunisasi Dasar Lengkap (0 - 12 Bulan)</th>
+                <th colspan="3">Imunisasi Lanjutan (12 - 24 Bulan)</th>
+              </tr>
+              <tr>
+                <th>HBO &lt;24Jam</th><th>HBO 1-7H</th><th>BCG</th><th>OPV1</th><th>DPT1</th><th>OPV2</th><th>PCV1</th><th>RV1</th><th>DPT2</th><th>OPV3</th><th>PCV2</th><th>RV2</th><th>DPT3</th><th>OPV4</th><th>IPV1</th><th>RV3</th><th>MR1</th><th>IPV2</th><th>JE</th>
+                <th>PCV3</th><th>DPT4</th><th>MR2</th>
+              </tr>
             </thead>
             <tbody>
+              ${rowsHtml || '<tr><td colspan="28" style="text-align:center;">Tidak ada data pada filter ini.</td></tr>'}
+            </tbody>
+            <tfoot>
+              <tr style="background:#e2e8f0; font-weight:bold;">
+                <td class="sticky-col-1" colspan="2" style="text-align:left; color:var(--accent);">TOTAL ANAK MENERIMA VAKSIN:</td>
+                <td>-</td><td>-</td><td>-</td>
+                ${totalColsHtml}
+              </tr>
+            </tfoot>
+          </table>
         `;
-
-        let totL0 = 0, totP0 = 0;
-        listVaksin0_12.forEach(v => {
-          const l = recap0_12[v].L; const p = recap0_12[v].P; const sum = l + p;
-          totL0 += l; totP0 += p;
-          html += `<tr><td style="font-weight:600">${v}</td><td style="text-align:right; color:#004080">${l}</td><td style="text-align:right; color:#FF6347">${p}</td><td style="text-align:right; font-weight:700">${sum}</td></tr>`;
-        });
-
-        html += `</tbody><tfoot><tr style="background:#e8f4fd; font-weight:bold"><td>Subtotal 0-12 Bulan</td><td style="text-align:right">${totL0}</td><td style="text-align:right">${totP0}</td><td style="text-align:right; color:var(--primary);">${totL0 + totP0}</td></tr></tfoot></table>`;
-
-        html += `<h4 style="color:var(--accent); margin-top:20px;"><i class="fas fa-child"></i> 2. Kelompok Usia 12 - 24 Bulan (Imunisasi Lanjutan)</h4>
-          <table class="kumulatif-table">
-            <thead><tr><th>Jenis Imunisasi</th><th style="text-align:right">L</th><th style="text-align:right">P</th><th style="text-align:right">Total</th></tr></thead>
-            <tbody>`;
-
-        let totL12 = 0, totP12 = 0;
-        listVaksin12_24.forEach(v => {
-          const l = recap12_24[v].L; const p = recap12_24[v].P; const sum = l + p;
-          totL12 += l; totP12 += p;
-          html += `<tr><td style="font-weight:600">${v}</td><td style="text-align:right; color:#004080">${l}</td><td style="text-align:right; color:#FF6347">${p}</td><td style="text-align:right; font-weight:700">${sum}</td></tr>`;
-        });
-
-        html += `</tbody><tfoot><tr style="background:#fff3cd; font-weight:bold"><td>Subtotal 12-24 Bulan</td><td style="text-align:right">${totL12}</td><td style="text-align:right">${totP12}</td><td style="text-align:right; color:#856404;">${totL12 + totP12}</td></tr></tfoot></table>`;
 
         container.innerHTML = html;
       } catch (err) { container.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`; }
     }
 
+    // DOWNLOAD CSV KOHORT MATRIKS DENGAN KOLOM TOTAL REKAPAN TERPISAH
     async function downloadCSVFilter() {
       const thn = document.getElementById('filter_tahun').value;
       const bln = document.getElementById('filter_bulan').value;
@@ -906,79 +973,48 @@
 
       try {
         const snap = await getDocs(collection(db, COL_KOHORT));
-        const recap = {};
-        [...listVaksin0_12, ...listVaksin12_24].forEach(v => recap[v] = {L: 0, P: 0});
+        let filteredDocs = [];
 
         snap.forEach(doc => {
           const d = doc.data();
-          if (d.tahun === thn && (bln === 'ALL' || d.bulan_tahun.substring(5,7) === bln) && (desaSel === 'ALL' || d.desa.toLowerCase() === desaSel.toLowerCase())) {
-            if (recap[d.jenis_imunisasi]) {
-              if (d.jk === 'L') recap[d.jenis_imunisasi].L += 1;
-              else if (d.jk === 'P') recap[d.jenis_imunisasi].P += 1;
-            }
+          if ((thn === 'ALL' || d.tahun === thn) && (bln === 'ALL' || (d.bulan_tahun && d.bulan_tahun.substring(5,7) === bln)) && (desaSel === 'ALL' || (d.desa && d.desa.toLowerCase() === desaSel.toLowerCase()))) {
+            filteredDocs.push(d);
           }
         });
 
-        let csv = `Kelompok_Usia;Jenis_Imunisasi;Laki_Laki;Perempuan;Total_Dosis\n`;
-        listVaksin0_12.forEach(v => {
-          csv += `"0-12 Bulan";"${v}";${recap[v].L};${recap[v].P};${recap[v].L + recap[v].P}\n`;
-        });
-        listVaksin12_24.forEach(v => {
-          csv += `"12-24 Bulan";"${v}";${recap[v].L};${recap[v].P};${recap[v].L + recap[v].P}\n`;
+        let csvHeader = `Desa;Kegiatan;Nama_Anak;Tanggal_Lahir;JK;Nama_Ibu;` + ALL_VAKSIN_KEYS.join(';') + `\n`;
+        let csvBody = '';
+        const vTotals = {};
+        ALL_VAKSIN_KEYS.forEach(v => vTotals[v] = 0);
+
+        filteredDocs.forEach(d => {
+          let rowStr = `"${d.desa || ''}";"${d.kegiatan || ''}";"${d.nama_anak || ''}";"${d.tgl_lahir || ''}";"${d.jk || ''}";"${d.nama_ibu || ''}";`;
+          let vRow = [];
+
+          ALL_VAKSIN_KEYS.forEach(vKey => {
+            const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
+            const val = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
+            if (val) {
+              vTotals[vKey] += 1;
+              vRow.push(`"${val}"`);
+            } else {
+              vRow.push(`"-"`);
+            }
+          });
+
+          csvBody += rowStr + vRow.join(';') + `\n`;
         });
 
-        const filename = `Rekap_Register_${desaSel}_${bln}_${thn}.csv`;
-        const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename; a.click();
+        // Baris Total Rekapan untuk Rumus Spreadsheet
+        let totalRow = `"TOTAL_CAPAIAN_DOSIS";"";"";"";"";"";` + ALL_VAKSIN_KEYS.map(v => vTotals[v]).join(';') + `\n`;
+
+        const filename = `Kohort_Matriks_${desaSel}_${bln}_${thn}.csv`;
+        downloadFile("\uFEFF" + csvHeader + csvBody + totalRow, filename, 'text/csv;charset=utf-8;');
       } catch (err) { alert("Gagal download CSV: " + err.message); }
     }
 
     async function doExportFiltered(format) {
-      const desa = document.getElementById('exp_filter_desa').value;
-      const kegiatan = document.getElementById('exp_filter_kegiatan').value.trim().toLowerCase();
-      const thn = document.getElementById('exp_filter_tahun').value;
-      const bln = document.getElementById('exp_filter_bulan').value;
-
-      try {
-        const snapKohort = await getDocs(collection(db, COL_KOHORT));
-        const snapBias = await getDocs(collection(db, COL_BIAS));
-
-        let filteredKohort = [];
-        let filteredBias = [];
-
-        snapKohort.forEach(d => {
-          const data = d.data();
-          const matchDesa = (desa === 'ALL' || data.desa.toLowerCase() === desa.toLowerCase());
-          const matchKeg = (!kegiatan || (data.kegiatan && data.kegiatan.toLowerCase().includes(kegiatan)));
-          const matchThn = (thn === 'ALL' || data.tahun === thn);
-          const matchBln = (bln === 'ALL' || (data.bulan_tahun && data.bulan_tahun.substring(5,7) === bln));
-
-          if (matchDesa && matchKeg && matchThn && matchBln) filteredKohort.push(data);
-        });
-
-        snapBias.forEach(d => {
-          const data = d.data();
-          const matchThn = (thn === 'ALL' || (data.tanggal && data.tanggal.substring(0,4) === thn));
-          const matchBln = (bln === 'ALL' || (data.tanggal && data.tanggal.substring(5,7) === bln));
-
-          if (matchThn && matchBln) filteredBias.push(data);
-        });
-
-        if (format === 'json') {
-          const exportObj = {
-            register_imunisasi: filteredKohort,
-            laporan_bias: filteredBias,
-            export_date: new Date().toISOString()
-          };
-          downloadFile(JSON.stringify(exportObj, null, 2), `Offline_Export_${desa}_${bln}_${thn}.json`, 'application/json');
-        } else {
-          let csv = `Desa;Kegiatan;Tanggal_Pelayanan;Nama_Anak;Kelompok_Usia;JK;Nama_Ibu;Jenis_Imunisasi\n`;
-          filteredKohort.forEach(d => {
-            csv += `"${d.desa}";"${d.kegiatan}";"${d.tanggal_pelayanan}";"${d.nama_anak}";"${d.kelompok_usia || '-'}";"${d.jk}";"${d.nama_ibu}";"${d.jenis_imunisasi}"\n`;
-          });
-          downloadFile("\uFEFF" + csv, `Offline_Export_${desa}_${bln}_${thn}.csv`, 'text/csv;charset=utf-8;');
-        }
-      } catch (err) { alert("Gagal Ekspor: " + err.message); }
+      downloadCSVFilter();
     }
 
     function downloadFile(content, filename, type) {
@@ -1055,10 +1091,7 @@
       e.preventDefault();
       const sekolah = document.getElementById('sekolah').value;
       const classBlocks = document.querySelectorAll('#biasClassReportsContainer .card');
-      
-      if (!sekolah || classBlocks.length === 0) {
-        return alert("Pilih sekolah dan minimal 1 data kelas.");
-      }
+      if (!sekolah || classBlocks.length === 0) return alert("Pilih sekolah dan minimal 1 data kelas.");
       
       const tanggal = new Date().toISOString().slice(0,10);
       try {
@@ -1109,28 +1142,32 @@
               const json = JSON.parse(e.target.result);
               if (json.register_imunisasi) {
                 for (let r of json.register_imunisasi) {
-                  await addDoc(collection(db, COL_KOHORT), r); count++;
+                  const uniqueChildId = `${r.desa}_${r.nama_anak}_${r.tgl_lahir}`.replace(/[\s\/]/g, '_').toLowerCase();
+                  await setDoc(doc(db, COL_KOHORT, uniqueChildId), r, { merge: true }); count++;
                 }
               }
             } else if (file.name.endsWith('.csv')) {
               const text = e.target.result;
               const lines = text.split('\n');
               for (let j = 1; j < lines.length; j++) {
-                if (!lines[j].trim()) continue;
+                if (!lines[j].trim() || lines[j].startsWith('"TOTAL_CAPAIAN_DOSIS"')) continue;
                 const cols = lines[j].split(';').map(c => c.replace(/"/g, '').trim());
-                if (cols.length >= 8) {
+                if (cols.length >= 6) {
+                  const uniqueChildId = `${cols[0]}_${cols[2]}_${cols[3]}`.replace(/[\s\/]/g, '_').toLowerCase();
                   const payload = {
-                    desa: cols[0], kegiatan: cols[1], tanggal_pelayanan: cols[2],
-                    bulan_tahun: cols[2].substring(0, 7), tahun: cols[2].substring(0, 4),
-                    nama_anak: cols[3], kelompok_usia: cols[4], jk: cols[5],
-                    nama_ibu: cols[6], jenis_imunisasi: cols[7],
-                    created_at: new Date().toISOString()
+                    desa: cols[0], kegiatan: cols[1], nama_anak: cols[2], tgl_lahir: cols[3], jk: cols[4], nama_ibu: cols[5],
+                    updated_at: new Date().toISOString()
                   };
-                  await addDoc(collection(db, COL_KOHORT), payload); count++;
+                  ALL_VAKSIN_KEYS.forEach((vKey, idx) => {
+                    if (cols[6 + idx] && cols[6 + idx] !== '-') {
+                      payload[`vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`] = cols[6 + idx];
+                    }
+                  });
+                  await setDoc(doc(db, COL_KOHORT, uniqueChildId), payload, { merge: true }); count++;
                 }
               }
             }
-            status.innerHTML = `<div class="alert-banner" style="background:#d1e7dd; color:#0f5132; border-color:#badbcc;">Berhasil sinkronisasi ${count} data dari file ${file.name} ke Firebase Cloud!</div>`;
+            status.innerHTML = `<div class="alert-banner" style="background:#d1e7dd; color:#0f5132; border-color:#badbcc;">Berhasil sinkronisasi ${count} data kohort matriks ke Firebase Cloud!</div>`;
             loadRecentTransactions();
           } catch (err) { status.innerHTML = `<div class="alert-banner" style="background:#f8d7da; color:#842029; border-color:#f5c2c7;">Error Import: ${err.message}</div>`; }
         };
@@ -1141,3 +1178,4 @@
   </script>
 </body>
 </html>
+

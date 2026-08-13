@@ -98,7 +98,6 @@
     .form-row { display: flex; gap: 10px; width: 100%; }
     .form-row .form-group { flex: 1; }
 
-    /* VACCINE CHECKBOX GRID STYLING */
     .vaccine-selection-box {
       border: 2px solid var(--primary);
       border-radius: var(--radius);
@@ -125,7 +124,6 @@
     .checkbox-item:hover { border-color: var(--primary); background: #fff5f2; }
     .checkbox-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer; }
 
-    /* TABEL KOHORT FORMAT MEMANJANG (WIDE MATRIX FORMAT) */
     .table-container {
       width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch;
       border-radius: 8px; border: 1px solid #cbd5e1; margin-top: 10px; background: #fff;
@@ -235,12 +233,12 @@
       </div>
 
       <div class="card" style="background:#f0f8ff; border:2px solid var(--accent-light);">
-        <h3><i class="fas fa-search"></i> Cari / Update Progres Anak Registered</h3>
-        <p class="lead" style="font-size:0.88rem; margin-bottom:10px;">Pilih desa untuk memilih anak yang sudah terdaftar guna memperbarui dosis imunisasinya.</p>
+        <h3><i class="fas fa-search"></i> Cari / Update Progres Sasaran Registered</h3>
+        <p class="lead" style="font-size:0.88rem; margin-bottom:10px;">Pilih desa untuk memilih sasaran (Bayi, Anak, Catin, Ibu Hamil) yang sudah terdaftar guna memperbarui vaksinasinya.</p>
         
         <div class="grid">
           <div class="form-group">
-            <label>Pilih Desa Anak</label>
+            <label>Pilih Desa Sasaran</label>
             <select id="search_desa_anak">
               <option value="">-- Pilih Desa --</option>
               <option value="Melata">Melata</option>
@@ -258,7 +256,7 @@
             </select>
           </div>
           <div class="form-group">
-            <label>Pilih Nama Anak (Klik untuk mengisi form)</label>
+            <label>Pilih Nama Sasaran (Klik untuk mengisi form)</label>
             <select id="select_anak_registered">
               <option value="">-- Pilih Desa Terlebih Dahulu --</option>
             </select>
@@ -267,8 +265,8 @@
       </div>
 
       <div class="card">
-        <h2><i class="fas fa-id-card"></i> Form Register Imunisasi Bayi / Anak</h2>
-        <p class="lead">Satu baris mewakili 1 anak. Pilihan jenis vaksin otomatis memanjang ke kanan pada matriks kohort.</p>
+        <h2><i class="fas fa-id-card"></i> Form Register Imunisasi (Bayi, Baduta, Catin & Bumil)</h2>
+        <p class="lead">Satu baris mewakili 1 sasaran. Pilihan vaksinasi (termasuk TT Catin & TT Bumil) otomatis memanjang ke kanan pada matriks kohort.</p>
 
         <form id="formRegisterIndividu">
           <div class="grid">
@@ -292,8 +290,8 @@
             </div>
 
             <div class="form-group">
-              <label>Nama Kegiatan / Posyandu</label>
-              <input type="text" id="reg_kegiatan" placeholder="Contoh: Posyandu Flamboyan" required>
+              <label>Nama Kegiatan / Posyandu / Pustu</label>
+              <input type="text" id="reg_kegiatan" placeholder="Contoh: Posyandu Flamboyan / Pustu" required>
             </div>
 
             <div class="form-group">
@@ -302,8 +300,8 @@
             </div>
 
             <div class="form-group">
-              <label>Nama Bayi / Anak</label>
-              <input type="text" id="reg_nama_anak" placeholder="Nama lengkap anak" required>
+              <label>Nama Sasaran (Anak / Catin / Bumil)</label>
+              <input type="text" id="reg_nama_anak" placeholder="Nama lengkap sasaran" required>
             </div>
 
             <div class="form-group">
@@ -311,25 +309,25 @@
               <div class="form-row">
                 <input type="date" id="reg_tgl_lahir" required>
                 <select id="reg_jk" required>
-                  <option value="L">Laki-Laki (L)</option>
                   <option value="P">Perempuan (P)</option>
+                  <option value="L">Laki-Laki (L)</option>
                 </select>
               </div>
             </div>
 
             <div class="form-group">
-              <label>NIK Anak (Opsional)</label>
-              <input type="text" id="reg_nik_anak" placeholder="NIK Anak">
+              <label>NIK Sasaran (Opsional)</label>
+              <input type="text" id="reg_nik_anak" placeholder="NIK Sasaran">
             </div>
 
             <div class="form-group">
-              <label>Nama Orang Tua / Ibu</label>
-              <input type="text" id="reg_nama_ibu" placeholder="Nama ibu kandung" required>
+              <label>Nama Orang Tua / Ibu / Suami</label>
+              <input type="text" id="reg_nama_ibu" placeholder="Nama ibu / nama suami" required>
             </div>
 
             <div class="form-group">
-              <label>NIK Ibu (Opsional)</label>
-              <input type="text" id="reg_nik_ibu" placeholder="NIK Ibu">
+              <label>NIK Orang Tua / Suami (Opsional)</label>
+              <input type="text" id="reg_nik_ibu" placeholder="NIK Orang Tua / Suami">
             </div>
 
             <div class="form-group full-width">
@@ -337,6 +335,7 @@
               <input type="text" id="reg_alamat" placeholder="Contoh: RT 02 / Dusun A" required>
             </div>
 
+            <!-- CHECKBOXES PILIHAN MULTI VAKSIN DENGAN LENGKAP TT CATIN & TT BUMIL -->
             <div class="form-group full-width">
               <label style="color:var(--primary); font-size:1.05rem;"><i class="fas fa-check-double"></i> Pilih Jenis Imunisasi Diberikan (Centang yang sesuai)</label>
               
@@ -370,6 +369,21 @@
                   <label class="checkbox-item"><input type="checkbox" name="chk_vaksin" value="DPT-HB-Hib4"> DPT-HB-Hib 4</label>
                   <label class="checkbox-item"><input type="checkbox" name="chk_vaksin" value="Campak Rubela-2"> MR 2 (Booster)</label>
                 </div>
+
+                <div class="vaccine-group-title" style="margin-top:16px; color:#856404;"><i class="fas fa-heart"></i> Td Calon Pengantin (TT Catin)</div>
+                <div class="vaccine-checkbox-grid">
+                  <label class="checkbox-item"><input type="checkbox" name="chk_vaksin" value="TT1 Catin"> TT1 Catin</label>
+                  <label class="checkbox-item"><input type="checkbox" name="chk_vaksin" value="TT2 Catin"> TT2 Catin</label>
+                </div>
+
+                <div class="vaccine-group-title" style="margin-top:16px; color:#0f5132;"><i class="fas fa-person-pregnant"></i> Td Ibu Hamil (TT Bumil)</div>
+                <div class="vaccine-checkbox-grid">
+                  <label class="checkbox-item"><input type="checkbox" name="chk_vaksin" value="TT1 Bumil"> TT1 Bumil</label>
+                  <label class="checkbox-item"><input type="checkbox" name="chk_vaksin" value="TT2 Bumil"> TT2 Bumil</label>
+                  <label class="checkbox-item"><input type="checkbox" name="chk_vaksin" value="TT3 Bumil"> TT3 Bumil</label>
+                  <label class="checkbox-item"><input type="checkbox" name="chk_vaksin" value="TT4 Bumil"> TT4 Bumil</label>
+                  <label class="checkbox-item"><input type="checkbox" name="chk_vaksin" value="TT5 Bumil"> TT5 Bumil</label>
+                </div>
               </div>
             </div>
           </div>
@@ -380,30 +394,35 @@
         </form>
       </div>
 
+      <!-- TABEL MATRIKS KOHORT MEMANJANG LENGKAP -->
       <div class="card">
         <h3><i class="fas fa-table"></i> Register Kohort Imunisasi (Geser ke Kanan <i class="fas fa-arrow-right"></i>)</h3>
-        <p class="lead" style="font-size:0.85rem; margin-bottom:10px;">Satu baris untuk satu anak. Kolom jenis vaksin memanjang horizontal.</p>
+        <p class="lead" style="font-size:0.85rem; margin-bottom:10px;">Satu baris untuk satu sasaran. Kolom jenis vaksin (termasuk Catin & Bumil) memanjang horizontal.</p>
         <div class="table-container">
           <table class="kohort-table" id="tblRecentTransactions">
             <thead>
               <tr>
-                <th class="sticky-col-1" rowspan="2">Nama Anak</th>
+                <th class="sticky-col-1" rowspan="2">Nama Sasaran</th>
                 <th class="sticky-col-2" rowspan="2">Tgl Lahir</th>
                 <th rowspan="2">L/P</th>
-                <th rowspan="2">Nama Ibu</th>
+                <th rowspan="2">Orang Tua / Suami</th>
                 <th rowspan="2">Desa</th>
                 <th rowspan="2">Alamat / RT</th>
                 <th colspan="19">Imunisasi Dasar Lengkap (0 - 12 Bulan)</th>
-                <th colspan="3">Imunisasi Lanjutan (12 - 24 Bulan)</th>
+                <th colspan="3">Imunisasi Lanjutan Baduta</th>
+                <th colspan="2">TT Catin</th>
+                <th colspan="5">TT Ibu Hamil</th>
                 <th rowspan="2">Aksi</th>
               </tr>
               <tr>
                 <th>HBO &lt;24Jam</th><th>HBO 1-7H</th><th>BCG</th><th>OPV1</th><th>DPT1</th><th>OPV2</th><th>PCV1</th><th>RV1</th><th>DPT2</th><th>OPV3</th><th>PCV2</th><th>RV2</th><th>DPT3</th><th>OPV4</th><th>IPV1</th><th>RV3</th><th>MR1</th><th>IPV2</th><th>JE</th>
                 <th>PCV3</th><th>DPT4</th><th>MR2</th>
+                <th>TT1</th><th>TT2</th>
+                <th>TT1</th><th>TT2</th><th>TT3</th><th>TT4</th><th>TT5</th>
               </tr>
             </thead>
             <tbody>
-              <tr><td colspan="29" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Memuat Matriks Kohort...</td></tr>
+              <tr><td colspan="36" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Memuat Matriks Kohort...</td></tr>
             </tbody>
           </table>
         </div>
@@ -531,7 +550,7 @@
     <section id="kumulatif" class="tab-panel" style="display:none">
       <div class="card" style="border-left: 5px solid var(--primary);">
         <h3 style="margin:0 0 8px 0; color:var(--accent)"><i class="fas fa-chart-bar"></i> Laporan Kumulatif Matriks Register</h3>
-        <p class="lead" style="margin-bottom:0">Mengunduh laporan otomatis menghasilkan file **Excel (.xlsx) 2 Sheet** (Sheet 1: Matriks Kohort Per Anak, Sheet 2: Rekapan Total Per Vaksin).</p>
+        <p class="lead" style="margin-bottom:0">Mengunduh laporan otomatis menghasilkan file **Excel (.xlsx) 2 Sheet** (Sheet 1: Matriks Kohort Per Sasaran, Sheet 2: Rekapan Total Per Vaksin termasuk Catin & Bumil).</p>
       </div>
 
       <div class="card">
@@ -609,7 +628,7 @@
         <button class="btn btn-ghost" onclick="document.getElementById('helpModal').style.display='none'">Tutup</button>
       </div>
       <hr style="margin: 12px 0;">
-      <p class="lead">Laporan yang diunduh langsung berformat Excel (.xlsx) dengan 2 Sheet: Sheet 1 berisi data matriks kohort per anak, dan Sheet 2 berisi rekapan total per vaksin yang mudah diolah.</p>
+      <p class="lead">Menu penginputan & laporan kini mendukung riwayat vaksinasi lengkap bayi, baduta, TT Catin (TT1-TT2) dan TT Ibu Hamil (TT1-TT5) dengan ekspor Excel 2 Sheet.</p>
     </div>
   </div>
 
@@ -631,10 +650,13 @@
     const COL_KOHORT = "register_imunisasi";
     const COL_BIAS = "laporan_bias";
 
+    // DAFTAR KANONIKAL VAKSIN TERMASUK CATIN & BUMIL
     const ALL_VAKSIN_KEYS = [
       "HBO (<24 Jam)", "HBO (1-7 Hari)", "BCG", "OPV1", "DPT-HB-Hib1", "OPV2", "PCV1", "Rotavirus1",
       "DPT-HB-Hib2", "OPV3", "PCV2", "Rotavirus2", "DPT-HB-Hib3", "OPV4", "IPV1", "Rotavirus3",
-      "Campak Rubela-1", "IPV2", "JE", "PCV3", "DPT-HB-Hib4", "Campak Rubela-2"
+      "Campak Rubela-1", "IPV2", "JE", "PCV3", "DPT-HB-Hib4", "Campak Rubela-2",
+      "TT1 Catin", "TT2 Catin",
+      "TT1 Bumil", "TT2 Bumil", "TT3 Bumil", "TT4 Bumil", "TT5 Bumil"
     ];
 
     const SCHOOL_DATA = {
@@ -658,7 +680,7 @@
       let diffMonths = (service.getFullYear() - birth.getFullYear()) * 12 + (service.getMonth() - birth.getMonth());
       if (diffMonths <= 12) return "0-12 Bulan";
       if (diffMonths <= 24) return "12-24 Bulan";
-      return "Sekolah";
+      return "Dewasa/Bumil/Catin";
     }
 
     window.switchTab = function(e){
@@ -699,7 +721,7 @@
     async function populateAnakByDesa() {
       const desaSel = document.getElementById('search_desa_anak').value;
       const selectAnak = document.getElementById('select_anak_registered');
-      selectAnak.innerHTML = '<option value="">-- Memuat Data Anak... --</option>';
+      selectAnak.innerHTML = '<option value="">-- Memuat Data Sasaran... --</option>';
 
       if (!desaSel) {
         selectAnak.innerHTML = '<option value="">-- Pilih Desa Terlebih Dahulu --</option>';
@@ -718,16 +740,16 @@
           }
         });
 
-        selectAnak.innerHTML = '<option value="">-- Pilih Nama Anak Untuk Update --</option>';
+        selectAnak.innerHTML = '<option value="">-- Pilih Nama Sasaran Untuk Update --</option>';
         if (anakMap.size === 0) {
-          selectAnak.innerHTML = '<option value="">-- Belum ada anak terdaftar di desa ini --</option>';
+          selectAnak.innerHTML = '<option value="">-- Belum ada sasaran terdaftar di desa ini --</option>';
           return;
         }
 
         anakMap.forEach((data) => {
           const opt = document.createElement('option');
           opt.value = JSON.stringify(data);
-          opt.textContent = `${data.nama_anak} (${data.tgl_lahir}) - Ibu: ${data.nama_ibu}`;
+          opt.textContent = `${data.nama_anak} (${data.tgl_lahir}) - Orang Tua/Suami: ${data.nama_ibu}`;
           selectAnak.appendChild(opt);
         });
       } catch (err) { selectAnak.innerHTML = `<option value="">Error: ${err.message}</option>`; }
@@ -742,7 +764,7 @@
         document.getElementById('reg_kegiatan').value = data.kegiatan || "";
         document.getElementById('reg_nama_anak').value = data.nama_anak || "";
         document.getElementById('reg_tgl_lahir').value = data.tgl_lahir || "";
-        document.getElementById('reg_jk').value = data.jk || "L";
+        document.getElementById('reg_jk').value = data.jk || "P";
         document.getElementById('reg_nik_anak').value = data.nik_anak !== "-" ? data.nik_anak : "";
         document.getElementById('reg_nama_ibu').value = data.nama_ibu || "";
         document.getElementById('reg_nik_ibu').value = data.nik_ibu !== "-" ? data.nik_ibu : "";
@@ -803,13 +825,13 @@
 
     async function loadRecentTransactions() {
       const tbody = document.querySelector('#tblRecentTransactions tbody');
-      tbody.innerHTML = '<tr><td colspan="29" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Memuat Matriks Kohort...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="36" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Memuat Matriks Kohort...</td></tr>';
       
       try {
         const snap = await getDocs(collection(db, COL_KOHORT));
         tbody.innerHTML = '';
         if (snap.empty) {
-          tbody.innerHTML = '<tr><td colspan="29" style="text-align:center;">Belum ada data Kohort.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="36" style="text-align:center;">Belum ada data Kohort.</td></tr>';
           return;
         }
 
@@ -843,11 +865,11 @@
           `;
           tbody.appendChild(tr);
         });
-      } catch (err) { tbody.innerHTML = `<tr><td colspan="29" style="color:red;">Error: ${err.message}</td></tr>`; }
+      } catch (err) { tbody.innerHTML = `<tr><td colspan="36" style="color:red;">Error: ${err.message}</td></tr>`; }
     }
 
     window.hapusTrans = async function(docId) {
-      if (confirm("Hapus data anak ini dari Kohort?")) {
+      if (confirm("Hapus data sasaran ini dari Kohort?")) {
         await deleteDoc(doc(db, COL_KOHORT, docId));
         loadRecentTransactions();
       }
@@ -912,30 +934,34 @@
           <div style="margin-bottom:12px; background:#f0f7ff; padding:10px 12px; border-radius:8px; border:1px solid #c0d8f0; font-size:0.85rem;">
             <strong>Periode:</strong> ${bln === 'ALL' ? 'Semua Bulan' : 'Bulan ' + bln} ${thn} | 
             <strong>Desa:</strong> ${desaSel === 'ALL' ? 'Semua' : desaSel} | 
-            <strong>Total Anak Terdaftar:</strong> ${filteredDocs.length} Anak
+            <strong>Total Sasaran Terdaftar:</strong> ${filteredDocs.length} Orang
           </div>
           <table class="kohort-table">
             <thead>
               <tr>
-                <th class="sticky-col-1" rowspan="2">Nama Anak</th>
+                <th class="sticky-col-1" rowspan="2">Nama Sasaran</th>
                 <th class="sticky-col-2" rowspan="2">Tgl Lahir</th>
                 <th rowspan="2">L/P</th>
-                <th rowspan="2">Nama Ibu</th>
+                <th rowspan="2">Orang Tua / Suami</th>
                 <th rowspan="2">Desa</th>
                 <th colspan="19">Imunisasi Dasar Lengkap (0 - 12 Bulan)</th>
-                <th colspan="3">Imunisasi Lanjutan (12 - 24 Bulan)</th>
+                <th colspan="3">Imunisasi Lanjutan Baduta</th>
+                <th colspan="2">TT Catin</th>
+                <th colspan="5">TT Ibu Hamil</th>
               </tr>
               <tr>
                 <th>HBO &lt;24Jam</th><th>HBO 1-7H</th><th>BCG</th><th>OPV1</th><th>DPT1</th><th>OPV2</th><th>PCV1</th><th>RV1</th><th>DPT2</th><th>OPV3</th><th>PCV2</th><th>RV2</th><th>DPT3</th><th>OPV4</th><th>IPV1</th><th>RV3</th><th>MR1</th><th>IPV2</th><th>JE</th>
                 <th>PCV3</th><th>DPT4</th><th>MR2</th>
+                <th>TT1</th><th>TT2</th>
+                <th>TT1</th><th>TT2</th><th>TT3</th><th>TT4</th><th>TT5</th>
               </tr>
             </thead>
             <tbody>
-              ${rowsHtml || '<tr><td colspan="28" style="text-align:center;">Tidak ada data pada filter ini.</td></tr>'}
+              ${rowsHtml || '<tr><td colspan="35" style="text-align:center;">Tidak ada data pada filter ini.</td></tr>'}
             </tbody>
             <tfoot>
               <tr style="background:#e2e8f0; font-weight:bold;">
-                <td class="sticky-col-1" colspan="2" style="text-align:left; color:var(--accent);">TOTAL ANAK MENERIMA VAKSIN:</td>
+                <td class="sticky-col-1" colspan="2" style="text-align:left; color:var(--accent);">TOTAL DOSIS DIBERIKAN:</td>
                 <td>-</td><td>-</td><td>-</td>
                 ${totalColsHtml}
               </tr>
@@ -947,7 +973,6 @@
       } catch (err) { container.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`; }
     }
 
-    // DOWNLOAD EXCEL (.XLSX) LANGSUNG 2 SHEET
     async function downloadExcel2Sheets() {
       const thn = document.getElementById('filter_tahun').value || document.getElementById('exp_filter_tahun').value;
       const bln = document.getElementById('filter_bulan').value || document.getElementById('exp_filter_bulan').value;
@@ -967,15 +992,13 @@
         const vTotals = {};
         ALL_VAKSIN_KEYS.forEach(v => vTotals[v] = 0);
 
-        // --- SHEET 1: KOHORT MATRIKS PER ANAK ---
+        // --- SHEET 1: KOHORT MATRIKS PER SASARAN ---
         const sheet1Data = [];
         
-        // Header Row 1 & 2
-        const headerRow1 = ["Desa", "Kegiatan", "Nama Anak", "Tanggal Lahir", "L/P", "Nama Ibu", "Alamat / RT"];
+        const headerRow1 = ["Desa", "Kegiatan", "Nama Sasaran", "Tanggal Lahir", "L/P", "Orang Tua / Suami", "Alamat / RT"];
         ALL_VAKSIN_KEYS.forEach(v => headerRow1.push(v));
         sheet1Data.push(headerRow1);
 
-        // Data Rows
         filteredDocs.forEach(d => {
           const row = [
             d.desa || '',
@@ -1001,22 +1024,25 @@
           sheet1Data.push(row);
         });
 
-        // Last Row Total Sheet 1
         const totalRow1 = ["TOTAL PENERIMA VAKSIN", "", "", "", "", "", ""];
         ALL_VAKSIN_KEYS.forEach(vKey => {
           totalRow1.push(vTotals[vKey]);
         });
         sheet1Data.push(totalRow1);
 
-
         // --- SHEET 2: REKAPAN TOTAL VAKSIN ---
         const sheet2Data = [
-          ["Kategori Usia", "Jenis Imunisasi / Antigen", "Total Penerima (Anak)"]
+          ["Kategori Usia / Sasaran", "Jenis Imunisasi / Antigen", "Total Penerima (Orang)"]
         ];
 
         let totalDosisSemua = 0;
         ALL_VAKSIN_KEYS.forEach(vKey => {
-          const cat = ALL_VAKSIN_KEYS.indexOf(vKey) < 19 ? "0 - 12 Bulan (Dasar)" : "12 - 24 Bulan (Lanjutan)";
+          let cat = "0 - 12 Bulan (Dasar)";
+          const idx = ALL_VAKSIN_KEYS.indexOf(vKey);
+          if (idx >= 19 && idx <= 21) cat = "12 - 24 Bulan (Lanjutan)";
+          else if (idx >= 22 && idx <= 23) cat = "TT Calon Pengantin (Catin)";
+          else if (idx >= 24) cat = "TT Ibu Hamil (Bumil)";
+
           const count = vTotals[vKey];
           totalDosisSemua += count;
           sheet2Data.push([cat, vKey, count]);
@@ -1024,7 +1050,6 @@
 
         sheet2Data.push(["TOTAL KESELURUHAN", "Seluruh Jenis Imunisasi", totalDosisSemua]);
 
-        // GENEREATE EXCEL WORKBOOK MEMAKAI SHEETJS
         const wb = XLSX.utils.book_new();
         const ws1 = XLSX.utils.aoa_to_sheet(sheet1Data);
         const ws2 = XLSX.utils.aoa_to_sheet(sheet2Data);

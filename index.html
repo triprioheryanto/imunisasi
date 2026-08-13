@@ -1,17 +1,3 @@
-Berikut adalah kode utuh index.html yang telah diperbarui total ke Format Kohort Memanjang (Wide Matrix Format):
-Perubahan Utama Sesuai Permintaan:
- * 1 Baris untuk 1 Anak (Format Matriks Kohort):
-   * Data tidak lagi menumpuk berbaris-baris untuk anak yang sama.
-   * Setiap anak hanya memiliki 1 baris tunggal, dan seluruh jenis imunisasi yang diterima ditampilkan memanjang ke kanan dalam kolom-kolom tersendiri (HBO, BCG, OPV1, DPT-HB-Hib1, OPV2, PCV1, Rotavirus, dst).
- * Pengalaman Navigasi Scrolling yang Nyaman:
-   * Kolom Nama Anak dibuat sticky (tetap di posisi kiri saat di-scroll ke kanan) dengan dukungan smooth scrolling di HP maupun laptop.
- * Penyimpanan Matriks Otomatis:
-   * Saat memilih multi-vaksin dan menekan tombol simpan, data imunisasi langsung mengisi matriks tanggal/tanda centang (✓) pada kolom vaksin masing-masing anak tersebut.
- * Download CSV & Kumulatif yang Mudah Diolah Rumus:
-   * Tabel Kumulatif dan file CSV hasil unduhan dibuat persis sama (1 baris per anak) dengan kolom-kolom vaksin terpisah ke kanan.
-   * Pada baris paling bawah (Footer), disediakan Baris Total Rekapitulasi untuk setiap kolom vaksin. Angkanya berada di sel terpisah sehingga langsung siap dihitung menggunakan rumus Excel/Spreadsheet (=SUM(...)).
-Kode Utuh File index.html
-Salin seluruh kode di bawah ini dan timpa (replace) isi file index.html di repositori GitHub Anda:
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -1178,4 +1164,3 @@ Salin seluruh kode di bawah ini dan timpa (replace) isi file index.html di repos
   </script>
 </body>
 </html>
-

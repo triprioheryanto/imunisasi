@@ -377,4 +377,886 @@
                 </div>
 
                 <div class="vaccine-group-title" style="margin-top:16px; color:#0f5132;"><i class="fas fa-person-pregnant"></i> Td Ibu Hamil (TT Bumil)</div>
-                <div class="vaccine-che
+                <div class="vaccine-checkbox-grid">
+                  <label class="checkbox-item"><input type="checkbox" name="chk_vaksin" value="TT1 Bumil"> TT1 Bumil</label>
+                  <label class="checkbox-item"><input type="checkbox" name="chk_vaksin" value="TT2 Bumil"> TT2 Bumil</label>
+                  <label class="checkbox-item"><input type="checkbox" name="chk_vaksin" value="TT3 Bumil"> TT3 Bumil</label>
+                  <label class="checkbox-item"><input type="checkbox" name="chk_vaksin" value="TT4 Bumil"> TT4 Bumil</label>
+                  <label class="checkbox-item"><input type="checkbox" name="chk_vaksin" value="TT5 Bumil"> TT5 Bumil</label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Simpan Ke Kohort Matriks</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- TABEL PREVIEW DATA KHUSUS DESA YANG SEDANG DIINPUT/DIPILIH -->
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <div>
+            <h3 style="margin:0;"><i class="fas fa-check-circle" style="color:var(--success);"></i> Preview Hasil Input Sesi Ini (<span id="preview_desa_title">Semua Desa</span>)</h3>
+            <p class="lead" style="font-size:0.85rem; margin:4px 0 0 0;">Menampilkan sasaran dari desa yang baru diinput/dipilih untuk verifikasi keberhasilan simpan.</p>
+          </div>
+          <button class="btn btn-ghost" onclick="loadRecentTransactions()" style="padding:4px 10px; font-size:0.8rem;"><i class="fas fa-sync-alt"></i> Refresh Preview</button>
+        </div>
+
+        <div class="table-container">
+          <table class="kohort-table" id="tblRecentTransactions">
+            <thead>
+              <tr>
+                <th class="sticky-col-1" rowspan="2">Nama Sasaran</th>
+                <th class="sticky-col-2" rowspan="2">Tgl Lahir</th>
+                <th rowspan="2">L/P</th>
+                <th rowspan="2">Orang Tua / Suami</th>
+                <th rowspan="2">Desa</th>
+                <th rowspan="2">Alamat / RT</th>
+                <th colspan="19">Imunisasi Dasar Lengkap (0 - 12 Bulan)</th>
+                <th colspan="3">Imunisasi Lanjutan Baduta</th>
+                <th colspan="2">TT Catin</th>
+                <th colspan="5">TT Ibu Hamil</th>
+                <th rowspan="2">Aksi</th>
+              </tr>
+              <tr>
+                <th>HBO &lt;24Jam</th><th>HBO 1-7H</th><th>BCG</th><th>OPV1</th><th>DPT1</th><th>OPV2</th><th>PCV1</th><th>RV1</th><th>DPT2</th><th>OPV3</th><th>PCV2</th><th>RV2</th><th>DPT3</th><th>OPV4</th><th>IPV1</th><th>RV3</th><th>MR1</th><th>IPV2</th><th>JE</th>
+                <th>PCV3</th><th>DPT4</th><th>MR2</th>
+                <th>TT1</th><th>TT2</th>
+                <th>TT1</th><th>TT2</th><th>TT3</th><th>TT4</th><th>TT5</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td colspan="36" style="text-align:center;"><i class="fas fa-info-circle"></i> Pilih atau simpan data desa untuk melihat preview.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: BIAS -->
+    <section id="bias" class="tab-panel" style="display:none">
+      <div class="card">
+        <h2><i class="fas fa-school"></i> Form BIAS (Imunisasi Anak Sekolah)</h2>
+        <p class="lead">Input data pelaksanaan BIAS di sekolah. Pilihan jenis vaksin dapat ditentukan secara spesifik untuk masing-masing kelas (misal: Kelas 1 MR, Kelas 5 HPV).</p>
+
+        <form id="biasForm">
+          <div class="grid">
+            <div class="form-group full-width">
+              <label>Nama Sekolah</label>
+              <select id="sekolah" required><option value="">-- Pilih Sekolah --</option></select>
+            </div>
+
+            <div class="form-group full-width">
+              <h3 style="margin:10px 0; font-size:1.1rem; color:var(--accent);">Input Data Kelas & Jenis Vaksin BIAS</h3>
+              <div id="biasClassReportsContainer"><p class="muted">Pilih sekolah di atas untuk mengaktifkan form kelas.</p></div>
+              <div style="margin-top:15px; border-top:1px dashed #ddd; padding-top:12px;">
+                 <button type="button" id="addBiasClassButton" class="btn btn-info" disabled style="opacity:0.5"><i class="fas fa-plus-circle"></i> Tambah Input Kelas BIAS</button>
+              </div>
+            </div>
+          </div>
+          <div class="actions">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-cloud-upload-alt"></i> Simpan BIAS ke Cloud</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- TAB 3: EXPORT -->
+    <section id="export" class="tab-panel" style="display:none">
+      <div class="card" style="border: 2px solid var(--info);">
+        <h2><i class="fas fa-file-export"></i> Ekspor Data Spesifik (Offline Sync)</h2>
+        <p class="lead">Ekspor data register kohort desa/bulan/tahun tertentu langsung dalam bentuk **Excel (.xlsx) 2 Sheet**.</p>
+
+        <div class="grid">
+          <div class="form-group">
+            <label>Pilih Desa</label>
+            <select id="exp_filter_desa">
+              <option value="ALL">-- Semua Desa --</option>
+              <option value="Melata">Melata</option>
+              <option value="Nanuah">Nanuah</option>
+              <option value="Topalan">Topalan</option>
+              <option value="Batu Ampar">Batu Ampar</option>
+              <option value="Lubuk Hiju">Lubuk Hiju</option>
+              <option value="Bukit Makmur">Bukit Makmur</option>
+              <option value="Bukit Raya">Bukit Raya</option>
+              <option value="Modang Mas">Modang Mas</option>
+              <option value="Mukti Manunggal">Mukti Manunggal</option>
+              <option value="Sumber Jaya">Sumber Jaya</option>
+              <option value="Bukit Harum">Bukit Harum</option>
+              <option value="PT. TSA">PT. TSA</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Nama Kegiatan (Opsional)</label>
+            <input type="text" id="exp_filter_kegiatan" placeholder="Ketik nama kegiatan/posyandu">
+          </div>
+
+          <div class="form-group">
+            <label>Tahun Spesifik</label>
+            <select id="exp_filter_tahun">
+              <option value="ALL">-- Semua Tahun --</option>
+              <option value="2026">2026</option>
+              <option value="2025">2025</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Bulan Spesifik</label>
+            <select id="exp_filter_bulan">
+              <option value="ALL">-- Semua Bulan --</option>
+              <option value="01">Januari (01)</option>
+              <option value="02">Februari (02)</option>
+              <option value="03">Maret (03)</option>
+              <option value="04">April (04)</option>
+              <option value="05">Mei (05)</option>
+              <option value="06">Juni (06)</option>
+              <option value="07">Juli (07)</option>
+              <option value="08">Agustus (08)</option>
+              <option value="09">September (09)</option>
+              <option value="10">Oktober (10)</option>
+              <option value="11">November (11)</option>
+              <option value="12">Desember (12)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary" id="btnExportFilteredJSON"><i class="fas fa-download"></i> Ekspor JSON Spesifik</button>
+          <button class="btn btn-success" id="btnExportFilteredExcel"><i class="fas fa-file-excel"></i> Ekspor Excel (.xlsx) 2 Sheet</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3><i class="fas fa-database"></i> Backup Full Database</h3>
+        <p class="lead" style="font-size:0.88rem;">Unduh seluruh snapshot register individu dan data BIAS dari Firebase Cloud.</p>
+        <button class="btn btn-ghost" id="btnExportDb"><i class="fas fa-cloud-download-alt"></i> Backup Full Database (.json)</button>
+      </div>
+    </section>
+
+    <!-- TAB 4: IMPORT -->
+    <section id="import" class="tab-panel" style="display:none">
+        <div class="card">
+          <h2><i class="fas fa-upload"></i> Import Database / File Ekspor ke Cloud</h2>
+          <p class="lead">Gunakan menu ini untuk mengunggah file **JSON** maupun **CSV/Excel** hasil ekspor offline ke server cloud saat sudah mendapatkan akses internet.</p>
+          <div class="form-group">
+            <label>Pilih File Database (JSON atau CSV)</label>
+            <input type="file" id="importFile" accept=".json,.csv" multiple>
+          </div>
+          <div id="importStatus" class="small" style="margin-top:12px;"></div>
+          <div class="actions" style="justify-content:flex-start">
+            <button class="btn btn-primary" id="btnStartImport"><i class="fas fa-cloud-upload-alt"></i> Mulai Import & Sync ke Cloud</button>
+          </div>
+        </div>
+    </section>
+    
+    <!-- TAB 5: KUMULATIF & LAPORAN MATRIKS -->
+    <section id="kumulatif" class="tab-panel" style="display:none">
+      <div class="card" style="border-left: 5px solid var(--primary);">
+        <h3 style="margin:0 0 8px 0; color:var(--accent)"><i class="fas fa-chart-bar"></i> Laporan Kumulatif Matriks Register</h3>
+        <p class="lead" style="margin-bottom:0">Mengunduh laporan otomatis menghasilkan file **Excel (.xlsx) 2 Sheet** (Sheet 1: Matriks Kohort Per Sasaran, Sheet 2: Rekapan Total Per Vaksin termasuk Catin & Bumil).</p>
+      </div>
+
+      <div class="card">
+        <h3><i class="fas fa-filter"></i> Filter Laporan Kumulatif</h3>
+        <div class="grid">
+          <div class="form-group">
+            <label>Tahun</label>
+            <select id="filter_tahun">
+              <option value="2026">2026</option>
+              <option value="2025">2025</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Bulan</label>
+            <select id="filter_bulan">
+              <option value="ALL">-- Semua Bulan --</option>
+              <option value="01">Januari (01)</option>
+              <option value="02">Februari (02)</option>
+              <option value="03">Maret (03)</option>
+              <option value="04">April (04)</option>
+              <option value="05">Mei (05)</option>
+              <option value="06">Juni (06)</option>
+              <option value="07">Juli (07)</option>
+              <option value="08">Agustus (08)</option>
+              <option value="09">September (09)</option>
+              <option value="10">Oktober (10)</option>
+              <option value="11">November (11)</option>
+              <option value="12">Desember (12)</option>
+            </select>
+          </div>
+          <div class="form-group full-width">
+            <label>Desa</label>
+            <select id="filter_desa">
+              <option value="ALL">-- Semua Desa --</option>
+              <option value="Melata">Melata</option>
+              <option value="Nanuah">Nanuah</option>
+              <option value="Topalan">Topalan</option>
+              <option value="Batu Ampar">Batu Ampar</option>
+              <option value="Lubuk Hiju">Lubuk Hiju</option>
+              <option value="Bukit Makmur">Bukit Makmur</option>
+              <option value="Bukit Raya">Bukit Raya</option>
+              <option value="Modang Mas">Modang Mas</option>
+              <option value="Mukti Manunggal">Mukti Manunggal</option>
+              <option value="Sumber Jaya">Sumber Jaya</option>
+              <option value="Bukit Harum">Bukit Harum</option>
+              <option value="PT. TSA">PT. TSA</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary" id="btnApplyFilter"><i class="fas fa-search"></i> Hitung Laporan Matriks</button>
+          <button class="btn btn-success" id="btnDownloadExcelFilter"><i class="fas fa-file-excel"></i> Download Excel (.xlsx) 2 Sheet</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3><i class="fas fa-list-alt"></i> Hasil Rekapitulasi Matriks Kohort</h3>
+        <div id="reviewContainer" class="table-container">
+          <p class="muted"><i class="fas fa-spinner fa-spin"></i> Memuat data dari Firebase Cloud...</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    &copy; 2026 Sistem Register Kohort Imunisasi & BIAS — Firebase Powered
+  </footer>
+
+  <div id="helpModal" style="display:none;position:fixed;inset:0;background:rgba(2,6,23,0.5);z-index:1050;align-items:center;justify-content:center">
+    <div style="background:#fff;padding:20px;border-radius:12px;max-width:500px;margin:20px; width:90%;">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <h3 style="margin:0; color:var(--accent);"><i class="fas fa-circle-info"></i> Bantuan</h3>
+        <button class="btn btn-ghost" onclick="document.getElementById('helpModal').style.display='none'">Tutup</button>
+      </div>
+      <hr style="margin: 12px 0;">
+      <p class="lead">Tabel preview pada tab input difilter khusus untuk desa yang sedang diinput/dipilih agar proses konfirmasi keberhasilan simpan lebih nyaman dan tidak membingungkan.</p>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAAyGTFyAkfua9wazWH6FFkYYmnGFTEh4",
+      authDomain: "imunisasi-puskesmas.firebaseapp.com",
+      projectId: "imunisasi-puskesmas",
+      storageBucket: "imunisasi-puskesmas.firebasestorage.app",
+      messagingSenderId: "26448709630",
+      appId: "1:26448709630:web:b29b4ed7357b44c876a2af"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const COL_KOHORT = "register_imunisasi";
+    const COL_BIAS = "laporan_bias";
+
+    const ALL_VAKSIN_KEYS = [
+      "HBO (<24 Jam)", "HBO (1-7 Hari)", "BCG", "OPV1", "DPT-HB-Hib1", "OPV2", "PCV1", "Rotavirus1",
+      "DPT-HB-Hib2", "OPV3", "PCV2", "Rotavirus2", "DPT-HB-Hib3", "OPV4", "IPV1", "Rotavirus3",
+      "Campak Rubela-1", "IPV2", "JE", "PCV3", "DPT-HB-Hib4", "Campak Rubela-2",
+      "TT1 Catin", "TT2 Catin",
+      "TT1 Bumil", "TT2 Bumil", "TT3 Bumil", "TT4 Bumil", "TT5 Bumil"
+    ];
+
+    const SCHOOL_DATA = {
+        'SD NEGERI MELATA': 'SD', 'SD NEGERI NANUAH': 'SD', 'SD NEGERI TOPALAN': 'SD', 
+        'SD NEGERI BATU AMPAR': 'SD', 'SD NEGERI LUBUK HIJU': 'SD', 'SD NEGERI BUKIT MAKMUR': 'SD',
+        'SD NEGERI BUKIT RAYA': 'SD', 'SD NEGERI MODANG MAS': 'SD', 'SD NEGERI MUKTI MANUNGGAL': 'SD',
+        'SD NEGERI SUMBER JAYA': 'SD', 'SD NEGERI BUKIT HARUM': 'SD', 'SD SWASTA TANJUNG SAWIT ABADI': 'SD',
+        'MIS RAUDHATUL ULUM': 'SD', 'SMP NEGERI 1 MENTHOBI RAYA': 'SMP', 'SMP NEGERI 2 MENTHOBI RAYA': 'SMP', 
+        'SMP NEGERI 3 MENTHOBI RAYA': 'SMP', 'SMP NEGERI 4 MENTHOBI RAYA': 'SMP', 
+        'SMP NEGERI 5 MENTHOBI RAYA': 'SMP', 'SMP NEGERI SATU ATAP 6 MENTHOBI RAYA': 'SMP',
+        'SMP ISLAM AT-TANWIR': 'SMP', 'MTS RAUDHATUL ULUM': 'SMP', 'SMA NEGERI 1 MENTHOBI RAYA': 'SMA',
+        'SMK NEGERI 1 MENTHOBI RAYA': 'SMA' 
+    };
+    const CLASS_MAP = { 'SD': [1, 2, 3, 4, 5, 6], 'SMP': [7, 8, 9], 'SMA': [10, 11, 12] };
+    let classInputCounter = 0;
+    let currentInputDesa = ""; // Menyimpan desa yang sedang aktif diinput
+
+    function getKelompokUsia(tglLahir, tglPelayanan) {
+      if (!tglLahir || !tglPelayanan) return "0-12 Bulan";
+      const birth = new Date(tglLahir);
+      const service = new Date(tglPelayanan);
+      let diffMonths = (service.getFullYear() - birth.getFullYear()) * 12 + (service.getMonth() - birth.getMonth());
+      if (diffMonths <= 12) return "0-12 Bulan";
+      if (diffMonths <= 24) return "12-24 Bulan";
+      return "Dewasa/Bumil/Catin";
+    }
+
+    window.switchTab = function(e){
+      const target = e.currentTarget.getAttribute('data-tab');
+      document.querySelectorAll('.app-nav-tabs .tab').forEach(t=>t.classList.remove('active'));
+      e.currentTarget.classList.add('active');
+      document.querySelectorAll('.tab-panel').forEach(p => p.style.display='none');
+      document.getElementById(target).style.display = 'block';
+      if (target === 'imunisasi') loadRecentTransactions();
+      if (target === 'kumulatif') loadReviewDetail();
+      window.scrollTo({top:0,behavior:'smooth'});
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('reg_tgl_pelayanan').value = today;
+
+      document.getElementById('formRegisterIndividu').addEventListener('submit', handleSaveKohortMatrix);
+      document.getElementById('biasForm').addEventListener('submit', handleSaveBias);
+      document.getElementById('sekolah').addEventListener('change', onChangeSekolah);
+      document.getElementById('addBiasClassButton').addEventListener('click', addNewClassInput);
+      document.getElementById('btnExportDb').addEventListener('click', exportDatabase);
+      document.getElementById('btnStartImport').addEventListener('click', startImport);
+
+      document.getElementById('btnApplyFilter').addEventListener('click', loadReviewDetail);
+      document.getElementById('btnDownloadExcelFilter').addEventListener('click', downloadExcel2Sheets);
+
+      document.getElementById('search_desa_anak').addEventListener('change', (e) => {
+        currentInputDesa = e.target.value;
+        populateAnakByDesa();
+        loadRecentTransactions(); // Update preview otomatis sesuai desa pilihan
+      });
+
+      document.getElementById('reg_desa').addEventListener('change', (e) => {
+        currentInputDesa = e.target.value;
+        loadRecentTransactions(); // Update preview saat memilih desa di form
+      });
+
+      document.getElementById('select_anak_registered').addEventListener('change', fillFormWithSelectedAnak);
+
+      document.getElementById('btnExportFilteredJSON').addEventListener('click', () => doExportFiltered('json'));
+      document.getElementById('btnExportFilteredExcel').addEventListener('click', downloadExcel2Sheets);
+
+      initBiasDropdowns();
+      loadRecentTransactions();
+    });
+
+    async function populateAnakByDesa() {
+      const desaSel = document.getElementById('search_desa_anak').value;
+      const selectAnak = document.getElementById('select_anak_registered');
+      selectAnak.innerHTML = '<option value="">-- Memuat Data Sasaran... --</option>';
+
+      if (!desaSel) {
+        selectAnak.innerHTML = '<option value="">-- Pilih Desa Terlebih Dahulu --</option>';
+        return;
+      }
+
+      try {
+        const snap = await getDocs(collection(db, COL_KOHORT));
+        const anakMap = new Map();
+
+        snap.forEach(d => {
+          const data = d.data();
+          if (data.desa && data.desa.toLowerCase() === desaSel.toLowerCase()) {
+            const key = `${data.nama_anak}_${data.tgl_lahir}`.toLowerCase();
+            if (!anakMap.has(key)) anakMap.set(key, data);
+          }
+        });
+
+        selectAnak.innerHTML = '<option value="">-- Pilih Nama Sasaran Untuk Update --</option>';
+        if (anakMap.size === 0) {
+          selectAnak.innerHTML = '<option value="">-- Belum ada sasaran terdaftar di desa ini --</option>';
+          return;
+        }
+
+        anakMap.forEach((data) => {
+          const opt = document.createElement('option');
+          opt.value = JSON.stringify(data);
+          opt.textContent = `${data.nama_anak} (${data.tgl_lahir}) - Orang Tua/Suami: ${data.nama_ibu}`;
+          selectAnak.appendChild(opt);
+        });
+      } catch (err) { selectAnak.innerHTML = `<option value="">Error: ${err.message}</option>`; }
+    }
+
+    function fillFormWithSelectedAnak() {
+      const val = document.getElementById('select_anak_registered').value;
+      if (!val) return;
+      try {
+        const data = JSON.parse(val);
+        document.getElementById('reg_desa').value = data.desa || "";
+        currentInputDesa = data.desa || "";
+        document.getElementById('reg_kegiatan').value = data.kegiatan || "";
+        document.getElementById('reg_nama_anak').value = data.nama_anak || "";
+        document.getElementById('reg_tgl_lahir').value = data.tgl_lahir || "";
+        document.getElementById('reg_jk').value = data.jk || "P";
+        document.getElementById('reg_nik_anak').value = data.nik_anak !== "-" ? data.nik_anak : "";
+        document.getElementById('reg_nama_ibu').value = data.nama_ibu || "";
+        document.getElementById('reg_nik_ibu').value = data.nik_ibu !== "-" ? data.nik_ibu : "";
+        document.getElementById('reg_alamat').value = data.alamat_rt || "";
+        
+        loadRecentTransactions();
+      } catch (e) { console.error(e); }
+    }
+
+    async function handleSaveKohortMatrix(e) {
+      e.preventDefault();
+
+      const selectedVaccines = Array.from(document.querySelectorAll('input[name="chk_vaksin"]:checked')).map(cb => cb.value);
+      if (selectedVaccines.length === 0) {
+        return alert("⚠️ Mohon centang minimal 1 jenis imunisasi!");
+      }
+
+      const tglPelayanan = document.getElementById('reg_tgl_pelayanan').value;
+      const tglLahir = document.getElementById('reg_tgl_lahir').value;
+      const namaAnak = document.getElementById('reg_nama_anak').value.trim();
+      const desa = document.getElementById('reg_desa').value;
+      currentInputDesa = desa; // Set desa aktif
+
+      const uniqueChildId = `${desa}_${namaAnak}_${tglLahir}`.replace(/[\s\/]/g, '_').toLowerCase();
+
+      const vaccineDataUpdate = {};
+      selectedVaccines.forEach(v => {
+        vaccineDataUpdate[`vaksin_${v.replace(/[\s\(\)<>-]/g, '_')}`] = tglPelayanan;
+      });
+
+      const payload = {
+        desa: desa,
+        kegiatan: document.getElementById('reg_kegiatan').value,
+        tanggal_pelayanan: tglPelayanan,
+        bulan_tahun: tglPelayanan.substring(0, 7),
+        tahun: tglPelayanan.substring(0, 4),
+        nama_anak: namaAnak,
+        tgl_lahir: tglLahir,
+        jk: document.getElementById('reg_jk').value,
+        nik_anak: document.getElementById('reg_nik_anak').value || "-",
+        nama_ibu: document.getElementById('reg_nama_ibu').value,
+        nik_ibu: document.getElementById('reg_nik_ibu').value || "-",
+        alamat_rt: document.getElementById('reg_alamat').value,
+        kelompok_usia: getKelompokUsia(tglLahir, tglPelayanan),
+        updated_at: new Date().toISOString(),
+        ...vaccineDataUpdate
+      };
+
+      try {
+        await setDoc(doc(db, COL_KOHORT, uniqueChildId), payload, { merge: true });
+
+        alert(`✅ Matriks Kohort ${namaAnak} diperbarui dengan imunisasi: ${selectedVaccines.join(', ')}!`);
+        
+        document.querySelectorAll('input[name="chk_vaksin"]:checked').forEach(cb => cb.checked = false);
+        document.getElementById('reg_nama_anak').value = "";
+        document.getElementById('reg_nik_anak').value = "";
+        
+        loadRecentTransactions(); // Refresh preview khusus desa ini
+      } catch (err) { alert("❌ Error: " + err.message); }
+    }
+
+    // LOAD TRANSAKSI PREVIEW KHUSUS DESA YANG SEDANG DIPILIH/DIINPUT
+    async function loadRecentTransactions() {
+      const tbody = document.querySelector('#tblRecentTransactions tbody');
+      const titleSpan = document.getElementById('preview_desa_title');
+
+      if (!currentInputDesa) {
+        titleSpan.textContent = "Belum Ada Desa Dipilih";
+        tbody.innerHTML = '<tr><td colspan="36" style="text-align:center; color:var(--muted);"><i class="fas fa-arrow-up"></i> Silakan pilih desa pada form di atas untuk menampilkan preview data.</td></tr>';
+        return;
+      }
+
+      titleSpan.textContent = `Desa ${currentInputDesa}`;
+      tbody.innerHTML = '<tr><td colspan="36" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Memuat Data Preview Desa ' + currentInputDesa + '...</td></tr>';
+      
+      try {
+        const snap = await getDocs(collection(db, COL_KOHORT));
+        tbody.innerHTML = '';
+
+        let docs = [];
+        snap.forEach(d => {
+          const data = d.data();
+          if (data.desa && data.desa.toLowerCase() === currentInputDesa.toLowerCase()) {
+            docs.push({id: d.id, ...data});
+          }
+        });
+
+        if (docs.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="36" style="text-align:center;">Belum ada data sasaran terdaftar di Desa ${currentInputDesa}.</td></tr>`;
+          return;
+        }
+
+        docs.sort((a,b) => new Date(b.updated_at || b.created_at || 0) - new Date(a.updated_at || a.created_at || 0));
+
+        docs.forEach(d => {
+          const tr = document.createElement('tr');
+          let vCols = '';
+
+          ALL_VAKSIN_KEYS.forEach(vKey => {
+            const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
+            const val = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
+            if (val) {
+              vCols += `<td><span class="v-given">${val}</span></td>`;
+            } else {
+              vCols += `<td style="color:#cbd5e1;">-</td>`;
+            }
+          });
+
+          tr.innerHTML = `
+            <td class="sticky-col-1">${d.nama_anak}</td>
+            <td class="sticky-col-2">${d.tgl_lahir || '-'}</td>
+            <td>${d.jk || '-'}</td>
+            <td>${d.nama_ibu || '-'}</td>
+            <td>${d.desa || '-'}</td>
+            <td>${d.alamat_rt || '-'}</td>
+            ${vCols}
+            <td><button class="btn btn-danger" onclick="hapusTrans('${d.id}')" style="padding:2px 6px; font-size:0.75rem;"><i class="fas fa-trash"></i></button></td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (err) { tbody.innerHTML = `<tr><td colspan="36" style="color:red;">Error: ${err.message}</td></tr>`; }
+    }
+
+    window.hapusTrans = async function(docId) {
+      if (confirm("Hapus data sasaran ini dari Kohort?")) {
+        await deleteDoc(doc(db, COL_KOHORT, docId));
+        loadRecentTransactions();
+      }
+    };
+
+    async function loadReviewDetail() {
+      const thn = document.getElementById('filter_tahun').value;
+      const bln = document.getElementById('filter_bulan').value;
+      const desaSel = document.getElementById('filter_desa').value;
+      const container = document.getElementById('reviewContainer');
+
+      container.innerHTML = '<p class="muted"><i class="fas fa-spinner fa-spin"></i> Memuat laporan matriks...</p>';
+
+      try {
+        const snap = await getDocs(collection(db, COL_KOHORT));
+        let filteredDocs = [];
+
+        snap.forEach(doc => {
+          const d = doc.data();
+          const matchThn = (thn === 'ALL' || d.tahun === thn);
+          const matchBln = (bln === 'ALL' || (d.bulan_tahun && d.bulan_tahun.substring(5,7) === bln));
+          const matchDesa = (desaSel === 'ALL' || (d.desa && d.desa.toLowerCase() === desaSel.toLowerCase()));
+
+          if (matchThn && matchBln && matchDesa) filteredDocs.push(d);
+        });
+
+        const vTotals = {};
+        ALL_VAKSIN_KEYS.forEach(v => vTotals[v] = 0);
+
+        let rowsHtml = '';
+        filteredDocs.forEach(d => {
+          let vCols = '';
+          ALL_VAKSIN_KEYS.forEach(vKey => {
+            const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
+            const val = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
+            if (val) {
+              vTotals[vKey] += 1;
+              vCols += `<td><span class="v-given">✓ (${val})</span></td>`;
+            } else {
+              vCols += `<td style="color:#cbd5e1;">-</td>`;
+            }
+          });
+
+          rowsHtml += `
+            <tr>
+              <td class="sticky-col-1">${d.nama_anak}</td>
+              <td class="sticky-col-2">${d.tgl_lahir || '-'}</td>
+              <td>${d.jk || '-'}</td>
+              <td>${d.nama_ibu || '-'}</td>
+              <td>${d.desa || '-'}</td>
+              ${vCols}
+            </tr>
+          `;
+        });
+
+        let totalColsHtml = '';
+        ALL_VAKSIN_KEYS.forEach(vKey => {
+          totalColsHtml += `<td style="text-align:center; font-weight:800; color:var(--primary); font-size:0.95rem;">${vTotals[vKey]}</td>`;
+        });
+
+        let html = `
+          <div style="margin-bottom:12px; background:#f0f7ff; padding:10px 12px; border-radius:8px; border:1px solid #c0d8f0; font-size:0.85rem;">
+            <strong>Periode:</strong> ${bln === 'ALL' ? 'Semua Bulan' : 'Bulan ' + bln} ${thn} | 
+            <strong>Desa:</strong> ${desaSel === 'ALL' ? 'Semua' : desaSel} | 
+            <strong>Total Sasaran Terdaftar:</strong> ${filteredDocs.length} Orang
+          </div>
+          <table class="kohort-table">
+            <thead>
+              <tr>
+                <th class="sticky-col-1" rowspan="2">Nama Sasaran</th>
+                <th class="sticky-col-2" rowspan="2">Tgl Lahir</th>
+                <th rowspan="2">L/P</th>
+                <th rowspan="2">Orang Tua / Suami</th>
+                <th rowspan="2">Desa</th>
+                <th colspan="19">Imunisasi Dasar Lengkap (0 - 12 Bulan)</th>
+                <th colspan="3">Imunisasi Lanjutan Baduta</th>
+                <th colspan="2">TT Catin</th>
+                <th colspan="5">TT Ibu Hamil</th>
+              </tr>
+              <tr>
+                <th>HBO &lt;24Jam</th><th>HBO 1-7H</th><th>BCG</th><th>OPV1</th><th>DPT1</th><th>OPV2</th><th>PCV1</th><th>RV1</th><th>DPT2</th><th>OPV3</th><th>PCV2</th><th>RV2</th><th>DPT3</th><th>OPV4</th><th>IPV1</th><th>RV3</th><th>MR1</th><th>IPV2</th><th>JE</th>
+                <th>PCV3</th><th>DPT4</th><th>MR2</th>
+                <th>TT1</th><th>TT2</th>
+                <th>TT1</th><th>TT2</th><th>TT3</th><th>TT4</th><th>TT5</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml || '<tr><td colspan="35" style="text-align:center;">Tidak ada data pada filter ini.</td></tr>'}
+            </tbody>
+            <tfoot>
+              <tr style="background:#e2e8f0; font-weight:bold;">
+                <td class="sticky-col-1" colspan="2" style="text-align:left; color:var(--accent);">TOTAL DOSIS DIBERIKAN:</td>
+                <td>-</td><td>-</td><td>-</td>
+                ${totalColsHtml}
+              </tr>
+            </tfoot>
+          </table>
+        `;
+
+        container.innerHTML = html;
+      } catch (err) { container.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`; }
+    }
+
+    async function downloadExcel2Sheets() {
+      const thn = document.getElementById('filter_tahun').value || document.getElementById('exp_filter_tahun').value;
+      const bln = document.getElementById('filter_bulan').value || document.getElementById('exp_filter_bulan').value;
+      const desaSel = document.getElementById('filter_desa').value || document.getElementById('exp_filter_desa').value;
+
+      try {
+        const snap = await getDocs(collection(db, COL_KOHORT));
+        let filteredDocs = [];
+
+        snap.forEach(doc => {
+          const d = doc.data();
+          if ((thn === 'ALL' || d.tahun === thn) && (bln === 'ALL' || (d.bulan_tahun && d.bulan_tahun.substring(5,7) === bln)) && (desaSel === 'ALL' || (d.desa && d.desa.toLowerCase() === desaSel.toLowerCase()))) {
+            filteredDocs.push(d);
+          }
+        });
+
+        const vTotals = {};
+        ALL_VAKSIN_KEYS.forEach(v => vTotals[v] = 0);
+
+        const sheet1Data = [];
+        
+        const headerRow1 = ["Desa", "Kegiatan", "Nama Sasaran", "Tanggal Lahir", "L/P", "Orang Tua / Suami", "Alamat / RT"];
+        ALL_VAKSIN_KEYS.forEach(v => headerRow1.push(v));
+        sheet1Data.push(headerRow1);
+
+        filteredDocs.forEach(d => {
+          const row = [
+            d.desa || '',
+            d.kegiatan || '',
+            d.nama_anak || '',
+            d.tgl_lahir || '',
+            d.jk || '',
+            d.nama_ibu || '',
+            d.alamat_rt || ''
+          ];
+
+          ALL_VAKSIN_KEYS.forEach(vKey => {
+            const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
+            const val = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
+            if (val) {
+              vTotals[vKey] += 1;
+              row.push(val);
+            } else {
+              row.push("-");
+            }
+          });
+
+          sheet1Data.push(row);
+        });
+
+        const totalRow1 = ["TOTAL PENERIMA VAKSIN", "", "", "", "", "", ""];
+        ALL_VAKSIN_KEYS.forEach(vKey => {
+          totalRow1.push(vTotals[vKey]);
+        });
+        sheet1Data.push(totalRow1);
+
+        const sheet2Data = [
+          ["Kategori Usia / Sasaran", "Jenis Imunisasi / Antigen", "Total Penerima (Orang)"]
+        ];
+
+        let totalDosisSemua = 0;
+        ALL_VAKSIN_KEYS.forEach(vKey => {
+          let cat = "0 - 12 Bulan (Dasar)";
+          const idx = ALL_VAKSIN_KEYS.indexOf(vKey);
+          if (idx >= 19 && idx <= 21) cat = "12 - 24 Bulan (Lanjutan)";
+          else if (idx >= 22 && idx <= 23) cat = "TT Calon Pengantin (Catin)";
+          else if (idx >= 24) cat = "TT Ibu Hamil (Bumil)";
+
+          const count = vTotals[vKey];
+          totalDosisSemua += count;
+          sheet2Data.push([cat, vKey, count]);
+        });
+
+        sheet2Data.push(["TOTAL KESELURUHAN", "Seluruh Jenis Imunisasi", totalDosisSemua]);
+
+        const wb = XLSX.utils.book_new();
+        const ws1 = XLSX.utils.aoa_to_sheet(sheet1Data);
+        const ws2 = XLSX.utils.aoa_to_sheet(sheet2Data);
+
+        XLSX.utils.book_append_sheet(wb, ws1, "Register Kohort Matriks");
+        XLSX.utils.book_append_sheet(wb, ws2, "Rekapan Total Vaksin");
+
+        const filename = `Kohort_Matriks_${desaSel}_${bln}_${thn}.xlsx`;
+        XLSX.writeFile(wb, filename);
+
+      } catch (err) { alert("Gagal download Excel: " + err.message); }
+    }
+
+    async function doExportFiltered(format) {
+      if (format === 'json') exportDatabase();
+      else downloadExcel2Sheets();
+    }
+
+    function initBiasDropdowns() {
+      const sekolahSelect = document.getElementById('sekolah');
+      sekolahSelect.innerHTML = '<option value="">-- Pilih Sekolah --</option>';
+      Object.keys(SCHOOL_DATA).forEach(school => { sekolahSelect.innerHTML += `<option value="${school}">${school}</option>`; });
+    }
+
+    function onChangeSekolah() {
+      const sekolah = document.getElementById('sekolah').value;
+      const classContainer = document.getElementById('biasClassReportsContainer');
+      const addButton = document.getElementById('addBiasClassButton');
+      classContainer.innerHTML = ''; classInputCounter = 0;
+      if (SCHOOL_DATA[sekolah]) {
+          addNewClassInput(); addButton.disabled = false; addButton.style.opacity = 1;
+      } else {
+          classContainer.innerHTML = '<p class="muted">Pilih sekolah untuk mengaktifkan form kelas.</p>';
+          addButton.disabled = true; addButton.style.opacity = 0.5;
+      }
+    }
+
+    function addNewClassInput() {
+      const sekolah = document.getElementById('sekolah').value;
+      if (!sekolah) return;
+      const schoolType = SCHOOL_DATA[sekolah];
+      classInputCounter++; const blockId = classInputCounter;
+      const container = document.getElementById('biasClassReportsContainer');
+      const html = `
+        <div class="card" id="block_${blockId}" style="background:#f8f9fa; border:1px solid #ced4da; margin-bottom:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <h4 style="margin:0; font-size:0.95rem; font-weight:700; color:var(--primary)">Input Kelas BIAS #${blockId}</h4>
+                <button type="button" class="btn btn-danger" onclick="this.closest('.card').remove()" style="padding:2px 6px; font-size:0.75rem;"><i class="fas fa-times"></i> Hapus</button>
+            </div>
+            <div class="grid" style="grid-template-columns: 1fr 1fr;">
+                <div class="form-group">
+                    <label>Kelas</label>
+                    <select id="kelas_${blockId}" required></select>
+                </div>
+                <div class="form-group">
+                    <label style="color:var(--primary)">Vaksin BIAS</label>
+                    <select id="jenis_vaksin_${blockId}" required style="border: 2px solid var(--primary);">
+                        <option value="MR">MR (Campak Rubella)</option>
+                        <option value="DT">DT (Difteria Tetanus)</option>
+                        <option value="Td">Td (Tetanus Diphtheria)</option>
+                        <option value="HPV">HPV (Human Papillomavirus)</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Sasaran L</label><select id="sasaran_l_${blockId}" class="bias-num" required></select></div>
+                <div class="form-group"><label>Sasaran P</label><select id="sasaran_p_${blockId}" class="bias-num" required></select></div>
+                <div class="form-group"><label>Capaian L</label><select id="capaian_l_${blockId}" class="bias-num" required></select></div>
+                <div class="form-group"><label>Capaian P</label><select id="capaian_p_${blockId}" class="bias-num" required></select></div>
+                <div class="form-group full-width"><label>Drop Out</label><select id="dropout_${blockId}" class="bias-num"></select></div>
+            </div>
+        </div>
+      `;
+      container.insertAdjacentHTML('beforeend', html);
+      const classSel = document.getElementById(`kelas_${blockId}`);
+      classSel.innerHTML = '<option value="" disabled selected>-- Pilih --</option>';
+      CLASS_MAP[schoolType].forEach(c => classSel.innerHTML += `<option value="${c}">${c}</option>`);
+      container.querySelectorAll('.bias-num').forEach(s => {
+        if(s.children.length === 0){
+          s.innerHTML = '<option value="0">0</option>';
+          for(let i=1;i<=200;i++) s.innerHTML += `<option value="${i}">${i}</option>`;
+        }
+      });
+    }
+
+    async function handleSaveBias(e) {
+      e.preventDefault();
+      const sekolah = document.getElementById('sekolah').value;
+      const classBlocks = document.querySelectorAll('#biasClassReportsContainer .card');
+      if (!sekolah || classBlocks.length === 0) return alert("Pilih sekolah dan minimal 1 data kelas.");
+      
+      const tanggal = new Date().toISOString().slice(0,10);
+      try {
+        for (let block of classBlocks) {
+          const blockId = block.id.replace('block_', '');
+          const kelas = document.getElementById(`kelas_${blockId}`).value;
+          const jenisVaksinBias = document.getElementById(`jenis_vaksin_${blockId}`).value;
+          const sasL = parseInt(document.getElementById(`sasaran_l_${blockId}`).value) || 0;
+          const sasP = parseInt(document.getElementById(`sasaran_p_${blockId}`).value) || 0;
+          const capL = parseInt(document.getElementById(`capaian_l_${blockId}`).value) || 0;
+          const capP = parseInt(document.getElementById(`capaian_p_${blockId}`).value) || 0;
+          const doVal = parseInt(document.getElementById(`dropout_${blockId}`).value) || 0;
+          
+          const docId = `${tanggal}_${sekolah}_kls${kelas}_${jenisVaksinBias}`.replace(/[\s\/]/g, '_').toLowerCase();
+          await setDoc(doc(db, COL_BIAS, docId), {
+            sekolah, kelas, tanggal, jenis_vaksin: jenisVaksinBias,
+            data: { Sasaran_L: sasL, Sasaran_P: sasP, Capaian_L: capL, Capaian_P: capP, DropOut: doVal },
+            updated_at: new Date().toISOString()
+          }, { merge: true });
+        }
+        alert(`✅ Laporan BIAS ${sekolah} Disimpan ke Cloud!`);
+        e.target.reset(); onChangeSekolah();
+      } catch (err) { alert("❌ Error BIAS: " + err.message); }
+    }
+
+    async function exportDatabase() {
+      try {
+        const snap = await getDocs(collection(db, COL_KOHORT));
+        const backup = { register_imunisasi: [], date: new Date().toISOString() };
+        snap.forEach(d => backup.register_imunisasi.push(d.data()));
+        const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Backup_Kohort_Firebase_${new Date().toISOString().slice(0,10)}.json`; a.click();
+      } catch (err) { alert("Gagal Backup: " + err.message); }
+    }
+
+    async function startImport() {
+      const fileInput = document.getElementById('importFile'); const status = document.getElementById('importStatus');
+      if (!fileInput.files[0]) return alert("Pilih file CSV atau JSON!");
+      status.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Menyinkronkan file ke Cloud...`;
+
+      for (let i = 0; i < fileInput.files.length; i++) {
+        const file = fileInput.files[i];
+        const reader = new FileReader();
+
+        reader.onload = async (e) => {
+          try {
+            let count = 0;
+            if (file.name.endsWith('.json')) {
+              const json = JSON.parse(e.target.result);
+              if (json.register_imunisasi) {
+                for (let r of json.register_imunisasi) {
+                  const uniqueChildId = `${r.desa}_${r.nama_anak}_${r.tgl_lahir}`.replace(/[\s\/]/g, '_').toLowerCase();
+                  await setDoc(doc(db, COL_KOHORT, uniqueChildId), r, { merge: true }); count++;
+                }
+              }
+            } else if (file.name.endsWith('.csv')) {
+              const text = e.target.result;
+              const lines = text.split('\n');
+              for (let j = 1; j < lines.length; j++) {
+                if (!lines[j].trim() || lines[j].startsWith('"TOTAL_CAPAIAN_DOSIS"')) continue;
+                const cols = lines[j].split(';').map(c => c.replace(/"/g, '').trim());
+                if (cols.length >= 6) {
+                  const uniqueChildId = `${cols[0]}_${cols[2]}_${cols[3]}`.replace(/[\s\/]/g, '_').toLowerCase();
+                  const payload = {
+                    desa: cols[0], kegiatan: cols[1], nama_anak: cols[2], tgl_lahir: cols[3], jk: cols[4], nama_ibu: cols[5],
+                    updated_at: new Date().toISOString()
+                  };
+                  ALL_VAKSIN_KEYS.forEach((vKey, idx) => {
+                    if (cols[6 + idx] && cols[6 + idx] !== '-') {
+                      payload[`vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`] = cols[6 + idx];
+                    }
+                  });
+                  await setDoc(doc(db, COL_KOHORT, uniqueChildId), payload, { merge: true }); count++;
+                }
+              }
+            }
+            status.innerHTML = `<div class="alert-banner" style="background:#d1e7dd; color:#0f5132; border-color:#badbcc;">Berhasil sinkronisasi ${count} data kohort matriks ke Firebase Cloud!</div>`;
+            loadRecentTransactions();
+          } catch (err) { status.innerHTML = `<div class="alert-banner" style="background:#f8d7da; color:#842029; border-color:#f5c2c7;">Error Import: ${err.message}</div>`; }
+        };
+
+        reader.readAsText(file);
+      }
+    }
+  </script>
+</body>
+</html>

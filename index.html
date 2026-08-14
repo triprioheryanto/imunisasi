@@ -276,7 +276,7 @@
       <div class="alert-banner">
         <i class="fas fa-exclamation-triangle" style="font-size: 1.2rem;"></i>
         <div>
-          <strong>PENTING:</strong> Lakukan ekspor data jika tidak ada akses internet saat penginputan di lokasi kegiatan/desa.
+          <strong>PENTING:</strong> Menambah/mencentang dosis lanjutan (misal DPT3) akan <strong>otomatis melengkapi dosis sebelumnya dengan tanggal ideal</strong> berdasarkan tanggal lahir sasaran.
         </div>
       </div>
 
@@ -345,7 +345,7 @@
             </div>
 
             <div class="form-group">
-              <label>Tanggal Pelayanan <span class="req">*</span></label>
+              <label>Tanggal Pelayanan Dosis Terbaru <span class="req">*</span></label>
               <input type="date" id="reg_tgl_pelayanan" required>
             </div>
 
@@ -385,9 +385,9 @@
               <input type="text" id="reg_alamat" placeholder="Contoh: RT 02 / Dusun A" required>
             </div>
 
-            <!-- CHECKBOXES PILIHAN MULTI VAKSIN -->
+            <!-- CHECKBOXES PILIHAN MULTI VAKSIN DENGAN AUTOFILL INTELIGEN -->
             <div class="form-group full-width">
-              <label style="color:var(--primary); font-size:1.05rem;"><i class="fas fa-check-double"></i> Pilih Jenis Imunisasi Diberikan (Centang minimal 1) <span class="req">*</span></label>
+              <label style="color:var(--primary); font-size:1.05rem;"><i class="fas fa-check-double"></i> Pilih Jenis Imunisasi Diberikan (Auto-fill dosis sebelumnya) <span class="req">*</span></label>
               
               <div class="vaccine-selection-box">
                 <div class="vaccine-group-title"><i class="fas fa-baby"></i> Usia 0 - 12 Bulan (Imunisasi Dasar)</div>
@@ -604,7 +604,7 @@
         </div>
     </section>
 
-    <!-- TAB 5: CATCH UP (TERUS DITINGKATKAN KLINIS) -->
+    <!-- TAB 5: CATCH UP -->
     <section id="catchup" class="tab-panel" style="display:none">
       <div class="card" style="border-left: 5px solid var(--warning);">
         <h3 style="margin:0 0 8px 0; color:var(--accent);"><i class="fas fa-exclamation-triangle" style="color:var(--warning)"></i> Panel Analisis Imunisasi Kejar (Catch Up) & Risiko Drop Out</h3>
@@ -806,6 +806,75 @@
       "TT1 Bumil", "TT2 Bumil", "TT3 Bumil", "TT4 Bumil", "TT5 Bumil"
     ];
 
+    // DEFINISI URUTAN ANTIGEN SEJENIS & OFFSET BULAN IDEAL PEMBERIAN DARI TGL LAHIR
+    const SERIES_SEQUENCES = [
+      {
+        name: "DPT-HB-Hib",
+        items: [
+          { key: "DPT-HB-Hib1", offsetMonths: 2 },
+          { key: "DPT-HB-Hib2", offsetMonths: 3 },
+          { key: "DPT-HB-Hib3", offsetMonths: 4 },
+          { key: "DPT-HB-Hib4", offsetMonths: 18 }
+        ]
+      },
+      {
+        name: "OPV",
+        items: [
+          { key: "OPV1", offsetMonths: 1 },
+          { key: "OPV2", offsetMonths: 2 },
+          { key: "OPV3", offsetMonths: 3 },
+          { key: "OPV4", offsetMonths: 4 }
+        ]
+      },
+      {
+        name: "PCV",
+        items: [
+          { key: "PCV1", offsetMonths: 2 },
+          { key: "PCV2", offsetMonths: 3 },
+          { key: "PCV3", offsetMonths: 12 }
+        ]
+      },
+      {
+        name: "Rotavirus",
+        items: [
+          { key: "Rotavirus1", offsetMonths: 2 },
+          { key: "Rotavirus2", offsetMonths: 3 },
+          { key: "Rotavirus3", offsetMonths: 4 }
+        ]
+      },
+      {
+        name: "IPV",
+        items: [
+          { key: "IPV1", offsetMonths: 4 },
+          { key: "IPV2", offsetMonths: 9 }
+        ]
+      },
+      {
+        name: "Campak Rubela",
+        items: [
+          { key: "Campak Rubela-1", offsetMonths: 9 },
+          { key: "Campak Rubela-2", offsetMonths: 18 }
+        ]
+      },
+      {
+        name: "TT Catin",
+        items: [
+          { key: "TT1 Catin", offsetMonths: 0 },
+          { key: "TT2 Catin", offsetMonths: 1 }
+        ]
+      },
+      {
+        name: "TT Bumil",
+        items: [
+          { key: "TT1 Bumil", offsetMonths: 0 },
+          { key: "TT2 Bumil", offsetMonths: 1 },
+          { key: "TT3 Bumil", offsetMonths: 6 },
+          { key: "TT4 Bumil", offsetMonths: 12 },
+          { key: "TT5 Bumil", offsetMonths: 24 }
+        ]
+      }
+    ];
+
     const SCHOOL_DATA = {
         'SD NEGERI MELATA': 'SD', 'SD NEGERI NANUAH': 'SD', 'SD NEGERI TOPALAN': 'SD', 
         'SD NEGERI BATU AMPAR': 'SD', 'SD NEGERI LUBUK HIJU': 'SD', 'SD NEGERI BUKIT MAKMUR': 'SD',
@@ -839,6 +908,14 @@
       const birth = new Date(tglLahir);
       const now = new Date();
       return (now.getFullYear() - birth.getFullYear()) * 12 + (now.getMonth() - birth.getMonth());
+    }
+
+    // HITUNG TANGGAL IDEAL SESUAI USIA PEMBERIAN VAKSIN (DARI TGL LAHIR)
+    function calculateIdealVaccineDate(tglLahirStr, offsetMonths) {
+      if (!tglLahirStr) return new Date().toISOString().split('T')[0];
+      const d = new Date(tglLahirStr);
+      d.setMonth(d.getMonth() + offsetMonths);
+      return d.toISOString().split('T')[0];
     }
 
     function initUserAuthCheck() {
@@ -892,6 +969,9 @@
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('reg_tgl_pelayanan').value = today;
 
+      // ATUR EVENT LISTENER AUTOFILL SAAT CHECKBOX VAKSIN DICENTANG
+      setupVaccineAutoFillListeners();
+
       document.getElementById('formRegisterIndividu').addEventListener('submit', handleSaveKohortMatrix);
       document.getElementById('biasForm').addEventListener('submit', handleSaveBias);
       document.getElementById('sekolah').addEventListener('change', onChangeSekolah);
@@ -924,6 +1004,32 @@
       initBiasDropdowns();
       loadRecentTransactions();
     });
+
+    // LOGIKA AUTOFILL CHECKBOX ANTIGEN SEJENIS
+    function setupVaccineAutoFillListeners() {
+      const checkboxes = document.querySelectorAll('input[name="chk_vaksin"]');
+      checkboxes.forEach(cb => {
+        cb.addEventListener('change', (e) => {
+          if (e.target.checked) {
+            const selectedVal = e.target.value;
+            // Cari seri Mana
+            SERIES_SEQUENCES.forEach(series => {
+              const idx = series.items.findIndex(item => item.key === selectedVal);
+              if (idx > 0) {
+                // Centang otomatis semua item di bawahnya (dosis lebih rendah)
+                for (let i = 0; i < idx; i++) {
+                  const prevKey = series.items[i].key;
+                  const prevCb = document.querySelector(`input[name="chk_vaksin"][value="${prevKey}"]`);
+                  if (prevCb && !prevCb.checked) {
+                    prevCb.checked = true;
+                  }
+                }
+              }
+            });
+          }
+        });
+      });
+    }
 
     async function populateAnakByDesa() {
       const desaSel = document.getElementById('search_desa_anak').value;
@@ -978,6 +1084,13 @@
         document.getElementById('reg_nik_ibu').value = data.nik_ibu !== "-" ? data.nik_ibu : "";
         document.getElementById('reg_alamat').value = data.alamat_rt || "";
         
+        // Centang ulang vaksin yang sudah tersimpan
+        document.querySelectorAll('input[name="chk_vaksin"]').forEach(cb => {
+          const fieldKey = `vaksin_${cb.value.replace(/[\s\(\)<>-]/g, '_')}`;
+          if (data[fieldKey]) cb.checked = true;
+          else cb.checked = false;
+        });
+
         loadRecentTransactions();
       } catch (e) { console.error(e); }
     }
@@ -995,7 +1108,7 @@
         return alert("⚠️ Mohon centang minimal 1 jenis imunisasi!");
       }
 
-      const tglPelayanan = document.getElementById('reg_tgl_pelayanan').value;
+      const tglPelayananInput = document.getElementById('reg_tgl_pelayanan').value;
       const tglLahir = document.getElementById('reg_tgl_lahir').value;
       const namaAnak = document.getElementById('reg_nama_anak').value.trim();
       const desa = document.getElementById('reg_desa').value;
@@ -1003,9 +1116,39 @@
 
       const uniqueChildId = `${desa}_${namaAnak}_${tglLahir}`.replace(/[\s\/]/g, '_').toLowerCase();
 
+      // PEMBUATAN PAYLOAD VAKSIN DENGAN TANGGAL IDEAL JIKA TERKECENTANG OTOMATIS
       const vaccineDataUpdate = {};
+
       selectedVaccines.forEach(v => {
-        vaccineDataUpdate[`vaksin_${v.replace(/[\s\(\)<>-]/g, '_')}`] = tglPelayanan;
+        let isLowerSeriesDose = false;
+        let idealOffsetMonths = 0;
+
+        // Cek apakah ini dosis berantai/sejenis
+        SERIES_SEQUENCES.forEach(series => {
+          const idx = series.items.findIndex(item => item.key === v);
+          if (idx !== -1) {
+            // Dapatkan dosis tertinggi yang dicentang di seri ini
+            let maxCheckedIdx = -1;
+            series.items.forEach((item, i) => {
+              if (selectedVaccines.includes(item.key)) maxCheckedIdx = i;
+            });
+
+            if (idx < maxCheckedIdx) {
+              isLowerSeriesDose = true;
+              idealOffsetMonths = series.items[idx].offsetMonths;
+            }
+          }
+        });
+
+        const fieldKey = `vaksin_${v.replace(/[\s\(\)<>-]/g, '_')}`;
+
+        if (isLowerSeriesDose) {
+          // Isi dengan tanggal ideal berdasarkan tanggal lahir
+          vaccineDataUpdate[fieldKey] = calculateIdealVaccineDate(tglLahir, idealOffsetMonths);
+        } else {
+          // Dosis tertinggi yang dicentang diisi dengan tanggal pelayanan terkini
+          vaccineDataUpdate[fieldKey] = tglPelayananInput;
+        }
       });
 
       const nowTimestamp = new Date().toLocaleString('id-ID');
@@ -1013,9 +1156,9 @@
       const payload = {
         desa: desa,
         kegiatan: document.getElementById('reg_kegiatan').value,
-        tanggal_pelayanan: tglPelayanan,
-        bulan_tahun: tglPelayanan.substring(0, 7),
-        tahun: tglPelayanan.substring(0, 4),
+        tanggal_pelayanan: tglPelayananInput,
+        bulan_tahun: tglPelayananInput.substring(0, 7),
+        tahun: tglPelayananInput.substring(0, 4),
         nama_anak: namaAnak,
         tgl_lahir: tglLahir,
         jk: document.getElementById('reg_jk').value,
@@ -1023,13 +1166,13 @@
         nama_ibu: document.getElementById('reg_nama_ibu').value,
         nik_ibu: document.getElementById('reg_nik_ibu').value || "-",
         alamat_rt: document.getElementById('reg_alamat').value,
-        kelompok_usia: getKelompokUsia(tglLahir, tglPelayanan),
+        kelompok_usia: getKelompokUsia(tglLahir, tglPelayananInput),
         updated_at: new Date().toISOString(),
         last_updated_by: activePetugasName,
         audit_log: arrayUnion({
           waktu: nowTimestamp,
           petugas: activePetugasName,
-          aksi: "Input/Update Dosis: " + selectedVaccines.join(', ')
+          aksi: "Input/Update Dosis dengan Auto-fill: " + selectedVaccines.join(', ')
         }),
         ...vaccineDataUpdate
       };
@@ -1037,7 +1180,7 @@
       try {
         await setDoc(doc(db, COL_KOHORT, uniqueChildId), payload, { merge: true });
 
-        alert(`✅ Matriks Kohort ${namaAnak} berhasil diperbarui oleh Petugas: ${activePetugasName}!`);
+        alert(`✅ Matriks Kohort ${namaAnak} berhasil diperbarui (termasuk autofill dosis sebelumnya)!`);
         
         document.querySelectorAll('input[name="chk_vaksin"]:checked').forEach(cb => cb.checked = false);
         document.getElementById('reg_nama_anak').value = "";
@@ -1123,7 +1266,7 @@
       }
     };
 
-    // FUNGSIONALITAS UTAMA KLINIS CATCH UP
+    // ANALISIS CATCH UP
     async function loadCatchUpAnalysis() {
       const desaSel = document.getElementById('catchup_filter_desa').value;
       const today = new Date();
@@ -1156,18 +1299,11 @@
             }
           }
 
-          // 2. ANTIGEN BERKESINAMBUNGAN (DPT1-3, OPV1-4, RV1-3, PCV1-3) & RISK DROP OUT (2 BULAN)
-          const seriesGroup = [
-            { name: "DPT-HB-Hib", items: ["DPT-HB-Hib1", "DPT-HB-Hib2", "DPT-HB-Hib3"] },
-            { name: "OPV", items: ["OPV1", "OPV2", "OPV3", "OPV4"] },
-            { name: "PCV", items: ["PCV1", "PCV2", "PCV3"] },
-            { name: "Rotavirus", items: ["Rotavirus1", "Rotavirus2", "Rotavirus3"] }
-          ];
-
-          seriesGroup.forEach(group => {
+          // 2. ANTIGEN BERKESINAMBUNGAN
+          SERIES_SEQUENCES.forEach(group => {
             for (let i = 0; i < group.items.length - 1; i++) {
-              const currentVal = getVal(group.items[i]);
-              const nextVal = getVal(group.items[i+1]);
+              const currentVal = getVal(group.items[i].key);
+              const nextVal = getVal(group.items[i+1].key);
 
               if (currentVal && !nextVal) {
                 const currentDate = new Date(currentVal);
@@ -1178,8 +1314,8 @@
                   listBerkesinambungan.push({
                     ...d,
                     ageMonths,
-                    antigen: group.items[i+1],
-                    lastDose: group.items[i],
+                    antigen: group.items[i+1].key,
+                    lastDose: group.items[i].key,
                     lastDate: currentVal,
                     delayMonths: diffMonths,
                     status: diffMonths >= 4 ? "Drop Out (Harus Catch Up)" : "Terancam Drop Out (≥2 Bulan)"
@@ -1189,12 +1325,10 @@
             }
           });
 
-          // 3. BADUTA > 24 BULAN (DPT4 & MR2)
+          // 3. BADUTA > 24 BULAN
           if (ageMonths >= 18) {
-            const dpt3Val = getVal("DPT-HB-Hib3");
-            const dpt4Val = getVal("DPT-HB-Hib4");
-            const mr1Val = getVal("Campak Rubela-1");
-            const mr2Val = getVal("Campak Rubela-2");
+            const dpt3Val = getVal("DPT-HB-Hib3"), dpt4Val = getVal("DPT-HB-Hib4");
+            const mr1Val = getVal("Campak Rubela-1"), mr2Val = getVal("Campak Rubela-2");
 
             let statusBaduta = [];
             let urgentFlag = false;
@@ -1243,7 +1377,6 @@
           }
         });
 
-        // RENDER PANEL 1 (BAYI < 1 TAHUN)
         p1.innerHTML = listBayi.length === 0 ? '<p class="muted" style="text-align:center;">Semua bayi < 1 tahun terimunisasi dasar lengkap.</p>' : `
           <table class="kohort-table">
             <thead><tr><th>Nama Sasaran</th><th>Usia</th><th>Desa</th><th>Alamat</th><th>Orang Tua</th><th>Vaksin Belum Diberikan</th></tr></thead>
@@ -1251,7 +1384,6 @@
           </table>
         `;
 
-        // RENDER PANEL 2 (BERKESINAMBUNGAN)
         p2.innerHTML = listBerkesinambungan.length === 0 ? '<p class="muted" style="text-align:center;">Tidak ada risiko drop out antigen berkesinambungan.</p>' : `
           <table class="kohort-table">
             <thead><tr><th>Nama Sasaran</th><th>Usia</th><th>Desa</th><th>Dosis Terakhir</th><th>Tgl Dosis Terakhir</th><th>Target Dosis Berikutnya</th><th>Status Risiko</th></tr></thead>
@@ -1259,7 +1391,6 @@
           </table>
         `;
 
-        // RENDER PANEL 3 (BADUTA > 24 BULAN)
         p3.innerHTML = listBaduta.length === 0 ? '<p class="muted" style="text-align:center;">Seluruh baduta telah menerima DPT4 & MR2 tepat waktu.</p>' : `
           <table class="kohort-table">
             <thead><tr><th>Nama Sasaran</th><th>Usia</th><th>Desa</th><th>Orang Tua</th><th>Target Booster</th><th>Penanda Tindakan</th></tr></thead>
@@ -1267,7 +1398,6 @@
           </table>
         `;
 
-        // RENDER PANEL 4 (CATIN & BUMIL)
         p4.innerHTML = listDewasa.length === 0 ? '<p class="muted" style="text-align:center;">Semua sasaran Catin & Ibu Hamil berstatus Td Lengkap.</p>' : `
           <table class="kohort-table">
             <thead><tr><th>Nama Sasaran</th><th>Kategori</th><th>Desa</th><th>Alamat</th><th>Pasangan/Suami</th><th>Status Perlindungan Td</th></tr></thead>
@@ -1287,7 +1417,6 @@
         ];
 
         let idx = 1;
-        const today = new Date();
 
         snap.forEach(doc => {
           const d = doc.data();
@@ -1690,7 +1819,7 @@
             }
             status.innerHTML = `<div class="alert-banner" style="background:#d1e7dd; color:#0f5132; border-color:#badbcc;">Berhasil sinkronisasi ${count} data kohort matriks ke Firebase Cloud!</div>`;
             loadRecentTransactions();
-          } catch (err) { status.innerHTML = `<div class="alert-banner" style="background:#f8d7da; color:#842029; border-color:#f5c2c7;">Error Import: ${err.message}</div>`; }
+          } catch (err) { status.innerHTML = `<div class="alert-banner" style="background:#f8f9fa; color:#842029; border-color:#f5c2c7;">Error Import: ${err.message}</div>`; }
         };
 
         reader.readAsText(file);

@@ -8,7 +8,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   
-  <!-- SHEETJS UNTUK GENERATE EXCEL (.XLSX) 2 SHEET CLIENT-SIDE -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <style>
@@ -169,6 +168,14 @@
 
     .badge-user {
       background: #e2e8f0; color: var(--accent); padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;
+    }
+
+    .badge-urgent {
+      background: #f8d7da; color: #842029; border: 1px solid #f5c2c7; font-weight: 700; padding: 3px 8px; border-radius: 4px; font-size: 0.78rem; display: inline-block;
+    }
+
+    .badge-warning-custom {
+      background: #fff3cd; color: #856404; border: 1px solid #ffeeba; font-weight: 700; padding: 3px 8px; border-radius: 4px; font-size: 0.78rem; display: inline-block;
     }
 
     .actions { display: flex; gap: 10px; justify-content: flex-end; align-items: center; margin-top: 16px; flex-wrap: wrap; }
@@ -597,22 +604,22 @@
         </div>
     </section>
 
-    <!-- TAB 5: CATCH UP & ANALISIS DROP OUT (BARU) -->
+    <!-- TAB 5: CATCH UP (TERUS DITINGKATKAN KLINIS) -->
     <section id="catchup" class="tab-panel" style="display:none">
       <div class="card" style="border-left: 5px solid var(--warning);">
-        <h3 style="margin:0 0 8px 0; color:var(--accent);"><i class="fas fa-exclamation-circle" style="color:var(--warning)"></i> Catch Up & Analisis Risiko Drop Out (Kriteria WHO)</h3>
-        <p class="lead" style="margin-bottom:0;">Menampilkan sasaran anak/bayi yang <strong>2 bulan berturut-turut tidak mengikuti imunisasi lanjutan</strong> (terancam Drop Out) atau yang <strong>berusia ≥ 12 bulan (1 tahun) tetapi belum melengkapi Imunisasi Dasar Lengkap (IDL)</strong>.</p>
+        <h3 style="margin:0 0 8px 0; color:var(--accent);"><i class="fas fa-exclamation-triangle" style="color:var(--warning)"></i> Panel Analisis Imunisasi Kejar (Catch Up) & Risiko Drop Out</h3>
+        <p class="lead" style="margin-bottom:0;">Panel tersegregasi secara klinis untuk memantau bayi &lt;1 tahun, dosis berkelanjutan DPT/OPV/RV/PCV, booster baduta &gt;24 bulan, serta kelompok Catin dan Ibu Hamil.</p>
       </div>
 
       <div class="card">
-        <h3><div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-          <span><i class="fas fa-filter"></i> Filter Sasaran Catch Up</span>
-          <button class="btn btn-success" id="btnDownloadCatchUpExcel" style="font-size:0.85rem;"><i class="fas fa-file-excel"></i> Export List Catch Up (.xlsx)</button>
-        </div></h3>
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <h3><i class="fas fa-filter"></i> Filter Wilayah & Ekspor</h3>
+          <button class="btn btn-success" id="btnDownloadCatchUpExcel" style="font-size:0.85rem;"><i class="fas fa-file-excel"></i> Download Laporan Catch Up (.xlsx)</button>
+        </div>
 
-        <div class="grid">
+        <div class="grid" style="margin-top:10px;">
           <div class="form-group full-width">
-            <label>Pilih Desa</label>
+            <label>Pilih Desa / Kelurahan</label>
             <select id="catchup_filter_desa">
               <option value="ALL">-- Semua Desa --</option>
               <option value="Melata">Melata</option>
@@ -633,14 +640,43 @@
         </div>
 
         <div class="actions">
-          <button class="btn btn-primary" id="btnApplyCatchUp"><i class="fas fa-search"></i> Analisis & Tampilkan Data Catch Up</button>
+          <button class="btn btn-primary" id="btnApplyCatchUp"><i class="fas fa-calculator"></i> Analisis Data Catch Up Spesifik</button>
         </div>
       </div>
 
+      <!-- PANEL 1: BAYI < 1 TAHUN -->
       <div class="card">
-        <h3><i class="fas fa-list-check"></i> Daftar Anak Memerlukan Imunisasi Kejar (Catch Up)</h3>
-        <div id="catchUpContainer" class="table-container">
-          <p class="muted" style="text-align:center; padding:20px;"><i class="fas fa-arrow-up"></i> Klik tombol <strong>Analisis & Tampilkan Data Catch Up</strong> di atas untuk melihat daftar sasaran.</p>
+        <h3 style="color:var(--accent);"><i class="fas fa-baby"></i> 1. Catch Up Usia &lt; 1 Tahun (Bayi)</h3>
+        <p class="lead" style="font-size:0.85rem;">Target: HBO, BCG, DPT1-3, OPV1-4, IPV1-2, MR1.</p>
+        <div id="panel_bayi_container" class="table-container">
+          <p class="muted" style="text-align:center; padding:15px;"><i class="fas fa-arrow-up"></i> Klik tombol Analisis di atas untuk memuat data.</p>
+        </div>
+      </div>
+
+      <!-- PANEL 2: VAKSIN BERKESINAMBUNGAN & DROP OUT (2 BULAN) -->
+      <div class="card">
+        <h3 style="color:#856404;"><i class="fas fa-link"></i> 2. Panel Risiko Drop Out & Catch Up Antigen Berkesinambungan</h3>
+        <p class="lead" style="font-size:0.85rem;">Menganalisis DPT1-3, OPV1-4, RV1-3, PCV1-3 dengan jeda ≥ 2 bulan berturut-turut.</p>
+        <div id="panel_berkesinambungan_container" class="table-container">
+          <p class="muted" style="text-align:center; padding:15px;"><i class="fas fa-arrow-up"></i> Klik tombol Analisis di atas untuk memuat data.</p>
+        </div>
+      </div>
+
+      <!-- PANEL 3: USIA > 24 BULAN (BADUTA BOOSTER DPT4 & MR2) -->
+      <div class="card">
+        <h3 style="color:var(--primary);"><i class="fas fa-child"></i> 3. Catch Up Usia &gt; 24 Bulan (Booster Baduta DPT4 & MR2)</h3>
+        <p class="lead" style="font-size:0.85rem;">Target: DPT4 (1 tahun pasca DPT3) & MR2 (1 tahun pasca MR1) di rentang 18-24 bulan. Bila terlewat, masuk penanda harus segera diberikan.</p>
+        <div id="panel_baduta_container" class="table-container">
+          <p class="muted" style="text-align:center; padding:15px;"><i class="fas fa-arrow-up"></i> Klik tombol Analisis di atas untuk memuat data.</p>
+        </div>
+      </div>
+
+      <!-- PANEL 4: CATIN & IBU HAMIL -->
+      <div class="card">
+        <h3 style="color:#0f5132;"><i class="fas fa-female"></i> 4. Catch Up Td Calon Pengantin (Catin) & Td Ibu Hamil</h3>
+        <p class="lead" style="font-size:0.85rem;">Sasaran Catin & Bumil yang menunggak dosis status Td (TT1 - TT5).</p>
+        <div id="panel_dewasa_container" class="table-container">
+          <p class="muted" style="text-align:center; padding:15px;"><i class="fas fa-arrow-up"></i> Klik tombol Analisis di atas untuk memuat data.</p>
         </div>
       </div>
     </section>
@@ -768,12 +804,6 @@
       "Campak Rubela-1", "IPV2", "JE", "PCV3", "DPT-HB-Hib4", "Campak Rubela-2",
       "TT1 Catin", "TT2 Catin",
       "TT1 Bumil", "TT2 Bumil", "TT3 Bumil", "TT4 Bumil", "TT5 Bumil"
-    ];
-
-    const BASIC_VAKSIN_KEYS = [
-      "HBO (<24 Jam)", "HBO (1-7 Hari)", "BCG", "OPV1", "DPT-HB-Hib1", "OPV2", "PCV1", "Rotavirus1",
-      "DPT-HB-Hib2", "OPV3", "PCV2", "Rotavirus2", "DPT-HB-Hib3", "OPV4", "IPV1", "Rotavirus3",
-      "Campak Rubela-1", "IPV2", "JE"
     ];
 
     const SCHOOL_DATA = {
@@ -1093,16 +1123,21 @@
       }
     };
 
-    // LOGIKA CATCH UP & ANALISIS DROP OUT (WHO)
+    // FUNGSIONALITAS UTAMA KLINIS CATCH UP
     async function loadCatchUpAnalysis() {
       const desaSel = document.getElementById('catchup_filter_desa').value;
-      const container = document.getElementById('catchUpContainer');
-      container.innerHTML = '<p class="muted" style="text-align:center; padding:20px;"><i class="fas fa-spinner fa-spin"></i> Menganalisis data imunisasi & kriteria drop out...</p>';
+      const today = new Date();
+
+      const p1 = document.getElementById('panel_bayi_container');
+      const p2 = document.getElementById('panel_berkesinambungan_container');
+      const p3 = document.getElementById('panel_baduta_container');
+      const p4 = document.getElementById('panel_dewasa_container');
+
+      [p1, p2, p3, p4].forEach(p => p.innerHTML = '<p class="muted" style="text-align:center; padding:15px;"><i class="fas fa-spinner fa-spin"></i> Menganalisis data...</p>');
 
       try {
         const snap = await getDocs(collection(db, COL_KOHORT));
-        let catchUpList = [];
-        const today = new Date();
+        let listBayi = [], listBerkesinambungan = [], listBaduta = [], listDewasa = [];
 
         snap.forEach(doc => {
           const d = doc.data();
@@ -1110,103 +1145,137 @@
           if (!matchDesa) return;
 
           const ageMonths = getAgeInMonths(d.tgl_lahir);
-          
-          let givenVaccineDates = [];
-          let missingBasicVaccines = [];
+          const getVal = (vk) => d[`vaksin_${vk.replace(/[\s\(\)<>-]/g, '_')}`] || (d.jenis_imunisasi === vk ? d.tanggal_pelayanan : null);
 
-          ALL_VAKSIN_KEYS.forEach(vKey => {
-            const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
-            const val = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
-            if (val) {
-              givenVaccineDates.push(new Date(val));
-            } else if (BASIC_VAKSIN_KEYS.includes(vKey)) {
-              missingBasicVaccines.push(vKey);
+          // 1. CATCH UP USIA < 1 TAHUN (BAYI)
+          if (ageMonths < 12) {
+            const targetBayi = ["HBO (<24 Jam)", "BCG", "OPV1", "OPV2", "OPV3", "OPV4", "DPT-HB-Hib1", "DPT-HB-Hib2", "DPT-HB-Hib3", "IPV1", "Campak Rubela-1"];
+            let missingBayi = targetBayi.filter(v => !getVal(v));
+            if (missingBayi.length > 0) {
+              listBayi.push({ ...d, ageMonths, missing: missingBayi });
+            }
+          }
+
+          // 2. ANTIGEN BERKESINAMBUNGAN (DPT1-3, OPV1-4, RV1-3, PCV1-3) & RISK DROP OUT (2 BULAN)
+          const seriesGroup = [
+            { name: "DPT-HB-Hib", items: ["DPT-HB-Hib1", "DPT-HB-Hib2", "DPT-HB-Hib3"] },
+            { name: "OPV", items: ["OPV1", "OPV2", "OPV3", "OPV4"] },
+            { name: "PCV", items: ["PCV1", "PCV2", "PCV3"] },
+            { name: "Rotavirus", items: ["Rotavirus1", "Rotavirus2", "Rotavirus3"] }
+          ];
+
+          seriesGroup.forEach(group => {
+            for (let i = 0; i < group.items.length - 1; i++) {
+              const currentVal = getVal(group.items[i]);
+              const nextVal = getVal(group.items[i+1]);
+
+              if (currentVal && !nextVal) {
+                const currentDate = new Date(currentVal);
+                const diffDays = Math.floor((today - currentDate) / (1000 * 60 * 60 * 24));
+                const diffMonths = Math.floor(diffDays / 30);
+
+                if (diffMonths >= 2) {
+                  listBerkesinambungan.push({
+                    ...d,
+                    ageMonths,
+                    antigen: group.items[i+1],
+                    lastDose: group.items[i],
+                    lastDate: currentVal,
+                    delayMonths: diffMonths,
+                    status: diffMonths >= 4 ? "Drop Out (Harus Catch Up)" : "Terancam Drop Out (≥2 Bulan)"
+                  });
+                }
+              }
             }
           });
 
-          let isDropOutRisk = false;
-          let isUnfinishedIDL = false;
-          let lastVaccineDateStr = "-";
+          // 3. BADUTA > 24 BULAN (DPT4 & MR2)
+          if (ageMonths >= 18) {
+            const dpt3Val = getVal("DPT-HB-Hib3");
+            const dpt4Val = getVal("DPT-HB-Hib4");
+            const mr1Val = getVal("Campak Rubela-1");
+            const mr2Val = getVal("Campak Rubela-2");
 
-          if (givenVaccineDates.length > 0) {
-            givenVaccineDates.sort((a,b) => b - a);
-            const lastDate = givenVaccineDates[0];
-            lastVaccineDateStr = lastDate.toISOString().split('T')[0];
-            
-            const diffDays = Math.floor((today - lastDate) / (1000 * 60 * 60 * 24));
-            if (diffDays >= 60 && missingBasicVaccines.length > 0) {
-              isDropOutRisk = true;
+            let statusBaduta = [];
+            let urgentFlag = false;
+
+            if (dpt3Val && !dpt4Val) {
+              const d3Date = new Date(dpt3Val);
+              const diffDpt3 = Math.floor((today - d3Date) / (1000 * 60 * 60 * 24 * 30));
+              if (diffDpt3 >= 12 || ageMonths > 24) {
+                statusBaduta.push("Menunggak DPT4");
+                if (ageMonths > 24) urgentFlag = true;
+              }
             }
-          } else if (ageMonths >= 2) {
-            isDropOutRisk = true;
+
+            if (mr1Val && !mr2Val) {
+              const mr1Date = new Date(mr1Val);
+              const diffMr1 = Math.floor((today - mr1Date) / (1000 * 60 * 60 * 24 * 30));
+              if (diffMr1 >= 12 || ageMonths > 24) {
+                statusBaduta.push("Menunggak MR2");
+                if (ageMonths > 24) urgentFlag = true;
+              }
+            }
+
+            if (statusBaduta.length > 0) {
+              listBaduta.push({
+                ...d,
+                ageMonths,
+                needs: statusBaduta.join(" & "),
+                urgent: urgentFlag ? "HARUS SEGERA DIBERIKAN (TERLEWAT >24 BLN)" : "Waktunya Booster (18-24 Bln)"
+              });
+            }
           }
 
-          if (ageMonths >= 12 && missingBasicVaccines.length > 0) {
-            isUnfinishedIDL = true;
-          }
+          // 4. CATIN & IBU HAMIL (TD)
+          const ttCatin1 = getVal("TT1 Catin"), ttCatin2 = getVal("TT2 Catin");
+          const ttBumil1 = getVal("TT1 Bumil"), ttBumil5 = getVal("TT5 Bumil");
 
-          if (isDropOutRisk || isUnfinishedIDL) {
-            catchUpList.push({
+          let catinAlert = (ttCatin1 && !ttCatin2) ? "Menunggak TT2 Catin" : "";
+          let bumilAlert = (ttBumil1 && !ttBumil5) ? "Status Td Belum Lengkap (TT5)" : "";
+
+          if (catinAlert || bumilAlert) {
+            listDewasa.push({
               ...d,
-              ageMonths,
-              lastVaccineDateStr,
-              missingBasicVaccines,
-              isDropOutRisk,
-              isUnfinishedIDL
+              kategori: catinAlert ? "Catin" : "Ibu Hamil",
+              statusTd: catinAlert || bumilAlert
             });
           }
         });
 
-        if (catchUpList.length === 0) {
-          container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--success); font-weight:700;"><i class="fas fa-check-circle" style="font-size:2rem; margin-bottom:8px; display:block;"></i> Sempurna! Tidak ditemukan sasaran yang terancam Drop Out atau menunggak imunisasi di desa ini.</div>`;
-          return;
-        }
-
-        let rowsHtml = '';
-        catchUpList.forEach((d, idx) => {
-          let statusBadge = '';
-          if (d.isDropOutRisk) statusBadge += `<span style="background:#fff3cd; color:#856404; padding:3px 6px; border-radius:4px; font-size:0.75rem; font-weight:bold; margin-right:4px;">≥2 Bkn Drop</span>`;
-          if (d.isUnfinishedIDL) statusBadge += `<span style="background:#f8d7da; color:#842029; padding:3px 6px; border-radius:4px; font-size:0.75rem; font-weight:bold;">Belum IDL (≥12Bln)</span>`;
-
-          rowsHtml += `
-            <tr>
-              <td>${idx + 1}</td>
-              <td style="text-align:left; font-weight:700; color:var(--accent);">${d.nama_anak}</td>
-              <td>${d.tgl_lahir || '-'} (${d.ageMonths} Bln)</td>
-              <td>${d.nama_ibu || '-'}</td>
-              <td>${d.desa || '-'}</td>
-              <td>${d.alamat_rt || '-'}</td>
-              <td>${statusBadge}</td>
-              <td>${d.lastVaccineDateStr}</td>
-              <td style="text-align:left; color:var(--danger); font-size:0.78rem; font-weight:600;">${d.missingBasicVaccines.join(', ')}</td>
-            </tr>
-          `;
-        });
-
-        container.innerHTML = `
-          <div style="margin-bottom:12px; background:#fff8e6; padding:10px 12px; border-radius:8px; border:1px solid #ffe8a1; font-size:0.85rem; color:#856404;">
-            <i class="fas fa-exclamation-triangle"></i> Ditemukan <strong>${catchUpList.length} Sasaran</strong> yang memerlukan imunisasi kejar / tindakan tindak lanjut pelayanan.
-          </div>
+        // RENDER PANEL 1 (BAYI < 1 TAHUN)
+        p1.innerHTML = listBayi.length === 0 ? '<p class="muted" style="text-align:center;">Semua bayi < 1 tahun terimunisasi dasar lengkap.</p>' : `
           <table class="kohort-table">
-            <thead>
-              <tr>
-                <th>No</th>
-                <th>Nama Sasaran</th>
-                <th>Tgl Lahir (Usia)</th>
-                <th>Orang Tua / Suami</th>
-                <th>Desa</th>
-                <th>Alamat</th>
-                <th>Kriteria Catch Up</th>
-                <th>Tgl Vaksin Terakhir</th>
-                <th>Vaksin Menunggak / Belum Diberikan</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${rowsHtml}
-            </tbody>
+            <thead><tr><th>Nama Sasaran</th><th>Usia</th><th>Desa</th><th>Alamat</th><th>Orang Tua</th><th>Vaksin Belum Diberikan</th></tr></thead>
+            <tbody>${listBayi.map(b => `<tr><td style="font-weight:700;">${b.nama_anak}</td><td>${b.ageMonths} Bln</td><td>${b.desa}</td><td>${b.alamat_rt}</td><td>${b.nama_ibu}</td><td style="color:var(--danger); font-weight:700;">${b.missing.join(', ')}</td></tr>`).join('')}</tbody>
           </table>
         `;
-      } catch (err) { container.innerHTML = `<p style="color:red; text-align:center;">Error: ${err.message}</p>`; }
+
+        // RENDER PANEL 2 (BERKESINAMBUNGAN)
+        p2.innerHTML = listBerkesinambungan.length === 0 ? '<p class="muted" style="text-align:center;">Tidak ada risiko drop out antigen berkesinambungan.</p>' : `
+          <table class="kohort-table">
+            <thead><tr><th>Nama Sasaran</th><th>Usia</th><th>Desa</th><th>Dosis Terakhir</th><th>Tgl Dosis Terakhir</th><th>Target Dosis Berikutnya</th><th>Status Risiko</th></tr></thead>
+            <tbody>${listBerkesinambungan.map(b => `<tr><td style="font-weight:700;">${b.nama_anak}</td><td>${b.ageMonths} Bln</td><td>${b.desa}</td><td>${b.lastDose}</td><td>${b.lastDate}</td><td style="color:var(--primary); font-weight:700;">${b.antigen}</td><td><span class="${b.status.includes('Drop Out') ? 'badge-urgent' : 'badge-warning-custom'}">${b.status} (${b.delayMonths} Bln)</span></td></tr>`).join('')}</tbody>
+          </table>
+        `;
+
+        // RENDER PANEL 3 (BADUTA > 24 BULAN)
+        p3.innerHTML = listBaduta.length === 0 ? '<p class="muted" style="text-align:center;">Seluruh baduta telah menerima DPT4 & MR2 tepat waktu.</p>' : `
+          <table class="kohort-table">
+            <thead><tr><th>Nama Sasaran</th><th>Usia</th><th>Desa</th><th>Orang Tua</th><th>Target Booster</th><th>Penanda Tindakan</th></tr></thead>
+            <tbody>${listBaduta.map(b => `<tr><td style="font-weight:700;">${b.nama_anak}</td><td>${b.ageMonths} Bln</td><td>${b.desa}</td><td>${b.nama_ibu}</td><td style="font-weight:700; color:var(--accent);">${b.needs}</td><td><span class="${b.urgent.includes('HARUS SEGERA') ? 'badge-urgent' : 'badge-warning-custom'}">${b.urgent}</span></td></tr>`).join('')}</tbody>
+          </table>
+        `;
+
+        // RENDER PANEL 4 (CATIN & BUMIL)
+        p4.innerHTML = listDewasa.length === 0 ? '<p class="muted" style="text-align:center;">Semua sasaran Catin & Ibu Hamil berstatus Td Lengkap.</p>' : `
+          <table class="kohort-table">
+            <thead><tr><th>Nama Sasaran</th><th>Kategori</th><th>Desa</th><th>Alamat</th><th>Pasangan/Suami</th><th>Status Perlindungan Td</th></tr></thead>
+            <tbody>${listDewasa.map(b => `<tr><td style="font-weight:700;">${b.nama_anak}</td><td>${b.kategori}</td><td>${b.desa}</td><td>${b.alamat_rt}</td><td>${b.nama_ibu}</td><td style="color:var(--danger); font-weight:700;">${b.statusTd}</td></tr>`).join('')}</tbody>
+          </table>
+        `;
+
+      } catch (err) { alert("Error Catch Up: " + err.message); }
     }
 
     async function downloadCatchUpExcel() {
@@ -1214,7 +1283,7 @@
       try {
         const snap = await getDocs(collection(db, COL_KOHORT));
         const excelData = [
-          ["No", "Desa", "Nama Sasaran", "Tanggal Lahir", "Usia (Bulan)", "Orang Tua / Suami", "Alamat / RT", "Kriteria Status", "Tgl Imunisasi Terakhir", "Daftar Vaksin Belum Diberikan"]
+          ["No", "Kategori Panel", "Desa", "Nama Sasaran", "Usia (Bulan)", "Orang Tua / Suami", "Alamat / RT", "Status / Target Catch Up", "Vaksin / Keterangan Dosis"]
         ];
 
         let idx = 1;
@@ -1226,61 +1295,33 @@
           if (!matchDesa) return;
 
           const ageMonths = getAgeInMonths(d.tgl_lahir);
-          let givenVaccineDates = [];
-          let missingBasicVaccines = [];
+          const getVal = (vk) => d[`vaksin_${vk.replace(/[\s\(\)<>-]/g, '_')}`] || (d.jenis_imunisasi === vk ? d.tanggal_pelayanan : null);
 
-          ALL_VAKSIN_KEYS.forEach(vKey => {
-            const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
-            const val = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
-            if (val) {
-              givenVaccineDates.push(new Date(val));
-            } else if (BASIC_VAKSIN_KEYS.includes(vKey)) {
-              missingBasicVaccines.push(vKey);
+          // 1. Bayi <1 tahun
+          if (ageMonths < 12) {
+            const targetBayi = ["HBO (<24 Jam)", "BCG", "OPV1", "OPV2", "OPV3", "OPV4", "DPT-HB-Hib1", "DPT-HB-Hib2", "DPT-HB-Hib3", "IPV1", "Campak Rubela-1"];
+            let missingBayi = targetBayi.filter(v => !getVal(v));
+            if (missingBayi.length > 0) {
+              excelData.push([idx++, "Bayi < 1 Tahun", d.desa, d.nama_anak, ageMonths, d.nama_ibu, d.alamat_rt, "Menunggak Imunisasi Dasar", missingBayi.join(', ')]);
             }
-          });
-
-          let isDropOutRisk = false;
-          let isUnfinishedIDL = false;
-          let lastVaccineDateStr = "-";
-
-          if (givenVaccineDates.length > 0) {
-            givenVaccineDates.sort((a,b) => b - a);
-            const lastDate = givenVaccineDates[0];
-            lastVaccineDateStr = lastDate.toISOString().split('T')[0];
-            const diffDays = Math.floor((today - lastDate) / (1000 * 60 * 60 * 24));
-            if (diffDays >= 60 && missingBasicVaccines.length > 0) isDropOutRisk = true;
-          } else if (ageMonths >= 2) {
-            isDropOutRisk = true;
           }
 
-          if (ageMonths >= 12 && missingBasicVaccines.length > 0) isUnfinishedIDL = true;
-
-          if (isDropOutRisk || isUnfinishedIDL) {
-            let statusText = [];
-            if (isDropOutRisk) statusText.push("Terancam Drop Out (≥2 Bulan)");
-            if (isUnfinishedIDL) statusText.push("Belum IDL Lengkap (≥12 Bulan)");
-
-            excelData.push([
-              idx++,
-              d.desa || '',
-              d.nama_anak || '',
-              d.tgl_lahir || '',
-              ageMonths,
-              d.nama_ibu || '',
-              d.alamat_rt || '',
-              statusText.join(' & '),
-              lastVaccineDateStr,
-              missingBasicVaccines.join(', ')
-            ]);
+          // 2. Baduta DPT4 & MR2
+          if (ageMonths >= 18) {
+            const dpt3Val = getVal("DPT-HB-Hib3"), dpt4Val = getVal("DPT-HB-Hib4");
+            const mr1Val = getVal("Campak Rubela-1"), mr2Val = getVal("Campak Rubela-2");
+            if ((dpt3Val && !dpt4Val) || (mr1Val && !mr2Val)) {
+              excelData.push([idx++, "Baduta > 24 Bulan", d.desa, d.nama_anak, ageMonths, d.nama_ibu, d.alamat_rt, ageMonths > 24 ? "Harus Segera Diberikan (Terlewat)" : "Waktunya Booster", "Target DPT4 / MR2"]);
+            }
           }
         });
 
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.aoa_to_sheet(excelData);
-        XLSX.utils.book_append_sheet(wb, ws, "Catch Up Imunisasi");
-        XLSX.writeFile(wb, `CatchUp_Imunisasi_${desaSel}_${new Date().toISOString().slice(0,10)}.xlsx`);
+        XLSX.utils.book_append_sheet(wb, ws, "Laporan Catch Up");
+        XLSX.writeFile(wb, `Laporan_CatchUp_Puskesmas_${desaSel}_${new Date().toISOString().slice(0,10)}.xlsx`);
 
-      } catch (err) { alert("Gagal download Catch Up Excel: " + err.message); }
+      } catch (err) { alert("Gagal Download Catch Up: " + err.message); }
     }
 
     async function loadReviewDetail() {

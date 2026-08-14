@@ -273,10 +273,11 @@
   <main class="wrap">
     <!-- TAB 1: INPUT REGISTER KOHORT INDIVIDU -->
     <section id="imunisasi" class="tab-panel">
+      <!-- PERINGATAN UTAMA BEBAS KONEKSI UNTUK PETUGAS -->
       <div class="alert-banner">
         <i class="fas fa-exclamation-triangle" style="font-size: 1.2rem;"></i>
         <div>
-          <strong>AUTOFILL AKTIF:</strong> Memilih BCG, DPT3, atau IPV akan <strong>otomatis mencentang dan mengisi tanggal ideal HB0 (1-7 hari) & BCG</strong> serta dosis sebelumnya.
+          <strong>PENTING:</strong> Lakukan ekspor data jika tidak ada akses internet saat penginputan di lokasi kegiatan/desa. Data tetap tersimpan di memori lokal dan akan diunggah otomatis saat terhubung internet.
         </div>
       </div>
 
@@ -608,7 +609,7 @@
     <section id="catchup" class="tab-panel" style="display:none">
       <div class="card" style="border-left: 5px solid var(--warning);">
         <h3 style="margin:0 0 8px 0; color:var(--accent);"><i class="fas fa-exclamation-triangle" style="color:var(--warning)"></i> Panel Analisis Imunisasi Kejar (Catch Up) & Risiko Drop Out</h3>
-        <p class="lead" style="margin-bottom:0;">Panel tersegregasi secara klinis untuk memantau bayi &lt;1 tahun, dosis berkelanjutan DPT/OPV/RV/PCV, booster baduta &gt;24 bulan, serta kelompok Catin dan Ibu Hamil.</p>
+        <p class="lead" style="margin-bottom:0;">Panel tersegregasi secara klinis untuk memantau sasaran yang usianya sudah tercapai/terlewat namun vaksinnya belum pernah diberikan.</p>
       </div>
 
       <div class="card">
@@ -647,7 +648,7 @@
       <!-- PANEL 1: BAYI < 1 TAHUN -->
       <div class="card">
         <h3 style="color:var(--accent);"><i class="fas fa-baby"></i> 1. Catch Up Usia &lt; 1 Tahun (Bayi)</h3>
-        <p class="lead" style="font-size:0.85rem;">Target: HBO, BCG, DPT1-3, OPV1-4, IPV1-2, MR1.</p>
+        <p class="lead" style="font-size:0.85rem;">Menampilkan sasaran usia &lt;1 tahun yang usianya sudah ideal/melewati jadwal namun vaksinnya belum diberikan.</p>
         <div id="panel_bayi_container" class="table-container">
           <p class="muted" style="text-align:center; padding:15px;"><i class="fas fa-arrow-up"></i> Klik tombol Analisis di atas untuk memuat data.</p>
         </div>
@@ -665,7 +666,7 @@
       <!-- PANEL 3: USIA > 24 BULAN (BADUTA BOOSTER DPT4 & MR2) -->
       <div class="card">
         <h3 style="color:var(--primary);"><i class="fas fa-child"></i> 3. Catch Up Usia &gt; 24 Bulan (Booster Baduta DPT4 & MR2)</h3>
-        <p class="lead" style="font-size:0.85rem;">Target: DPT4 (1 tahun pasca DPT3) & MR2 (1 tahun pasca MR1) di rentang 18-24 bulan. Bila terlewat, masuk penanda harus segera diberikan.</p>
+        <p class="lead" style="font-size:0.85rem;">Target: DPT4 & MR2 di rentang 18-24 bulan. Jika terlewat (&gt;24 Bulan), otomatis masuk dalam penanda merah harus segera diberikan.</p>
         <div id="panel_baduta_container" class="table-container">
           <p class="muted" style="text-align:center; padding:15px;"><i class="fas fa-arrow-up"></i> Klik tombol Analisis di atas untuk memuat data.</p>
         </div>
@@ -975,7 +976,6 @@
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('reg_tgl_pelayanan').value = today;
 
-      // SETUP EVENT LISTENER AUTOFILL SAAT CHECKBOX DICENTANG
       setupVaccineAutoFillListeners();
 
       document.getElementById('formRegisterIndividu').addEventListener('submit', handleSaveKohortMatrix);
@@ -1009,9 +1009,12 @@
 
       initBiasDropdowns();
       loadRecentTransactions();
+
+      // OTOMATIS AUTO-UPLOAD ANTREAN OFFLINE KETIKA KONEKSI INTERNET TERDAPATKAN
+      window.addEventListener('online', syncOfflineQueueToCloud);
     });
 
-    // LOGIKA AUTOFILL INTELIGEN ANTIGEN SEJENIS, BCG, HB0, CATIN & BUMIL
+    // AUTOFILL INTELIGEN (BCG, HB0, DPT3, IPV, CATIN & BUMIL)
     function setupVaccineAutoFillListeners() {
       const checkboxes = document.querySelectorAll('input[name="chk_vaksin"]');
       checkboxes.forEach(cb => {
@@ -1019,18 +1022,15 @@
           if (e.target.checked) {
             const selectedVal = e.target.value;
 
-            // 1. Jika BCG dicentang -> Autofill HB0 (1-7 Hari)
             if (selectedVal === "BCG") {
               checkCb("HBO (1-7 Hari)");
             }
 
-            // 2. Jika mencapai DPT3, IPV1, atau IPV2 -> Autofill HB0 (1-7 Hari) & BCG
             if (["DPT-HB-Hib3", "IPV1", "IPV2"].includes(selectedVal)) {
               checkCb("HBO (1-7 Hari)");
               checkCb("BCG");
             }
 
-            // 3. Logika Dosis Berantai (DPT 1-4, OPV 1-4, PCV 1-3, RV 1-3, IPV 1-2, MR 1-2, TT Catin, TT Bumil)
             SERIES_SEQUENCES.forEach(series => {
               const idx = series.items.findIndex(item => item.key === selectedVal);
               if (idx > 0) {
@@ -1097,7 +1097,6 @@
         document.getElementById('reg_nik_ibu').value = data.nik_ibu !== "-" ? data.nik_ibu : "";
         document.getElementById('reg_alamat').value = data.alamat_rt || "";
         
-        // Centang ulang vaksin yang sudah tersimpan
         document.querySelectorAll('input[name="chk_vaksin"]').forEach(cb => {
           const fieldKey = `vaksin_${cb.value.replace(/[\s\(\)<>-]/g, '_')}`;
           if (data[fieldKey]) cb.checked = true;
@@ -1108,6 +1107,7 @@
       } catch (e) { console.error(e); }
     }
 
+    // FUNGSI SIMPAN DENGAN OFFLINE FALLBACK & SYNC AUTOMATIS
     async function handleSaveKohortMatrix(e) {
       e.preventDefault();
 
@@ -1129,7 +1129,6 @@
 
       const uniqueChildId = `${desa}_${namaAnak}_${tglLahir}`.replace(/[\s\/]/g, '_').toLowerCase();
 
-      // PEMBUATAN PAYLOAD VAKSIN DENGAN TANGGAL IDEAL JIKA TERKECENTANG OTOMATIS
       const vaccineDataUpdate = {};
 
       selectedVaccines.forEach(v => {
@@ -1137,17 +1136,15 @@
         let idealOffsetMonths = 0;
         let idealOffsetDays = 0;
 
-        // Cek Logika HB0 & BCG
         if (v === "HBO (1-7 Hari)" && (selectedVaccines.includes("BCG") || selectedVaccines.includes("DPT-HB-Hib3") || selectedVaccines.includes("IPV1"))) {
           if (!selectedVaccines.includes("HBO (<24 Jam)")) {
             isLowerSeriesDose = true;
-            idealOffsetDays = 1; // 1 hari pasca lahir
+            idealOffsetDays = 1;
           }
         } else if (v === "BCG" && (selectedVaccines.includes("DPT-HB-Hib3") || selectedVaccines.includes("IPV1") || selectedVaccines.includes("IPV2"))) {
           isLowerSeriesDose = true;
-          idealOffsetMonths = 1; // 1 bulan pasca lahir
+          idealOffsetMonths = 1;
         } else {
-          // Cek Seri Dosis Berantai
           SERIES_SEQUENCES.forEach(series => {
             const idx = series.items.findIndex(item => item.key === v);
             if (idx !== -1) {
@@ -1176,6 +1173,7 @@
       const nowTimestamp = new Date().toLocaleString('id-ID');
 
       const payload = {
+        id: uniqueChildId,
         desa: desa,
         kegiatan: document.getElementById('reg_kegiatan').value,
         tanggal_pelayanan: tglPelayananInput,
@@ -1194,22 +1192,54 @@
         audit_log: arrayUnion({
           waktu: nowTimestamp,
           petugas: activePetugasName,
-          aksi: "Input/Update Dosis dengan Auto-fill: " + selectedVaccines.join(', ')
+          aksi: "Input/Update Dosis: " + selectedVaccines.join(', ')
         }),
         ...vaccineDataUpdate
       };
 
       try {
-        await setDoc(doc(db, COL_KOHORT, uniqueChildId), payload, { merge: true });
-
-        alert(`✅ Matriks Kohort ${namaAnak} berhasil diperbarui (autofill HB0, BCG & dosis sebelumnya sukses)!`);
+        if (navigator.onLine) {
+          await setDoc(doc(db, COL_KOHORT, uniqueChildId), payload, { merge: true });
+          alert(`✅ Matriks Kohort ${namaAnak} tersimpan langsung ke Cloud oleh ${activePetugasName}!`);
+        } else {
+          saveToOfflineQueue(payload);
+          alert(`🌐 Koneksi internet offline. Data ${namaAnak} tersimpan aman di Memori Lokal dan akan diunggah otomatis saat online!`);
+        }
         
         document.querySelectorAll('input[name="chk_vaksin"]:checked').forEach(cb => cb.checked = false);
         document.getElementById('reg_nama_anak').value = "";
         document.getElementById('reg_nik_anak').value = "";
         
         loadRecentTransactions();
-      } catch (err) { alert("❌ Error: " + err.message); }
+      } catch (err) { 
+        saveToOfflineQueue(payload);
+        alert(`🌐 Gagal terhubung ke Cloud. Data tersimpan di Memori Lokal (Offline): ${err.message}`);
+      }
+    }
+
+    function saveToOfflineQueue(data) {
+      let queue = JSON.parse(localStorage.getItem('pkm_offline_queue') || '[]');
+      queue.push(data);
+      localStorage.setItem('pkm_offline_queue', JSON.stringify(queue));
+    }
+
+    async function syncOfflineQueueToCloud() {
+      let queue = JSON.parse(localStorage.getItem('pkm_offline_queue') || '[]');
+      if (queue.length === 0) return;
+
+      console.log(`Menyinkronkan ${queue.length} data offline ke Cloud...`);
+      for (let payload of queue) {
+        try {
+          const docId = payload.id;
+          delete payload.id;
+          await setDoc(doc(db, COL_KOHORT, docId), payload, { merge: true });
+        } catch (e) {
+          console.error("Gagal sync item:", e);
+        }
+      }
+      localStorage.removeItem('pkm_offline_queue');
+      alert("✅ Koneksi internet kembali! Antrean data offline berhasil diunggah ke Firebase Cloud.");
+      loadRecentTransactions();
     }
 
     async function loadRecentTransactions() {
@@ -1226,23 +1256,31 @@
       tbody.innerHTML = '<tr><td colspan="37" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Memuat Data Preview Desa ' + currentInputDesa + '...</td></tr>';
       
       try {
-        const snap = await getDocs(collection(db, COL_KOHORT));
-        tbody.innerHTML = '';
-
         let docs = [];
-        snap.forEach(d => {
-          const data = d.data();
-          if (data.desa && data.desa.toLowerCase() === currentInputDesa.toLowerCase()) {
-            docs.push({id: d.id, ...data});
+        if (navigator.onLine) {
+          const snap = await getDocs(collection(db, COL_KOHORT));
+          snap.forEach(d => {
+            const data = d.data();
+            if (data.desa && data.desa.toLowerCase() === currentInputDesa.toLowerCase()) {
+              docs.push({id: d.id, ...data});
+            }
+          });
+        }
+
+        // Tampilkan juga data offline di preview
+        let offlineQueue = JSON.parse(localStorage.getItem('pkm_offline_queue') || '[]');
+        offlineQueue.forEach(item => {
+          if (item.desa && item.desa.toLowerCase() === currentInputDesa.toLowerCase()) {
+            docs.unshift({ id: item.id || 'offline', ...item, last_updated_by: `${item.last_updated_by} (Offline)` });
           }
         });
+
+        tbody.innerHTML = '';
 
         if (docs.length === 0) {
           tbody.innerHTML = `<tr><td colspan="37" style="text-align:center;">Belum ada data sasaran terdaftar di Desa ${currentInputDesa}.</td></tr>`;
           return;
         }
-
-        docs.sort((a,b) => new Date(b.updated_at || b.created_at || 0) - new Date(a.updated_at || a.created_at || 0));
 
         docs.forEach(d => {
           const tr = document.createElement('tr');
@@ -1283,12 +1321,14 @@
       }
 
       if (confirm(`Apakah Anda (Petugas: ${activePetugasName}) yakin ingin menghapus data ini dari Kohort? Aksi ini akan dicatat.`)) {
-        await deleteDoc(doc(db, COL_KOHORT, docId));
+        if (navigator.onLine && docId !== 'offline') {
+          await deleteDoc(doc(db, COL_KOHORT, docId));
+        }
         loadRecentTransactions();
       }
     };
 
-    // ANALISIS CATCH UP
+    // ANALISIS CATCH UP PRESISI KLINIS
     async function loadCatchUpAnalysis() {
       const desaSel = document.getElementById('catchup_filter_desa').value;
       const today = new Date();
@@ -1312,16 +1352,38 @@
           const ageMonths = getAgeInMonths(d.tgl_lahir);
           const getVal = (vk) => d[`vaksin_${vk.replace(/[\s\(\)<>-]/g, '_')}`] || (d.jenis_imunisasi === vk ? d.tanggal_pelayanan : null);
 
+          // Cek kesetaraan status HB0 (HBO <24 jam & 1-7 hari saling melengkapi)
+          const hasHb0 = getVal("HBO (<24 Jam)") || getVal("HBO (1-7 Hari)");
+
           // 1. CATCH UP USIA < 1 TAHUN (BAYI)
+          // Menampilkan hanya jika usia bayi sudah ideal/melewati jadwal namun vaksin belum diberikan
           if (ageMonths < 12) {
-            const targetBayi = ["HBO (<24 Jam)", "BCG", "OPV1", "OPV2", "OPV3", "OPV4", "DPT-HB-Hib1", "DPT-HB-Hib2", "DPT-HB-Hib3", "IPV1", "Campak Rubela-1"];
-            let missingBayi = targetBayi.filter(v => !getVal(v));
+            let missingBayi = [];
+            
+            if (!hasHb0 && ageMonths >= 1) missingBayi.push("HBO");
+            if (!getVal("BCG") && ageMonths >= 1) missingBayi.push("BCG");
+            if (!getVal("OPV1") && ageMonths >= 1) missingBayi.push("OPV1");
+            if (!getVal("DPT-HB-Hib1") && ageMonths >= 2) missingBayi.push("DPT1");
+            if (!getVal("OPV2") && ageMonths >= 2) missingBayi.push("OPV2");
+            if (!getVal("PCV1") && ageMonths >= 2) missingBayi.push("PCV1");
+            if (!getVal("Rotavirus1") && ageMonths >= 2) missingBayi.push("RV1");
+            if (!getVal("DPT-HB-Hib2") && ageMonths >= 3) missingBayi.push("DPT2");
+            if (!getVal("OPV3") && ageMonths >= 3) missingBayi.push("OPV3");
+            if (!getVal("PCV2") && ageMonths >= 3) missingBayi.push("PCV2");
+            if (!getVal("Rotavirus2") && ageMonths >= 3) missingBayi.push("RV2");
+            if (!getVal("DPT-HB-Hib3") && ageMonths >= 4) missingBayi.push("DPT3");
+            if (!getVal("OPV4") && ageMonths >= 4) missingBayi.push("OPV4");
+            if (!getVal("IPV1") && ageMonths >= 4) missingBayi.push("IPV1");
+            if (!getVal("Rotavirus3") && ageMonths >= 4) missingBayi.push("RV3");
+            if (!getVal("Campak Rubela-1") && ageMonths >= 9) missingBayi.push("MR1");
+            if (!getVal("IPV2") && ageMonths >= 9) missingBayi.push("IPV2");
+
             if (missingBayi.length > 0) {
               listBayi.push({ ...d, ageMonths, missing: missingBayi });
             }
           }
 
-          // 2. ANTIGEN BERKESINAMBUNGAN
+          // 2. ANTIGEN BERKESINAMBUNGAN (JEDA >= 2 BULAN)
           SERIES_SEQUENCES.forEach(group => {
             for (let i = 0; i < group.items.length - 1; i++) {
               const currentVal = getVal(group.items[i].key);
@@ -1347,7 +1409,7 @@
             }
           });
 
-          // 3. BADUTA > 24 BULAN
+          // 3. BADUTA > 24 BULAN (DPT4 & MR2)
           if (ageMonths >= 18) {
             const dpt3Val = getVal("DPT-HB-Hib3"), dpt4Val = getVal("DPT-HB-Hib4");
             const mr1Val = getVal("Campak Rubela-1"), mr2Val = getVal("Campak Rubela-2");
@@ -1356,21 +1418,13 @@
             let urgentFlag = false;
 
             if (dpt3Val && !dpt4Val) {
-              const d3Date = new Date(dpt3Val);
-              const diffDpt3 = Math.floor((today - d3Date) / (1000 * 60 * 60 * 24 * 30));
-              if (diffDpt3 >= 12 || ageMonths > 24) {
-                statusBaduta.push("Menunggak DPT4");
-                if (ageMonths > 24) urgentFlag = true;
-              }
+              statusBaduta.push("Menunggak DPT4");
+              if (ageMonths > 24) urgentFlag = true;
             }
 
             if (mr1Val && !mr2Val) {
-              const mr1Date = new Date(mr1Val);
-              const diffMr1 = Math.floor((today - mr1Date) / (1000 * 60 * 60 * 24 * 30));
-              if (diffMr1 >= 12 || ageMonths > 24) {
-                statusBaduta.push("Menunggak MR2");
-                if (ageMonths > 24) urgentFlag = true;
-              }
+              statusBaduta.push("Menunggak MR2");
+              if (ageMonths > 24) urgentFlag = true;
             }
 
             if (statusBaduta.length > 0) {
@@ -1399,9 +1453,9 @@
           }
         });
 
-        p1.innerHTML = listBayi.length === 0 ? '<p class="muted" style="text-align:center;">Semua bayi < 1 tahun terimunisasi dasar lengkap.</p>' : `
+        p1.innerHTML = listBayi.length === 0 ? '<p class="muted" style="text-align:center;">Semua bayi < 1 tahun terimunisasi dasar sesuai usianya.</p>' : `
           <table class="kohort-table">
-            <thead><tr><th>Nama Sasaran</th><th>Usia</th><th>Desa</th><th>Alamat</th><th>Orang Tua</th><th>Vaksin Belum Diberikan</th></tr></thead>
+            <thead><tr><th>Nama Sasaran</th><th>Usia</th><th>Desa</th><th>Alamat</th><th>Orang Tua</th><th>Vaksin Belum Diberikan (Usia Ideal Tercapai)</th></tr></thead>
             <tbody>${listBayi.map(b => `<tr><td style="font-weight:700;">${b.nama_anak}</td><td>${b.ageMonths} Bln</td><td>${b.desa}</td><td>${b.alamat_rt}</td><td>${b.nama_ibu}</td><td style="color:var(--danger); font-weight:700;">${b.missing.join(', ')}</td></tr>`).join('')}</tbody>
           </table>
         `;
@@ -1450,10 +1504,15 @@
 
           // 1. Bayi <1 tahun
           if (ageMonths < 12) {
-            const targetBayi = ["HBO (<24 Jam)", "BCG", "OPV1", "OPV2", "OPV3", "OPV4", "DPT-HB-Hib1", "DPT-HB-Hib2", "DPT-HB-Hib3", "IPV1", "Campak Rubela-1"];
-            let missingBayi = targetBayi.filter(v => !getVal(v));
+            const hasHb0 = getVal("HBO (<24 Jam)") || getVal("HBO (1-7 Hari)");
+            let missingBayi = [];
+            if (!hasHb0 && ageMonths >= 1) missingBayi.push("HBO");
+            if (!getVal("BCG") && ageMonths >= 1) missingBayi.push("BCG");
+            if (!getVal("DPT-HB-Hib1") && ageMonths >= 2) missingBayi.push("DPT1");
+            if (!getVal("Campak Rubela-1") && ageMonths >= 9) missingBayi.push("MR1");
+
             if (missingBayi.length > 0) {
-              excelData.push([idx++, "Bayi < 1 Tahun", d.desa, d.nama_anak, ageMonths, d.nama_ibu, d.alamat_rt, "Menunggak Imunisasi Dasar", missingBayi.join(', ')]);
+              excelData.push([idx++, "Bayi < 1 Tahun", d.desa, d.nama_anak, ageMonths, d.nama_ibu, d.alamat_rt, "Menunggak Imunisasi Dasar (Usia Tercapai)", missingBayi.join(', ')]);
             }
           }
 
@@ -1462,7 +1521,7 @@
             const dpt3Val = getVal("DPT-HB-Hib3"), dpt4Val = getVal("DPT-HB-Hib4");
             const mr1Val = getVal("Campak Rubela-1"), mr2Val = getVal("Campak Rubela-2");
             if ((dpt3Val && !dpt4Val) || (mr1Val && !mr2Val)) {
-              excelData.push([idx++, "Baduta > 24 Bulan", d.desa, d.nama_anak, ageMonths, d.nama_ibu, d.alamat_rt, ageMonths > 24 ? "Harus Segera Diberikan (Terlewat)" : "Waktunya Booster", "Target DPT4 / MR2"]);
+              excelData.push([idx++, "Baduta > 24 Bulan", d.desa, d.nama_anak, ageMonths, d.nama_ibu, d.alamat_rt, ageMonths > 24 ? "Harus Segera Diberikan (Terlewat >24 Bln)" : "Waktunya Booster", "Target DPT4 / MR2"]);
             }
           }
         });

@@ -84,7 +84,9 @@
     .full-width { grid-column: span 2; }
 
     label { font-weight: 600; color: var(--accent); margin-bottom: 6px; font-size: 0.9rem; }
-    input[type="text"], input[type="date"], input[type="month"], select, textarea, input[type="file"] {
+    .req { color: var(--danger); font-weight: 700; margin-left: 2px; }
+
+    input[type="text"], input[type="password"], input[type="date"], input[type="month"], select, textarea, input[type="file"] {
       width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #ced4da;
       background: #fefefe; font-size: 0.95rem; outline: none; transition: all 0.2s ease;
       -webkit-appearance: none; appearance: none;
@@ -165,10 +167,9 @@
       background: #d1e7dd; color: #0f5132; font-weight: 700; padding: 2px 6px; border-radius: 4px; font-size: 0.78rem;
     }
 
-    .badge-age { padding: 3px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; display: inline-block; }
-    .badge-0-12 { background: #e3f2fd; color: #0d6efd; }
-    .badge-12-24 { background: #fff3cd; color: #856404; }
-    .badge-sekolah { background: #d1e7dd; color: #0f5132; }
+    .badge-user {
+      background: #e2e8f0; color: var(--accent); padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;
+    }
 
     .actions { display: flex; gap: 10px; justify-content: flex-end; align-items: center; margin-top: 16px; flex-wrap: wrap; }
     .btn {
@@ -184,6 +185,12 @@
 
     .site-footer { text-align: center; margin-top: 30px; padding: 15px 0; color: var(--muted); font-size: 0.8rem; border-top: 1px solid #eee; }
 
+    /* MODAL OVERLAY UNTUK LOGIN & BANTUAN */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(2, 6, 23, 0.7); z-index: 2000;
+      display: flex; align-items: center; justify-content: center; padding: 16px;
+    }
+
     @media (max-width: 768px) {
       .wrap { padding: 0 10px; margin: 12px auto; }
       .card { padding: 16px; }
@@ -198,6 +205,36 @@
 </head>
 <body>
 
+  <!-- MODAL LOGIN PETUGAS DEKAT DENGAN DEVICE ID MEMORY -->
+  <div id="loginModal" class="modal-overlay">
+    <div style="background:#fff; padding:24px; border-radius:12px; max-width:400px; width:100%; box-shadow:0 10px 25px rgba(0,0,0,0.2);">
+      <div style="text-align:center; margin-bottom:16px;">
+        <div style="width:50px; height:50px; background:var(--accent); color:#fff; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:22px; margin-bottom:8px;">
+          <i class="fas fa-user-shield"></i>
+        </div>
+        <h3 style="margin:0; color:var(--accent);">Autentikasi Petugas</h3>
+        <p style="font-size:0.85rem; color:var(--muted); margin-top:4px;">Sistem Register Imunisasi Puskesmas Melata</p>
+      </div>
+
+      <form id="formLoginPetugas">
+        <div class="form-group">
+          <label>Nama Petugas / Username <span class="req">*</span></label>
+          <input type="text" id="login_username" placeholder="Masukkan nama/username petugas" required>
+          <small id="login_device_hint" style="font-size:0.75rem; color:var(--info); margin-top:4px;"></small>
+        </div>
+
+        <div class="form-group">
+          <label>Password Akun <span class="req">*</span></label>
+          <input type="password" id="login_password" placeholder="Masukkan password" required>
+        </div>
+
+        <div id="loginError" style="display:none; color:var(--danger); font-size:0.82rem; margin-bottom:12px; font-weight:600;"></div>
+
+        <button type="submit" class="btn btn-primary" style="width:100%;"><i class="fas fa-sign-in-alt"></i> Masuk Ke Sistem</button>
+      </form>
+    </div>
+  </div>
+
   <header class="app-header">
     <div class="brand-row">
       <div class="brand">
@@ -208,8 +245,12 @@
         </div>
       </div>
       <div class="header-actions">
-        <button class="btn btn-ghost" onclick="document.getElementById('helpModal').style.display='flex'" style="color:#fff; border-color:rgba(255,255,255,0.4)">
-          <i class="fas fa-circle-info"></i> Bantuan
+        <div class="badge-user" id="currentUserDisplay"><i class="fas fa-user-circle"></i> <span>Petugas</span></div>
+        <button class="btn btn-ghost" onclick="logoutPetugas()" style="color:#fff; border-color:rgba(255,255,255,0.4); padding:6px 10px; font-size:0.8rem;" title="Ganti Petugas">
+          <i class="fas fa-sign-out-alt"></i> Ganti
+        </button>
+        <button class="btn btn-ghost" onclick="document.getElementById('helpModal').style.display='flex'" style="color:#fff; border-color:rgba(255,255,255,0.4); padding:6px 10px; font-size:0.8rem;">
+          <i class="fas fa-circle-info"></i>
         </button>
       </div>
     </div>
@@ -238,7 +279,7 @@
         
         <div class="grid">
           <div class="form-group">
-            <label>Pilih Desa Sasaran</label>
+            <label>Pilih Desa Sasaran <span class="req">*</span></label>
             <select id="search_desa_anak">
               <option value="">-- Pilih Desa --</option>
               <option value="Melata">Melata</option>
@@ -253,6 +294,7 @@
               <option value="Sumber Jaya">Sumber Jaya</option>
               <option value="Bukit Harum">Bukit Harum</option>
               <option value="PT. TSA">PT. TSA</option>
+              <option value="PT. SHS">PT. SHS</option>
             </select>
           </div>
           <div class="form-group">
@@ -266,12 +308,12 @@
 
       <div class="card">
         <h2><i class="fas fa-id-card"></i> Form Register Imunisasi (Bayi, Baduta, Catin & Bumil)</h2>
-        <p class="lead">Satu baris mewakili 1 sasaran. Pilihan vaksinasi (termasuk TT Catin & TT Bumil) otomatis memanjang ke kanan pada matriks kohort.</p>
+        <p class="lead">Satu baris mewakili 1 sasaran. Pilihan vaksinasi (termasuk TT Catin & TT Bumil) otomatis memanjang ke kanan pada matriks kohort. Bidang bertanda <span class="req">*</span> wajib diisi.</p>
 
         <form id="formRegisterIndividu">
           <div class="grid">
             <div class="form-group">
-              <label>Desa / Kelurahan</label>
+              <label>Desa / Kelurahan <span class="req">*</span></label>
               <select id="reg_desa" required>
                 <option value="">-- Pilih Desa --</option>
                 <option value="Melata">Melata</option>
@@ -286,26 +328,27 @@
                 <option value="Sumber Jaya">Sumber Jaya</option>
                 <option value="Bukit Harum">Bukit Harum</option>
                 <option value="PT. TSA">PT. TSA</option>
+                <option value="PT. SHS">PT. SHS</option>
               </select>
             </div>
 
             <div class="form-group">
-              <label>Nama Kegiatan / Posyandu / Pustu</label>
+              <label>Nama Kegiatan / Posyandu / Pustu <span class="req">*</span></label>
               <input type="text" id="reg_kegiatan" placeholder="Contoh: Posyandu Flamboyan / Pustu" required>
             </div>
 
             <div class="form-group">
-              <label>Tanggal Pelayanan</label>
+              <label>Tanggal Pelayanan <span class="req">*</span></label>
               <input type="date" id="reg_tgl_pelayanan" required>
             </div>
 
             <div class="form-group">
-              <label>Nama Sasaran (Anak / Catin / Bumil)</label>
+              <label>Nama Sasaran (Anak / Catin / Bumil) <span class="req">*</span></label>
               <input type="text" id="reg_nama_anak" placeholder="Nama lengkap sasaran" required>
             </div>
 
             <div class="form-group">
-              <label>Tanggal Lahir & Jenis Kelamin</label>
+              <label>Tanggal Lahir & Jenis Kelamin <span class="req">*</span></label>
               <div class="form-row">
                 <input type="date" id="reg_tgl_lahir" required>
                 <select id="reg_jk" required>
@@ -321,7 +364,7 @@
             </div>
 
             <div class="form-group">
-              <label>Nama Orang Tua / Ibu / Suami</label>
+              <label>Nama Orang Tua / Ibu / Suami <span class="req">*</span></label>
               <input type="text" id="reg_nama_ibu" placeholder="Nama ibu / nama suami" required>
             </div>
 
@@ -331,13 +374,13 @@
             </div>
 
             <div class="form-group full-width">
-              <label>Alamat / RT</label>
+              <label>Alamat / RT <span class="req">*</span></label>
               <input type="text" id="reg_alamat" placeholder="Contoh: RT 02 / Dusun A" required>
             </div>
 
             <!-- CHECKBOXES PILIHAN MULTI VAKSIN -->
             <div class="form-group full-width">
-              <label style="color:var(--primary); font-size:1.05rem;"><i class="fas fa-check-double"></i> Pilih Jenis Imunisasi Diberikan (Centang yang sesuai)</label>
+              <label style="color:var(--primary); font-size:1.05rem;"><i class="fas fa-check-double"></i> Pilih Jenis Imunisasi Diberikan (Centang minimal 1) <span class="req">*</span></label>
               
               <div class="vaccine-selection-box">
                 <div class="vaccine-group-title"><i class="fas fa-baby"></i> Usia 0 - 12 Bulan (Imunisasi Dasar)</div>
@@ -399,7 +442,7 @@
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
           <div>
             <h3 style="margin:0;"><i class="fas fa-check-circle" style="color:var(--success);"></i> Preview Hasil Input Sesi Ini (<span id="preview_desa_title">Semua Desa</span>)</h3>
-            <p class="lead" style="font-size:0.85rem; margin:4px 0 0 0;">Menampilkan sasaran dari desa yang baru diinput/dipilih untuk verifikasi keberhasilan simpan.</p>
+            <p class="lead" style="font-size:0.85rem; margin:4px 0 0 0;">Menampilkan sasaran dari desa yang baru diinput/dipilih untuk verifikasi keberhasilan simpan & jejak petugas.</p>
           </div>
           <button class="btn btn-ghost" onclick="loadRecentTransactions()" style="padding:4px 10px; font-size:0.8rem;"><i class="fas fa-sync-alt"></i> Refresh Preview</button>
         </div>
@@ -418,6 +461,7 @@
                 <th colspan="3">Imunisasi Lanjutan Baduta</th>
                 <th colspan="2">TT Catin</th>
                 <th colspan="5">TT Ibu Hamil</th>
+                <th rowspan="2">Jejak Penginput</th>
                 <th rowspan="2">Aksi</th>
               </tr>
               <tr>
@@ -428,7 +472,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr><td colspan="36" style="text-align:center;"><i class="fas fa-info-circle"></i> Pilih atau simpan data desa untuk melihat preview.</td></tr>
+              <tr><td colspan="37" style="text-align:center;"><i class="fas fa-info-circle"></i> Pilih atau simpan data desa untuk melihat preview.</td></tr>
             </tbody>
           </table>
         </div>
@@ -439,12 +483,12 @@
     <section id="bias" class="tab-panel" style="display:none">
       <div class="card">
         <h2><i class="fas fa-school"></i> Form BIAS (Imunisasi Anak Sekolah)</h2>
-        <p class="lead">Input data pelaksanaan BIAS di sekolah. Pilihan jenis vaksin dapat ditentukan secara spesifik untuk masing-masing kelas (misal: Kelas 1 MR, Kelas 5 HPV).</p>
+        <p class="lead">Input data pelaksanaan BIAS di sekolah. Bidang bertanda <span class="req">*</span> wajib diisi.</p>
 
         <form id="biasForm">
           <div class="grid">
             <div class="form-group full-width">
-              <label>Nama Sekolah</label>
+              <label>Nama Sekolah <span class="req">*</span></label>
               <select id="sekolah" required><option value="">-- Pilih Sekolah --</option></select>
             </div>
 
@@ -486,6 +530,7 @@
               <option value="Sumber Jaya">Sumber Jaya</option>
               <option value="Bukit Harum">Bukit Harum</option>
               <option value="PT. TSA">PT. TSA</option>
+              <option value="PT. SHS">PT. SHS</option>
             </select>
           </div>
 
@@ -603,6 +648,7 @@
               <option value="Sumber Jaya">Sumber Jaya</option>
               <option value="Bukit Harum">Bukit Harum</option>
               <option value="PT. TSA">PT. TSA</option>
+              <option value="PT. SHS">PT. SHS</option>
             </select>
           </div>
         </div>
@@ -624,23 +670,23 @@
   </main>
 
   <footer class="site-footer">
-    &copy; 2026 Sistem Register Kohort Imunisasi & BIAS — Firebase Powered
+    &copy; 2026 Sistem Register Imunisasi. All Rights Reserved.
   </footer>
 
-  <div id="helpModal" style="display:none;position:fixed;inset:0;background:rgba(2,6,23,0.5);z-index:1050;align-items:center;justify-content:center">
+  <div id="helpModal" class="modal-overlay" style="display:none;">
     <div style="background:#fff;padding:20px;border-radius:12px;max-width:500px;margin:20px; width:90%;">
       <div style="display:flex;justify-content:space-between;align-items:center">
         <h3 style="margin:0; color:var(--accent);"><i class="fas fa-circle-info"></i> Bantuan</h3>
         <button class="btn btn-ghost" onclick="document.getElementById('helpModal').style.display='none'">Tutup</button>
       </div>
       <hr style="margin: 12px 0;">
-      <p class="lead">Tabel preview pada tab input difilter khusus untuk desa yang sedang diinput/dipilih agar proses konfirmasi keberhasilan simpan lebih nyaman dan tidak membingungkan.</p>
+      <p class="lead">Sistem dilengkapi jejak audit otomatis per petugas. Setiap update atau penghapusan data mencatat nama petugas dan waktu pengisian demi menjaga keabsahan data.</p>
     </div>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, setDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAAyGTFyAkfua9wazWH6FFkYYmnGFTEh4",
@@ -677,7 +723,11 @@
     };
     const CLASS_MAP = { 'SD': [1, 2, 3, 4, 5, 6], 'SMP': [7, 8, 9], 'SMA': [10, 11, 12] };
     let classInputCounter = 0;
-    let currentInputDesa = ""; // Menyimpan desa yang sedang aktif diinput
+    let currentInputDesa = "";
+    let activePetugasName = "";
+
+    // KUNCI PASSWORD SISTEM
+    const AUTH_PASSWORD = "sri26";
 
     function getKelompokUsia(tglLahir, tglPelayanan) {
       if (!tglLahir || !tglPelayanan) return "0-12 Bulan";
@@ -688,6 +738,41 @@
       if (diffMonths <= 24) return "12-24 Bulan";
       return "Dewasa/Bumil/Catin";
     }
+
+    // MEMORY PERSISTENCE USERNAME UNTUK PERANGKAT/BROWSER SAMA
+    function initUserAuthCheck() {
+      const savedUser = localStorage.getItem('pkm_app_username');
+      if (savedUser) {
+        document.getElementById('login_username').value = savedUser;
+        document.getElementById('login_device_hint').innerHTML = `<i class="fas fa-mobile-alt"></i> Terdeteksi username perangkat ini: <strong>${savedUser}</strong>`;
+      }
+
+      document.getElementById('formLoginPetugas').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const usernameInput = document.getElementById('login_username').value.trim();
+        const passwordInput = document.getElementById('login_password').value;
+        const errDiv = document.getElementById('loginError');
+
+        if (passwordInput === AUTH_PASSWORD) {
+          activePetugasName = usernameInput;
+          localStorage.setItem('pkm_app_username', usernameInput);
+          document.querySelector('#currentUserDisplay span').textContent = activePetugasName;
+          document.getElementById('loginModal').style.display = 'none';
+          errDiv.style.display = 'none';
+        } else {
+          errDiv.textContent = "❌ Password salah! Silakan masukkan password yang benar.";
+          errDiv.style.display = 'block';
+        }
+      });
+    }
+
+    window.logoutPetugas = function() {
+      if (confirm("Keluar dari sesi petugas saat ini?")) {
+        activePetugasName = "";
+        document.getElementById('login_password').value = "";
+        document.getElementById('loginModal').style.display = 'flex';
+      }
+    };
 
     window.switchTab = function(e){
       const target = e.currentTarget.getAttribute('data-tab');
@@ -701,6 +786,8 @@
     };
 
     document.addEventListener('DOMContentLoaded', () => {
+      initUserAuthCheck();
+
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('reg_tgl_pelayanan').value = today;
 
@@ -717,12 +804,12 @@
       document.getElementById('search_desa_anak').addEventListener('change', (e) => {
         currentInputDesa = e.target.value;
         populateAnakByDesa();
-        loadRecentTransactions(); // Update preview otomatis sesuai desa pilihan
+        loadRecentTransactions();
       });
 
       document.getElementById('reg_desa').addEventListener('change', (e) => {
         currentInputDesa = e.target.value;
-        loadRecentTransactions(); // Update preview saat memilih desa di form
+        loadRecentTransactions();
       });
 
       document.getElementById('select_anak_registered').addEventListener('change', fillFormWithSelectedAnak);
@@ -794,6 +881,11 @@
     async function handleSaveKohortMatrix(e) {
       e.preventDefault();
 
+      if (!activePetugasName) {
+        document.getElementById('loginModal').style.display = 'flex';
+        return alert("Silakan login terlebih dahulu!");
+      }
+
       const selectedVaccines = Array.from(document.querySelectorAll('input[name="chk_vaksin"]:checked')).map(cb => cb.value);
       if (selectedVaccines.length === 0) {
         return alert("⚠️ Mohon centang minimal 1 jenis imunisasi!");
@@ -803,7 +895,7 @@
       const tglLahir = document.getElementById('reg_tgl_lahir').value;
       const namaAnak = document.getElementById('reg_nama_anak').value.trim();
       const desa = document.getElementById('reg_desa').value;
-      currentInputDesa = desa; // Set desa aktif
+      currentInputDesa = desa;
 
       const uniqueChildId = `${desa}_${namaAnak}_${tglLahir}`.replace(/[\s\/]/g, '_').toLowerCase();
 
@@ -811,6 +903,8 @@
       selectedVaccines.forEach(v => {
         vaccineDataUpdate[`vaksin_${v.replace(/[\s\(\)<>-]/g, '_')}`] = tglPelayanan;
       });
+
+      const nowTimestamp = new Date().toLocaleString('id-ID');
 
       const payload = {
         desa: desa,
@@ -827,35 +921,40 @@
         alamat_rt: document.getElementById('reg_alamat').value,
         kelompok_usia: getKelompokUsia(tglLahir, tglPelayanan),
         updated_at: new Date().toISOString(),
+        last_updated_by: activePetugasName,
+        audit_log: arrayUnion({
+          waktu: nowTimestamp,
+          petugas: activePetugasName,
+          aksi: "Input/Update Dosis: " + selectedVaccines.join(', ')
+        }),
         ...vaccineDataUpdate
       };
 
       try {
         await setDoc(doc(db, COL_KOHORT, uniqueChildId), payload, { merge: true });
 
-        alert(`✅ Matriks Kohort ${namaAnak} diperbarui dengan imunisasi: ${selectedVaccines.join(', ')}!`);
+        alert(`✅ Matriks Kohort ${namaAnak} berhasil diperbarui oleh Petugas: ${activePetugasName}!`);
         
         document.querySelectorAll('input[name="chk_vaksin"]:checked').forEach(cb => cb.checked = false);
         document.getElementById('reg_nama_anak').value = "";
         document.getElementById('reg_nik_anak').value = "";
         
-        loadRecentTransactions(); // Refresh preview khusus desa ini
+        loadRecentTransactions();
       } catch (err) { alert("❌ Error: " + err.message); }
     }
 
-    // LOAD TRANSAKSI PREVIEW KHUSUS DESA YANG SEDANG DIPILIH/DIINPUT
     async function loadRecentTransactions() {
       const tbody = document.querySelector('#tblRecentTransactions tbody');
       const titleSpan = document.getElementById('preview_desa_title');
 
       if (!currentInputDesa) {
         titleSpan.textContent = "Belum Ada Desa Dipilih";
-        tbody.innerHTML = '<tr><td colspan="36" style="text-align:center; color:var(--muted);"><i class="fas fa-arrow-up"></i> Silakan pilih desa pada form di atas untuk menampilkan preview data.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="37" style="text-align:center; color:var(--muted);"><i class="fas fa-arrow-up"></i> Silakan pilih desa pada form di atas untuk menampilkan preview data.</td></tr>';
         return;
       }
 
       titleSpan.textContent = `Desa ${currentInputDesa}`;
-      tbody.innerHTML = '<tr><td colspan="36" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Memuat Data Preview Desa ' + currentInputDesa + '...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="37" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Memuat Data Preview Desa ' + currentInputDesa + '...</td></tr>';
       
       try {
         const snap = await getDocs(collection(db, COL_KOHORT));
@@ -870,7 +969,7 @@
         });
 
         if (docs.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="36" style="text-align:center;">Belum ada data sasaran terdaftar di Desa ${currentInputDesa}.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="37" style="text-align:center;">Belum ada data sasaran terdaftar di Desa ${currentInputDesa}.</td></tr>`;
           return;
         }
 
@@ -890,6 +989,8 @@
             }
           });
 
+          const petugasKet = d.last_updated_by ? `<strong style="color:var(--accent);">${d.last_updated_by}</strong>` : '-';
+
           tr.innerHTML = `
             <td class="sticky-col-1">${d.nama_anak}</td>
             <td class="sticky-col-2">${d.tgl_lahir || '-'}</td>
@@ -898,15 +999,21 @@
             <td>${d.desa || '-'}</td>
             <td>${d.alamat_rt || '-'}</td>
             ${vCols}
+            <td>${petugasKet}</td>
             <td><button class="btn btn-danger" onclick="hapusTrans('${d.id}')" style="padding:2px 6px; font-size:0.75rem;"><i class="fas fa-trash"></i></button></td>
           `;
           tbody.appendChild(tr);
         });
-      } catch (err) { tbody.innerHTML = `<tr><td colspan="36" style="color:red;">Error: ${err.message}</td></tr>`; }
+      } catch (err) { tbody.innerHTML = `<tr><td colspan="37" style="color:red;">Error: ${err.message}</td></tr>`; }
     }
 
     window.hapusTrans = async function(docId) {
-      if (confirm("Hapus data sasaran ini dari Kohort?")) {
+      if (!activePetugasName) {
+        document.getElementById('loginModal').style.display = 'flex';
+        return alert("Silakan login terlebih dahulu!");
+      }
+
+      if (confirm(`Apakah Anda (Petugas: ${activePetugasName}) yakin ingin menghapus data ini dari Kohort? Aksi ini akan dicatat.`)) {
         await deleteDoc(doc(db, COL_KOHORT, docId));
         loadRecentTransactions();
       }
@@ -1033,6 +1140,7 @@
         
         const headerRow1 = ["Desa", "Kegiatan", "Nama Sasaran", "Tanggal Lahir", "L/P", "Orang Tua / Suami", "Alamat / RT"];
         ALL_VAKSIN_KEYS.forEach(v => headerRow1.push(v));
+        headerRow1.push("Penginput Terakhir");
         sheet1Data.push(headerRow1);
 
         filteredDocs.forEach(d => {
@@ -1057,6 +1165,7 @@
             }
           });
 
+          row.push(d.last_updated_by || '-');
           sheet1Data.push(row);
         });
 
@@ -1064,6 +1173,7 @@
         ALL_VAKSIN_KEYS.forEach(vKey => {
           totalRow1.push(vTotals[vKey]);
         });
+        totalRow1.push("");
         sheet1Data.push(totalRow1);
 
         const sheet2Data = [
@@ -1136,11 +1246,11 @@
             </div>
             <div class="grid" style="grid-template-columns: 1fr 1fr;">
                 <div class="form-group">
-                    <label>Kelas</label>
+                    <label>Kelas <span class="req">*</span></label>
                     <select id="kelas_${blockId}" required></select>
                 </div>
                 <div class="form-group">
-                    <label style="color:var(--primary)">Vaksin BIAS</label>
+                    <label style="color:var(--primary)">Vaksin BIAS <span class="req">*</span></label>
                     <select id="jenis_vaksin_${blockId}" required style="border: 2px solid var(--primary);">
                         <option value="MR">MR (Campak Rubella)</option>
                         <option value="DT">DT (Difteria Tetanus)</option>
@@ -1148,10 +1258,10 @@
                         <option value="HPV">HPV (Human Papillomavirus)</option>
                     </select>
                 </div>
-                <div class="form-group"><label>Sasaran L</label><select id="sasaran_l_${blockId}" class="bias-num" required></select></div>
-                <div class="form-group"><label>Sasaran P</label><select id="sasaran_p_${blockId}" class="bias-num" required></select></div>
-                <div class="form-group"><label>Capaian L</label><select id="capaian_l_${blockId}" class="bias-num" required></select></div>
-                <div class="form-group"><label>Capaian P</label><select id="capaian_p_${blockId}" class="bias-num" required></select></div>
+                <div class="form-group"><label>Sasaran L <span class="req">*</span></label><select id="sasaran_l_${blockId}" class="bias-num" required></select></div>
+                <div class="form-group"><label>Sasaran P <span class="req">*</span></label><select id="sasaran_p_${blockId}" class="bias-num" required></select></div>
+                <div class="form-group"><label>Capaian L <span class="req">*</span></label><select id="capaian_l_${blockId}" class="bias-num" required></select></div>
+                <div class="form-group"><label>Capaian P <span class="req">*</span></label><select id="capaian_p_${blockId}" class="bias-num" required></select></div>
                 <div class="form-group full-width"><label>Drop Out</label><select id="dropout_${blockId}" class="bias-num"></select></div>
             </div>
         </div>
@@ -1170,6 +1280,12 @@
 
     async function handleSaveBias(e) {
       e.preventDefault();
+
+      if (!activePetugasName) {
+        document.getElementById('loginModal').style.display = 'flex';
+        return alert("Silakan login terlebih dahulu!");
+      }
+
       const sekolah = document.getElementById('sekolah').value;
       const classBlocks = document.querySelectorAll('#biasClassReportsContainer .card');
       if (!sekolah || classBlocks.length === 0) return alert("Pilih sekolah dan minimal 1 data kelas.");
@@ -1190,10 +1306,11 @@
           await setDoc(doc(db, COL_BIAS, docId), {
             sekolah, kelas, tanggal, jenis_vaksin: jenisVaksinBias,
             data: { Sasaran_L: sasL, Sasaran_P: sasP, Capaian_L: capL, Capaian_P: capP, DropOut: doVal },
-            updated_at: new Date().toISOString()
+            updated_at: new Date().toISOString(),
+            last_updated_by: activePetugasName
           }, { merge: true });
         }
-        alert(`✅ Laporan BIAS ${sekolah} Disimpan ke Cloud!`);
+        alert(`✅ Laporan BIAS ${sekolah} Disimpan ke Cloud oleh Petugas ${activePetugasName}!`);
         e.target.reset(); onChangeSekolah();
       } catch (err) { alert("❌ Error BIAS: " + err.message); }
     }

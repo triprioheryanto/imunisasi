@@ -5,204 +5,241 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Sistem Register Imunisasi & BIAS — Puskesmas Melata</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <style>
-    :root{
-      --primary:#FF6347; 
-      --primary-light:#FF8866;
-      --accent:#004080; 
-      --accent-light:#0066b3;
-      --bg:#f8f9fa; 
-      --card:#ffffff;
-      --muted:#6c757d;
-      --success:#198754;
-      --danger:#dc3545;
-      --info:#0d6efd;
-      --warning:#ffc107;
-      --radius:10px;
-      --gap:16px;
-      --shadow-subtle:0 2px 8px rgba(0,0,0,0.05);
-      --shadow-card:0 6px 18px rgba(0,0,0,0.06);
+    :root {
+      --primary: #FF5722; 
+      --primary-hover: #E64A19;
+      --accent: #003366; 
+      --accent-light: #004080;
+      --bg: #F4F7FA; 
+      --card: #FFFFFF;
+      --text-dark: #1E293B;
+      --muted: #64748B;
+      --border-color: #E2E8F0;
+      
+      --success: #10B981;
+      --danger: #EF4444;
+      --info: #2563EB;
+      --warning: #F59E0B;
+      
+      --radius: 12px;
+      --gap: 20px;
+      --shadow-subtle: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+      --shadow-glow: 0 0 20px rgba(255, 87, 34, 0.2);
     }
     
     *, *::before, *::after { box-sizing: border-box; }
 
     html, body {
       width: 100%; max-width: 100%; overflow-x: hidden;
-      margin: 0; padding: 0; background: var(--bg); color: #212529;
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      margin: 0; padding: 0; background: var(--bg); color: var(--text-dark);
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
       -webkit-font-smoothing: antialiased;
     }
 
     header.app-header {
-      background: linear-gradient(135deg, var(--accent), var(--accent-light));
-      color: #fff; padding: 12px 16px 0 16px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      background: linear-gradient(135deg, var(--accent) 0%, #001F3F 100%);
+      color: #fff; padding: 14px 20px 0 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
       position: sticky; top: 0; z-index: 1000; width: 100%;
+      backdrop-filter: blur(10px);
     }
 
-    .brand-row { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1100px; margin: 0 auto; gap: 10px; }
-    .brand { display: flex; align-items: center; gap: 12px; font-weight: 700; font-size: 1.1rem; }
-    .brand .logo { width: 40px; height: 40px; border-radius: 10px; background: var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 3px 8px rgba(255, 99, 71, 0.4); }
-    .brand-title-small { font-weight: 500; font-size: 0.75rem; opacity: 0.9; display: block; }
-    .header-actions { display: flex; align-items: center; gap: 8px; }
+    .brand-row { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1200px; margin: 0 auto; gap: 12px; }
+    .brand { display: flex; align-items: center; gap: 14px; font-weight: 800; font-size: 1.15rem; letter-spacing: -0.3px; }
+    .brand .logo { 
+      width: 44px; height: 44px; border-radius: 12px; 
+      background: linear-gradient(135deg, var(--primary), #FF8A65); 
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0; 
+      box-shadow: 0 4px 12px rgba(255, 87, 34, 0.4); 
+    }
+    .brand-title-small { font-weight: 500; font-size: 0.78rem; opacity: 0.85; display: block; margin-top: 1px; }
+    .header-actions { display: flex; align-items: center; gap: 10px; }
 
     .app-nav-tabs {
-      display: flex; gap: 8px; width: 100%; max-width: 1100px;
-      margin: 12px auto 0 auto; overflow-x: auto; white-space: nowrap;
+      display: flex; gap: 6px; width: 100%; max-width: 1200px;
+      margin: 16px auto 0 auto; overflow-x: auto; white-space: nowrap;
       -webkit-overflow-scrolling: touch; padding-bottom: 2px;
     }
     .app-nav-tabs::-webkit-scrollbar { display: none; }
     .app-nav-tabs .tab {
-      flex-shrink: 0; color: #c9e0f6; background: transparent; border: 0;
-      padding: 10px 14px; border-radius: var(--radius) var(--radius) 0 0;
+      flex-shrink: 0; color: #94A3B8; background: transparent; border: 0;
+      padding: 12px 18px; border-radius: var(--radius) var(--radius) 0 0;
       cursor: pointer; font-weight: 600; display: inline-flex; align-items: center;
-      gap: 6px; opacity: 0.85; font-size: 0.85rem; border-bottom: 3px solid transparent;
-      transition: all 0.2s ease;
+      gap: 8px; font-size: 0.88rem; border-bottom: 3px solid transparent;
+      transition: all 0.25s ease;
     }
-    .app-nav-tabs .tab.active { background: var(--card); color: var(--accent); opacity: 1; font-weight: 700; border-bottom: 3px solid var(--primary); }
+    .app-nav-tabs .tab:hover { color: #E2E8F0; background: rgba(255,255,255,0.05); }
+    .app-nav-tabs .tab.active { 
+      background: var(--card); color: var(--accent); font-weight: 700; 
+      border-bottom: 3px solid var(--primary); 
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+    }
 
-    .wrap { width: 100%; max-width: 1200px; margin: 16px auto; padding: 0 16px; }
-    .card { background: var(--card); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow-card); margin-bottom: var(--gap); border: 1px solid #e9ecef; width: 100%; }
+    .wrap { width: 100%; max-width: 1200px; margin: 24px auto; padding: 0 16px; }
+    .card { 
+      background: var(--card); border-radius: var(--radius); padding: 24px; 
+      box-shadow: var(--shadow-card); margin-bottom: var(--gap); 
+      border: 1px solid var(--border-color); width: 100%; 
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
 
-    h2 { margin: 0 0 10px 0; color: var(--accent); font-size: 1.35rem; word-break: break-word; }
-    p.lead { margin: 0 0 16px 0; color: var(--muted); font-size: 0.95rem; line-height: 1.4; }
+    h2 { margin: 0 0 10px 0; color: var(--accent); font-size: 1.4rem; font-weight: 800; letter-spacing: -0.3px; display: flex; align-items: center; gap: 10px; }
+    h3 { color: var(--accent); font-weight: 700; }
+    p.lead { margin: 0 0 18px 0; color: var(--muted); font-size: 0.92rem; line-height: 1.5; }
 
     .alert-banner {
-      background: #fff3cd; border: 1px solid #ffeeba; color: #856404;
-      padding: 12px 16px; border-radius: var(--radius); font-size: 0.88rem;
-      font-weight: 600; display: flex; align-items: center; gap: 10px; margin-bottom: 16px;
+      background: linear-gradient(135deg, #FFFBEB, #FEF3C7); 
+      border: 1px solid #FCD34D; color: #92400E;
+      padding: 14px 18px; border-radius: var(--radius); font-size: 0.88rem;
+      font-weight: 600; display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
+      box-shadow: var(--shadow-subtle);
     }
 
-    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; width: 100%; }
-    .form-group { margin-bottom: 12px; display: flex; flex-direction: column; width: 100%; }
+    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; width: 100%; }
+    .form-group { margin-bottom: 14px; display: flex; flex-direction: column; width: 100%; }
     .full-width { grid-column: span 2; }
 
-    label { font-weight: 600; color: var(--accent); margin-bottom: 6px; font-size: 0.9rem; }
-    .req { color: var(--danger); font-weight: 700; margin-left: 2px; }
+    label { font-weight: 700; color: #334155; margin-bottom: 8px; font-size: 0.88rem; display: flex; align-items: center; gap: 6px; }
+    .req { color: var(--danger); font-weight: 800; }
 
     input[type="text"], input[type="password"], input[type="date"], input[type="month"], select, textarea, input[type="file"] {
-      width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #ced4da;
-      background: #fefefe; font-size: 0.95rem; outline: none; transition: all 0.2s ease;
-      -webkit-appearance: none; appearance: none;
+      width: 100%; padding: 11px 14px; border-radius: 10px; border: 1.5px solid var(--border-color);
+      background: #F8FAFC; font-size: 0.92rem; font-family: inherit; outline: none; transition: all 0.2s ease;
+      color: var(--text-dark); font-weight: 500;
     }
     select {
-      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2004080' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-      background-repeat: no-repeat; background-position: right 10px center; background-size: 16px; padding-right: 32px;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23003366' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding-right: 36px;
+      cursor: pointer;
     }
-    input:focus, select:focus, textarea:focus { box-shadow: 0 0 0 3px rgba(255, 99, 71, 0.25); border-color: var(--primary); }
+    input:focus, select:focus, textarea:focus { 
+      box-shadow: 0 0 0 4px rgba(255, 87, 34, 0.15); 
+      border-color: var(--primary); background: #FFFFFF;
+    }
 
-    .form-row { display: flex; gap: 10px; width: 100%; }
+    .form-row { display: flex; gap: 12px; width: 100%; }
     .form-row .form-group { flex: 1; }
 
     .vaccine-selection-box {
-      border: 2px solid var(--primary);
+      border: 2px solid #FFD8CC;
       border-radius: var(--radius);
-      padding: 16px;
-      background: #fffcfb;
-      margin-top: 6px;
+      padding: 20px;
+      background: #FFFDFB;
+      margin-top: 8px;
     }
 
     .vaccine-group-title {
-      font-weight: 700; color: var(--accent); font-size: 0.9rem;
-      margin: 12px 0 8px 0; padding-bottom: 4px; border-bottom: 1px dashed #e0e0e0;
+      font-weight: 800; color: var(--accent); font-size: 0.92rem;
+      margin: 16px 0 10px 0; padding-bottom: 6px; border-bottom: 2px dashed #F1F5F9;
+      display: flex; align-items: center; gap: 8px;
     }
+    .vaccine-group-title:first-child { margin-top: 0; }
 
     .vaccine-checkbox-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px;
     }
 
     .checkbox-item {
-      display: flex; align-items: center; gap: 8px; background: #ffffff;
-      padding: 8px 12px; border-radius: 8px; border: 1px solid #e2e8f0;
+      display: flex; align-items: center; gap: 10px; background: #FFFFFF;
+      padding: 10px 14px; border-radius: 10px; border: 1.5px solid var(--border-color);
       cursor: pointer; font-size: 0.88rem; font-weight: 600; color: #334155;
-      transition: all 0.15s ease; user-select: none;
+      transition: all 0.2s ease; user-select: none;
     }
-    .checkbox-item:hover { border-color: var(--primary); background: #fff5f2; }
+    .checkbox-item:hover { border-color: var(--primary); background: #FFF5F2; transform: translateY(-1px); }
     .checkbox-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer; }
 
     .table-container {
       width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch;
-      border-radius: 8px; border: 1px solid #cbd5e1; margin-top: 10px; background: #fff;
+      border-radius: var(--radius); border: 1px solid var(--border-color); 
+      margin-top: 14px; background: #FFF; box-shadow: var(--shadow-subtle);
     }
 
     .kohort-table {
       width: 100%; border-collapse: separate; border-spacing: 0;
-      font-size: 0.82rem; white-space: nowrap;
+      font-size: 0.83rem; white-space: nowrap;
     }
 
     .kohort-table th, .kohort-table td {
-      border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0;
-      padding: 8px 10px; text-align: center;
+      border-right: 1px solid #F1F5F9; border-bottom: 1px solid #F1F5F9;
+      padding: 10px 12px; text-align: center;
     }
 
     .kohort-table thead tr:first-child th {
-      background: var(--accent); color: #fff; font-weight: 700;
+      background: var(--accent); color: #FFF; font-weight: 700;
     }
 
     .kohort-table thead tr:nth-child(2) th {
-      background: #002b55; color: #e2e8f0; font-size: 0.78rem; font-weight: 600;
+      background: #002244; color: #E2E8F0; font-size: 0.78rem; font-weight: 600;
     }
 
     .kohort-table .sticky-col-1 {
-      position: sticky; left: 0; z-index: 10; background: #f8fafc; text-align: left; font-weight: 700; color: var(--accent); min-width: 140px;
+      position: sticky; left: 0; z-index: 10; background: #F8FAFC; text-align: left; font-weight: 700; color: var(--accent); min-width: 150px;
     }
     .kohort-table .sticky-col-2 {
-      position: sticky; left: 140px; z-index: 10; background: #f8fafc; text-align: left; min-width: 100px;
+      position: sticky; left: 150px; z-index: 10; background: #F8FAFC; text-align: left; min-width: 110px;
     }
 
     .kohort-table thead th.sticky-col-1, .kohort-table thead th.sticky-col-2 {
-      z-index: 20; background: var(--accent) !important; color: #fff !important;
+      z-index: 20; background: var(--accent) !important; color: #FFF !important;
     }
 
-    .kohort-table tbody tr:nth-child(even) { background: #f8fafc; }
-    .kohort-table tbody tr:hover { background: #f1f5f9; }
+    .kohort-table tbody tr:nth-child(even) { background: #F8FAFC; }
+    .kohort-table tbody tr:hover { background: #F1F5F9; }
 
     .v-given {
-      background: #d1e7dd; color: #0f5132; font-weight: 700; padding: 2px 6px; border-radius: 4px; font-size: 0.78rem;
+      background: #D1FAE5; color: #065F46; font-weight: 700; padding: 4px 8px; border-radius: 6px; font-size: 0.78rem;
     }
 
     .badge-user {
-      background: #e2e8f0; color: var(--accent); padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255, 255, 255, 0.15); color: #FFF; padding: 6px 14px; border-radius: 20px; 
+      font-size: 0.82rem; font-weight: 700; display: inline-flex; align-items: center; gap: 8px;
+      backdrop-filter: blur(4px); border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     .badge-urgent {
-      background: #f8d7da; color: #842029; border: 1px solid #f5c2c7; font-weight: 700; padding: 3px 8px; border-radius: 4px; font-size: 0.78rem; display: inline-block;
+      background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5; font-weight: 700; padding: 4px 8px; border-radius: 6px; font-size: 0.78rem; display: inline-block;
     }
 
     .badge-warning-custom {
-      background: #fff3cd; color: #856404; border: 1px solid #ffeeba; font-weight: 700; padding: 3px 8px; border-radius: 4px; font-size: 0.78rem; display: inline-block;
+      background: #FEF3C7; color: #92400E; border: 1px solid #FCD34D; font-weight: 700; padding: 4px 8px; border-radius: 6px; font-size: 0.78rem; display: inline-block;
     }
 
-    .actions { display: flex; gap: 10px; justify-content: flex-end; align-items: center; margin-top: 16px; flex-wrap: wrap; }
+    .actions { display: flex; gap: 12px; justify-content: flex-end; align-items: center; margin-top: 20px; flex-wrap: wrap; }
     .btn {
-      padding: 10px 16px; border-radius: 8px; border: 0; font-weight: 600; cursor: pointer;
-      display: inline-flex; gap: 6px; align-items: center; justify-content: center; font-size: 0.9rem;
-      box-shadow: var(--shadow-subtle); transition: all 0.2s;
+      padding: 11px 20px; border-radius: 10px; border: 0; font-weight: 700; cursor: pointer;
+      display: inline-flex; gap: 8px; align-items: center; justify-content: center; font-size: 0.9rem;
+      box-shadow: var(--shadow-subtle); transition: all 0.2s ease; font-family: inherit;
     }
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 15px rgba(0,0,0,0.1); }
     .btn-primary { background: var(--primary); color: #fff; }
-    .btn-ghost { background: transparent; border: 1px solid #ced4da; color: var(--accent); }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-ghost { background: transparent; border: 1.5px solid var(--border-color); color: var(--accent); }
+    .btn-ghost:hover { background: #F1F5F9; }
     .btn-info { background: var(--info); color: #fff; } 
     .btn-danger { background: var(--danger); color: #fff; }
     .btn-success { background: var(--success); color: #fff; }
 
-    .site-footer { text-align: center; margin-top: 30px; padding: 15px 0; color: var(--muted); font-size: 0.8rem; border-top: 1px solid #eee; }
+    .site-footer { text-align: center; margin-top: 40px; padding: 20px 0; color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--border-color); }
 
     .modal-overlay {
-      position: fixed; inset: 0; background: rgba(2, 6, 23, 0.7); z-index: 2000;
+      position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75); z-index: 2000;
       display: flex; align-items: center; justify-content: center; padding: 16px;
+      backdrop-filter: blur(4px);
     }
 
     @media (max-width: 768px) {
-      .wrap { padding: 0 10px; margin: 12px auto; }
-      .card { padding: 16px; }
-      .grid { grid-template-columns: 1fr !important; gap: 12px; }
+      .wrap { padding: 0 12px; margin: 16px auto; }
+      .card { padding: 18px; }
+      .grid { grid-template-columns: 1fr !important; gap: 14px; }
       .full-width { grid-column: span 1 !important; }
-      .form-row { flex-direction: column; gap: 10px; }
+      .form-row { flex-direction: column; gap: 12px; }
       .vaccine-checkbox-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
       .actions { width: 100%; }
       .actions .btn { width: 100%; }
@@ -213,12 +250,12 @@
 
   <!-- MODAL LOGIN PETUGAS -->
   <div id="loginModal" class="modal-overlay">
-    <div style="background:#fff; padding:24px; border-radius:12px; max-width:400px; width:100%; box-shadow:0 10px 25px rgba(0,0,0,0.2);">
-      <div style="text-align:center; margin-bottom:16px;">
-        <div style="width:50px; height:50px; background:var(--accent); color:#fff; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:22px; margin-bottom:8px;">
+    <div style="background:#fff; padding:28px; border-radius:16px; max-width:400px; width:100%; box-shadow:0 20px 30px rgba(0,0,0,0.2);">
+      <div style="text-align:center; margin-bottom:20px;">
+        <div style="width:56px; height:56px; background:linear-gradient(135deg, var(--accent), var(--accent-light)); color:#fff; border-radius:16px; display:inline-flex; align-items:center; justify-content:center; font-size:24px; margin-bottom:10px; box-shadow:0 8px 16px rgba(0,51,102,0.3);">
           <i class="fas fa-user-shield"></i>
         </div>
-        <h3 style="margin:0; color:var(--accent);">Autentikasi Petugas</h3>
+        <h3 style="margin:0; color:var(--accent); font-size:1.25rem;">Autentikasi Petugas</h3>
         <p style="font-size:0.85rem; color:var(--muted); margin-top:4px;">Sistem Register Imunisasi Puskesmas Melata</p>
       </div>
 
@@ -244,7 +281,7 @@
   <header class="app-header">
     <div class="brand-row">
       <div class="brand">
-        <div class="logo"><i class="fas fa-syringe" style="font-size:18px;color:#fff"></i></div>
+        <div class="logo"><i class="fas fa-syringe" style="font-size:20px;color:#fff"></i></div>
         <div>
           Sistem Register Imunisasi & BIAS<br>
           <span class="brand-title-small">Puskesmas Melata (Kohort Mode)</span>
@@ -252,10 +289,10 @@
       </div>
       <div class="header-actions">
         <div class="badge-user" id="currentUserDisplay"><i class="fas fa-user-circle"></i> <span>Petugas</span></div>
-        <button class="btn btn-ghost" onclick="logoutPetugas()" style="color:#fff; border-color:rgba(255,255,255,0.4); padding:6px 10px; font-size:0.8rem;" title="Ganti Petugas">
+        <button class="btn btn-ghost" onclick="logoutPetugas()" style="color:#fff; border-color:rgba(255,255,255,0.3); padding:7px 12px; font-size:0.8rem;" title="Ganti Petugas">
           <i class="fas fa-sign-out-alt"></i> Ganti
         </button>
-        <button class="btn btn-ghost" onclick="document.getElementById('helpModal').style.display='flex'" style="color:#fff; border-color:rgba(255,255,255,0.4); padding:6px 10px; font-size:0.8rem;">
+        <button class="btn btn-ghost" onclick="document.getElementById('helpModal').style.display='flex'" style="color:#fff; border-color:rgba(255,255,255,0.3); padding:7px 12px; font-size:0.8rem;">
           <i class="fas fa-circle-info"></i>
         </button>
       </div>
@@ -275,15 +312,15 @@
     <section id="imunisasi" class="tab-panel">
       <!-- PERINGATAN UTAMA KONEKSI & OFFLINE STORAGE -->
       <div class="alert-banner">
-        <i class="fas fa-exclamation-triangle" style="font-size: 1.2rem;"></i>
+        <i class="fas fa-exclamation-triangle" style="font-size: 1.3rem;"></i>
         <div>
           <strong>PENTING:</strong> Lakukan ekspor data jika tidak ada akses internet saat penginputan di lokasi kegiatan/desa. Data tetap tersimpan di memori lokal dan akan diunggah otomatis saat terhubung internet.
         </div>
       </div>
 
-      <div class="card" style="background:#f0f8ff; border:2px solid var(--accent-light);">
-        <h3><i class="fas fa-search"></i> Cari / Update Progres Sasaran Registered</h3>
-        <p class="lead" style="font-size:0.88rem; margin-bottom:10px;">Pilih desa untuk memilih sasaran (Bayi, Baduta, Catin, Ibu Hamil) yang sudah terdaftar guna memperbarui vaksinasinya.</p>
+      <div class="card" style="background:#F0F7FF; border:2px solid #BAE6FD;">
+        <h2><i class="fas fa-search" style="color:var(--info)"></i> Cari / Update Progres Sasaran Registered</h2>
+        <p class="lead" style="font-size:0.88rem; margin-bottom:12px;">Pilih desa untuk memilih sasaran (Bayi, Baduta, Catin, Ibu Hamil) yang sudah terdaftar guna memperbarui vaksinasinya.</p>
         
         <div class="grid">
           <div class="form-group">
@@ -315,8 +352,8 @@
       </div>
 
       <div class="card">
-        <h2><i class="fas fa-id-card"></i> Form Register Imunisasi (Bayi, Baduta, Catin & Bumil)</h2>
-        <p class="lead">Isi data sasaran di bawah. Pilihan vaksinasi otomatis disesuaikan secara terpisah untuk kategori Anak/Baduta dan Catin/Bumil.</p>
+        <h2><i class="fas fa-id-card" style="color:var(--primary)"></i> Form Register Imunisasi (Bayi, Baduta, Catin & Bumil)</h2>
+        <p class="lead">Isi data sasaran di bawah. Pilihan vaksinasi disesuaikan secara independen tanpa autofill tanggal paksaan pada TT Catin maupun TT Bumil.</p>
 
         <form id="formRegisterIndividu">
           <div class="grid">
@@ -386,9 +423,9 @@
               <input type="text" id="reg_alamat" placeholder="Contoh: RT 02 / Dusun A" required>
             </div>
 
-            <!-- CHECKBOXES PILIHAN VAKSINASI TERISOLASI -->
+            <!-- CHECKBOXES PILIHAN VAKSINASI -->
             <div class="form-group full-width">
-              <label style="color:var(--primary); font-size:1.05rem;"><i class="fas fa-check-double"></i> Pilih Jenis Imunisasi Diberikan <span class="req">*</span></label>
+              <label style="color:var(--primary); font-size:1rem;"><i class="fas fa-check-double"></i> Pilih Jenis Imunisasi Diberikan <span class="req">*</span></label>
               
               <div class="vaccine-selection-box">
                 <div class="vaccine-group-title"><i class="fas fa-baby"></i> Imunisasi Bayi (0 - 12 Bulan)</div>
@@ -414,20 +451,20 @@
                   <label class="checkbox-item"><input type="checkbox" name="chk_vaksin" value="JE"> JE</label>
                 </div>
 
-                <div class="vaccine-group-title" style="margin-top:16px;"><i class="fas fa-child"></i> Imunisasi Lanjutan Baduta (12 - 24 Bulan)</div>
+                <div class="vaccine-group-title" style="margin-top:20px;"><i class="fas fa-child"></i> Imunisasi Lanjutan Baduta (12 - 24 Bulan)</div>
                 <div class="vaccine-checkbox-grid">
                   <label class="checkbox-item"><input type="checkbox" name="chk_vaksin" value="PCV3"> PCV 3</label>
                   <label class="checkbox-item"><input type="checkbox" name="chk_vaksin" value="DPT-HB-Hib4"> DPT-HB-Hib 4</label>
                   <label class="checkbox-item"><input type="checkbox" name="chk_vaksin" value="Campak Rubela-2"> MR 2 (Booster Baduta)</label>
                 </div>
 
-                <div class="vaccine-group-title" style="margin-top:16px; color:#856404;"><i class="fas fa-heart"></i> Td Calon Pengantin (TT Catin)</div>
+                <div class="vaccine-group-title" style="margin-top:20px; color:#B45309;"><i class="fas fa-heart"></i> Td Calon Pengantin (TT Catin)</div>
                 <div class="vaccine-checkbox-grid">
                   <label class="checkbox-item"><input type="checkbox" name="chk_vaksin" value="TT1 Catin"> TT1 Catin</label>
                   <label class="checkbox-item"><input type="checkbox" name="chk_vaksin" value="TT2 Catin" id="cb_tt2_catin"> TT2 Catin</label>
                 </div>
 
-                <div class="vaccine-group-title" style="margin-top:16px; color:#0f5132;"><i class="fas fa-person-pregnant"></i> Td Ibu Hamil (TT Bumil)</div>
+                <div class="vaccine-group-title" style="margin-top:20px; color:#065F46;"><i class="fas fa-person-pregnant"></i> Td Ibu Hamil (TT Bumil)</div>
                 <div class="vaccine-checkbox-grid">
                   <label class="checkbox-item"><input type="checkbox" name="chk_vaksin" value="TT1 Bumil" class="cb-bumil"> TT1 Bumil</label>
                   <label class="checkbox-item"><input type="checkbox" name="chk_vaksin" value="TT2 Bumil" class="cb-bumil"> TT2 Bumil</label>
@@ -449,13 +486,13 @@
       <div class="card">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
           <div>
-            <h3 style="margin:0;"><i class="fas fa-check-circle" style="color:var(--success);"></i> Preview Data Desa Terpilih (<span id="preview_desa_title">Semua Desa</span>)</h3>
+            <h3 style="margin:0;"><i class="fas fa-list-check" style="color:var(--success);"></i> Preview Data Desa Terpilih (<span id="preview_desa_title">Semua Desa</span>)</h3>
             <p class="lead" style="font-size:0.85rem; margin:4px 0 0 0;">Tabel terpisah antara Bayi/Baduta (s/d MR2) dan Td Catin/Bumil (TT Catin s/d TT5 Bumil).</p>
           </div>
-          <button class="btn btn-ghost" onclick="loadRecentTransactions()" style="padding:4px 10px; font-size:0.8rem;"><i class="fas fa-sync-alt"></i> Refresh Preview</button>
+          <button class="btn btn-ghost" onclick="loadRecentTransactions()" style="padding:6px 12px; font-size:0.82rem;"><i class="fas fa-sync-alt"></i> Refresh Preview</button>
         </div>
 
-        <h4 style="color:var(--accent); margin-top:16px;"><i class="fas fa-baby"></i> 1. Matriks Imunisasi Bayi & Baduta (s/d MR2)</h4>
+        <h4 style="color:var(--accent); margin-top:20px; display:flex; align-items:center; gap:8px;"><i class="fas fa-baby"></i> 1. Matriks Imunisasi Bayi & Baduta (s/d MR2)</h4>
         <div class="table-container">
           <table class="kohort-table" id="tblRecentAnak">
             <thead>
@@ -482,7 +519,7 @@
           </table>
         </div>
 
-        <h4 style="color:#0f5132; margin-top:24px;"><i class="fas fa-female"></i> 2. Matriks Td Calon Pengantin (Catin) & Ibu Hamil (Bumil)</h4>
+        <h4 style="color:#065F46; margin-top:28px; display:flex; align-items:center; gap:8px;"><i class="fas fa-female"></i> 2. Matriks Td Calon Pengantin (Catin) & Ibu Hamil (Bumil)</h4>
         <div class="table-container">
           <table class="kohort-table" id="tblRecentDewasa">
             <thead>
@@ -514,7 +551,7 @@
     <!-- TAB 2: BIAS -->
     <section id="bias" class="tab-panel" style="display:none">
       <div class="card">
-        <h2><i class="fas fa-school"></i> Form BIAS (Imunisasi Anak Sekolah)</h2>
+        <h2><i class="fas fa-school" style="color:var(--info)"></i> Form BIAS (Imunisasi Anak Sekolah)</h2>
         <p class="lead">Input data pelaksanaan BIAS di sekolah. Bidang bertanda <span class="req">*</span> wajib diisi.</p>
 
         <form id="biasForm">
@@ -525,9 +562,9 @@
             </div>
 
             <div class="form-group full-width">
-              <h3 style="margin:10px 0; font-size:1.1rem; color:var(--accent);">Input Data Kelas & Jenis Vaksin BIAS</h3>
+              <h3 style="margin:12px 0; font-size:1.1rem; color:var(--accent);">Input Data Kelas & Jenis Vaksin BIAS</h3>
               <div id="biasClassReportsContainer"><p class="muted">Pilih sekolah di atas untuk mengaktifkan form kelas.</p></div>
-              <div style="margin-top:15px; border-top:1px dashed #ddd; padding-top:12px;">
+              <div style="margin-top:16px; border-top:1px dashed var(--border-color); padding-top:14px;">
                  <button type="button" id="addBiasClassButton" class="btn btn-info" disabled style="opacity:0.5"><i class="fas fa-plus-circle"></i> Tambah Input Kelas BIAS</button>
               </div>
             </div>
@@ -541,8 +578,8 @@
 
     <!-- TAB 3: EXPORT -->
     <section id="export" class="tab-panel" style="display:none">
-      <div class="card" style="border: 2px solid var(--info);">
-        <h2><i class="fas fa-file-export"></i> Ekspor Data Spesifik (Offline Sync)</h2>
+      <div class="card" style="border-left: 5px solid var(--info);">
+        <h2><i class="fas fa-file-export" style="color:var(--info)"></i> Ekspor Data Spesifik (Offline Sync)</h2>
         <p class="lead">Ekspor data register kohort desa/bulan/tahun tertentu langsung dalam bentuk **Excel (.xlsx) 2 Sheet**.</p>
 
         <div class="grid">
@@ -616,7 +653,7 @@
     <!-- TAB 4: IMPORT -->
     <section id="import" class="tab-panel" style="display:none">
         <div class="card">
-          <h2><i class="fas fa-upload"></i> Import Database / File Ekspor ke Cloud</h2>
+          <h2><i class="fas fa-upload" style="color:var(--primary)"></i> Import Database / File Ekspor ke Cloud</h2>
           <p class="lead">Gunakan menu ini untuk mengunggah file **JSON** maupun **CSV/Excel** hasil ekspor offline ke server cloud saat sudah mendapatkan akses internet.</p>
           <div class="form-group">
             <label>Pilih File Database (JSON atau CSV)</label>
@@ -642,7 +679,7 @@
           <button class="btn btn-success" id="btnDownloadCatchUpExcel" style="font-size:0.85rem;"><i class="fas fa-file-excel"></i> Download Laporan Catch Up (.xlsx)</button>
         </div>
 
-        <div class="grid" style="margin-top:10px;">
+        <div class="grid" style="margin-top:12px;">
           <div class="form-group full-width">
             <label>Pilih Desa / Kelurahan</label>
             <select id="catchup_filter_desa">
@@ -678,9 +715,9 @@
         </div>
       </div>
 
-      <!-- PANEL 2: VAKSIN BERKESINAMBUNGAN & DROP OUT (2 BULAN / 4 MINGGU) -->
+      <!-- PANEL 2: VAKSIN BERKESINAMBUNGAN & DROP OUT -->
       <div class="card">
-        <h3 style="color:#856404;"><i class="fas fa-link"></i> 2. Panel Risiko Drop Out & Catch Up Antigen Berkesinambungan</h3>
+        <h3 style="color:#B45309;"><i class="fas fa-link"></i> 2. Panel Risiko Drop Out & Catch Up Antigen Berkesinambungan</h3>
         <p class="lead" style="font-size:0.85rem;">Menganalisis DPT1-3, OPV1-4, PCV1-3, RV1-3 dengan jeda minimal 4 minggu / ≥ 2 bulan.</p>
         <div id="panel_berkesinambungan_container" class="table-container">
           <p class="muted" style="text-align:center; padding:15px;"><i class="fas fa-arrow-up"></i> Klik tombol Analisis di atas untuk memuat data.</p>
@@ -698,7 +735,7 @@
 
       <!-- PANEL 4: CATIN & IBU HAMIL -->
       <div class="card">
-        <h3 style="color:#0f5132;"><i class="fas fa-female"></i> 4. Catch Up Td Calon Pengantin (Catin) & Td Ibu Hamil</h3>
+        <h3 style="color:#065F46;"><i class="fas fa-female"></i> 4. Catch Up Td Calon Pengantin (Catin) & Td Ibu Hamil</h3>
         <p class="lead" style="font-size:0.85rem;">Sasaran Catin & Bumil yang menunggak dosis status Td (TT1 - TT5).</p>
         <div id="panel_dewasa_container" class="table-container">
           <p class="muted" style="text-align:center; padding:15px;"><i class="fas fa-arrow-up"></i> Klik tombol Analisis di atas untuk memuat data.</p>
@@ -709,7 +746,7 @@
     <!-- TAB 6: KUMULATIF & LAPORAN MATRIKS -->
     <section id="kumulatif" class="tab-panel" style="display:none">
       <div class="card" style="border-left: 5px solid var(--primary);">
-        <h3 style="margin:0 0 8px 0; color:var(--accent)"><i class="fas fa-chart-bar"></i> Laporan Kumulatif Matriks Register</h3>
+        <h3 style="margin:0 0 8px 0; color:var(--accent)"><i class="fas fa-chart-line" style="color:var(--primary)"></i> Laporan Kumulatif Matriks Register</h3>
         <p class="lead" style="margin-bottom:0">Mengunduh laporan otomatis menghasilkan file **Excel (.xlsx) 2 Sheet** yang terpisah per kelompok sasaran dan terformat rapi.</p>
       </div>
 
@@ -796,12 +833,12 @@
   </footer>
 
   <div id="helpModal" class="modal-overlay" style="display:none;">
-    <div style="background:#fff;padding:20px;border-radius:12px;max-width:500px;margin:20px; width:90%;">
+    <div style="background:#fff;padding:24px;border-radius:16px;max-width:500px;margin:20px; width:90%;">
       <div style="display:flex;justify-content:space-between;align-items:center">
         <h3 style="margin:0; color:var(--accent);"><i class="fas fa-circle-info"></i> Bantuan</h3>
         <button class="btn btn-ghost" onclick="document.getElementById('helpModal').style.display='none'">Tutup</button>
       </div>
-      <hr style="margin: 12px 0;">
+      <hr style="margin: 14px 0; border:0; border-top:1px solid var(--border-color);">
       <p class="lead">Sistem dilengkapi jejak audit otomatis per petugas. Setiap update atau penghapusan data mencatat nama petugas dan waktu pengisian demi menjaga keabsahan data.</p>
     </div>
   </div>
@@ -824,7 +861,6 @@
     const COL_KOHORT = "register_imunisasi";
     const COL_BIAS = "laporan_bias";
 
-    // PISAHKAN DEFINISI KEYS BERDASARKAN KELOMPOK
     const VAKSIN_ANAK_KEYS = [
       "HBO (<24 Jam)", "HBO (1-7 Hari)", "BCG", "OPV1", "DPT-HB-Hib1", "OPV2", "PCV1", "Rotavirus1",
       "DPT-HB-Hib2", "OPV3", "PCV2", "Rotavirus2", "DPT-HB-Hib3", "OPV4", "IPV1", "Rotavirus3",
@@ -886,23 +922,6 @@
           { key: "Campak Rubela-1", offsetMonths: 9 },
           { key: "Campak Rubela-2", offsetMonths: 18 }
         ]
-      },
-      {
-        name: "TT Catin",
-        items: [
-          { key: "TT1 Catin", offsetMonths: 0 },
-          { key: "TT2 Catin", offsetMonths: 1 }
-        ]
-      },
-      {
-        name: "TT Bumil",
-        items: [
-          { key: "TT1 Bumil", offsetMonths: 0 },
-          { key: "TT2 Bumil", offsetMonths: 1 },
-          { key: "TT3 Bumil", offsetMonths: 6 },
-          { key: "TT4 Bumil", offsetMonths: 12 },
-          { key: "TT5 Bumil", offsetMonths: 24 }
-        ]
       }
     ];
 
@@ -954,11 +973,6 @@
       const prev = new Date(prevDateStr);
       const diffDays = Math.floor((targetDate - prev) / (1000 * 60 * 60 * 24));
       return diffDays >= 28;
-    }
-
-    function checkCb(val) {
-      const cb = document.querySelector(`input[name="chk_vaksin"][value="${val}"]`);
-      if (cb && !cb.checked) cb.checked = true;
     }
 
     function getActiveVaccineKeysByCategory(katSel) {
@@ -1020,8 +1034,6 @@
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('reg_tgl_pelayanan').value = today;
 
-      setupVaccineAutoFillListeners();
-
       document.getElementById('reg_jk').addEventListener('change', handleJkRules);
 
       document.getElementById('formRegisterIndividu').addEventListener('submit', handleSaveKohortMatrix);
@@ -1059,7 +1071,6 @@
       window.addEventListener('online', syncOfflineQueueToCloud);
     });
 
-    // BATASAN JENIS KELAMIN KHUSUS LAKI-LAKI UNTUK TT CATIN (HANYA TT1 CATIN)
     function handleJkRules() {
       const jk = document.getElementById('reg_jk').value;
       const cbTT2Catin = document.getElementById('cb_tt2_catin');
@@ -1073,39 +1084,6 @@
         cbTT2Catin.disabled = false;
         bumilCBs.forEach(cb => { cb.disabled = false; });
       }
-    }
-
-    // AUTOFILL INTELIGEN & FIX BUG PERHITUNGAN TANGGAL
-    function setupVaccineAutoFillListeners() {
-      const checkboxes = document.querySelectorAll('input[name="chk_vaksin"]');
-      checkboxes.forEach(cb => {
-        cb.addEventListener('change', (e) => {
-          if (e.target.checked) {
-            const selectedVal = e.target.value;
-
-            if (selectedVal === "BCG") {
-              checkCb("HBO (1-7 Hari)");
-            }
-
-            if (["DPT-HB-Hib3", "IPV1", "IPV2"].includes(selectedVal)) {
-              checkCb("HBO (1-7 Hari)");
-              checkCb("BCG");
-            }
-
-            // PERBAIKAN: AUTOFILL DPT, OPV, PCV, RV (JANGAN SENTUH TT1 CATIN & TT1 BUMIL DENGAN TGL LAHIR)
-            SERIES_SEQUENCES.forEach(series => {
-              if (series.name !== "TT Catin" && series.name !== "TT Bumil") {
-                const idx = series.items.findIndex(item => item.key === selectedVal);
-                if (idx > 0) {
-                  for (let i = 0; i < idx; i++) {
-                    checkCb(series.items[i].key);
-                  }
-                }
-              }
-            });
-          }
-        });
-      });
     }
 
     async function populateAnakByDesa() {
@@ -1188,7 +1166,6 @@
         return alert("⚠️ Mohon centang minimal 1 jenis imunisasi!");
       }
 
-      // Validasi Laki-laki hanya TT1 Catin
       if (jk === 'L' && (selectedVaccines.includes('TT2 Catin') || selectedVaccines.some(v => v.includes('Bumil')))) {
         return alert("⚠️ Laki-Laki (Pria) hanya dapat menerima TT1 Catin!");
       }
@@ -1207,12 +1184,6 @@
         let idealOffsetMonths = 0;
         let idealOffsetDays = 0;
 
-        // PENGECUALIAN UNTUK TT1 BUMIL & TT1 CATIN: PAKAI TANGGAL PELAYANAN
-        if (v === "TT1 Catin" || v === "TT1 Bumil") {
-          vaccineDataUpdate[`vaksin_${v.replace(/[\s\(\)<>-]/g, '_')}`] = tglPelayananInput;
-          return;
-        }
-
         if (v === "HBO (1-7 Hari)" && (selectedVaccines.includes("BCG") || selectedVaccines.includes("DPT-HB-Hib3") || selectedVaccines.includes("IPV1"))) {
           if (!selectedVaccines.includes("HBO (<24 Jam)")) {
             isLowerSeriesDose = true;
@@ -1223,18 +1194,16 @@
           idealOffsetMonths = 1;
         } else {
           SERIES_SEQUENCES.forEach(series => {
-            if (series.name !== "TT Catin" && series.name !== "TT Bumil") {
-              const idx = series.items.findIndex(item => item.key === v);
-              if (idx !== -1) {
-                let maxCheckedIdx = -1;
-                series.items.forEach((item, i) => {
-                  if (selectedVaccines.includes(item.key)) maxCheckedIdx = i;
-                });
+            const idx = series.items.findIndex(item => item.key === v);
+            if (idx !== -1) {
+              let maxCheckedIdx = -1;
+              series.items.forEach((item, i) => {
+                if (selectedVaccines.includes(item.key)) maxCheckedIdx = i;
+              });
 
-                if (idx < maxCheckedIdx) {
-                  isLowerSeriesDose = true;
-                  idealOffsetMonths = series.items[idx].offsetMonths;
-                }
+              if (idx < maxCheckedIdx) {
+                isLowerSeriesDose = true;
+                idealOffsetMonths = series.items[idx].offsetMonths;
               }
             }
           });
@@ -1321,7 +1290,6 @@
       loadRecentTransactions();
     }
 
-    // PEMISAHAN PREVIEW INDIVIDU DUA TABEL (ANAK DARI HBO S/D MR2 DAN CATIN/BUMIL TT CATIN S/D TT5 BUMIL)
     async function loadRecentTransactions() {
       const tbodyAnak = document.querySelector('#tblRecentAnak tbody');
       const tbodyDewasa = document.querySelector('#tblRecentDewasa tbody');
@@ -1367,7 +1335,6 @@
           const hasDewasaVaccine = VAKSIN_DEWASA_KEYS.some(v => d[`vaksin_${v.replace(/[\s\(\)<>-]/g, '_')}`]);
           const petugasKet = d.last_updated_by ? `<strong style="color:var(--accent);">${d.last_updated_by}</strong>` : '-';
 
-          // TABEL 1: ANAK S/D MR2
           if (hasAnakVaccine || getAgeInMonths(d.tgl_lahir) <= 24) {
             countAnak++;
             const tr = document.createElement('tr');
@@ -1376,7 +1343,7 @@
             VAKSIN_ANAK_KEYS.forEach(vKey => {
               const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
               const val = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
-              vCols += val ? `<td><span class="v-given">${val}</span></td>` : `<td style="color:#cbd5e1;">-</td>`;
+              vCols += val ? `<td><span class="v-given">${val}</span></td>` : `<td style="color:#CBD5E1;">-</td>`;
             });
 
             tr.innerHTML = `
@@ -1388,12 +1355,11 @@
               <td>${d.alamat_rt || '-'}</td>
               ${vCols}
               <td>${petugasKet}</td>
-              <td><button class="btn btn-danger" onclick="hapusTrans('${d.id}')" style="padding:2px 6px; font-size:0.75rem;"><i class="fas fa-trash"></i></button></td>
+              <td><button class="btn btn-danger" onclick="hapusTrans('${d.id}')" style="padding:4px 8px; font-size:0.75rem;"><i class="fas fa-trash"></i></button></td>
             `;
             tbodyAnak.appendChild(tr);
           }
 
-          // TABEL 2: CATIN & BUMIL (TT1 CATIN S/D TT5 BUMIL)
           if (hasDewasaVaccine || getAgeInMonths(d.tgl_lahir) > 24) {
             countDewasa++;
             const tr = document.createElement('tr');
@@ -1402,7 +1368,7 @@
             VAKSIN_DEWASA_KEYS.forEach(vKey => {
               const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
               const val = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
-              vCols += val ? `<td><span class="v-given">${val}</span></td>` : `<td style="color:#cbd5e1;">-</td>`;
+              vCols += val ? `<td><span class="v-given">${val}</span></td>` : `<td style="color:#CBD5E1;">-</td>`;
             });
 
             tr.innerHTML = `
@@ -1414,7 +1380,7 @@
               <td>${d.alamat_rt || '-'}</td>
               ${vCols}
               <td>${petugasKet}</td>
-              <td><button class="btn btn-danger" onclick="hapusTrans('${d.id}')" style="padding:2px 6px; font-size:0.75rem;"><i class="fas fa-trash"></i></button></td>
+              <td><button class="btn btn-danger" onclick="hapusTrans('${d.id}')" style="padding:4px 8px; font-size:0.75rem;"><i class="fas fa-trash"></i></button></td>
             `;
             tbodyDewasa.appendChild(tr);
           }
@@ -1670,7 +1636,6 @@
       } catch (err) { alert("Gagal Download Catch Up: " + err.message); }
     }
 
-    // HITUNG REVIEW MATRIKS KUMULATIF TERMASUK KATEGORI BIAS DENGAN SANGAT PRESISI
     async function loadReviewDetail() {
       const thn = document.getElementById('filter_tahun').value;
       const bln = document.getElementById('filter_bulan').value;
@@ -1681,7 +1646,6 @@
       container.innerHTML = '<p class="muted" style="text-align:center; padding:20px;"><i class="fas fa-spinner fa-spin"></i> Memuat laporan matriks...</p>';
 
       try {
-        // HANDLER KHUSUS BIAS
         if (katSel === 'BIAS') {
           const snapBias = await getDocs(collection(db, COL_BIAS));
           let biasRows = [];
@@ -1699,7 +1663,7 @@
           }
 
           let biasHtml = `
-            <div style="margin-bottom:12px; background:#f0f7ff; padding:10px 12px; border-radius:8px; border:1px solid #c0d8f0; font-size:0.85rem;">
+            <div style="margin-bottom:12px; background:#F0F7FF; padding:12px 16px; border-radius:10px; border:1px solid #BAE6FD; font-size:0.88rem;">
               <strong>Periode BIAS:</strong> ${bln === 'ALL' ? 'Semua Bulan' : 'Bulan ' + bln} ${thn} | 
               <strong>Total Laporan BIAS Sekolah:</strong> ${biasRows.length} Data Kelas
             </div>
@@ -1739,7 +1703,7 @@
           biasHtml += `
               </tbody>
               <tfoot>
-                <tr style="background:#e2e8f0; font-weight:bold;">
+                <tr style="background:#E2E8F0; font-weight:bold;">
                   <td colspan="4" style="text-align:left; color:var(--accent);">TOTAL KESELURUHAN BIAS:</td>
                   <td>${sumSasL}</td><td>${sumSasP}</td><td>${sumCapL}</td><td>${sumCapP}</td>
                   <td style="color:var(--primary); font-size:1rem;">${sumCapL + sumCapP}</td>
@@ -1754,7 +1718,6 @@
           return;
         }
 
-        // HANDLER KOHORT INDIVIDU (BAYI, BADUTA, CATIN, BUMIL)
         const snap = await getDocs(collection(db, COL_KOHORT));
         let activeVaccineKeys = getActiveVaccineKeysByCategory(katSel);
         let filteredDocs = [];
@@ -1792,7 +1755,7 @@
               vTotals[vKey] += 1;
               vCols += `<td><span class="v-given">✓ (${val})</span></td>`;
             } else {
-              vCols += `<td style="color:#cbd5e1;">-</td>`;
+              vCols += `<td style="color:#CBD5E1;">-</td>`;
             }
           });
 
@@ -1819,7 +1782,7 @@
         });
 
         let html = `
-          <div style="margin-bottom:12px; background:#f0f7ff; padding:10px 12px; border-radius:8px; border:1px solid #c0d8f0; font-size:0.85rem;">
+          <div style="margin-bottom:12px; background:#F0F7FF; padding:12px 16px; border-radius:10px; border:1px solid #BAE6FD; font-size:0.88rem;">
             <strong>Periode:</strong> ${bln === 'ALL' ? 'Semua Bulan' : 'Bulan ' + bln} ${thn} | 
             <strong>Desa:</strong> ${desaSel === 'ALL' ? 'Semua Desa' : desaSel} | 
             <strong>Kategori:</strong> ${katSel} | 
@@ -1843,7 +1806,7 @@
               ${rowsHtml || '<tr><td colspan="35" style="text-align:center;">Tidak ada data pada filter ini.</td></tr>'}
             </tbody>
             <tfoot>
-              <tr style="background:#e2e8f0; font-weight:bold;">
+              <tr style="background:#E2E8F0; font-weight:bold;">
                 <td class="sticky-col-1" colspan="2" style="text-align:left; color:var(--accent);">TOTAL DOSIS DIBERIKAN:</td>
                 <td>-</td><td>-</td><td>-</td>
                 ${totalColsHtml}
@@ -1856,7 +1819,6 @@
       } catch (err) { container.innerHTML = `<p style="color:red; text-align:center;">Error: ${err.message}</p>`; }
     }
 
-    // EKSPOR EXCEL DENGAN TABEL TERPISAH SANGAT RAPI DENGAN OPSI BIAS
     async function downloadExcel2Sheets() {
       const thn = document.getElementById('filter_tahun').value || document.getElementById('exp_filter_tahun').value;
       const bln = document.getElementById('filter_bulan').value || document.getElementById('exp_filter_bulan').value;
@@ -1923,7 +1885,6 @@
         const vTotals = {};
         activeVaccineKeys.forEach(v => vTotals[v] = 0);
 
-        // SHEET 1: REGISTER KOHORT MATRIKS
         const sheet1Data = [];
         sheet1Data.push([`LAPORAN REGISTER KOHORT MATRIKS - PUSKESMAS MELATA`]);
         sheet1Data.push([`Periode: ${bln === 'ALL' ? 'Semua Bulan' : 'Bulan ' + bln} ${thn} | Wilayah: ${desaSel === 'ALL' ? 'Semua Desa' : desaSel} | Kategori: ${katSel}`]);
@@ -1969,7 +1930,6 @@
         totalRow1.push("");
         sheet1Data.push(totalRow1);
 
-        // SHEET 2: REKAPAN TOTAL VAKSIN
         const sheet2Data = [
           [`REKAPITULASI TOTAL PENERIMA VAKSIN - PUSKESMAS MELATA`],
           [`Periode: ${bln === 'ALL' ? 'Semua Bulan' : 'Bulan ' + bln} ${thn} | Wilayah: ${desaSel === 'ALL' ? 'Semua Desa' : desaSel}`],
@@ -2054,10 +2014,10 @@
       classInputCounter++; const blockId = classInputCounter;
       const container = document.getElementById('biasClassReportsContainer');
       const html = `
-        <div class="card" id="block_${blockId}" style="background:#f8f9fa; border:1px solid #ced4da; margin-bottom:12px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <div class="card" id="block_${blockId}" style="background:#F8FAFC; border:1px solid var(--border-color); margin-bottom:14px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                 <h4 style="margin:0; font-size:0.95rem; font-weight:700; color:var(--primary)">Input Kelas BIAS #${blockId}</h4>
-                <button type="button" class="btn btn-danger" onclick="this.closest('.card').remove()" style="padding:2px 6px; font-size:0.75rem;"><i class="fas fa-times"></i> Hapus</button>
+                <button type="button" class="btn btn-danger" onclick="this.closest('.card').remove()" style="padding:4px 8px; font-size:0.75rem;"><i class="fas fa-times"></i> Hapus</button>
             </div>
             <div class="grid" style="grid-template-columns: 1fr 1fr;">
                 <div class="form-group">
@@ -2181,9 +2141,9 @@
                 }
               }
             }
-            status.innerHTML = `<div class="alert-banner" style="background:#d1e7dd; color:#0f5132; border-color:#badbcc;">Berhasil sinkronisasi ${count} data kohort matriks ke Firebase Cloud!</div>`;
+            status.innerHTML = `<div class="alert-banner" style="background:#D1FAE5; color:#065F46; border-color:#6EE7B7;">Berhasil sinkronisasi ${count} data kohort matriks ke Firebase Cloud!</div>`;
             loadRecentTransactions();
-          } catch (err) { status.innerHTML = `<div class="alert-banner" style="background:#f8f9fa; color:#842029; border-color:#f5c2c7;">Error Import: ${err.message}</div>`; }
+          } catch (err) { status.innerHTML = `<div class="alert-banner" style="background:#FEE2E2; color:#991B1B; border-color:#FCA5A5;">Error Import: ${err.message}</div>`; }
         };
 
         reader.readAsText(file);

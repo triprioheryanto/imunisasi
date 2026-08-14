@@ -276,7 +276,7 @@
       <div class="alert-banner">
         <i class="fas fa-exclamation-triangle" style="font-size: 1.2rem;"></i>
         <div>
-          <strong>PENTING:</strong> Menambah/mencentang dosis lanjutan (misal DPT3) akan <strong>otomatis melengkapi dosis sebelumnya dengan tanggal ideal</strong> berdasarkan tanggal lahir sasaran.
+          <strong>AUTOFILL AKTIF:</strong> Memilih BCG, DPT3, atau IPV akan <strong>otomatis mencentang dan mengisi tanggal ideal HB0 (1-7 hari) & BCG</strong> serta dosis sebelumnya.
         </div>
       </div>
 
@@ -806,7 +806,7 @@
       "TT1 Bumil", "TT2 Bumil", "TT3 Bumil", "TT4 Bumil", "TT5 Bumil"
     ];
 
-    // DEFINISI URUTAN ANTIGEN SEJENIS & OFFSET BULAN IDEAL PEMBERIAN DARI TGL LAHIR
+    // DEFINISI URUTAN ANTIGEN SEJENIS & OFFSET HARI/BULAN IDEAL PEMBERIAN DARI TGL LAHIR
     const SERIES_SEQUENCES = [
       {
         name: "DPT-HB-Hib",
@@ -911,11 +911,17 @@
     }
 
     // HITUNG TANGGAL IDEAL SESUAI USIA PEMBERIAN VAKSIN (DARI TGL LAHIR)
-    function calculateIdealVaccineDate(tglLahirStr, offsetMonths) {
+    function calculateIdealVaccineDate(tglLahirStr, offsetMonths, offsetDays = 0) {
       if (!tglLahirStr) return new Date().toISOString().split('T')[0];
       const d = new Date(tglLahirStr);
-      d.setMonth(d.getMonth() + offsetMonths);
+      if (offsetMonths) d.setMonth(d.getMonth() + offsetMonths);
+      if (offsetDays) d.setDate(d.getDate() + offsetDays);
       return d.toISOString().split('T')[0];
+    }
+
+    function checkCb(val) {
+      const cb = document.querySelector(`input[name="chk_vaksin"][value="${val}"]`);
+      if (cb && !cb.checked) cb.checked = true;
     }
 
     function initUserAuthCheck() {
@@ -969,7 +975,7 @@
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('reg_tgl_pelayanan').value = today;
 
-      // ATUR EVENT LISTENER AUTOFILL SAAT CHECKBOX VAKSIN DICENTANG
+      // SETUP EVENT LISTENER AUTOFILL SAAT CHECKBOX DICENTANG
       setupVaccineAutoFillListeners();
 
       document.getElementById('formRegisterIndividu').addEventListener('submit', handleSaveKohortMatrix);
@@ -1005,24 +1011,31 @@
       loadRecentTransactions();
     });
 
-    // LOGIKA AUTOFILL CHECKBOX ANTIGEN SEJENIS
+    // LOGIKA AUTOFILL INTELIGEN ANTIGEN SEJENIS, BCG, HB0, CATIN & BUMIL
     function setupVaccineAutoFillListeners() {
       const checkboxes = document.querySelectorAll('input[name="chk_vaksin"]');
       checkboxes.forEach(cb => {
         cb.addEventListener('change', (e) => {
           if (e.target.checked) {
             const selectedVal = e.target.value;
-            // Cari seri Mana
+
+            // 1. Jika BCG dicentang -> Autofill HB0 (1-7 Hari)
+            if (selectedVal === "BCG") {
+              checkCb("HBO (1-7 Hari)");
+            }
+
+            // 2. Jika mencapai DPT3, IPV1, atau IPV2 -> Autofill HB0 (1-7 Hari) & BCG
+            if (["DPT-HB-Hib3", "IPV1", "IPV2"].includes(selectedVal)) {
+              checkCb("HBO (1-7 Hari)");
+              checkCb("BCG");
+            }
+
+            // 3. Logika Dosis Berantai (DPT 1-4, OPV 1-4, PCV 1-3, RV 1-3, IPV 1-2, MR 1-2, TT Catin, TT Bumil)
             SERIES_SEQUENCES.forEach(series => {
               const idx = series.items.findIndex(item => item.key === selectedVal);
               if (idx > 0) {
-                // Centang otomatis semua item di bawahnya (dosis lebih rendah)
                 for (let i = 0; i < idx; i++) {
-                  const prevKey = series.items[i].key;
-                  const prevCb = document.querySelector(`input[name="chk_vaksin"][value="${prevKey}"]`);
-                  if (prevCb && !prevCb.checked) {
-                    prevCb.checked = true;
-                  }
+                  checkCb(series.items[i].key);
                 }
               }
             });
@@ -1122,31 +1135,40 @@
       selectedVaccines.forEach(v => {
         let isLowerSeriesDose = false;
         let idealOffsetMonths = 0;
+        let idealOffsetDays = 0;
 
-        // Cek apakah ini dosis berantai/sejenis
-        SERIES_SEQUENCES.forEach(series => {
-          const idx = series.items.findIndex(item => item.key === v);
-          if (idx !== -1) {
-            // Dapatkan dosis tertinggi yang dicentang di seri ini
-            let maxCheckedIdx = -1;
-            series.items.forEach((item, i) => {
-              if (selectedVaccines.includes(item.key)) maxCheckedIdx = i;
-            });
-
-            if (idx < maxCheckedIdx) {
-              isLowerSeriesDose = true;
-              idealOffsetMonths = series.items[idx].offsetMonths;
-            }
+        // Cek Logika HB0 & BCG
+        if (v === "HBO (1-7 Hari)" && (selectedVaccines.includes("BCG") || selectedVaccines.includes("DPT-HB-Hib3") || selectedVaccines.includes("IPV1"))) {
+          if (!selectedVaccines.includes("HBO (<24 Jam)")) {
+            isLowerSeriesDose = true;
+            idealOffsetDays = 1; // 1 hari pasca lahir
           }
-        });
+        } else if (v === "BCG" && (selectedVaccines.includes("DPT-HB-Hib3") || selectedVaccines.includes("IPV1") || selectedVaccines.includes("IPV2"))) {
+          isLowerSeriesDose = true;
+          idealOffsetMonths = 1; // 1 bulan pasca lahir
+        } else {
+          // Cek Seri Dosis Berantai
+          SERIES_SEQUENCES.forEach(series => {
+            const idx = series.items.findIndex(item => item.key === v);
+            if (idx !== -1) {
+              let maxCheckedIdx = -1;
+              series.items.forEach((item, i) => {
+                if (selectedVaccines.includes(item.key)) maxCheckedIdx = i;
+              });
+
+              if (idx < maxCheckedIdx) {
+                isLowerSeriesDose = true;
+                idealOffsetMonths = series.items[idx].offsetMonths;
+              }
+            }
+          });
+        }
 
         const fieldKey = `vaksin_${v.replace(/[\s\(\)<>-]/g, '_')}`;
 
         if (isLowerSeriesDose) {
-          // Isi dengan tanggal ideal berdasarkan tanggal lahir
-          vaccineDataUpdate[fieldKey] = calculateIdealVaccineDate(tglLahir, idealOffsetMonths);
+          vaccineDataUpdate[fieldKey] = calculateIdealVaccineDate(tglLahir, idealOffsetMonths, idealOffsetDays);
         } else {
-          // Dosis tertinggi yang dicentang diisi dengan tanggal pelayanan terkini
           vaccineDataUpdate[fieldKey] = tglPelayananInput;
         }
       });
@@ -1180,7 +1202,7 @@
       try {
         await setDoc(doc(db, COL_KOHORT, uniqueChildId), payload, { merge: true });
 
-        alert(`✅ Matriks Kohort ${namaAnak} berhasil diperbarui (termasuk autofill dosis sebelumnya)!`);
+        alert(`✅ Matriks Kohort ${namaAnak} berhasil diperbarui (autofill HB0, BCG & dosis sebelumnya sukses)!`);
         
         document.querySelectorAll('input[name="chk_vaksin"]:checked').forEach(cb => cb.checked = false);
         document.getElementById('reg_nama_anak').value = "";

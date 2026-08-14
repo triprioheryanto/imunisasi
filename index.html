@@ -273,7 +273,7 @@
   <main class="wrap">
     <!-- TAB 1: INPUT REGISTER KOHORT INDIVIDU -->
     <section id="imunisasi" class="tab-panel">
-      <!-- PERINGATAN UTAMA BEBAS KONEKSI UNTUK PETUGAS -->
+      <!-- PERINGATAN UTAMA KONEKSI & OFFLINE STORAGE -->
       <div class="alert-banner">
         <i class="fas fa-exclamation-triangle" style="font-size: 1.2rem;"></i>
         <div>
@@ -609,7 +609,7 @@
     <section id="catchup" class="tab-panel" style="display:none">
       <div class="card" style="border-left: 5px solid var(--warning);">
         <h3 style="margin:0 0 8px 0; color:var(--accent);"><i class="fas fa-exclamation-triangle" style="color:var(--warning)"></i> Panel Analisis Imunisasi Kejar (Catch Up) & Risiko Drop Out</h3>
-        <p class="lead" style="margin-bottom:0;">Panel tersegregasi secara klinis untuk memantau sasaran yang usianya sudah tercapai/terlewat namun vaksinnya belum pernah diberikan.</p>
+        <p class="lead" style="margin-bottom:0;">Panel tersegregasi secara klinis. <strong>PCV</strong> hanya ditagih pada bayi &lt;12 bulan (interval 4 minggu). <strong>Rotavirus</strong> hanya ditagih pada bayi &lt;7 bulan (interval 4 minggu).</p>
       </div>
 
       <div class="card">
@@ -648,16 +648,16 @@
       <!-- PANEL 1: BAYI < 1 TAHUN -->
       <div class="card">
         <h3 style="color:var(--accent);"><i class="fas fa-baby"></i> 1. Catch Up Usia &lt; 1 Tahun (Bayi)</h3>
-        <p class="lead" style="font-size:0.85rem;">Menampilkan sasaran usia &lt;1 tahun yang usianya sudah ideal/melewati jadwal namun vaksinnya belum diberikan.</p>
+        <p class="lead" style="font-size:0.85rem;">Menampilkan sasaran usia &lt;1 tahun yang usianya sudah ideal/melewati jadwal namun vaksinnya belum diberikan (termasuk PCV &lt;1th & RV &lt;7 bln).</p>
         <div id="panel_bayi_container" class="table-container">
           <p class="muted" style="text-align:center; padding:15px;"><i class="fas fa-arrow-up"></i> Klik tombol Analisis di atas untuk memuat data.</p>
         </div>
       </div>
 
-      <!-- PANEL 2: VAKSIN BERKESINAMBUNGAN & DROP OUT (2 BULAN) -->
+      <!-- PANEL 2: VAKSIN BERKESINAMBUNGAN & DROP OUT (2 BULAN / 4 MINGGU) -->
       <div class="card">
         <h3 style="color:#856404;"><i class="fas fa-link"></i> 2. Panel Risiko Drop Out & Catch Up Antigen Berkesinambungan</h3>
-        <p class="lead" style="font-size:0.85rem;">Menganalisis DPT1-3, OPV1-4, RV1-3, PCV1-3 dengan jeda ≥ 2 bulan berturut-turut.</p>
+        <p class="lead" style="font-size:0.85rem;">Menganalisis DPT1-3, OPV1-4, PCV1-3, RV1-3 dengan jeda minimal 4 minggu / ≥ 2 bulan.</p>
         <div id="panel_berkesinambungan_container" class="table-container">
           <p class="muted" style="text-align:center; padding:15px;"><i class="fas fa-arrow-up"></i> Klik tombol Analisis di atas untuk memuat data.</p>
         </div>
@@ -920,6 +920,14 @@
       return d.toISOString().split('T')[0];
     }
 
+    // FUNGSI CEK INTERVAL MINIMAL 4 MINGGU (28 HARI) BETWEEN DOSES
+    function hasMinInterval4Weeks(prevDateStr, targetDate = new Date()) {
+      if (!prevDateStr) return true;
+      const prev = new Date(prevDateStr);
+      const diffDays = Math.floor((targetDate - prev) / (1000 * 60 * 60 * 24));
+      return diffDays >= 28; // 4 Minggu
+    }
+
     function checkCb(val) {
       const cb = document.querySelector(`input[name="chk_vaksin"][value="${val}"]`);
       if (cb && !cb.checked) cb.checked = true;
@@ -1010,7 +1018,6 @@
       initBiasDropdowns();
       loadRecentTransactions();
 
-      // OTOMATIS AUTO-UPLOAD ANTREAN OFFLINE KETIKA KONEKSI INTERNET TERDAPATKAN
       window.addEventListener('online', syncOfflineQueueToCloud);
     });
 
@@ -1107,7 +1114,6 @@
       } catch (e) { console.error(e); }
     }
 
-    // FUNGSI SIMPAN DENGAN OFFLINE FALLBACK & SYNC AUTOMATIS
     async function handleSaveKohortMatrix(e) {
       e.preventDefault();
 
@@ -1267,7 +1273,6 @@
           });
         }
 
-        // Tampilkan juga data offline di preview
         let offlineQueue = JSON.parse(localStorage.getItem('pkm_offline_queue') || '[]');
         offlineQueue.forEach(item => {
           if (item.desa && item.desa.toLowerCase() === currentInputDesa.toLowerCase()) {
@@ -1328,7 +1333,7 @@
       }
     };
 
-    // ANALISIS CATCH UP PRESISI KLINIS
+    // ANALISIS CATCH UP PRESISI KLINIS (DENGAN BATAS USIA & INTERVAL 4 MINGGU KHUSUS PCV & ROTAVIRUS)
     async function loadCatchUpAnalysis() {
       const desaSel = document.getElementById('catchup_filter_desa').value;
       const today = new Date();
@@ -1352,11 +1357,16 @@
           const ageMonths = getAgeInMonths(d.tgl_lahir);
           const getVal = (vk) => d[`vaksin_${vk.replace(/[\s\(\)<>-]/g, '_')}`] || (d.jenis_imunisasi === vk ? d.tanggal_pelayanan : null);
 
-          // Cek kesetaraan status HB0 (HBO <24 jam & 1-7 hari saling melengkapi)
+          // Cek kesetaraan status HB0
           const hasHb0 = getVal("HBO (<24 Jam)") || getVal("HBO (1-7 Hari)");
 
+          // Tanggal-tanggal pemberian dosis terdahulu PCV & RV
+          const pcv1Date = getVal("PCV1");
+          const pcv2Date = getVal("PCV2");
+          const rv1Date = getVal("Rotavirus1");
+          const rv2Date = getVal("Rotavirus2");
+
           // 1. CATCH UP USIA < 1 TAHUN (BAYI)
-          // Menampilkan hanya jika usia bayi sudah ideal/melewati jadwal namun vaksin belum diberikan
           if (ageMonths < 12) {
             let missingBayi = [];
             
@@ -1365,44 +1375,61 @@
             if (!getVal("OPV1") && ageMonths >= 1) missingBayi.push("OPV1");
             if (!getVal("DPT-HB-Hib1") && ageMonths >= 2) missingBayi.push("DPT1");
             if (!getVal("OPV2") && ageMonths >= 2) missingBayi.push("OPV2");
-            if (!getVal("PCV1") && ageMonths >= 2) missingBayi.push("PCV1");
-            if (!getVal("Rotavirus1") && ageMonths >= 2) missingBayi.push("RV1");
             if (!getVal("DPT-HB-Hib2") && ageMonths >= 3) missingBayi.push("DPT2");
             if (!getVal("OPV3") && ageMonths >= 3) missingBayi.push("OPV3");
-            if (!getVal("PCV2") && ageMonths >= 3) missingBayi.push("PCV2");
-            if (!getVal("Rotavirus2") && ageMonths >= 3) missingBayi.push("RV2");
             if (!getVal("DPT-HB-Hib3") && ageMonths >= 4) missingBayi.push("DPT3");
             if (!getVal("OPV4") && ageMonths >= 4) missingBayi.push("OPV4");
             if (!getVal("IPV1") && ageMonths >= 4) missingBayi.push("IPV1");
-            if (!getVal("Rotavirus3") && ageMonths >= 4) missingBayi.push("RV3");
             if (!getVal("Campak Rubela-1") && ageMonths >= 9) missingBayi.push("MR1");
             if (!getVal("IPV2") && ageMonths >= 9) missingBayi.push("IPV2");
+
+            // LOGIKA ATURAN KHUSUS PCV (< 1 TAHUN, INTERVAL 4 MINGGU)
+            if (!getVal("PCV1") && ageMonths >= 2) {
+              missingBayi.push("PCV1");
+            } else if (pcv1Date && !getVal("PCV2") && ageMonths >= 3 && hasMinInterval4Weeks(pcv1Date, today)) {
+              missingBayi.push("PCV2");
+            }
+
+            // LOGIKA ATURAN KHUSUS ROTAVIRUS (< 7 BULAN, INTERVAL 4 MINGGU)
+            if (ageMonths < 7) {
+              if (!rv1Date && ageMonths >= 2) {
+                missingBayi.push("Rotavirus1");
+              } else if (rv1Date && !rv2Date && ageMonths >= 3 && hasMinInterval4Weeks(rv1Date, today)) {
+                missingBayi.push("Rotavirus2");
+              } else if (rv2Date && !getVal("Rotavirus3") && ageMonths >= 4 && hasMinInterval4Weeks(rv2Date, today)) {
+                missingBayi.push("Rotavirus3");
+              }
+            }
 
             if (missingBayi.length > 0) {
               listBayi.push({ ...d, ageMonths, missing: missingBayi });
             }
           }
 
-          // 2. ANTIGEN BERKESINAMBUNGAN (JEDA >= 2 BULAN)
+          // 2. ANTIGEN BERKESINAMBUNGAN
           SERIES_SEQUENCES.forEach(group => {
             for (let i = 0; i < group.items.length - 1; i++) {
               const currentVal = getVal(group.items[i].key);
               const nextVal = getVal(group.items[i+1].key);
 
               if (currentVal && !nextVal) {
+                // Filter Usia Ketat untuk PCV & Rotavirus
+                if (group.name === "PCV" && ageMonths >= 12) continue;
+                if (group.name === "Rotavirus" && ageMonths >= 7) continue;
+
                 const currentDate = new Date(currentVal);
                 const diffDays = Math.floor((today - currentDate) / (1000 * 60 * 60 * 24));
                 const diffMonths = Math.floor(diffDays / 30);
 
-                if (diffMonths >= 2) {
+                if (diffDays >= 28) { // Minimal 4 Minggu / ≥2 Bulan
                   listBerkesinambungan.push({
                     ...d,
                     ageMonths,
                     antigen: group.items[i+1].key,
                     lastDose: group.items[i].key,
                     lastDate: currentVal,
-                    delayMonths: diffMonths,
-                    status: diffMonths >= 4 ? "Drop Out (Harus Catch Up)" : "Terancam Drop Out (≥2 Bulan)"
+                    delayMonths: diffMonths || 1,
+                    status: diffMonths >= 3 ? "Drop Out (Harus Catch Up)" : "Terancam Drop Out (≥4 Minggu)"
                   });
                 }
               }
@@ -1455,7 +1482,7 @@
 
         p1.innerHTML = listBayi.length === 0 ? '<p class="muted" style="text-align:center;">Semua bayi < 1 tahun terimunisasi dasar sesuai usianya.</p>' : `
           <table class="kohort-table">
-            <thead><tr><th>Nama Sasaran</th><th>Usia</th><th>Desa</th><th>Alamat</th><th>Orang Tua</th><th>Vaksin Belum Diberikan (Usia Ideal Tercapai)</th></tr></thead>
+            <thead><tr><th>Nama Sasaran</th><th>Usia</th><th>Desa</th><th>Alamat</th><th>Orang Tua</th><th>Vaksin Belum Diberikan (Usia & Interval Ideal)</th></tr></thead>
             <tbody>${listBayi.map(b => `<tr><td style="font-weight:700;">${b.nama_anak}</td><td>${b.ageMonths} Bln</td><td>${b.desa}</td><td>${b.alamat_rt}</td><td>${b.nama_ibu}</td><td style="color:var(--danger); font-weight:700;">${b.missing.join(', ')}</td></tr>`).join('')}</tbody>
           </table>
         `;
@@ -1463,7 +1490,7 @@
         p2.innerHTML = listBerkesinambungan.length === 0 ? '<p class="muted" style="text-align:center;">Tidak ada risiko drop out antigen berkesinambungan.</p>' : `
           <table class="kohort-table">
             <thead><tr><th>Nama Sasaran</th><th>Usia</th><th>Desa</th><th>Dosis Terakhir</th><th>Tgl Dosis Terakhir</th><th>Target Dosis Berikutnya</th><th>Status Risiko</th></tr></thead>
-            <tbody>${listBerkesinambungan.map(b => `<tr><td style="font-weight:700;">${b.nama_anak}</td><td>${b.ageMonths} Bln</td><td>${b.desa}</td><td>${b.lastDose}</td><td>${b.lastDate}</td><td style="color:var(--primary); font-weight:700;">${b.antigen}</td><td><span class="${b.status.includes('Drop Out') ? 'badge-urgent' : 'badge-warning-custom'}">${b.status} (${b.delayMonths} Bln)</span></td></tr>`).join('')}</tbody>
+            <tbody>${listBerkesinambungan.map(b => `<tr><td style="font-weight:700;">${b.nama_anak}</td><td>${b.ageMonths} Bln</td><td>${b.desa}</td><td>${b.lastDose}</td><td>${b.lastDate}</td><td style="color:var(--primary); font-weight:700;">${b.antigen}</td><td><span class="${b.status.includes('Drop Out') ? 'badge-urgent' : 'badge-warning-custom'}">${b.status}</span></td></tr>`).join('')}</tbody>
           </table>
         `;
 
@@ -1502,7 +1529,6 @@
           const ageMonths = getAgeInMonths(d.tgl_lahir);
           const getVal = (vk) => d[`vaksin_${vk.replace(/[\s\(\)<>-]/g, '_')}`] || (d.jenis_imunisasi === vk ? d.tanggal_pelayanan : null);
 
-          // 1. Bayi <1 tahun
           if (ageMonths < 12) {
             const hasHb0 = getVal("HBO (<24 Jam)") || getVal("HBO (1-7 Hari)");
             let missingBayi = [];
@@ -1511,12 +1537,14 @@
             if (!getVal("DPT-HB-Hib1") && ageMonths >= 2) missingBayi.push("DPT1");
             if (!getVal("Campak Rubela-1") && ageMonths >= 9) missingBayi.push("MR1");
 
+            if (!getVal("PCV1") && ageMonths >= 2) missingBayi.push("PCV1");
+            if (ageMonths < 7 && !getVal("Rotavirus1") && ageMonths >= 2) missingBayi.push("RV1");
+
             if (missingBayi.length > 0) {
-              excelData.push([idx++, "Bayi < 1 Tahun", d.desa, d.nama_anak, ageMonths, d.nama_ibu, d.alamat_rt, "Menunggak Imunisasi Dasar (Usia Tercapai)", missingBayi.join(', ')]);
+              excelData.push([idx++, "Bayi < 1 Tahun", d.desa, d.nama_anak, ageMonths, d.nama_ibu, d.alamat_rt, "Menunggak Imunisasi (Usia Ideal & Interval 4 Mgg)", missingBayi.join(', ')]);
             }
           }
 
-          // 2. Baduta DPT4 & MR2
           if (ageMonths >= 18) {
             const dpt3Val = getVal("DPT-HB-Hib3"), dpt4Val = getVal("DPT-HB-Hib4");
             const mr1Val = getVal("Campak Rubela-1"), mr2Val = getVal("Campak Rubela-2");

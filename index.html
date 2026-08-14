@@ -185,7 +185,6 @@
 
     .site-footer { text-align: center; margin-top: 30px; padding: 15px 0; color: var(--muted); font-size: 0.8rem; border-top: 1px solid #eee; }
 
-    /* MODAL OVERLAY UNTUK LOGIN & BANTUAN */
     .modal-overlay {
       position: fixed; inset: 0; background: rgba(2, 6, 23, 0.7); z-index: 2000;
       display: flex; align-items: center; justify-content: center; padding: 16px;
@@ -205,7 +204,7 @@
 </head>
 <body>
 
-  <!-- MODAL LOGIN PETUGAS DEKAT DENGAN DEVICE ID MEMORY -->
+  <!-- MODAL LOGIN PETUGAS -->
   <div id="loginModal" class="modal-overlay">
     <div style="background:#fff; padding:24px; border-radius:12px; max-width:400px; width:100%; box-shadow:0 10px 25px rgba(0,0,0,0.2);">
       <div style="text-align:center; margin-bottom:16px;">
@@ -259,6 +258,7 @@
       <button class="tab" data-tab="bias" onclick="switchTab(event)"><i class="fas fa-school"></i> BIAS SEKOLAH</button>
       <button class="tab" data-tab="export" onclick="switchTab(event)"><i class="fas fa-file-export"></i> EKSPOR</button>
       <button class="tab" data-tab="import" onclick="switchTab(event)"><i class="fas fa-upload"></i> IMPORT</button>
+      <button class="tab" data-tab="catchup" onclick="switchTab(event)"><i class="fas fa-exclamation-circle" style="color:#ffc107;"></i> CATCH UP</button>
       <button class="tab" data-tab="kumulatif" onclick="switchTab(event)"><i class="fas fa-chart-line"></i> KUMULATIF</button>
     </div>
   </header>
@@ -596,8 +596,56 @@
           </div>
         </div>
     </section>
+
+    <!-- TAB 5: CATCH UP & ANALISIS DROP OUT (BARU) -->
+    <section id="catchup" class="tab-panel" style="display:none">
+      <div class="card" style="border-left: 5px solid var(--warning);">
+        <h3 style="margin:0 0 8px 0; color:var(--accent);"><i class="fas fa-exclamation-circle" style="color:var(--warning)"></i> Catch Up & Analisis Risiko Drop Out (Kriteria WHO)</h3>
+        <p class="lead" style="margin-bottom:0;">Menampilkan sasaran anak/bayi yang <strong>2 bulan berturut-turut tidak mengikuti imunisasi lanjutan</strong> (terancam Drop Out) atau yang <strong>berusia ≥ 12 bulan (1 tahun) tetapi belum melengkapi Imunisasi Dasar Lengkap (IDL)</strong>.</p>
+      </div>
+
+      <div class="card">
+        <h3><div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <span><i class="fas fa-filter"></i> Filter Sasaran Catch Up</span>
+          <button class="btn btn-success" id="btnDownloadCatchUpExcel" style="font-size:0.85rem;"><i class="fas fa-file-excel"></i> Export List Catch Up (.xlsx)</button>
+        </div></h3>
+
+        <div class="grid">
+          <div class="form-group full-width">
+            <label>Pilih Desa</label>
+            <select id="catchup_filter_desa">
+              <option value="ALL">-- Semua Desa --</option>
+              <option value="Melata">Melata</option>
+              <option value="Nanuah">Nanuah</option>
+              <option value="Topalan">Topalan</option>
+              <option value="Batu Ampar">Batu Ampar</option>
+              <option value="Lubuk Hiju">Lubuk Hiju</option>
+              <option value="Bukit Makmur">Bukit Makmur</option>
+              <option value="Bukit Raya">Bukit Raya</option>
+              <option value="Modang Mas">Modang Mas</option>
+              <option value="Mukti Manunggal">Mukti Manunggal</option>
+              <option value="Sumber Jaya">Sumber Jaya</option>
+              <option value="Bukit Harum">Bukit Harum</option>
+              <option value="PT. TSA">PT. TSA</option>
+              <option value="PT. SHS">PT. SHS</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary" id="btnApplyCatchUp"><i class="fas fa-search"></i> Analisis & Tampilkan Data Catch Up</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3><i class="fas fa-list-check"></i> Daftar Anak Memerlukan Imunisasi Kejar (Catch Up)</h3>
+        <div id="catchUpContainer" class="table-container">
+          <p class="muted" style="text-align:center; padding:20px;"><i class="fas fa-arrow-up"></i> Klik tombol <strong>Analisis & Tampilkan Data Catch Up</strong> di atas untuk melihat daftar sasaran.</p>
+        </div>
+      </div>
+    </section>
     
-    <!-- TAB 5: KUMULATIF & LAPORAN MATRIKS -->
+    <!-- TAB 6: KUMULATIF & LAPORAN MATRIKS -->
     <section id="kumulatif" class="tab-panel" style="display:none">
       <div class="card" style="border-left: 5px solid var(--primary);">
         <h3 style="margin:0 0 8px 0; color:var(--accent)"><i class="fas fa-chart-bar"></i> Laporan Kumulatif Matriks Register</h3>
@@ -632,7 +680,19 @@
               <option value="12">Desember (12)</option>
             </select>
           </div>
-          <div class="form-group full-width">
+
+          <div class="form-group">
+            <label>Kategori Jenis Pelayanan</label>
+            <select id="filter_kategori">
+              <option value="ALL">-- Semua Pelayanan (Lengkap) --</option>
+              <option value="IMUNISASI_BAYI">Imunisasi Dasar & Lanjutan (Bayi/Baduta)</option>
+              <option value="BIAS">BIAS (Anak Sekolah)</option>
+              <option value="CATIN">Td Calon Pengantin (TT Catin)</option>
+              <option value="BUMIL">Td Ibu Hamil (TT Bumil)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
             <label>Desa</label>
             <select id="filter_desa">
               <option value="ALL">-- Semua Desa --</option>
@@ -662,7 +722,7 @@
       <div class="card">
         <h3><i class="fas fa-list-alt"></i> Hasil Rekapitulasi Matriks Kohort</h3>
         <div id="reviewContainer" class="table-container">
-          <p class="muted"><i class="fas fa-spinner fa-spin"></i> Memuat data dari Firebase Cloud...</p>
+          <p class="muted" style="text-align:center; padding:20px;"><i class="fas fa-info-circle"></i> Klik tombol <strong>Hitung Laporan Matriks</strong> di atas untuk memuat data laporan.</p>
         </div>
       </div>
     </section>
@@ -710,6 +770,12 @@
       "TT1 Bumil", "TT2 Bumil", "TT3 Bumil", "TT4 Bumil", "TT5 Bumil"
     ];
 
+    const BASIC_VAKSIN_KEYS = [
+      "HBO (<24 Jam)", "HBO (1-7 Hari)", "BCG", "OPV1", "DPT-HB-Hib1", "OPV2", "PCV1", "Rotavirus1",
+      "DPT-HB-Hib2", "OPV3", "PCV2", "Rotavirus2", "DPT-HB-Hib3", "OPV4", "IPV1", "Rotavirus3",
+      "Campak Rubela-1", "IPV2", "JE"
+    ];
+
     const SCHOOL_DATA = {
         'SD NEGERI MELATA': 'SD', 'SD NEGERI NANUAH': 'SD', 'SD NEGERI TOPALAN': 'SD', 
         'SD NEGERI BATU AMPAR': 'SD', 'SD NEGERI LUBUK HIJU': 'SD', 'SD NEGERI BUKIT MAKMUR': 'SD',
@@ -726,7 +792,6 @@
     let currentInputDesa = "";
     let activePetugasName = "";
 
-    // KUNCI PASSWORD SISTEM
     const AUTH_PASSWORD = "sri26";
 
     function getKelompokUsia(tglLahir, tglPelayanan) {
@@ -739,7 +804,13 @@
       return "Dewasa/Bumil/Catin";
     }
 
-    // MEMORY PERSISTENCE USERNAME UNTUK PERANGKAT/BROWSER SAMA
+    function getAgeInMonths(tglLahir) {
+      if (!tglLahir) return 0;
+      const birth = new Date(tglLahir);
+      const now = new Date();
+      return (now.getFullYear() - birth.getFullYear()) * 12 + (now.getMonth() - birth.getMonth());
+    }
+
     function initUserAuthCheck() {
       const savedUser = localStorage.getItem('pkm_app_username');
       if (savedUser) {
@@ -781,7 +852,7 @@
       document.querySelectorAll('.tab-panel').forEach(p => p.style.display='none');
       document.getElementById(target).style.display = 'block';
       if (target === 'imunisasi') loadRecentTransactions();
-      if (target === 'kumulatif') loadReviewDetail();
+      if (target === 'catchup') loadCatchUpAnalysis();
       window.scrollTo({top:0,behavior:'smooth'});
     };
 
@@ -800,6 +871,9 @@
 
       document.getElementById('btnApplyFilter').addEventListener('click', loadReviewDetail);
       document.getElementById('btnDownloadExcelFilter').addEventListener('click', downloadExcel2Sheets);
+
+      document.getElementById('btnApplyCatchUp').addEventListener('click', loadCatchUpAnalysis);
+      document.getElementById('btnDownloadCatchUpExcel').addEventListener('click', downloadCatchUpExcel);
 
       document.getElementById('search_desa_anak').addEventListener('change', (e) => {
         currentInputDesa = e.target.value;
@@ -1019,13 +1093,204 @@
       }
     };
 
+    // LOGIKA CATCH UP & ANALISIS DROP OUT (WHO)
+    async function loadCatchUpAnalysis() {
+      const desaSel = document.getElementById('catchup_filter_desa').value;
+      const container = document.getElementById('catchUpContainer');
+      container.innerHTML = '<p class="muted" style="text-align:center; padding:20px;"><i class="fas fa-spinner fa-spin"></i> Menganalisis data imunisasi & kriteria drop out...</p>';
+
+      try {
+        const snap = await getDocs(collection(db, COL_KOHORT));
+        let catchUpList = [];
+        const today = new Date();
+
+        snap.forEach(doc => {
+          const d = doc.data();
+          const matchDesa = (desaSel === 'ALL' || (d.desa && d.desa.toLowerCase() === desaSel.toLowerCase()));
+          if (!matchDesa) return;
+
+          const ageMonths = getAgeInMonths(d.tgl_lahir);
+          
+          let givenVaccineDates = [];
+          let missingBasicVaccines = [];
+
+          ALL_VAKSIN_KEYS.forEach(vKey => {
+            const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
+            const val = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
+            if (val) {
+              givenVaccineDates.push(new Date(val));
+            } else if (BASIC_VAKSIN_KEYS.includes(vKey)) {
+              missingBasicVaccines.push(vKey);
+            }
+          });
+
+          let isDropOutRisk = false;
+          let isUnfinishedIDL = false;
+          let lastVaccineDateStr = "-";
+
+          if (givenVaccineDates.length > 0) {
+            givenVaccineDates.sort((a,b) => b - a);
+            const lastDate = givenVaccineDates[0];
+            lastVaccineDateStr = lastDate.toISOString().split('T')[0];
+            
+            const diffDays = Math.floor((today - lastDate) / (1000 * 60 * 60 * 24));
+            if (diffDays >= 60 && missingBasicVaccines.length > 0) {
+              isDropOutRisk = true;
+            }
+          } else if (ageMonths >= 2) {
+            isDropOutRisk = true;
+          }
+
+          if (ageMonths >= 12 && missingBasicVaccines.length > 0) {
+            isUnfinishedIDL = true;
+          }
+
+          if (isDropOutRisk || isUnfinishedIDL) {
+            catchUpList.push({
+              ...d,
+              ageMonths,
+              lastVaccineDateStr,
+              missingBasicVaccines,
+              isDropOutRisk,
+              isUnfinishedIDL
+            });
+          }
+        });
+
+        if (catchUpList.length === 0) {
+          container.innerHTML = `<div style="text-align:center; padding:20px; color:var(--success); font-weight:700;"><i class="fas fa-check-circle" style="font-size:2rem; margin-bottom:8px; display:block;"></i> Sempurna! Tidak ditemukan sasaran yang terancam Drop Out atau menunggak imunisasi di desa ini.</div>`;
+          return;
+        }
+
+        let rowsHtml = '';
+        catchUpList.forEach((d, idx) => {
+          let statusBadge = '';
+          if (d.isDropOutRisk) statusBadge += `<span style="background:#fff3cd; color:#856404; padding:3px 6px; border-radius:4px; font-size:0.75rem; font-weight:bold; margin-right:4px;">≥2 Bkn Drop</span>`;
+          if (d.isUnfinishedIDL) statusBadge += `<span style="background:#f8d7da; color:#842029; padding:3px 6px; border-radius:4px; font-size:0.75rem; font-weight:bold;">Belum IDL (≥12Bln)</span>`;
+
+          rowsHtml += `
+            <tr>
+              <td>${idx + 1}</td>
+              <td style="text-align:left; font-weight:700; color:var(--accent);">${d.nama_anak}</td>
+              <td>${d.tgl_lahir || '-'} (${d.ageMonths} Bln)</td>
+              <td>${d.nama_ibu || '-'}</td>
+              <td>${d.desa || '-'}</td>
+              <td>${d.alamat_rt || '-'}</td>
+              <td>${statusBadge}</td>
+              <td>${d.lastVaccineDateStr}</td>
+              <td style="text-align:left; color:var(--danger); font-size:0.78rem; font-weight:600;">${d.missingBasicVaccines.join(', ')}</td>
+            </tr>
+          `;
+        });
+
+        container.innerHTML = `
+          <div style="margin-bottom:12px; background:#fff8e6; padding:10px 12px; border-radius:8px; border:1px solid #ffe8a1; font-size:0.85rem; color:#856404;">
+            <i class="fas fa-exclamation-triangle"></i> Ditemukan <strong>${catchUpList.length} Sasaran</strong> yang memerlukan imunisasi kejar / tindakan tindak lanjut pelayanan.
+          </div>
+          <table class="kohort-table">
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Nama Sasaran</th>
+                <th>Tgl Lahir (Usia)</th>
+                <th>Orang Tua / Suami</th>
+                <th>Desa</th>
+                <th>Alamat</th>
+                <th>Kriteria Catch Up</th>
+                <th>Tgl Vaksin Terakhir</th>
+                <th>Vaksin Menunggak / Belum Diberikan</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+            </tbody>
+          </table>
+        `;
+      } catch (err) { container.innerHTML = `<p style="color:red; text-align:center;">Error: ${err.message}</p>`; }
+    }
+
+    async function downloadCatchUpExcel() {
+      const desaSel = document.getElementById('catchup_filter_desa').value;
+      try {
+        const snap = await getDocs(collection(db, COL_KOHORT));
+        const excelData = [
+          ["No", "Desa", "Nama Sasaran", "Tanggal Lahir", "Usia (Bulan)", "Orang Tua / Suami", "Alamat / RT", "Kriteria Status", "Tgl Imunisasi Terakhir", "Daftar Vaksin Belum Diberikan"]
+        ];
+
+        let idx = 1;
+        const today = new Date();
+
+        snap.forEach(doc => {
+          const d = doc.data();
+          const matchDesa = (desaSel === 'ALL' || (d.desa && d.desa.toLowerCase() === desaSel.toLowerCase()));
+          if (!matchDesa) return;
+
+          const ageMonths = getAgeInMonths(d.tgl_lahir);
+          let givenVaccineDates = [];
+          let missingBasicVaccines = [];
+
+          ALL_VAKSIN_KEYS.forEach(vKey => {
+            const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
+            const val = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
+            if (val) {
+              givenVaccineDates.push(new Date(val));
+            } else if (BASIC_VAKSIN_KEYS.includes(vKey)) {
+              missingBasicVaccines.push(vKey);
+            }
+          });
+
+          let isDropOutRisk = false;
+          let isUnfinishedIDL = false;
+          let lastVaccineDateStr = "-";
+
+          if (givenVaccineDates.length > 0) {
+            givenVaccineDates.sort((a,b) => b - a);
+            const lastDate = givenVaccineDates[0];
+            lastVaccineDateStr = lastDate.toISOString().split('T')[0];
+            const diffDays = Math.floor((today - lastDate) / (1000 * 60 * 60 * 24));
+            if (diffDays >= 60 && missingBasicVaccines.length > 0) isDropOutRisk = true;
+          } else if (ageMonths >= 2) {
+            isDropOutRisk = true;
+          }
+
+          if (ageMonths >= 12 && missingBasicVaccines.length > 0) isUnfinishedIDL = true;
+
+          if (isDropOutRisk || isUnfinishedIDL) {
+            let statusText = [];
+            if (isDropOutRisk) statusText.push("Terancam Drop Out (≥2 Bulan)");
+            if (isUnfinishedIDL) statusText.push("Belum IDL Lengkap (≥12 Bulan)");
+
+            excelData.push([
+              idx++,
+              d.desa || '',
+              d.nama_anak || '',
+              d.tgl_lahir || '',
+              ageMonths,
+              d.nama_ibu || '',
+              d.alamat_rt || '',
+              statusText.join(' & '),
+              lastVaccineDateStr,
+              missingBasicVaccines.join(', ')
+            ]);
+          }
+        });
+
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet(excelData);
+        XLSX.utils.book_append_sheet(wb, ws, "Catch Up Imunisasi");
+        XLSX.writeFile(wb, `CatchUp_Imunisasi_${desaSel}_${new Date().toISOString().slice(0,10)}.xlsx`);
+
+      } catch (err) { alert("Gagal download Catch Up Excel: " + err.message); }
+    }
+
     async function loadReviewDetail() {
       const thn = document.getElementById('filter_tahun').value;
       const bln = document.getElementById('filter_bulan').value;
       const desaSel = document.getElementById('filter_desa').value;
+      const katSel = document.getElementById('filter_kategori').value;
       const container = document.getElementById('reviewContainer');
 
-      container.innerHTML = '<p class="muted"><i class="fas fa-spinner fa-spin"></i> Memuat laporan matriks...</p>';
+      container.innerHTML = '<p class="muted" style="text-align:center; padding:20px;"><i class="fas fa-spinner fa-spin"></i> Memuat laporan matriks...</p>';
 
       try {
         const snap = await getDocs(collection(db, COL_KOHORT));
@@ -1040,45 +1305,61 @@
           if (matchThn && matchBln && matchDesa) filteredDocs.push(d);
         });
 
+        let activeVaccineKeys = ALL_VAKSIN_KEYS;
+        if (katSel === 'IMUNISASI_BAYI') activeVaccineKeys = ALL_VAKSIN_KEYS.slice(0, 22);
+        else if (katSel === 'CATIN') activeVaccineKeys = ALL_VAKSIN_KEYS.slice(22, 24);
+        else if (katSel === 'BUMIL') activeVaccineKeys = ALL_VAKSIN_KEYS.slice(24, 29);
+
         const vTotals = {};
-        ALL_VAKSIN_KEYS.forEach(v => vTotals[v] = 0);
+        activeVaccineKeys.forEach(v => vTotals[v] = 0);
 
         let rowsHtml = '';
         filteredDocs.forEach(d => {
           let vCols = '';
-          ALL_VAKSIN_KEYS.forEach(vKey => {
+          let hasGivenInFilter = false;
+
+          activeVaccineKeys.forEach(vKey => {
             const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
             const val = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
             if (val) {
               vTotals[vKey] += 1;
+              hasGivenInFilter = true;
               vCols += `<td><span class="v-given">✓ (${val})</span></td>`;
             } else {
               vCols += `<td style="color:#cbd5e1;">-</td>`;
             }
           });
 
-          rowsHtml += `
-            <tr>
-              <td class="sticky-col-1">${d.nama_anak}</td>
-              <td class="sticky-col-2">${d.tgl_lahir || '-'}</td>
-              <td>${d.jk || '-'}</td>
-              <td>${d.nama_ibu || '-'}</td>
-              <td>${d.desa || '-'}</td>
-              ${vCols}
-            </tr>
-          `;
+          if (katSel === 'ALL' || hasGivenInFilter) {
+            rowsHtml += `
+              <tr>
+                <td class="sticky-col-1">${d.nama_anak}</td>
+                <td class="sticky-col-2">${d.tgl_lahir || '-'}</td>
+                <td>${d.jk || '-'}</td>
+                <td>${d.nama_ibu || '-'}</td>
+                <td>${d.desa || '-'}</td>
+                ${vCols}
+              </tr>
+            `;
+          }
         });
 
         let totalColsHtml = '';
-        ALL_VAKSIN_KEYS.forEach(vKey => {
+        activeVaccineKeys.forEach(vKey => {
           totalColsHtml += `<td style="text-align:center; font-weight:800; color:var(--primary); font-size:0.95rem;">${vTotals[vKey]}</td>`;
+        });
+
+        let headerVColsHtml = '';
+        activeVaccineKeys.forEach(vKey => {
+          headerVColsHtml += `<th>${vKey}</th>`;
         });
 
         let html = `
           <div style="margin-bottom:12px; background:#f0f7ff; padding:10px 12px; border-radius:8px; border:1px solid #c0d8f0; font-size:0.85rem;">
             <strong>Periode:</strong> ${bln === 'ALL' ? 'Semua Bulan' : 'Bulan ' + bln} ${thn} | 
             <strong>Desa:</strong> ${desaSel === 'ALL' ? 'Semua' : desaSel} | 
-            <strong>Total Sasaran Terdaftar:</strong> ${filteredDocs.length} Orang
+            <strong>Kategori:</strong> ${katSel} | 
+            <strong>Total Sasaran Matriks:</strong> ${filteredDocs.length} Orang
           </div>
           <table class="kohort-table">
             <thead>
@@ -1088,16 +1369,10 @@
                 <th rowspan="2">L/P</th>
                 <th rowspan="2">Orang Tua / Suami</th>
                 <th rowspan="2">Desa</th>
-                <th colspan="19">Imunisasi Dasar Lengkap (0 - 12 Bulan)</th>
-                <th colspan="3">Imunisasi Lanjutan Baduta</th>
-                <th colspan="2">TT Catin</th>
-                <th colspan="5">TT Ibu Hamil</th>
+                <th colspan="${activeVaccineKeys.length}">Jenis Imunisasi / Antigen Terfilter</th>
               </tr>
               <tr>
-                <th>HBO &lt;24Jam</th><th>HBO 1-7H</th><th>BCG</th><th>OPV1</th><th>DPT1</th><th>OPV2</th><th>PCV1</th><th>RV1</th><th>DPT2</th><th>OPV3</th><th>PCV2</th><th>RV2</th><th>DPT3</th><th>OPV4</th><th>IPV1</th><th>RV3</th><th>MR1</th><th>IPV2</th><th>JE</th>
-                <th>PCV3</th><th>DPT4</th><th>MR2</th>
-                <th>TT1</th><th>TT2</th>
-                <th>TT1</th><th>TT2</th><th>TT3</th><th>TT4</th><th>TT5</th>
+                ${headerVColsHtml}
               </tr>
             </thead>
             <tbody>
@@ -1114,13 +1389,14 @@
         `;
 
         container.innerHTML = html;
-      } catch (err) { container.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`; }
+      } catch (err) { container.innerHTML = `<p style="color:red; text-align:center;">Error: ${err.message}</p>`; }
     }
 
     async function downloadExcel2Sheets() {
       const thn = document.getElementById('filter_tahun').value || document.getElementById('exp_filter_tahun').value;
       const bln = document.getElementById('filter_bulan').value || document.getElementById('exp_filter_bulan').value;
       const desaSel = document.getElementById('filter_desa').value || document.getElementById('exp_filter_desa').value;
+      const katSel = document.getElementById('filter_kategori').value || 'ALL';
 
       try {
         const snap = await getDocs(collection(db, COL_KOHORT));
@@ -1133,13 +1409,18 @@
           }
         });
 
+        let activeVaccineKeys = ALL_VAKSIN_KEYS;
+        if (katSel === 'IMUNISASI_BAYI') activeVaccineKeys = ALL_VAKSIN_KEYS.slice(0, 22);
+        else if (katSel === 'CATIN') activeVaccineKeys = ALL_VAKSIN_KEYS.slice(22, 24);
+        else if (katSel === 'BUMIL') activeVaccineKeys = ALL_VAKSIN_KEYS.slice(24, 29);
+
         const vTotals = {};
-        ALL_VAKSIN_KEYS.forEach(v => vTotals[v] = 0);
+        activeVaccineKeys.forEach(v => vTotals[v] = 0);
 
         const sheet1Data = [];
         
         const headerRow1 = ["Desa", "Kegiatan", "Nama Sasaran", "Tanggal Lahir", "L/P", "Orang Tua / Suami", "Alamat / RT"];
-        ALL_VAKSIN_KEYS.forEach(v => headerRow1.push(v));
+        activeVaccineKeys.forEach(v => headerRow1.push(v));
         headerRow1.push("Penginput Terakhir");
         sheet1Data.push(headerRow1);
 
@@ -1154,7 +1435,7 @@
             d.alamat_rt || ''
           ];
 
-          ALL_VAKSIN_KEYS.forEach(vKey => {
+          activeVaccineKeys.forEach(vKey => {
             const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
             const val = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
             if (val) {
@@ -1170,7 +1451,7 @@
         });
 
         const totalRow1 = ["TOTAL PENERIMA VAKSIN", "", "", "", "", "", ""];
-        ALL_VAKSIN_KEYS.forEach(vKey => {
+        activeVaccineKeys.forEach(vKey => {
           totalRow1.push(vTotals[vKey]);
         });
         totalRow1.push("");
@@ -1181,7 +1462,7 @@
         ];
 
         let totalDosisSemua = 0;
-        ALL_VAKSIN_KEYS.forEach(vKey => {
+        activeVaccineKeys.forEach(vKey => {
           let cat = "0 - 12 Bulan (Dasar)";
           const idx = ALL_VAKSIN_KEYS.indexOf(vKey);
           if (idx >= 19 && idx <= 21) cat = "12 - 24 Bulan (Lanjutan)";

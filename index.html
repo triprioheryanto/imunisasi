@@ -31,7 +31,6 @@
       --gap: 20px;
       --shadow-subtle: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
       --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
-      --shadow-glow: 0 0 20px rgba(255, 87, 34, 0.2);
     }
     
     *, *::before, *::after { box-sizing: border-box; }
@@ -109,7 +108,7 @@
     label { font-weight: 700; color: #334155; margin-bottom: 8px; font-size: 0.88rem; display: flex; align-items: center; gap: 6px; }
     .req { color: var(--danger); font-weight: 800; }
 
-    input[type="text"], input[type="password"], input[type="date"], input[type="month"], select, textarea, input[type="file"] {
+    input[type="text"], input[type="password"], input[type="number"], input[type="date"], input[type="month"], select, textarea, input[type="file"] {
       width: 100%; padding: 11px 14px; border-radius: 10px; border: 1.5px solid var(--border-color);
       background: #F8FAFC; font-size: 0.92rem; font-family: inherit; outline: none; transition: all 0.2s ease;
       color: var(--text-dark); font-weight: 500;
@@ -304,6 +303,7 @@
       <button class="tab" data-tab="import" onclick="switchTab(event)"><i class="fas fa-upload"></i> IMPORT</button>
       <button class="tab" data-tab="catchup" onclick="switchTab(event)"><i class="fas fa-exclamation-circle" style="color:#ffc107;"></i> CATCH UP</button>
       <button class="tab" data-tab="kumulatif" onclick="switchTab(event)"><i class="fas fa-chart-line"></i> KUMULATIF</button>
+      <button class="tab" data-tab="capaian" onclick="switchTab(event)"><i class="fas fa-award" style="color:#10B981;"></i> CAPAIAN</button>
     </div>
   </header>
 
@@ -353,7 +353,7 @@
 
       <div class="card">
         <h2><i class="fas fa-id-card" style="color:var(--primary)"></i> Form Register Imunisasi (Bayi, Baduta, Catin & Bumil)</h2>
-        <p class="lead">Isi data sasaran di bawah. Pilihan vaksinasi disesuaikan secara independen tanpa autofill tanggal paksaan pada TT Catin maupun TT Bumil.</p>
+        <p class="lead">Isi data sasaran di bawah. Autofill tanggal otomatis berlaku untuk imunisasi bayi/baduta berkesinambungan (dikecualikan untuk TT Catin & Bumil).</p>
 
         <form id="formRegisterIndividu">
           <div class="grid">
@@ -826,6 +826,128 @@
       </div>
     </section>
 
+    <!-- TAB 7: TAB BARU CAPAIAN & TARGET SASARAN (ADMIN PROTECTED) -->
+    <section id="capaian" class="tab-panel" style="display:none">
+      <div class="card" style="border-left: 5px solid var(--success);">
+        <h3 style="margin:0 0 8px 0; color:var(--accent);"><i class="fas fa-award" style="color:var(--success)"></i> Laporan Capaian Imunisasi & Imunisasi Dasar Lengkap (IDL)</h3>
+        <p class="lead" style="margin-bottom:0">Analisis capaian per antigen, Imunisasi Dasar Lengkap (IDL) per desa/kumulatif, serta capaian BIAS anak sekolah.</p>
+      </div>
+
+      <!-- KARTU INPUT SASARAN TERPROTEKSI ADMIN -->
+      <div class="card" style="background:#FFFBEB; border:2px solid #FCD34D;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <div>
+            <h3 style="margin:0; color:#92400E;"><i class="fas fa-lock"></i> Target Sasaran Wilayah (Khusus Admin)</h3>
+            <p class="lead" style="font-size:0.85rem; margin:4px 0 0 0; color:#B45309;">Hanya akun Admin (Username: <strong>admin</strong>) yang dapat mengubah data target sasaran ini.</p>
+          </div>
+          <button class="btn btn-warning" onclick="toggleFormAdminSasaran()"><i class="fas fa-user-lock"></i> Pengaturan Sasaran Admin</button>
+        </div>
+
+        <form id="formTargetSasaran" style="display:none; margin-top:16px; border-top:1px dashed #FCD34D; padding-top:16px;">
+          <div class="grid">
+            <div class="form-group">
+              <label>Pilih Desa <span class="req">*</span></label>
+              <select id="sas_desa" required>
+                <option value="Melata">Melata</option>
+                <option value="Nanuah">Nanuah</option>
+                <option value="Topalan">Topalan</option>
+                <option value="Batu Ampar">Batu Ampar</option>
+                <option value="Lubuk Hiju">Lubuk Hiju</option>
+                <option value="Bukit Makmur">Bukit Makmur</option>
+                <option value="Bukit Raya">Bukit Raya</option>
+                <option value="Modang Mas">Modang Mas</option>
+                <option value="Mukti Manunggal">Mukti Manunggal</option>
+                <option value="Sumber Jaya">Sumber Jaya</option>
+                <option value="Bukit Harum">Bukit Harum</option>
+                <option value="PT. TSA">PT. TSA</option>
+                <option value="PT. SHS">PT. SHS</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Tahun Berlaku <span class="req">*</span></label>
+              <input type="number" id="sas_tahun" value="2026" required>
+            </div>
+            <div class="form-group">
+              <label>Target Sasaran Bayi (0-12 Bln) <span class="req">*</span></label>
+              <input type="number" id="sas_target_bayi" placeholder="Jumlah sasaran bayi" required>
+            </div>
+            <div class="form-group">
+              <label>Target Sasaran Baduta (12-24 Bln) <span class="req">*</span></label>
+              <input type="number" id="sas_target_baduta" placeholder="Jumlah sasaran baduta" required>
+            </div>
+            <div class="form-group full-width">
+              <label>Target Sasaran BIAS (Anak Sekolah) <span class="req">*</span></label>
+              <input type="number" id="sas_target_bias" placeholder="Jumlah sasaran anak sekolah BIAS" required>
+            </div>
+          </div>
+          <div class="actions">
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Simpan Target Sasaran (Admin)</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- FILTER CAPAIAN -->
+      <div class="card">
+        <h3><i class="fas fa-filter"></i> Filter Laporan Capaian</h3>
+        <div class="grid">
+          <div class="form-group">
+            <label>Tahun</label>
+            <select id="cap_filter_tahun">
+              <option value="2026">2026</option>
+              <option value="2025">2025</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Bulan</label>
+            <select id="cap_filter_bulan">
+              <option value="ALL">-- Semua Bulan (Kumulatif Tahunan) --</option>
+              <option value="01">Januari (01)</option>
+              <option value="02">Februari (02)</option>
+              <option value="03">Maret (03)</option>
+              <option value="04">April (04)</option>
+              <option value="05">Mei (05)</option>
+              <option value="06">Juni (06)</option>
+              <option value="07">Juli (07)</option>
+              <option value="08">Agustus (08)</option>
+              <option value="09">September (09)</option>
+              <option value="10">Oktober (10)</option>
+              <option value="11">November (11)</option>
+              <option value="12">Desember (12)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary" id="btnHitungCapaian"><i class="fas fa-chart-pie"></i> Hitung Capaian & IDL</button>
+        </div>
+      </div>
+
+      <!-- HASIL CAPAIAN BAYI & BADUTA -->
+      <div class="card">
+        <h3><i class="fas fa-baby"></i> 1. Rekapitulasi Capaian Imunisasi Bayi & Baduta Per Antigen</h3>
+        <div id="containerCapaianBayiBaduta" class="table-container">
+          <p class="muted" style="text-align:center; padding:15px;"><i class="fas fa-info-circle"></i> Klik tombol <strong>Hitung Capaian & IDL</strong> di atas.</p>
+        </div>
+      </div>
+
+      <!-- TABEL IDL PER DESA -->
+      <div class="card">
+        <h3><i class="fas fa-certificate" style="color:var(--success)"></i> 2. Tabel Imunisasi Dasar Lengkap (IDL) Per Desa & Kumulatif</h3>
+        <p class="lead" style="font-size:0.85rem;">Kriteria IDL: Bayi yang mendapatkan <strong>HBO (&lt;24H / 1-7H), BCG, DPT1-3, OPV1-4, IPV, dan MR1</strong>.</p>
+        <div id="containerTabelIDL" class="table-container">
+          <p class="muted" style="text-align:center; padding:15px;"><i class="fas fa-info-circle"></i> Klik tombol <strong>Hitung Capaian & IDL</strong> di atas.</p>
+        </div>
+      </div>
+
+      <!-- TABEL CAPAIAN BIAS -->
+      <div class="card">
+        <h3><i class="fas fa-school" style="color:var(--info)"></i> 3. Rekapitulasi Capaian BIAS (Imunisasi Anak Sekolah)</h3>
+        <div id="containerCapaianBIAS" class="table-container">
+          <p class="muted" style="text-align:center; padding:15px;"><i class="fas fa-info-circle"></i> Klik tombol <strong>Hitung Capaian & IDL</strong> di atas.</p>
+        </div>
+      </div>
+    </section>
+
   </main>
 
   <footer class="site-footer">
@@ -860,6 +982,7 @@
     const db = getFirestore(app);
     const COL_KOHORT = "register_imunisasi";
     const COL_BIAS = "laporan_bias";
+    const COL_TARGET = "target_sasaran";
 
     const VAKSIN_ANAK_KEYS = [
       "HBO (<24 Jam)", "HBO (1-7 Hari)", "BCG", "OPV1", "DPT-HB-Hib1", "OPV2", "PCV1", "Rotavirus1",
@@ -925,6 +1048,11 @@
       }
     ];
 
+    const LIST_DESA = [
+      "Melata", "Nanuah", "Topalan", "Batu Ampar", "Lubuk Hiju", "Bukit Makmur", 
+      "Bukit Raya", "Modang Mas", "Mukti Manunggal", "Sumber Jaya", "Bukit Harum", "PT. TSA", "PT. SHS"
+    ];
+
     const SCHOOL_DATA = {
         'SD NEGERI MELATA': 'SD', 'SD NEGERI NANUAH': 'SD', 'SD NEGERI TOPALAN': 'SD', 
         'SD NEGERI BATU AMPAR': 'SD', 'SD NEGERI LUBUK HIJU': 'SD', 'SD NEGERI BUKIT MAKMUR': 'SD',
@@ -941,7 +1069,9 @@
     let currentInputDesa = "";
     let activePetugasName = "";
 
-    const AUTH_PASSWORD = "sri26";
+    const AUTH_PASSWORD_PETUGAS = "sri26";
+    const AUTH_ADMIN_USER = "admin";
+    const AUTH_ADMIN_PASS = "adminsri26";
 
     function getKelompokUsia(tglLahir, tglPelayanan) {
       if (!tglLahir || !tglPelayanan) return "0-12 Bulan";
@@ -975,6 +1105,11 @@
       return diffDays >= 28;
     }
 
+    function checkCb(val) {
+      const cb = document.querySelector(`input[name="chk_vaksin"][value="${val}"]`);
+      if (cb && !cb.checked) cb.checked = true;
+    }
+
     function getActiveVaccineKeysByCategory(katSel) {
       if (katSel === 'IMUNISASI_BAYI') return VAKSIN_ANAK_KEYS.slice(0, 19);
       if (katSel === 'BADUTA') return VAKSIN_ANAK_KEYS.slice(19, 22);
@@ -996,7 +1131,7 @@
         const passwordInput = document.getElementById('login_password').value;
         const errDiv = document.getElementById('loginError');
 
-        if (passwordInput === AUTH_PASSWORD) {
+        if (passwordInput === AUTH_PASSWORD_PETUGAS || (usernameInput === AUTH_ADMIN_USER && passwordInput === AUTH_ADMIN_PASS)) {
           activePetugasName = usernameInput;
           localStorage.setItem('pkm_app_username', usernameInput);
           document.querySelector('#currentUserDisplay span').textContent = activePetugasName;
@@ -1025,6 +1160,7 @@
       document.getElementById(target).style.display = 'block';
       if (target === 'imunisasi') loadRecentTransactions();
       if (target === 'catchup') loadCatchUpAnalysis();
+      if (target === 'capaian') loadCapanTabContent();
       window.scrollTo({top:0,behavior:'smooth'});
     };
 
@@ -1033,6 +1169,8 @@
 
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('reg_tgl_pelayanan').value = today;
+
+      setupVaccineAutoFillListeners();
 
       document.getElementById('reg_jk').addEventListener('change', handleJkRules);
 
@@ -1048,6 +1186,9 @@
 
       document.getElementById('btnApplyCatchUp').addEventListener('click', loadCatchUpAnalysis);
       document.getElementById('btnDownloadCatchUpExcel').addEventListener('click', downloadCatchUpExcel);
+
+      document.getElementById('btnHitungCapaian').addEventListener('click', loadCapanTabContent);
+      document.getElementById('formTargetSasaran').addEventListener('submit', handleSaveTargetSasaran);
 
       document.getElementById('search_desa_anak').addEventListener('change', (e) => {
         currentInputDesa = e.target.value;
@@ -1070,6 +1211,39 @@
 
       window.addEventListener('online', syncOfflineQueueToCloud);
     });
+
+    // PENGAKTIFAN KEMBALI AUTOFILL KHUSUS VAKSIN BAYI & BADUTA (TT CATIN & BUMIL DIKECUALIKAN)
+    function setupVaccineAutoFillListeners() {
+      const checkboxes = document.querySelectorAll('input[name="chk_vaksin"]');
+      checkboxes.forEach(cb => {
+        cb.addEventListener('change', (e) => {
+          if (e.target.checked) {
+            const selectedVal = e.target.value;
+
+            // Pengecualian mutlak: TT Catin & TT Bumil TIDAK DI-AUTOFILL
+            if (selectedVal.includes("TT")) return;
+
+            if (selectedVal === "BCG") {
+              checkCb("HBO (1-7 Hari)");
+            }
+
+            if (["DPT-HB-Hib3", "IPV1", "IPV2"].includes(selectedVal)) {
+              checkCb("HBO (1-7 Hari)");
+              checkCb("BCG");
+            }
+
+            SERIES_SEQUENCES.forEach(series => {
+              const idx = series.items.findIndex(item => item.key === selectedVal);
+              if (idx > 0) {
+                for (let i = 0; i < idx; i++) {
+                  checkCb(series.items[i].key);
+                }
+              }
+            });
+          }
+        });
+      });
+    }
 
     function handleJkRules() {
       const jk = document.getElementById('reg_jk').value;
@@ -1183,6 +1357,12 @@
         let isLowerSeriesDose = false;
         let idealOffsetMonths = 0;
         let idealOffsetDays = 0;
+
+        // TT CATIN & TT BUMIL SELALU GUNAKAN TANGGAL PELAYANAN INPUT
+        if (v.includes("TT")) {
+          vaccineDataUpdate[`vaksin_${v.replace(/[\s\(\)<>-]/g, '_')}`] = tglPelayananInput;
+          return;
+        }
 
         if (v === "HBO (1-7 Hari)" && (selectedVaccines.includes("BCG") || selectedVaccines.includes("DPT-HB-Hib3") || selectedVaccines.includes("IPV1"))) {
           if (!selectedVaccines.includes("HBO (<24 Jam)")) {
@@ -1408,6 +1588,201 @@
         loadRecentTransactions();
       }
     };
+
+    // FITUR TAB CAPAIAN & LOGIKA IDL DENGAN AKSES PROTEKSI ADMIN
+    window.toggleFormAdminSasaran = function() {
+      if (activePetugasName !== AUTH_ADMIN_USER) {
+        return alert("🔒 AKSES DITOLAK: Fitur ini hanya dapat diakses oleh Admin (Username: admin)!");
+      }
+      const form = document.getElementById('formTargetSasaran');
+      form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    };
+
+    async function handleSaveTargetSasaran(e) {
+      e.preventDefault();
+      if (activePetugasName !== AUTH_ADMIN_USER) {
+        return alert("🔒 AKSES DITOLAK: Hanya Admin yang berhak merubah Target Sasaran!");
+      }
+
+      const desa = document.getElementById('sas_desa').value;
+      const tahun = document.getElementById('sas_tahun').value;
+      const targetBayi = parseInt(document.getElementById('sas_target_bayi').value) || 0;
+      const targetBaduta = parseInt(document.getElementById('sas_target_baduta').value) || 0;
+      const targetBias = parseInt(document.getElementById('sas_target_bias').value) || 0;
+
+      const docId = `${tahun}_${desa}`.toLowerCase();
+      try {
+        await setDoc(doc(db, COL_TARGET, docId), {
+          tahun, desa, target_bayi: targetBayi, target_baduta: targetBaduta, target_bias: targetBias,
+          updated_by: activePetugasName, updated_at: new Date().toISOString()
+        }, { merge: true });
+
+        alert(`✅ Target sasaran tahun ${tahun} untuk Desa ${desa} berhasil diperbarui oleh Admin!`);
+        loadCapanTabContent();
+      } catch (err) { alert("Error menyimpan target sasaran: " + err.message); }
+    }
+
+    async function loadCapanTabContent() {
+      const thn = document.getElementById('cap_filter_tahun').value;
+      const bln = document.getElementById('cap_filter_bulan').value;
+
+      const cBayi = document.getElementById('containerCapaianBayiBaduta');
+      const cIDL = document.getElementById('containerTabelIDL');
+      const cBIAS = document.getElementById('containerCapaianBIAS');
+
+      [cBayi, cIDL, cBIAS].forEach(c => c.innerHTML = '<p class="muted" style="text-align:center; padding:15px;"><i class="fas fa-spinner fa-spin"></i> Menghitung data capaian...</p>');
+
+      try {
+        // Fetch Target Sasaran
+        const snapTarget = await getDocs(collection(db, COL_TARGET));
+        const targetMap = new Map();
+        snapTarget.forEach(d => {
+          const t = d.data();
+          if (t.tahun === thn) targetMap.set(t.desa.toLowerCase(), t);
+        });
+
+        // Fetch Kohort Data
+        const snapKohort = await getDocs(collection(db, COL_KOHORT));
+        const kohortDocs = [];
+        snapKohort.forEach(d => {
+          const data = d.data();
+          const matchThn = (thn === 'ALL' || data.tahun === thn);
+          const matchBln = (bln === 'ALL' || (data.bulan_tahun && data.bulan_tahun.substring(5,7) === bln));
+          if (matchThn && matchBln) kohortDocs.push(data);
+        });
+
+        // 1. HITUNG CAPAIAN VAKSIN BAYI & BADUTA PER ANTIGEN
+        const antigenCounts = {};
+        VAKSIN_ANAK_KEYS.forEach(v => antigenCounts[v] = 0);
+
+        kohortDocs.forEach(d => {
+          VAKSIN_ANAK_KEYS.forEach(vKey => {
+            const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
+            if (d[fieldKey] || d.jenis_imunisasi === vKey) antigenCounts[vKey]++;
+          });
+        });
+
+        let htmlBayi = `
+          <table class="kohort-table">
+            <thead>
+              <tr><th>Kategori</th><th>Nama Antigen / Imunisasi</th><th>Total Capaian Dosis (Orang)</th></tr>
+            </thead>
+            <tbody>
+        `;
+        VAKSIN_ANAK_KEYS.forEach(vKey => {
+          const idx = VAKSIN_ANAK_KEYS.indexOf(vKey);
+          const kat = idx <= 18 ? "Imunisasi Bayi (0-12 Bln)" : "Booster Baduta (12-24 Bln)";
+          htmlBayi += `<tr><td>${kat}</td><td style="font-weight:700;">${vKey}</td><td style="font-weight:800; color:var(--primary);">${antigenCounts[vKey]}</td></tr>`;
+        });
+        htmlBayi += `</tbody></table>`;
+        cBayi.innerHTML = htmlBayi;
+
+        // 2. HITUNG IDL PER DESA & KUMULATIF
+        const idlDesaMap = {};
+        LIST_DESA.forEach(d => idlDesaMap[d.toLowerCase()] = { desa: d, countIDL: 0, totalSasaranBayi: 0 });
+
+        kohortDocs.forEach(d => {
+          const getVal = (vk) => d[`vaksin_${vk.replace(/[\s\(\)<>-]/g, '_')}`] || (d.jenis_imunisasi === vk ? d.tanggal_pelayanan : null);
+          const hasHb0 = getVal("HBO (<24 Jam)") || getVal("HBO (1-7 Hari)");
+          const hasBcg = getVal("BCG");
+          const hasDpt3 = getVal("DPT-HB-Hib3");
+          const hasOpv4 = getVal("OPV4");
+          const hasIpv1 = getVal("IPV1");
+          const hasMr1 = getVal("Campak Rubela-1");
+
+          // KRITERIA IDL
+          if (hasHb0 && hasBcg && hasDpt3 && hasOpv4 && hasIpv1 && hasMr1) {
+            const desaKey = (d.desa || '').toLowerCase();
+            if (idlDesaMap[desaKey]) idlDesaMap[desaKey].countIDL++;
+          }
+        });
+
+        let totalIDLKumulatif = 0, totalTargetBayiKumulatif = 0;
+        let htmlIDL = `
+          <table class="kohort-table">
+            <thead>
+              <tr><th>Nama Desa</th><th>Target Sasaran Bayi</th><th>Jumlah Bayi IDL (Capaian)</th><th>Persentase Capaian IDL (%)</th></tr>
+            </thead>
+            <tbody>
+        `;
+
+        LIST_DESA.forEach(dName => {
+          const item = idlDesaMap[dName.toLowerCase()];
+          const targetObj = targetMap.get(dName.toLowerCase());
+          const targetBayi = targetObj ? targetObj.target_bayi : 0;
+          const countIDL = item ? item.countIDL : 0;
+          const persen = targetBayi > 0 ? ((countIDL / targetBayi) * 100).toFixed(1) : "0.0";
+
+          totalIDLKumulatif += countIDL;
+          totalTargetBayiKumulatif += targetBayi;
+
+          htmlIDL += `
+            <tr>
+              <td style="text-align:left; font-weight:700;">Desa ${dName}</td>
+              <td>${targetBayi}</td>
+              <td style="font-weight:800; color:var(--success);">${countIDL}</td>
+              <td style="font-weight:800; color:var(--accent);">${persen}%</td>
+            </tr>
+          `;
+        });
+
+        const totalPersenKumulatif = totalTargetBayiKumulatif > 0 ? ((totalIDLKumulatif / totalTargetBayiKumulatif) * 100).toFixed(1) : "0.0";
+        htmlIDL += `
+            </tbody>
+            <tfoot>
+              <tr style="background:#E2E8F0; font-weight:bold;">
+                <td style="text-align:left; color:var(--accent);">TOTAL KUMULATIF PUSKESMAS:</td>
+                <td>${totalTargetBayiKumulatif}</td>
+                <td style="font-weight:800; color:var(--success); font-size:1rem;">${totalIDLKumulatif}</td>
+                <td style="font-weight:800; color:var(--primary); font-size:1rem;">${totalPersenKumulatif}%</td>
+              </tr>
+            </tfoot>
+          </table>
+        `;
+        cIDL.innerHTML = htmlIDL;
+
+        // 3. HITUNG CAPAIAN BIAS
+        const snapBias = await getDocs(collection(db, COL_BIAS));
+        const biasVaksinCounts = { MR: 0, DT: 0, Td: 0, HPV: 0 };
+        let totalCapaianBiasAll = 0;
+
+        snapBias.forEach(doc => {
+          const b = doc.data();
+          const matchThn = (thn === 'ALL' || (b.tanggal && b.tanggal.substring(0,4) === thn));
+          const matchBln = (bln === 'ALL' || (b.tanggal && b.tanggal.substring(5,7) === bln));
+          if (matchThn && matchBln) {
+            const capL = b.data?.Capaian_L || 0, capP = b.data?.Capaian_P || 0;
+            const total = capL + capP;
+            if (biasVaksinCounts[b.jenis_vaksin] !== undefined) {
+              biasVaksinCounts[b.jenis_vaksin] += total;
+            }
+            totalCapaianBiasAll += total;
+          }
+        });
+
+        let htmlBIAS = `
+          <table class="kohort-table">
+            <thead>
+              <tr><th>Jenis Imunisasi BIAS</th><th>Total Siswa Diberikan (Orang)</th></tr>
+            </thead>
+            <tbody>
+              <tr><td style="font-weight:700;">BIAS MR (Campak Rubella)</td><td style="font-weight:800; color:var(--primary);">${biasVaksinCounts.MR}</td></tr>
+              <tr><td style="font-weight:700;">BIAS DT (Difteria Tetanus)</td><td style="font-weight:800; color:var(--primary);">${biasVaksinCounts.DT}</td></tr>
+              <tr><td style="font-weight:700;">BIAS Td (Tetanus Diphtheria)</td><td style="font-weight:800; color:var(--primary);">${biasVaksinCounts.Td}</td></tr>
+              <tr><td style="font-weight:700;">BIAS HPV (Human Papillomavirus)</td><td style="font-weight:800; color:var(--primary);">${biasVaksinCounts.HPV}</td></tr>
+            </tbody>
+            <tfoot>
+              <tr style="background:#E2E8F0; font-weight:bold;">
+                <td style="text-align:left; color:var(--accent);">TOTAL SISWA TERVAKSINASI BIAS:</td>
+                <td style="font-weight:800; color:var(--success); font-size:1rem;">${totalCapaianBiasAll}</td>
+              </tr>
+            </tfoot>
+          </table>
+        `;
+        cBIAS.innerHTML = htmlBIAS;
+
+      } catch (err) { alert("Error Capaian: " + err.message); }
+    }
 
     async function loadCatchUpAnalysis() {
       const desaSel = document.getElementById('catchup_filter_desa').value;

@@ -754,7 +754,7 @@
             </select>
           </div>
           <div class="form-group">
-            <label>Bulan</label>
+            <label>Bulan Spesifik</label>
             <select id="filter_bulan">
               <option value="ALL">-- Semua Bulan --</option>
               <option value="01">Januari (01)</option>
@@ -891,7 +891,7 @@
             </select>
           </div>
           <div class="form-group">
-            <label>Bulan (Filter S/D Bulan Ini)</label>
+            <label>Bulan Spesifik</label>
             <select id="cap_filter_bulan">
               <option value="ALL">-- Semua Bulan (Kumulatif Tahunan) --</option>
               <option value="01">Januari (01)</option>
@@ -922,7 +922,6 @@
         </div>
       </div>
 
-      <!-- TABEL IDL TERPISAH DESA DALAM & LUAR WILAYAH -->
       <div class="card">
         <h3><i class="fas fa-certificate" style="color:var(--success)"></i> 2. Tabel Imunisasi Dasar Lengkap (IDL) Per Desa & Luar Wilayah</h3>
         <p class="lead" style="font-size:0.85rem;">Kriteria IDL: Bayi yang mendapatkan <strong>HBO (&lt;24H / 1-7H), BCG, DPT1-3, OPV1-4, IPV, dan MR1</strong>.</p>
@@ -1039,7 +1038,6 @@
       }
     ];
 
-    // PEMISAHAN WILAYAH DALAM DAN LUAR WILAYAH
     const DESA_DALAM_WILAYAH = [
       "Melata", "Nanuah", "Topalan", "Batu Ampar", "Lubuk Hiju", "Bukit Makmur", 
       "Bukit Raya", "Modang Mas", "Mukti Manunggal", "Sumber Jaya", "Bukit Harum"
@@ -1067,16 +1065,27 @@
     const AUTH_ADMIN_USER = "admin";
     const AUTH_ADMIN_PASS = "adminsri26";
 
-    // HELPER UNTUK FILTER TANGGAL VAKSIN SEBENARNYA
-    function isVaccineGivenInPeriod(vaccineDateStr, targetYear, targetMonth) {
+    // HELPER PENGECEKAN PERSIS BULAN FILTER VS KUMULATIF S/D BULAN FILTER
+    function isVaccineGivenExactMonth(vaccineDateStr, targetYear, targetMonth) {
       if (!vaccineDateStr || vaccineDateStr === '-') return false;
       const vDate = vaccineDateStr.substring(0, 10);
       const vYear = vDate.substring(0, 4);
       const vMonth = vDate.substring(5, 7);
 
       if (targetYear !== 'ALL' && vYear !== targetYear) return false;
-      if (targetMonth !== 'ALL' && vMonth > targetMonth) return false; // Diberikan sampai dengan bulan filter
-      return true;
+      if (targetMonth === 'ALL') return true;
+      return vMonth === targetMonth;
+    }
+
+    function isVaccineGivenUpToMonth(vaccineDateStr, targetYear, targetMonth) {
+      if (!vaccineDateStr || vaccineDateStr === '-') return false;
+      const vDate = vaccineDateStr.substring(0, 10);
+      const vYear = vDate.substring(0, 4);
+      const vMonth = vDate.substring(5, 7);
+
+      if (targetYear !== 'ALL' && vYear !== targetYear) return false;
+      if (targetMonth === 'ALL') return true;
+      return vMonth <= targetMonth;
     }
 
     function getKelompokUsia(tglLahir, tglPelayanan) {
@@ -1618,7 +1627,6 @@
       } catch (err) { alert("Error menyimpan target sasaran: " + err.message); }
     }
 
-    // HITUNG TAB CAPAIAN & PEMISAHAN PT. TSA DAN PT. SHS SEBAGAI CAKUPAN LUAR WILAYAH
     async function loadCapanTabContent() {
       const thn = document.getElementById('cap_filter_tahun').value;
       const bln = document.getElementById('cap_filter_bulan').value;
@@ -1627,7 +1635,7 @@
       const cIDL = document.getElementById('containerTabelIDL');
       const cBIAS = document.getElementById('containerCapaianBIAS');
 
-      [cBayi, cIDL, cBIAS].forEach(c => c.innerHTML = '<p class="muted" style="text-align:center; padding:15px;"><i class="fas fa-spinner fa-spin"></i> Menghitung data capaian berdasarkan tanggal vaksin...</p>');
+      [cBayi, cIDL, cBIAS].forEach(c => c.innerHTML = '<p class="muted" style="text-align:center; padding:15px;"><i class="fas fa-spinner fa-spin"></i> Menghitung data capaian berdasarkan tanggal pelayanan...</p>');
 
       try {
         const snapTarget = await getDocs(collection(db, COL_TARGET));
@@ -1641,36 +1649,48 @@
         const kohortDocs = [];
         snapKohort.forEach(d => kohortDocs.push(d.data()));
 
-        // 1. REKAPITULASI CAPAIAN DOSIS BAYI & BADUTA PER VAKSIN (DENGAN FILTER TANGGAL VAKSIN SEBENARNYA)
-        const antigenCounts = {};
-        VAKSIN_ANAK_KEYS.forEach(v => antigenCounts[v] = 0);
+        const exactCounts = {};
+        const kumulatifCounts = {};
+        VAKSIN_ANAK_KEYS.forEach(v => { exactCounts[v] = 0; kumulatifCounts[v] = 0; });
 
         kohortDocs.forEach(d => {
           VAKSIN_ANAK_KEYS.forEach(vKey => {
             const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
             const vDate = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
-            if (isVaccineGivenInPeriod(vDate, thn, bln)) {
-              antigenCounts[vKey]++;
-            }
+            if (isVaccineGivenExactMonth(vDate, thn, bln)) exactCounts[vKey]++;
+            if (isVaccineGivenUpToMonth(vDate, thn, bln)) kumulatifCounts[vKey]++;
           });
         });
+
+        const monthLabel = bln === 'ALL' ? 'Semua Bulan' : `Bulan ${bln}`;
 
         let htmlBayi = `
           <table class="kohort-table">
             <thead>
-              <tr><th>Kategori</th><th>Nama Antigen / Imunisasi</th><th>Total Capaian Dosis S/D Periode Ini</th></tr>
+              <tr>
+                <th>Kategori</th>
+                <th>Nama Antigen / Imunisasi</th>
+                <th>Total Dosis Diberikan (Khusus ${monthLabel})</th>
+                <th>Total Dosis Kumulatif (s/d ${monthLabel})</th>
+              </tr>
             </thead>
             <tbody>
         `;
         VAKSIN_ANAK_KEYS.forEach(vKey => {
           const idx = VAKSIN_ANAK_KEYS.indexOf(vKey);
           const kat = idx <= 18 ? "Imunisasi Bayi (0-12 Bln)" : "Booster Baduta (12-24 Bln)";
-          htmlBayi += `<tr><td>${kat}</td><td style="font-weight:700;">${vKey}</td><td style="font-weight:800; color:var(--primary);">${antigenCounts[vKey]}</td></tr>`;
+          htmlBayi += `
+            <tr>
+              <td>${kat}</td>
+              <td style="font-weight:700;">${vKey}</td>
+              <td style="font-weight:800; color:var(--primary);">${exactCounts[vKey]}</td>
+              <td style="font-weight:800; color:var(--accent);">${kumulatifCounts[vKey]}</td>
+            </tr>
+          `;
         });
         htmlBayi += `</tbody></table>`;
         cBayi.innerHTML = htmlBayi;
 
-        // 2. TABEL IDL DENGAN PEMISAHAN LUAR WILAYAH (PT. TSA & PT. SHS)
         const idlDesaMap = {};
         ALL_DESA_LIST.forEach(d => idlDesaMap[d.toLowerCase()] = { desa: d, countIDL: 0 });
 
@@ -1678,7 +1698,7 @@
           const getVal = (vk) => {
             const fieldKey = `vaksin_${vk.replace(/[\s\(\)<>-]/g, '_')}`;
             const vDate = d[fieldKey] || (d.jenis_imunisasi === vk ? d.tanggal_pelayanan : null);
-            return isVaccineGivenInPeriod(vDate, thn, bln) ? vDate : null;
+            return isVaccineGivenUpToMonth(vDate, thn, bln) ? vDate : null;
           };
 
           const hasHb0 = getVal("HBO (<24 Jam)") || getVal("HBO (1-7 Hari)");
@@ -1700,7 +1720,7 @@
         let htmlIDL = `
           <table class="kohort-table">
             <thead>
-              <tr><th>Kategori Wilayah</th><th>Nama Desa / Perusahaan</th><th>Target Sasaran Bayi</th><th>Jumlah Bayi IDL (Capaian)</th><th>Persentase Capaian IDL (%)</th></tr>
+              <tr><th>Kategori Wilayah</th><th>Nama Desa / Perusahaan</th><th>Target Sasaran Bayi</th><th>Jumlah Bayi IDL (s/d ${monthLabel})</th><th>Persentase Capaian IDL (%)</th></tr>
             </thead>
             <tbody>
               <tr style="background:#E0F2FE; font-weight:700;"><td colspan="5" style="text-align:left; color:var(--accent);"><i class="fas fa-map-marker-alt"></i> A. DALAM WILAYAH PUSKESMAS MELATA (11 DESA)</td></tr>
@@ -1784,40 +1804,38 @@
         `;
         cIDL.innerHTML = htmlIDL;
 
-        // 3. CAPAIAN BIAS
         const snapBias = await getDocs(collection(db, COL_BIAS));
-        const biasVaksinCounts = { MR: 0, DT: 0, Td: 0, HPV: 0 };
-        let totalCapaianBiasAll = 0;
+        const biasExact = { MR: 0, DT: 0, Td: 0, HPV: 0 };
+        const biasKumulatif = { MR: 0, DT: 0, Td: 0, HPV: 0 };
 
         snapBias.forEach(doc => {
           const b = doc.data();
-          if (isVaccineGivenInPeriod(b.tanggal, thn, bln)) {
-            const capL = b.data?.Capaian_L || 0, capP = b.data?.Capaian_P || 0;
-            const total = capL + capP;
-            if (biasVaksinCounts[b.jenis_vaksin] !== undefined) {
-              biasVaksinCounts[b.jenis_vaksin] += total;
-            }
-            totalCapaianBiasAll += total;
+          const capL = b.data?.Capaian_L || 0, capP = b.data?.Capaian_P || 0;
+          const total = capL + capP;
+
+          if (isVaccineGivenExactMonth(b.tanggal, thn, bln)) {
+            if (biasExact[b.jenis_vaksin] !== undefined) biasExact[b.jenis_vaksin] += total;
+          }
+          if (isVaccineGivenUpToMonth(b.tanggal, thn, bln)) {
+            if (biasKumulatif[b.jenis_vaksin] !== undefined) biasKumulatif[b.jenis_vaksin] += total;
           }
         });
 
         let htmlBIAS = `
           <table class="kohort-table">
             <thead>
-              <tr><th>Jenis Imunisasi BIAS</th><th>Total Siswa Diberikan (Orang)</th></tr>
+              <tr>
+                <th>Jenis Imunisasi BIAS</th>
+                <th>Siswa Diberikan (Khusus ${monthLabel})</th>
+                <th>Total Kumulatif Siswa (s/d ${monthLabel})</th>
+              </tr>
             </thead>
             <tbody>
-              <tr><td style="font-weight:700;">BIAS MR (Campak Rubella)</td><td style="font-weight:800; color:var(--primary);">${biasVaksinCounts.MR}</td></tr>
-              <tr><td style="font-weight:700;">BIAS DT (Difteria Tetanus)</td><td style="font-weight:800; color:var(--primary);">${biasVaksinCounts.DT}</td></tr>
-              <tr><td style="font-weight:700;">BIAS Td (Tetanus Diphtheria)</td><td style="font-weight:800; color:var(--primary);">${biasVaksinCounts.Td}</td></tr>
-              <tr><td style="font-weight:700;">BIAS HPV (Human Papillomavirus)</td><td style="font-weight:800; color:var(--primary);">${biasVaksinCounts.HPV}</td></tr>
+              <tr><td style="font-weight:700;">BIAS MR (Campak Rubella)</td><td style="font-weight:800; color:var(--primary);">${biasExact.MR}</td><td style="font-weight:800; color:var(--accent);">${biasKumulatif.MR}</td></tr>
+              <tr><td style="font-weight:700;">BIAS DT (Difteria Tetanus)</td><td style="font-weight:800; color:var(--primary);">${biasExact.DT}</td><td style="font-weight:800; color:var(--accent);">${biasKumulatif.DT}</td></tr>
+              <tr><td style="font-weight:700;">BIAS Td (Tetanus Diphtheria)</td><td style="font-weight:800; color:var(--primary);">${biasExact.Td}</td><td style="font-weight:800; color:var(--accent);">${biasKumulatif.Td}</td></tr>
+              <tr><td style="font-weight:700;">BIAS HPV (Human Papillomavirus)</td><td style="font-weight:800; color:var(--primary);">${biasExact.HPV}</td><td style="font-weight:800; color:var(--accent);">${biasKumulatif.HPV}</td></tr>
             </tbody>
-            <tfoot>
-              <tr style="background:#E2E8F0; font-weight:bold;">
-                <td style="text-align:left; color:var(--accent);">TOTAL SISWA TERVAKSINASI BIAS:</td>
-                <td style="font-weight:800; color:var(--success); font-size:1rem;">${totalCapaianBiasAll}</td>
-              </tr>
-            </tfoot>
           </table>
         `;
         cBIAS.innerHTML = htmlBIAS;
@@ -2068,7 +2086,7 @@
           
           snapBias.forEach(doc => {
             const d = doc.data();
-            if (isVaccineGivenInPeriod(d.tanggal, thn, bln)) biasRows.push(d);
+            if (isVaccineGivenExactMonth(d.tanggal, thn, bln)) biasRows.push(d);
           });
 
           if (biasRows.length === 0) {
@@ -2144,7 +2162,7 @@
           activeVaccineKeys.forEach(vKey => {
             const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
             const vDate = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
-            if (isVaccineGivenInPeriod(vDate, thn, bln)) {
+            if (isVaccineGivenExactMonth(vDate, thn, bln)) {
               hasMatchingVaccineInKat = true;
             }
           });
@@ -2164,7 +2182,7 @@
           activeVaccineKeys.forEach(vKey => {
             const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
             const val = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
-            if (isVaccineGivenInPeriod(val, thn, bln)) {
+            if (isVaccineGivenExactMonth(val, thn, bln)) {
               vTotals[vKey] += 1;
               vCols += `<td><span class="v-given">✓ (${val})</span></td>`;
             } else {
@@ -2196,7 +2214,7 @@
 
         let html = `
           <div style="margin-bottom:12px; background:#F0F7FF; padding:12px 16px; border-radius:10px; border:1px solid #BAE6FD; font-size:0.88rem;">
-            <strong>Periode S/D:</strong> ${bln === 'ALL' ? 'Semua Bulan' : 'Bulan ' + bln} ${thn} | 
+            <strong>Periode Khusus:</strong> ${bln === 'ALL' ? 'Semua Bulan' : 'Bulan ' + bln} ${thn} | 
             <strong>Desa:</strong> ${desaSel === 'ALL' ? 'Semua Desa' : desaSel} | 
             <strong>Kategori:</strong> ${katSel} | 
             <strong>Total Sasaran Terfilter:</strong> ${filteredDocs.length} Orang
@@ -2232,7 +2250,7 @@
       } catch (err) { container.innerHTML = `<p style="color:red; text-align:center;">Error: ${err.message}</p>`; }
     }
 
-    // DOWNLOAD EXCEL REKAPAN DENGAN LOGIKA TANGGAL TERFILTER PRESISI
+    // DOWNLOAD EXCEL DENGAN PERBAIKAN REKAPAN KHUSUS BULAN VS KUMULATIF S/D BULAN
     async function downloadExcel2Sheets() {
       const thn = document.getElementById('filter_tahun').value || document.getElementById('exp_filter_tahun').value;
       const bln = document.getElementById('filter_bulan').value || document.getElementById('exp_filter_bulan').value;
@@ -2252,7 +2270,7 @@
           let idx = 1;
           snapBias.forEach(doc => {
             const d = doc.data();
-            if (isVaccineGivenInPeriod(d.tanggal, thn, bln)) {
+            if (isVaccineGivenExactMonth(d.tanggal, thn, bln)) {
               const data = d.data || {};
               const capL = data.Capaian_L || 0, capP = data.Capaian_P || 0;
               const sasL = data.Sasaran_L || 0, sasP = data.Sasaran_P || 0;
@@ -2283,7 +2301,7 @@
           activeVaccineKeys.forEach(vKey => {
             const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
             const vDate = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
-            if (isVaccineGivenInPeriod(vDate, thn, bln)) {
+            if (isVaccineGivenUpToMonth(vDate, thn, bln)) {
               hasMatchingVaccineInKat = true;
             }
           });
@@ -2293,12 +2311,15 @@
           }
         });
 
-        const vTotals = {};
-        activeVaccineKeys.forEach(v => vTotals[v] = 0);
+        const vExactTotals = {};
+        const vKumulatifTotals = {};
+        activeVaccineKeys.forEach(v => { vExactTotals[v] = 0; vKumulatifTotals[v] = 0; });
+
+        const monthLabelText = bln === 'ALL' ? 'Semua Bulan' : `Bulan ${bln}`;
 
         const sheet1Data = [];
         sheet1Data.push([`LAPORAN REGISTER KOHORT MATRIKS - PUSKESMAS MELATA`]);
-        sheet1Data.push([`Periode S/D: ${bln === 'ALL' ? 'Semua Bulan' : 'Bulan ' + bln} ${thn} | Wilayah: ${desaSel === 'ALL' ? 'Semua Desa' : desaSel} | Kategori: ${katSel}`]);
+        sheet1Data.push([`Periode Matriks: s/d ${monthLabelText} ${thn} | Wilayah: ${desaSel === 'ALL' ? 'Semua Desa' : desaSel} | Kategori: ${katSel}`]);
         sheet1Data.push([]);
 
         const headerRow1 = ["No", "Desa", "Kegiatan / Posyandu", "Nama Sasaran", "Tanggal Lahir", "L/P", "Orang Tua / Suami", "Alamat / RT"];
@@ -2322,8 +2343,12 @@
           activeVaccineKeys.forEach(vKey => {
             const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
             const val = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
-            if (isVaccineGivenInPeriod(val, thn, bln)) {
-              vTotals[vKey] += 1;
+            
+            if (isVaccineGivenExactMonth(val, thn, bln)) {
+              vExactTotals[vKey] += 1;
+            }
+            if (isVaccineGivenUpToMonth(val, thn, bln)) {
+              vKumulatifTotals[vKey] += 1;
               row.push(val);
             } else {
               row.push("-");
@@ -2334,22 +2359,30 @@
           sheet1Data.push(row);
         });
 
-        const totalRow1 = ["TOTAL DOSIS", "", "", "", "", "", "", ""];
+        const totalRow1 = ["TOTAL DOSIS (S/D PERIODE)", "", "", "", "", "", "", ""];
         activeVaccineKeys.forEach(vKey => {
-          totalRow1.push(vTotals[vKey]);
+          totalRow1.push(vKumulatifTotals[vKey]);
         });
         totalRow1.push("");
         sheet1Data.push(totalRow1);
 
         const sheet2Data = [
           [`REKAPITULASI TOTAL PENERIMA VAKSIN - PUSKESMAS MELATA`],
-          [`Periode S/D: ${bln === 'ALL' ? 'Semua Bulan' : 'Bulan ' + bln} ${thn} | Wilayah: ${desaSel === 'ALL' ? 'Semua Desa' : desaSel}`],
+          [`Periode Filter: ${monthLabelText} ${thn} | Wilayah: ${desaSel === 'ALL' ? 'Semua Desa' : desaSel}`],
           [],
-          ["No", "Kategori Sasaran / Usia", "Jenis Imunisasi / Antigen", "Total Dosis Diberikan (Orang)"]
+          [
+            "No", 
+            "Kategori Sasaran / Usia", 
+            "Jenis Imunisasi / Antigen", 
+            `Total Dosis Diberikan (Khusus ${monthLabelText})`, 
+            `Total Dosis Diberikan (s/d ${monthLabelText})`
+          ]
         ];
 
-        let totalDosisSemua = 0;
+        let totalExactSemua = 0;
+        let totalKumulatifSemua = 0;
         let s2Idx = 1;
+
         activeVaccineKeys.forEach(vKey => {
           let cat = "0 - 12 Bulan (Imunisasi Dasar)";
           const idx = ALL_VAKSIN_KEYS.indexOf(vKey);
@@ -2357,12 +2390,16 @@
           else if (idx >= 22 && idx <= 23) cat = "TT Calon Pengantin (Catin)";
           else if (idx >= 24) cat = "TT Ibu Hamil (Bumil)";
 
-          const count = vTotals[vKey];
-          totalDosisSemua += count;
-          sheet2Data.push([s2Idx++, cat, vKey, count]);
+          const exactCount = vExactTotals[vKey];
+          const kumulatifCount = vKumulatifTotals[vKey];
+
+          totalExactSemua += exactCount;
+          totalKumulatifSemua += kumulatifCount;
+
+          sheet2Data.push([s2Idx++, cat, vKey, exactCount, kumulatifCount]);
         });
 
-        sheet2Data.push(["", "TOTAL KESELURUHAN", "Seluruh Jenis Vaksin Terfilter", totalDosisSemua]);
+        sheet2Data.push(["", "TOTAL KESELURUHAN", "Seluruh Jenis Vaksin Terfilter", totalExactSemua, totalKumulatifSemua]);
 
         const wb = XLSX.utils.book_new();
         const ws1 = XLSX.utils.aoa_to_sheet(sheet1Data);
@@ -2382,7 +2419,8 @@
           { wch: 6 },
           { wch: 32 },
           { wch: 25 },
-          { wch: 28 }
+          { wch: 32 },
+          { wch: 32 }
         ];
 
         XLSX.utils.book_append_sheet(wb, ws1, "Register Kohort Matriks");

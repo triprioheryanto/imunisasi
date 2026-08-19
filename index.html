@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Sistem Register Imunisasi & BIAS — Puskesmas Melata</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cinzel:wght@700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -1560,136 +1560,269 @@
       loadRecentTransactions();
     }
 
-    // FUNGSI GENERATE SERTIFIKAT IMUNISASI (OPSI 1)
+    // FUNGSI GENERATE SERTIFIKAT IMUNISASI (A4 LANDSCAPE & KHUSUS ADMIN)
     window.cetakSertifikatIndividu = function(dataAnakJson) {
+      // 1. Proteksi Akses Khusus Mode Admin
+      if (typeof activePetugasName === 'undefined' || activePetugasName !== 'admin') {
+        return alert("🔒 AKSES DITOLAK: Fitur cetak/generate Sertifikat Imunisasi Dasar Lengkap hanya dapat diakses pada Mode Admin!");
+      }
+
       try {
         const d = JSON.parse(decodeURIComponent(dataAnakJson));
         const win = window.open('', '_blank');
 
-        let isAdult = (d.peran === 'Catin' || d.peran === 'Bumil');
-        let keysToUse = isAdult ? VAKSIN_DEWASA_KEYS : VAKSIN_ANAK_KEYS;
-        let vRows = '';
-        let countV = 0;
-
-        keysToUse.forEach(vKey => {
-          const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
-          const val = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
-          if (val) {
-            countV++;
-            vRows += `
-              <tr>
-                <td style="border:1px solid #CBD5E1; padding:8px; text-align:center;">${countV}</td>
-                <td style="border:1px solid #CBD5E1; padding:8px; font-weight:bold;">${vKey}</td>
-                <td style="border:1px solid #CBD5E1; padding:8px; text-align:center; color:#065F46; font-weight:bold;">✓ Terimunisasi</td>
-                <td style="border:1px solid #CBD5E1; padding:8px; text-align:center;">${val}</td>
-              </tr>
-            `;
+        // 2. Logika Penomoran Sertifikat Berdasarkan Singkatan Desa
+        function getDesaCode(desaName) {
+          if (!desaName) return "XX";
+          const words = desaName.trim().replace(/^PT\.\s*/i, '').split(/\s+/);
+          if (words.length >= 2) {
+            const w1 = words[0], w2 = words[1];
+            return (w1[0] + w2[0]).toUpperCase();
+          } else {
+            const w = words[0];
+            return (w[0] + w[w.length - 1]).toUpperCase();
           }
-        });
-
-        if (countV === 0) {
-          vRows = `<tr><td colspan="4" style="border:1px solid #CBD5E1; padding:12px; text-align:center; color:#64748B;">Belum ada catatan imunisasi yang terverifikasi.</td></tr>`;
         }
 
+        const kodeDesa = getDesaCode(d.desa);
+        const noUrut = d.id ? String(d.id).replace(/[^0-9]/g, '').slice(-3) || "001" : "001";
+        const noSertifikat = `${kodeDesa}/IDL/${noUrut}/${new Date().getFullYear()}`;
+
+        // 3. Menyusun Ringkasan Imunisasi Dasar Lengkap
+        const listVaksinRingkas = [
+          { key: "HBO (<24 Jam)", label: "HB-0" },
+          { key: "BCG", label: "BCG" },
+          { key: "OPV1", label: "Polio 1" },
+          { key: "DPT-HB-Hib1", label: "DPT-HB-Hib 1" },
+          { key: "OPV2", label: "Polio 2" },
+          { key: "PCV1", label: "PCV 1" },
+          { key: "Rotavirus1", label: "RV 1" },
+          { key: "DPT-HB-Hib2", label: "DPT-HB-Hib 2" },
+          { key: "OPV3", label: "Polio 3" },
+          { key: "PCV2", label: "PCV 2" },
+          { key: "Rotavirus2", label: "RV 2" },
+          { key: "DPT-HB-Hib3", label: "DPT-HB-Hib 3" },
+          { key: "OPV4", label: "Polio 4" },
+          { key: "IPV1", label: "IPV 1" },
+          { key: "Rotavirus3", label: "RV 3" },
+          { key: "Campak Rubela-1", label: "Campak Rubella (MR)" },
+          { key: "IPV2", label: "IPV 2" }
+        ];
+
+        let vGridHtml = '';
+        listVaksinRingkas.forEach(item => {
+          const fieldKey = `vaksin_${item.key.replace(/[\s\(\)<>-]/g, '_')}`;
+          const tgl = d[fieldKey] || (d.jenis_imunisasi === item.key ? d.tanggal_pelayanan : null);
+          vGridHtml += `
+            <div style="border: 1px solid #CBD5E1; padding: 3px 6px; border-radius: 4px; background: #FFF; font-size: 10px; display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-weight: 600; color: #334155;">${item.label}:</span>
+              <span style="font-weight: bold; color: ${tgl ? '#065F46' : '#94A3B8'};">${tgl || '✔'}</span>
+            </div>
+          `;
+        });
+
+        const nowFormatted = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'Long', year: 'numeric' });
+
+        // 4. HTML Template Sertifikat A4 Landscape
         const template = `
           <!DOCTYPE html>
           <html lang="id">
           <head>
             <meta charset="utf-8">
-            <title>Sertifikat Imunisasi - ${d.nama_anak}</title>
+            <title>Sertifikat IDL - ${d.nama_anak}</title>
+            <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
             <style>
-              @page { size: A4 portrait; margin: 15mm; }
-              body { font-family: 'Plus Jakarta Sans', sans-serif, Arial; color: #1E293B; margin:0; padding:20px; }
-              .cert-border { border: 8px double #003366; padding: 30px; border-radius: 12px; background: #FFFDFB; position:relative; }
-              .header { text-align: center; border-bottom: 3px double #FF5722; padding-bottom: 12px; margin-bottom: 20px; }
-              .header h2 { margin: 0; color: #003366; font-size: 22px; text-transform: uppercase; letter-spacing:1px; }
-              .header p { margin: 4px 0 0 0; font-size: 13px; color: #64748B; }
-              .cert-title { text-align: center; margin: 20px 0; }
-              .cert-title h1 { margin: 0; font-size: 24px; color: #FF5722; text-transform: uppercase; letter-spacing: 1px; }
-              .cert-title p { margin: 5px 0 0 0; font-size: 14px; color: #475569; }
-              .bio-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px; }
-              .bio-table td { padding: 6px 4px; vertical-align: top; }
-              .v-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
-              .v-table th { background: #003366; color: #FFF; border: 1px solid #003366; padding: 8px; text-align: center; }
-              .footer-row { margin-top: 40px; display: flex; justify-content: space-between; align-items: flex-end; font-size: 13px; }
-              .watermark { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg); font-size: 70px; color: rgba(0, 51, 102, 0.04); font-weight: 800; pointer-events: none; text-transform: uppercase; }
+              @page { size: A4 landscape; margin: 6mm; }
+              *, *::before, *::after { box-sizing: border-box; }
+              body { font-family: 'Plus Jakarta Sans', sans-serif; color: #0F172A; margin: 0; padding: 0; background: #FFF; }
+              
+              .cert-outer {
+                border: 4px solid #003366;
+                padding: 4px;
+                height: 195mm;
+                position: relative;
+                box-sizing: border-box;
+              }
+              .cert-inner {
+                border: 2px solid #FF5722;
+                height: 100%;
+                padding: 12px 20px;
+                position: relative;
+                background: #FFFDFB;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+              }
+
+              /* Kop Sertifikat */
+              .kop-container {
+                display: flex;
+                align-items: center;
+                border-bottom: 3px double #003366;
+                padding-bottom: 6px;
+                margin-bottom: 8px;
+              }
+              .kop-logo { width: 75px; height: auto; flex-shrink: 0; }
+              .kop-text { flex-grow: 1; text-align: center; margin-right: 75px; }
+              .kop-text h3 { margin: 0; font-size: 15px; font-weight: 800; color: #003366; letter-spacing: 0.5px; }
+              .kop-text h2 { margin: 1px 0; font-size: 17px; font-weight: 800; color: #003366; letter-spacing: 1px; }
+              .kop-text h1 { margin: 1px 0; font-size: 20px; font-weight: 800; color: #003366; letter-spacing: 1.5px; }
+              .kop-text p { margin: 0; font-size: 11px; color: #334155; font-weight: 600; }
+
+              /* Watermark Logo Puskesmas */
+              .watermark-bg {
+                position: absolute;
+                top: 52%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 320px;
+                opacity: 0.06;
+                pointer-events: none;
+                z-index: 1;
+              }
+
+              /* Content Core */
+              .content-body { position: relative; z-index: 2; text-align: center; }
+              .cert-title { font-family: 'Cinzel', serif; font-size: 28px; font-weight: 800; color: #003366; letter-spacing: 4px; margin: 2px 0 0 0; }
+              .cert-no { font-size: 11px; font-weight: 700; color: #475569; margin-bottom: 6px; }
+
+              .bio-container {
+                width: 80%;
+                margin: 4px auto 8px auto;
+                text-align: left;
+                font-size: 13px;
+                line-height: 1.4;
+              }
+              .bio-row { display: flex; margin-bottom: 2px; }
+              .bio-label { width: 180px; font-weight: 700; color: #1E293B; }
+              .bio-val { font-weight: 700; color: #003366; }
+
+              .statement-box {
+                margin: 6px 0;
+                font-size: 13px;
+                line-height: 1.3;
+                color: #1E293B;
+              }
+              .motto {
+                font-size: 15px;
+                font-weight: 800;
+                color: #FF5722;
+                margin-top: 2px;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+              }
+
+              /* Grid Riwayat Imunisasi Ringkas */
+              .v-section { margin-top: 4px; text-align: left; }
+              .v-title { font-size: 11px; font-weight: 800; color: #003366; margin-bottom: 3px; }
+              .v-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
+
+              /* Tanda Tangan */
+              .ttd-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-end;
+                margin-top: 6px;
+                position: relative;
+                z-index: 2;
+              }
+              .ttd-box { width: 38%; text-align: center; font-size: 11px; }
+              .ttd-title { font-weight: 700; color: #003366; margin-bottom: 35px; }
+              .ttd-name { font-weight: 800; font-size: 12px; text-decoration: underline; color: #003366; }
+              .ttd-nip { font-size: 10px; color: #334155; font-weight: 600; margin-top: 1px; }
+
+              @media print {
+                body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+              }
             </style>
           </head>
           <body>
-            <div class="cert-border">
-              <div class="watermark">Puskesmas Melata</div>
-              
-              <div class="header">
-                <h2>PEMERINTAH KABUPATEN LAMANDAU</h2>
-                <h3 style="margin:2px 0; color:#003366;">DINAS KESEHATAN — PUSKESMAS MELATA</h3>
-                <p>Kecamatan Menthobi Raya, Kabupaten Lamandau, Kalimantan Tengah</p>
-              </div>
+            <div class="cert-outer">
+              <div class="cert-inner">
+                
+                <!-- Logo Watermark -->
+                <img class="watermark-bg" src="MELATA LOGO.jpg" alt="Watermark Puskesmas">
 
-              <div class="cert-title">
-                <h1>SERTIFIKAT REKAPITULASI IMUNISASI</h1>
-                <p>Nomor Registrasi Kohort: <code>${d.id || '-'}</code></p>
-              </div>
-
-              <p style="font-size:14px; margin-bottom:10px;">Diberikan secara resmi kepada:</p>
-
-              <table class="bio-table">
-                <tr>
-                  <td width="28%"><b>Nama Lengkap Sasaran</b></td><td width="2%">:</td>
-                  <td width="70%" style="font-size:16px; font-weight:bold; color:#003366;">${d.nama_anak.toUpperCase()}</td>
-                </tr>
-                <tr>
-                  <td><b>Tanggal Lahir / JK</b></td><td>:</td>
-                  <td>${d.tgl_lahir || '-'} (${d.jk === 'L' ? 'Laki-Laki' : 'Perempuan'})</td>
-                </tr>
-                <tr>
-                  <td><b>NIK Sasaran</b></td><td>:</td>
-                  <td>${d.nik_anak || '-'}</td>
-                </tr>
-                <tr>
-                  <td><b>Orang Tua / Suami</b></td><td>:</td>
-                  <td>${d.nama_ibu || '-'} ${d.nik_ibu && d.nik_ibu !== '-' ? '(NIK: ' + d.nik_ibu + ')' : ''}</td>
-                </tr>
-                <tr>
-                  <td><b>No. WhatsApp / HP</b></td><td>:</td>
-                  <td>${d.wa_anak || '-'}</td>
-                </tr>
-                <tr>
-                  <td><b>Wilayah / Alamat</b></td><td>:</td>
-                  <td>Desa ${d.desa || '-'}, ${d.alamat_rt || '-'}</td>
-                </tr>
-              </table>
-
-              <h4 style="margin: 15px 0 8px 0; color:#003366;">Riwayat Vaksinasi Terverifikasi:</h4>
-              <table class="v-table">
-                <thead>
-                  <tr>
-                    <th width="8%">No</th>
-                    <th width="42%">Jenis Imunisasi / Antigen</th>
-                    <th width="25%">Status Pemberian</th>
-                    <th width="25%">Tanggal Pelayanan</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${vRows}
-                </tbody>
-              </table>
-
-              <div class="footer-row">
-                <div>
-                  <p>Dicetak Pada: <b>${new Date().toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric'})}</b></p>
-                  <p style="font-size:11px; color:#64748B;">* Dokumen ini merupakan bukti sah rekapitulasi imunisasi di Puskesmas Melata.</p>
+                <!-- Header / Kop Sertifikat -->
+                <div class="kop-container">
+                  <img class="kop-logo" src="image_1d3605.png" alt="Logo Kab Lamandau">
+                  <div class="kop-text">
+                    <h3>PEMERINTAH KABUPATEN LAMANDAU</h3>
+                    <h2>DINAS KESEHATAN</h2>
+                    <h1>PUSKESMAS MELATA</h1>
+                    <p>Jln. Tri Setya No. 01 Ds. Melata Kec. Menthobi Raya Kab. Lamandau</p>
+                  </div>
                 </div>
-                <div style="text-align:center;">
-                  <p>Puskesmas Melata, ${new Date().toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric'})}</p>
-                  <p>Petugas Register Imunisasi,</p>
-                  <br><br><br>
-                  <p><b><u>${d.last_updated_by || 'Petugas Imunisasi'}</u></b></p>
+
+                <!-- Isi Utama Sertifikat -->
+                <div class="content-body">
+                  <div class="cert-title">SERTIFIKAT</div>
+                  <div class="cert-no">Nomor: ${noSertifikat}</div>
+
+                  <div class="statement-box">
+                    Diberikan kepada anak:
+                  </div>
+
+                  <div class="bio-container">
+                    <div class="bio-row">
+                      <div class="bio-label">Nama Lengkap Anak</div>
+                      <div>: <span class="bio-val" style="font-size:15px; text-transform:uppercase;">${d.nama_anak}</span></div>
+                    </div>
+                    <div class="bio-row">
+                      <div class="bio-label">Tanggal Lahir / Jenis Kelamin</div>
+                      <div>: ${d.tgl_lahir || '-'} (${d.jk === 'L' ? 'Laki-Laki' : 'Perempuan'})</div>
+                    </div>
+                    <div class="bio-row">
+                      <div class="bio-label">Nama Orang Tua / Ibu</div>
+                      <div>: ${d.nama_ibu || '-'}</div>
+                    </div>
+                    <div class="bio-row">
+                      <div class="bio-label">Desa / Alamat</div>
+                      <div>: Desa ${d.desa || '-'}, ${d.alamat_rt || '-'}</div>
+                    </div>
+                  </div>
+
+                  <div class="statement-box">
+                    Menyatakan bahwa anak tersebut di atas telah mendapatkan <b>Imunisasi Dasar Lengkap</b>.
+                    <div class="motto">"Anak Sehat Generasi Kuat"</div>
+                  </div>
+
+                  <!-- Bagian Belakang / Bawah: Ringkasan Jenis Imunisasi Diterima -->
+                  <div class="v-section">
+                    <div class="v-title">Rincian Imunisasi Dasar Yang Telah Diterima:</div>
+                    <div class="v-grid">
+                      ${vGridHtml}
+                    </div>
+                  </div>
                 </div>
+
+                <!-- Bagian Tanda Tangan Kiri & Kanan -->
+                <div class="ttd-row">
+                  <div class="ttd-box">
+                    <div class="ttd-title">
+                      Koordinator Imunisasi,
+                    </div>
+                    <div class="ttd-name">Tri Prio Heryanto</div>
+                  </div>
+
+                  <div class="ttd-box">
+                    <div style="font-size: 10px; margin-bottom: 2px;">Melata, ${nowFormatted}</div>
+                    <div class="ttd-title">
+                      Mengetahui,<br>Kepala Puskesmas Melata
+                    </div>
+                    <div class="ttd-name">dr. Anang Argo Yuwono</div>
+                    <div class="ttd-nip">Pembina Tingkat I</div>
+                    <div class="ttd-nip">NIP. 19830521 201403 003</div>
+                  </div>
+                </div>
+
               </div>
             </div>
 
             <script>
-              window.onload = function() { window.print(); }
+              window.onload = function() {
+                window.print();
+              }
             <\/script>
           </body>
           </html>
@@ -1697,7 +1830,9 @@
 
         win.document.write(template);
         win.document.close();
-      } catch (err) { alert("Gagal memuat sertifikat: " + err.message); }
+      } catch (err) {
+        alert("Gagal memuat sertifikat: " + err.message);
+      }
     };
 
     async function loadRecentTransactions() {

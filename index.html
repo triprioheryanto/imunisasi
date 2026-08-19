@@ -241,14 +241,6 @@
       backdrop-filter: blur(6px); border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
-    .badge-urgent {
-      background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5; font-weight: 700; padding: 4px 10px; border-radius: 8px; font-size: 0.78rem; display: inline-block;
-    }
-
-    .badge-warning-custom {
-      background: #FEF3C7; color: #92400E; border: 1px solid #FCD34D; font-weight: 700; padding: 4px 10px; border-radius: 8px; font-size: 0.78rem; display: inline-block;
-    }
-
     /* BUTTONS */
     .actions { display: flex; gap: 12px; justify-content: flex-end; align-items: center; margin-top: 22px; flex-wrap: wrap; }
     .btn {
@@ -261,9 +253,7 @@
     .btn-primary:hover { background: var(--primary-hover); }
     .btn-ghost { background: transparent; border: 1.5px solid var(--border-color); color: var(--accent); }
     .btn-ghost:hover { background: #F1F5F9; }
-    .btn-info { background: var(--info); color: #fff; } 
     .btn-danger { background: var(--danger); color: #fff; }
-    .btn-success { background: var(--success); color: #fff; }
 
     .site-footer { text-align: center; margin-top: 48px; padding: 24px 0; color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--border-color); }
 
@@ -302,7 +292,6 @@
         <div class="form-group">
           <label>Nama Petugas / Username <span class="req">*</span></label>
           <input type="text" id="login_username" placeholder="Masukkan nama/username petugas" required>
-          <small id="login_device_hint" style="font-size:0.75rem; color:var(--info); margin-top:4px;"></small>
         </div>
 
         <div class="form-group">
@@ -329,7 +318,7 @@
       </div>
       <div class="header-actions">
         <div class="badge-user" id="currentUserDisplay"><i class="fas fa-user-circle"></i> <span>Petugas</span></div>
-        <button class="btn btn-ghost" onclick="logoutPetugas()" style="color:#fff; border-color:rgba(255,255,255,0.25); padding:8px 14px; font-size:0.82rem;" title="Ganti Petugas">
+        <button class="btn btn-ghost" id="btnLogoutPetugas" style="color:#fff; border-color:rgba(255,255,255,0.25); padding:8px 14px; font-size:0.82rem;" title="Ganti Petugas">
           <i class="fas fa-sign-out-alt"></i> Ganti
         </button>
       </div>
@@ -453,7 +442,6 @@
               <input type="text" id="reg_nik_anak" placeholder="NIK Sasaran">
             </div>
 
-            <!-- DROPDOWN DINAMIS HUBUNGAN PERAN PASANGAN -->
             <div class="form-group">
               <label>Nama Pasangan / Orang Tua <span class="req">*</span></label>
               <div class="form-row">
@@ -521,7 +509,7 @@
                   <div class="vaccine-group-title" style="margin-top:20px; color:#B45309;"><i class="fas fa-heart"></i> Td Calon Pengantin (TT Catin)</div>
                   <div class="vaccine-checkbox-grid">
                     <label class="checkbox-item"><input type="checkbox" name="chk_vaksin" value="TT1 Catin"> TT1 Catin</label>
-                    <label class="checkbox-item"><input type="checkbox" name="chk_vaksin" value="TT2 Catin" id="cb_tt2_catin"> TT2 Catin</label>
+                    <label class="checkbox-item"><input type="checkbox" name="chk_vaksin" value="TT2 Catin"> TT2 Catin</label>
                   </div>
                 </div>
 
@@ -529,11 +517,11 @@
                 <div id="section_bumil" class="vaccine-section collapsed">
                   <div class="vaccine-group-title" style="margin-top:20px; color:#065F46;"><i class="fas fa-person-pregnant"></i> Td Ibu Hamil (TT Bumil)</div>
                   <div class="vaccine-checkbox-grid">
-                    <label class="checkbox-item"><input type="checkbox" name="chk_vaksin" value="TT1 Bumil" class="cb-bumil"> TT1 Bumil</label>
-                    <label class="checkbox-item"><input type="checkbox" name="chk_vaksin" value="TT2 Bumil" class="cb-bumil"> TT2 Bumil</label>
-                    <label class="checkbox-item"><input type="checkbox" name="chk_vaksin" value="TT3 Bumil" class="cb-bumil"> TT3 Bumil</label>
-                    <label class="checkbox-item"><input type="checkbox" name="chk_vaksin" value="TT4 Bumil" class="cb-bumil"> TT4 Bumil</label>
-                    <label class="checkbox-item"><input type="checkbox" name="chk_vaksin" value="TT5 Bumil" class="cb-bumil"> TT5 Bumil</label>
+                    <label class="checkbox-item"><input type="checkbox" name="chk_vaksin" value="TT1 Bumil"> TT1 Bumil</label>
+                    <label class="checkbox-item"><input type="checkbox" name="chk_vaksin" value="TT2 Bumil"> TT2 Bumil</label>
+                    <label class="checkbox-item"><input type="checkbox" name="chk_vaksin" value="TT3 Bumil"> TT3 Bumil</label>
+                    <label class="checkbox-item"><input type="checkbox" name="chk_vaksin" value="TT4 Bumil"> TT4 Bumil</label>
+                    <label class="checkbox-item"><input type="checkbox" name="chk_vaksin" value="TT5 Bumil"> TT5 Bumil</label>
                   </div>
                 </div>
 
@@ -554,7 +542,7 @@
             <h3 style="margin:0;"><i class="fas fa-list-check" style="color:var(--success);"></i> Preview Data Desa Terpilih (<span id="preview_desa_title">Semua Desa</span>)</h3>
             <p class="lead" style="font-size:0.85rem; margin:4px 0 0 0;">Tabel terpisah secara presisi antara Bayi/Baduta dan TT Catin/Bumil.</p>
           </div>
-          <button class="btn btn-ghost" onclick="loadRecentTransactions()" style="padding:7px 14px; font-size:0.82rem;"><i class="fas fa-sync-alt"></i> Refresh Preview</button>
+          <button class="btn btn-ghost" id="btnRefreshPreview" style="padding:7px 14px; font-size:0.82rem;"><i class="fas fa-sync-alt"></i> Refresh Preview</button>
         </div>
 
         <h4 style="color:var(--accent); margin-top:24px; display:flex; align-items:center; gap:8px;"><i class="fas fa-baby"></i> 1. Matriks Imunisasi Bayi & Baduta (s/d MR2)</h4>
@@ -626,7 +614,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, setDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, deleteDoc, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAAyGTFyAkfua9wazWH6FFkYYmnGFTEh4",
@@ -653,9 +641,39 @@
     ];
 
     let currentInputDesa = "";
-    let activePetugasName = "";
+    let activePetugasName = sessionStorage.getItem("petugas_aktif") || "";
 
-    // FUNGSI ANIMASI COLLAPSE / EXPAND VAKSIN CHECKLIST
+    // AUTENTIKASI PETUGAS LOGIC
+    function checkLoginStatus() {
+      const modal = document.getElementById('loginModal');
+      const userDisplay = document.getElementById('currentUserDisplay');
+      if (activePetugasName) {
+        modal.style.display = 'none';
+        userDisplay.querySelector('span').textContent = activePetugasName;
+      } else {
+        modal.style.display = 'flex';
+      }
+    }
+
+    document.getElementById('formLoginPetugas').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const u = document.getElementById('login_username').value.trim();
+      if (u) {
+        activePetugasName = u;
+        sessionStorage.setItem("petugas_aktif", u);
+        checkLoginStatus();
+      }
+    });
+
+    window.logoutPetugas = function() {
+      sessionStorage.removeItem("petugas_aktif");
+      activePetugasName = "";
+      checkLoginStatus();
+    };
+
+    document.getElementById('btnLogoutPetugas').addEventListener('click', window.logoutPetugas);
+
+    // ANIMASI COLLAPSE / EXPAND VAKSIN CHECKLIST
     function updateVaccineVisibility() {
       const kat = document.getElementById('reg_kategori_sasaran').value;
       const peran = document.getElementById('reg_peran_pasangan').value;
@@ -680,38 +698,43 @@
       }
     }
 
-    // LISTENER DROPDOWN PERAN & KATEGORI
-    document.addEventListener('DOMContentLoaded', () => {
-      const selectKategori = document.getElementById('reg_kategori_sasaran');
-      const selectPeran = document.getElementById('reg_peran_pasangan');
+    // PEMUATAN DROPDOWN NAMA SASARAN BERDASARKAN DESA TERPILIH
+    async function loadRegisteredAnakList(desa) {
+      const selectAnak = document.getElementById('select_anak_registered');
+      selectAnak.innerHTML = '<option value="">-- Memuat Data Sasaran... --</option>';
 
-      selectKategori.addEventListener('change', () => {
-        if (selectKategori.value === 'DEWASA') selectPeran.value = 'Suami';
-        else selectPeran.value = 'Ibu';
-        updateVaccineVisibility();
-      });
-
-      selectPeran.addEventListener('change', () => {
-        if (selectPeran.value === 'Suami') selectKategori.value = 'DEWASA';
-        else selectKategori.value = 'ANAK';
-        updateVaccineVisibility();
-      });
-
-      updateVaccineVisibility();
-    });
-
-    window.switchTab = function(e) {
-      const target = e.currentTarget.getAttribute('data-tab');
-      document.querySelectorAll('.app-nav-tabs .tab').forEach(t=>t.classList.remove('active'));
-      e.currentTarget.classList.add('active');
-      document.querySelectorAll('.tab-panel').forEach(p => p.style.display='none');
-      
-      const targetEl = document.getElementById(target);
-      if (targetEl) {
-        targetEl.style.display = 'block';
-        window.scrollTo({ top: targetEl.offsetTop - 100, behavior: 'smooth' });
+      if (!desa) {
+        selectAnak.innerHTML = '<option value="">-- Pilih Desa Terlebih Dahulu --</option>';
+        return;
       }
-    };
+
+      try {
+        const snap = await getDocs(collection(db, COL_KOHORT));
+        let list = [];
+        snap.forEach(d => {
+          const data = d.data();
+          if (data.desa && data.desa.toLowerCase() === desa.toLowerCase()) {
+            list.push({ id: d.id, ...data });
+          }
+        });
+
+        if (list.length === 0) {
+          selectAnak.innerHTML = '<option value="">-- Tidak ada sasaran terdaftar di desa ini --</option>';
+          return;
+        }
+
+        selectAnak.innerHTML = '<option value="">-- Pilih Nama Sasaran Registered --</option>';
+        list.forEach(item => {
+          const opt = document.createElement('option');
+          opt.value = JSON.stringify(item);
+          opt.textContent = `${item.nama_anak} (${item.tgl_lahir || 'Tgl Lahir -'}) - Ortu/Pasangan: ${item.nama_ibu || '-'}`;
+          selectAnak.appendChild(opt);
+        });
+      } catch (err) {
+        console.error("Gagal memuat daftar sasaran:", err);
+        selectAnak.innerHTML = '<option value="">-- Gagal Memuat Data --</option>';
+      }
+    }
 
     function fillFormWithSelectedAnak() {
       const val = document.getElementById('select_anak_registered').value;
@@ -729,6 +752,7 @@
         document.getElementById('reg_nama_ibu').value = data.nama_ibu || "";
         document.getElementById('reg_nik_ibu').value = data.nik_ibu !== "-" ? data.nik_ibu : "";
         document.getElementById('reg_alamat').value = data.alamat_rt || "";
+        if (data.tanggal_pelayanan) document.getElementById('reg_tgl_pelayanan').value = data.tanggal_pelayanan;
 
         const hasDewasaVaccine = VAKSIN_DEWASA_KEYS.some(v => data[`vaksin_${v.replace(/[\s\(\)<>-]/g, '_')}`]);
         if (hasDewasaVaccine || data.peran_pasangan === 'Suami') {
@@ -743,12 +767,12 @@
           cb.checked = !!data[fieldKey];
         });
 
-        // Smooth scroll ke form
         document.getElementById('cardFormRegister').scrollIntoView({ behavior: 'smooth' });
         loadRecentTransactions();
       } catch (e) { console.error(e); }
     }
 
+    // OPERASI SIMPAN & INPUT KOHORT
     async function handleSaveKohortMatrix(e) {
       e.preventDefault();
 
@@ -784,17 +808,29 @@
         ...vaccineDataUpdate
       };
 
-      await setDoc(doc(db, COL_KOHORT, uniqueChildId), payload, { merge: true });
-      alert(`✅ Data Kohort ${namaAnak} berhasil tersimpan!`);
-      loadRecentTransactions();
+      try {
+        await setDoc(doc(db, COL_KOHORT, uniqueChildId), payload, { merge: true });
+        alert(`✅ Data Kohort ${namaAnak} berhasil tersimpan!`);
+        currentInputDesa = desa;
+        document.getElementById('search_desa_anak').value = desa;
+        loadRegisteredAnakList(desa);
+        loadRecentTransactions();
+      } catch (err) {
+        console.error("Gagal menyimpan data:", err);
+        alert("❌ Terjadi kesalahan saat menyimpan data ke server.");
+      }
     }
 
+    // PEMUATAN TABEL PREVIEW
     async function loadRecentTransactions() {
       const tbodyAnak = document.querySelector('#tblRecentAnak tbody');
       const tbodyDewasa = document.querySelector('#tblRecentDewasa tbody');
       const titleSpan = document.getElementById('preview_desa_title');
 
-      if (!currentInputDesa) return;
+      if (!currentInputDesa) {
+        titleSpan.textContent = "Pilih Desa";
+        return;
+      }
       titleSpan.textContent = `Desa ${currentInputDesa}`;
 
       tbodyAnak.innerHTML = '<tr><td colspan="30" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Memuat Data Anak...</td></tr>';
@@ -806,7 +842,7 @@
         snap.forEach(d => {
           const data = d.data();
           if (data.desa && data.desa.toLowerCase() === currentInputDesa.toLowerCase()) {
-            docs.push({id: d.id, ...data});
+            docs.push({ id: d.id, ...data });
           }
         });
 
@@ -842,7 +878,7 @@
               <td>${d.alamat_rt || '-'}</td>
               ${vCols}
               <td>${d.last_updated_by || '-'}</td>
-              <td><button class="btn btn-danger" onclick="hapusTrans('${d.id}')" style="padding:4px 8px; font-size:0.75rem;"><i class="fas fa-trash"></i></button></td>
+              <td><button class="btn btn-danger btn-del" data-id="${d.id}" style="padding:4px 8px; font-size:0.75rem;"><i class="fas fa-trash"></i></button></td>
             `;
             tbodyAnak.appendChild(tr);
           }
@@ -866,7 +902,7 @@
               <td>${d.alamat_rt || '-'}</td>
               ${vCols}
               <td>${d.last_updated_by || '-'}</td>
-              <td><button class="btn btn-danger" onclick="hapusTrans('${d.id}')" style="padding:4px 8px; font-size:0.75rem;"><i class="fas fa-trash"></i></button></td>
+              <td><button class="btn btn-danger btn-del" data-id="${d.id}" style="padding:4px 8px; font-size:0.75rem;"><i class="fas fa-trash"></i></button></td>
             `;
             tbodyDewasa.appendChild(tr);
           }
@@ -875,8 +911,80 @@
         if (countAnak === 0) tbodyAnak.innerHTML = `<tr><td colspan="30" style="text-align:center;">Belum ada sasaran bayi/baduta terdaftar di Desa ${currentInputDesa}.</td></tr>`;
         if (countDewasa === 0) tbodyDewasa.innerHTML = `<tr><td colspan="15" style="text-align:center;">Belum ada sasaran Catin/Ibu Hamil terdaftar di Desa ${currentInputDesa}.</td></tr>`;
 
+        // ATTACH EVENT LISTENER UNTUK TOMBOL HAPUS
+        document.querySelectorAll('.btn-del').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            const targetId = e.currentTarget.getAttribute('data-id');
+            hapusTrans(targetId);
+          });
+        });
+
       } catch (err) { console.error(err); }
     }
+
+    // FUNGSI HAPUS RECORD
+    async function hapusTrans(docId) {
+      if (confirm("Apakah Anda yakin ingin menghapus data sasaran ini dari kohort?")) {
+        try {
+          await deleteDoc(doc(db, COL_KOHORT, docId));
+          alert("Data berhasil dihapus.");
+          loadRecentTransactions();
+          if (currentInputDesa) loadRegisteredAnakList(currentInputDesa);
+        } catch (e) {
+          console.error("Gagal menghapus dokumen:", e);
+          alert("Gagal menghapus data.");
+        }
+      }
+    }
+
+    // BINDING EVENT LISTENERS SETELAH DOM READY
+    document.addEventListener('DOMContentLoaded', () => {
+      checkLoginStatus();
+
+      const selectKategori = document.getElementById('reg_kategori_sasaran');
+      const selectPeran = document.getElementById('reg_peran_pasangan');
+      const searchDesa = document.getElementById('search_desa_anak');
+      const selectRegistered = document.getElementById('select_anak_registered');
+      const formRegister = document.getElementById('formRegisterIndividu');
+      const btnRefresh = document.getElementById('btnRefreshPreview');
+
+      selectKategori.addEventListener('change', () => {
+        if (selectKategori.value === 'DEWASA') selectPeran.value = 'Suami';
+        else selectPeran.value = 'Ibu';
+        updateVaccineVisibility();
+      });
+
+      selectPeran.addEventListener('change', () => {
+        if (selectPeran.value === 'Suami') selectKategori.value = 'DEWASA';
+        else selectKategori.value = 'ANAK';
+        updateVaccineVisibility();
+      });
+
+      searchDesa.addEventListener('change', (e) => {
+        currentInputDesa = e.target.value;
+        loadRegisteredAnakList(currentInputDesa);
+        loadRecentTransactions();
+      });
+
+      selectRegistered.addEventListener('change', fillFormWithSelectedAnak);
+      formRegister.addEventListener('submit', handleSaveKohortMatrix);
+      btnRefresh.addEventListener('click', loadRecentTransactions);
+
+      updateVaccineVisibility();
+    });
+
+    window.switchTab = function(e) {
+      const target = e.currentTarget.getAttribute('data-tab');
+      document.querySelectorAll('.app-nav-tabs .tab').forEach(t=>t.classList.remove('active'));
+      e.currentTarget.classList.add('active');
+      document.querySelectorAll('.tab-panel').forEach(p => p.style.display='none');
+      
+      const targetEl = document.getElementById(target);
+      if (targetEl) {
+        targetEl.style.display = 'block';
+        window.scrollTo({ top: targetEl.offsetTop - 100, behavior: 'smooth' });
+      }
+    };
   </script>
 </body>
 </html>

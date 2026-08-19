@@ -108,7 +108,7 @@
     label { font-weight: 700; color: #334155; margin-bottom: 8px; font-size: 0.88rem; display: flex; align-items: center; gap: 6px; }
     .req { color: var(--danger); font-weight: 800; }
 
-    input[type="text"], input[type="password"], input[type="number"], input[type="date"], input[type="month"], select, textarea, input[type="file"] {
+    input[type="text"], input[type="password"], input[type="number"], input[type="date"], input[type="month"], select, textarea, input[type="file"], input[type="tel"] {
       width: 100%; padding: 11px 14px; border-radius: 10px; border: 1.5px solid var(--border-color);
       background: #F8FAFC; font-size: 0.92rem; font-family: inherit; outline: none; transition: all 0.2s ease;
       color: var(--text-dark); font-weight: 500;
@@ -352,7 +352,7 @@
 
       <div class="card">
         <h2><i class="fas fa-id-card" style="color:var(--primary)"></i> Form Register Imunisasi (Bayi, Baduta, Catin & Bumil)</h2>
-        <p class="lead">Isi data sasaran di bawah. Autofill tanggal otomatis berlaku untuk imunisasi bayi/baduta berkesinambungan (dikecualikan untuk TT Catin & Bumil).</p>
+        <p class="lead">Isi data sasaran di bawah secara berurutan. Pilih peran sasaran terlebih dahulu untuk memicu penyesuaian otomatis checklist vaksin.</p>
 
         <form id="formRegisterIndividu">
           <div class="grid">
@@ -381,9 +381,19 @@
               <input type="text" id="reg_kegiatan" placeholder="Contoh: Posyandu Flamboyan / Pustu" required>
             </div>
 
+            <!-- URUTAN TANGGAL PELAYANAN DILANJUTKAN PERAN SASARAN -->
             <div class="form-group">
               <label>Tanggal Pelayanan Dosis Terbaru <span class="req">*</span></label>
               <input type="date" id="reg_tgl_pelayanan" required>
+            </div>
+
+            <div class="form-group">
+              <label>Peran Sasaran <span class="req">*</span></label>
+              <select id="reg_peran" required>
+                <option value="Bayi/Baduta">Bayi / Anak (Bisa Usia > 2 Tahun)</option>
+                <option value="Catin">Calon Pengantin (Catin)</option>
+                <option value="Bumil">Ibu Hamil (Bumil)</option>
+              </select>
             </div>
 
             <div class="form-group">
@@ -403,21 +413,18 @@
             </div>
 
             <div class="form-group">
-              <label>Peran Sasaran <span class="req">*</span></label>
-              <select id="reg_peran" required>
-                <option value="Bayi/Baduta">Bayi / Anak (Bisa Usia > 2 Tahun)</option>
-                <option value="Catin">Calon Pengantin (Catin)</option>
-                <option value="Bumil">Ibu Hamil (Bumil)</option>
-              </select>
-            </div>
-
-            <div class="form-group">
               <label>NIK Sasaran (Opsional)</label>
               <input type="text" id="reg_nik_anak" placeholder="NIK Sasaran">
             </div>
 
+            <!-- NO WHATSAPP (OPSIONAL) -->
+            <div class="form-group">
+              <label>No. WhatsApp / HP (Opsional)</label>
+              <input type="tel" id="reg_wa_anak" placeholder="Contoh: 081234567890">
+            </div>
+
             <div class="form-group" id="group_nama_ortu">
-              <label id="lbl_nama_ibu">Nama Orang Tua / Ibu / Suami <span class="req">*</span></label>
+              <label id="lbl_nama_ibu">Nama Orang Tua / Ibu <span class="req">*</span></label>
               <input type="text" id="reg_nama_ibu" placeholder="Nama ibu / nama suami" required>
             </div>
 
@@ -515,6 +522,7 @@
                 <th class="sticky-col-2" rowspan="2">Tgl Lahir</th>
                 <th rowspan="2">L/P</th>
                 <th rowspan="2">Orang Tua</th>
+                <th rowspan="2">No. WhatsApp</th>
                 <th rowspan="2">Desa</th>
                 <th rowspan="2">Alamat / RT</th>
                 <th colspan="19">Imunisasi Dasar Lengkap (0 - 12 Bulan)</th>
@@ -528,7 +536,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr><td colspan="30" style="text-align:center;"><i class="fas fa-info-circle"></i> Pilih desa untuk melihat data preview anak.</td></tr>
+              <tr><td colspan="31" style="text-align:center;"><i class="fas fa-info-circle"></i> Pilih desa untuk melihat data preview anak.</td></tr>
             </tbody>
           </table>
         </div>
@@ -542,6 +550,7 @@
                 <th class="sticky-col-2" rowspan="2">Tgl Lahir</th>
                 <th rowspan="2">L/P</th>
                 <th rowspan="2">Suami / Pasangan</th>
+                <th rowspan="2">No. WhatsApp</th>
                 <th rowspan="2">Desa</th>
                 <th rowspan="2">Alamat / RT</th>
                 <th colspan="2">TT Calon Pengantin (Catin)</th>
@@ -555,7 +564,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr><td colspan="15" style="text-align:center;"><i class="fas fa-info-circle"></i> Pilih desa untuk melihat data preview Catin/Bumil.</td></tr>
+              <tr><td colspan="16" style="text-align:center;"><i class="fas fa-info-circle"></i> Pilih desa untuk melihat data preview Catin/Bumil.</td></tr>
             </tbody>
           </table>
         </div>
@@ -684,7 +693,7 @@
     <section id="catchup" class="tab-panel" style="display:none">
       <div class="card" style="border-left: 5px solid var(--warning);">
         <h3 style="margin:0 0 8px 0; color:var(--accent);"><i class="fas fa-exclamation-triangle" style="color:var(--warning)"></i> Panel Analisis Imunisasi Kejar (Catch Up) & Risiko Drop Out</h3>
-        <p class="lead" style="margin-bottom:0;">Panel tersegregasi secara klinis. <strong>PCV</strong> hanya ditagih pada bayi &lt;12 bulan (interval 4 minggu). <strong>Rotavirus</strong> hanya ditagih pada bayi &lt;7 bulan (interval 4 minggu).</p>
+        <p class="lead" style="margin-bottom:0;">Panel tersegregasi secara klinis. <strong>DPT4 & MR2</strong> dihitung ideal 1 tahun (12 bulan) dari tanggal DPT3/MR1 (Rentang Usia 18 Bulan - 3 Tahun).</p>
       </div>
 
       <div class="card">
@@ -737,8 +746,8 @@
       </div>
 
       <div class="card">
-        <h3 style="color:var(--primary);"><i class="fas fa-child"></i> 3. Catch Up Usia &gt; 24 Bulan (Booster Baduta DPT4 & MR2)</h3>
-        <p class="lead" style="font-size:0.85rem;">Target: DPT4 & MR2 di rentang 18-24 bulan. Jika terlewat (&gt;24 Bulan), otomatis masuk dalam penanda merah harus segera diberikan.</p>
+        <h3 style="color:var(--primary);"><i class="fas fa-child"></i> 3. Catch Up Usia 18 Bulan - 3 Tahun (Booster/Lanjutan DPT4 & MR2)</h3>
+        <p class="lead" style="font-size:0.85rem;">Jadwal Ideal: Tepat 1 tahun (12 bulan) setelah tanggal DPT3/MR1. Di atas 24 bulan yang menunggak akan ditandai mendesak.</p>
         <div id="panel_baduta_container" class="table-container">
           <p class="muted" style="text-align:center; padding:15px;"><i class="fas fa-arrow-up"></i> Klik tombol Analisis di atas untuk memuat data.</p>
         </div>
@@ -1182,7 +1191,6 @@
       });
     }
 
-    // LOGIKA PENYESUAIAN PERAN & FILTER CHECKLIST VAKSIN BESERTA AKSI GULIR HALUS
     function applyPeranUIFilter() {
       const peran = document.getElementById('reg_peran').value;
       const lblOrtu = document.getElementById('lbl_nama_ibu');
@@ -1193,7 +1201,6 @@
       const secCatin = document.getElementById('sec_vax_catin');
       const secBumil = document.getElementById('sec_vax_bumil');
 
-      // Reset pilihan checklist setiap pergantian peran
       document.querySelectorAll('input[name="chk_vaksin"]').forEach(cb => cb.checked = false);
 
       if (peran === 'Catin') {
@@ -1213,7 +1220,6 @@
         secCatin.style.display = 'none';
         secBumil.style.display = 'block';
       } else {
-        // Peran "Bayi/Baduta" (Termasuk Anak Usia > 2 Tahun yang bukan Catin/Bumil)
         lblOrtu.innerHTML = 'Nama Orang Tua / Ibu <span class="req">*</span>';
         lblNikOrtu.innerText = 'NIK Orang Tua / Ibu (Opsional)';
         
@@ -1223,7 +1229,6 @@
         secBumil.style.display = 'none';
       }
 
-      // AKSI GULIR HALUS (SCROLL INTO VIEW) KE ELEMEN NAMA ORANG TUA/SUAMI
       const groupOrtu = document.getElementById('group_nama_ortu');
       if (groupOrtu) {
         groupOrtu.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1391,6 +1396,7 @@
         document.getElementById('reg_jk').value = data.jk || "P";
         document.getElementById('reg_peran').value = data.peran || "Bayi/Baduta";
         document.getElementById('reg_nik_anak').value = data.nik_anak !== "-" ? data.nik_anak : "";
+        document.getElementById('reg_wa_anak').value = data.wa_anak || "";
         document.getElementById('reg_nama_ibu').value = data.nama_ibu || "";
         document.getElementById('reg_nik_ibu').value = data.nik_ibu !== "-" ? data.nik_ibu : "";
         document.getElementById('reg_alamat').value = data.alamat_rt || "";
@@ -1494,6 +1500,7 @@
         jk: jk,
         peran: document.getElementById('reg_peran').value,
         nik_anak: document.getElementById('reg_nik_anak').value || "-",
+        wa_anak: document.getElementById('reg_wa_anak').value || "-",
         nama_ibu: document.getElementById('reg_nama_ibu').value,
         nik_ibu: document.getElementById('reg_nik_ibu').value || "-",
         alamat_rt: document.getElementById('reg_alamat').value,
@@ -1520,6 +1527,7 @@
         document.querySelectorAll('input[name="chk_vaksin"]:checked').forEach(cb => cb.checked = false);
         document.getElementById('reg_nama_anak').value = "";
         document.getElementById('reg_nik_anak').value = "";
+        document.getElementById('reg_wa_anak').value = "";
         
         loadRecentTransactions();
       } catch (err) { 
@@ -1552,6 +1560,146 @@
       loadRecentTransactions();
     }
 
+    // FUNGSI GENERATE SERTIFIKAT IMUNISASI (OPSI 1)
+    window.cetakSertifikatIndividu = function(dataAnakJson) {
+      try {
+        const d = JSON.parse(decodeURIComponent(dataAnakJson));
+        const win = window.open('', '_blank');
+
+        let isAdult = (d.peran === 'Catin' || d.peran === 'Bumil');
+        let keysToUse = isAdult ? VAKSIN_DEWASA_KEYS : VAKSIN_ANAK_KEYS;
+        let vRows = '';
+        let countV = 0;
+
+        keysToUse.forEach(vKey => {
+          const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
+          const val = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
+          if (val) {
+            countV++;
+            vRows += `
+              <tr>
+                <td style="border:1px solid #CBD5E1; padding:8px; text-align:center;">${countV}</td>
+                <td style="border:1px solid #CBD5E1; padding:8px; font-weight:bold;">${vKey}</td>
+                <td style="border:1px solid #CBD5E1; padding:8px; text-align:center; color:#065F46; font-weight:bold;">✓ Terimunisasi</td>
+                <td style="border:1px solid #CBD5E1; padding:8px; text-align:center;">${val}</td>
+              </tr>
+            `;
+          }
+        });
+
+        if (countV === 0) {
+          vRows = `<tr><td colspan="4" style="border:1px solid #CBD5E1; padding:12px; text-align:center; color:#64748B;">Belum ada catatan imunisasi yang terverifikasi.</td></tr>`;
+        }
+
+        const template = `
+          <!DOCTYPE html>
+          <html lang="id">
+          <head>
+            <meta charset="utf-8">
+            <title>Sertifikat Imunisasi - ${d.nama_anak}</title>
+            <style>
+              @page { size: A4 portrait; margin: 15mm; }
+              body { font-family: 'Plus Jakarta Sans', sans-serif, Arial; color: #1E293B; margin:0; padding:20px; }
+              .cert-border { border: 8px double #003366; padding: 30px; border-radius: 12px; background: #FFFDFB; position:relative; }
+              .header { text-align: center; border-bottom: 3px double #FF5722; padding-bottom: 12px; margin-bottom: 20px; }
+              .header h2 { margin: 0; color: #003366; font-size: 22px; text-transform: uppercase; letter-spacing:1px; }
+              .header p { margin: 4px 0 0 0; font-size: 13px; color: #64748B; }
+              .cert-title { text-align: center; margin: 20px 0; }
+              .cert-title h1 { margin: 0; font-size: 24px; color: #FF5722; text-transform: uppercase; letter-spacing: 1px; }
+              .cert-title p { margin: 5px 0 0 0; font-size: 14px; color: #475569; }
+              .bio-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px; }
+              .bio-table td { padding: 6px 4px; vertical-align: top; }
+              .v-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
+              .v-table th { background: #003366; color: #FFF; border: 1px solid #003366; padding: 8px; text-align: center; }
+              .footer-row { margin-top: 40px; display: flex; justify-content: space-between; align-items: flex-end; font-size: 13px; }
+              .watermark { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg); font-size: 70px; color: rgba(0, 51, 102, 0.04); font-weight: 800; pointer-events: none; text-transform: uppercase; }
+            </style>
+          </head>
+          <body>
+            <div class="cert-border">
+              <div class="watermark">Puskesmas Melata</div>
+              
+              <div class="header">
+                <h2>PEMERINTAH KABUPATEN LAMANDAU</h2>
+                <h3 style="margin:2px 0; color:#003366;">DINAS KESEHATAN — PUSKESMAS MELATA</h3>
+                <p>Kecamatan Menthobi Raya, Kabupaten Lamandau, Kalimantan Tengah</p>
+              </div>
+
+              <div class="cert-title">
+                <h1>SERTIFIKAT REKAPITULASI IMUNISASI</h1>
+                <p>Nomor Registrasi Kohort: <code>${d.id || '-'}</code></p>
+              </div>
+
+              <p style="font-size:14px; margin-bottom:10px;">Diberikan secara resmi kepada:</p>
+
+              <table class="bio-table">
+                <tr>
+                  <td width="28%"><b>Nama Lengkap Sasaran</b></td><td width="2%">:</td>
+                  <td width="70%" style="font-size:16px; font-weight:bold; color:#003366;">${d.nama_anak.toUpperCase()}</td>
+                </tr>
+                <tr>
+                  <td><b>Tanggal Lahir / JK</b></td><td>:</td>
+                  <td>${d.tgl_lahir || '-'} (${d.jk === 'L' ? 'Laki-Laki' : 'Perempuan'})</td>
+                </tr>
+                <tr>
+                  <td><b>NIK Sasaran</b></td><td>:</td>
+                  <td>${d.nik_anak || '-'}</td>
+                </tr>
+                <tr>
+                  <td><b>Orang Tua / Suami</b></td><td>:</td>
+                  <td>${d.nama_ibu || '-'} ${d.nik_ibu && d.nik_ibu !== '-' ? '(NIK: ' + d.nik_ibu + ')' : ''}</td>
+                </tr>
+                <tr>
+                  <td><b>No. WhatsApp / HP</b></td><td>:</td>
+                  <td>${d.wa_anak || '-'}</td>
+                </tr>
+                <tr>
+                  <td><b>Wilayah / Alamat</b></td><td>:</td>
+                  <td>Desa ${d.desa || '-'}, ${d.alamat_rt || '-'}</td>
+                </tr>
+              </table>
+
+              <h4 style="margin: 15px 0 8px 0; color:#003366;">Riwayat Vaksinasi Terverifikasi:</h4>
+              <table class="v-table">
+                <thead>
+                  <tr>
+                    <th width="8%">No</th>
+                    <th width="42%">Jenis Imunisasi / Antigen</th>
+                    <th width="25%">Status Pemberian</th>
+                    <th width="25%">Tanggal Pelayanan</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${vRows}
+                </tbody>
+              </table>
+
+              <div class="footer-row">
+                <div>
+                  <p>Dicetak Pada: <b>${new Date().toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric'})}</b></p>
+                  <p style="font-size:11px; color:#64748B;">* Dokumen ini merupakan bukti sah rekapitulasi imunisasi di Puskesmas Melata.</p>
+                </div>
+                <div style="text-align:center;">
+                  <p>Puskesmas Melata, ${new Date().toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric'})}</p>
+                  <p>Petugas Register Imunisasi,</p>
+                  <br><br><br>
+                  <p><b><u>${d.last_updated_by || 'Petugas Imunisasi'}</u></b></p>
+                </div>
+              </div>
+            </div>
+
+            <script>
+              window.onload = function() { window.print(); }
+            <\/script>
+          </body>
+          </html>
+        `;
+
+        win.document.write(template);
+        win.document.close();
+      } catch (err) { alert("Gagal memuat sertifikat: " + err.message); }
+    };
+
     async function loadRecentTransactions() {
       const tbodyAnak = document.querySelector('#tblRecentAnak tbody');
       const tbodyDewasa = document.querySelector('#tblRecentDewasa tbody');
@@ -1559,14 +1707,14 @@
 
       if (!currentInputDesa) {
         titleSpan.textContent = "Belum Ada Desa Dipilih";
-        tbodyAnak.innerHTML = '<tr><td colspan="30" style="text-align:center; color:var(--muted);"><i class="fas fa-arrow-up"></i> Silakan pilih desa pada form di atas untuk menampilkan preview.</td></tr>';
-        tbodyDewasa.innerHTML = '<tr><td colspan="15" style="text-align:center; color:var(--muted);"><i class="fas fa-arrow-up"></i> Silakan pilih desa pada form di atas untuk menampilkan preview.</td></tr>';
+        tbodyAnak.innerHTML = '<tr><td colspan="31" style="text-align:center; color:var(--muted);"><i class="fas fa-arrow-up"></i> Silakan pilih desa pada form di atas untuk menampilkan preview.</td></tr>';
+        tbodyDewasa.innerHTML = '<tr><td colspan="16" style="text-align:center; color:var(--muted);"><i class="fas fa-arrow-up"></i> Silakan pilih desa pada form di atas untuk menampilkan preview.</td></tr>';
         return;
       }
 
       titleSpan.textContent = `Desa ${currentInputDesa}`;
-      tbodyAnak.innerHTML = '<tr><td colspan="30" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Memuat Data Anak Desa ' + currentInputDesa + '...</td></tr>';
-      tbodyDewasa.innerHTML = '<tr><td colspan="15" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Memuat Data Catin/Bumil Desa ' + currentInputDesa + '...</td></tr>';
+      tbodyAnak.innerHTML = '<tr><td colspan="31" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Memuat Data Anak Desa ' + currentInputDesa + '...</td></tr>';
+      tbodyDewasa.innerHTML = '<tr><td colspan="16" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Memuat Data Catin/Bumil Desa ' + currentInputDesa + '...</td></tr>';
 
       try {
         let docs = [];
@@ -1594,8 +1742,8 @@
 
         docs.forEach(d => {
           const petugasKet = d.last_updated_by ? `<strong style="color:var(--accent);">${d.last_updated_by}</strong>` : '-';
+          const jsonString = encodeURIComponent(JSON.stringify(d));
 
-          // Pemisahan Matriks Berdasarkan PERAN SASARAN
           if (d.peran === 'Catin' || d.peran === 'Bumil') {
             countDewasa++;
             const tr = document.createElement('tr');
@@ -1612,15 +1760,18 @@
               <td class="sticky-col-2">${d.tgl_lahir || '-'}</td>
               <td>${d.jk || '-'}</td>
               <td>${d.nama_ibu || '-'}</td>
+              <td>${d.wa_anak || '-'}</td>
               <td>${d.desa || '-'}</td>
               <td>${d.alamat_rt || '-'}</td>
               ${vCols}
               <td>${petugasKet}</td>
-              <td><button class="btn btn-danger" onclick="hapusTrans('${d.id}')" style="padding:4px 8px; font-size:0.75rem;"><i class="fas fa-trash"></i></button></td>
+              <td style="display:flex; gap:6px; justify-content:center;">
+                <button class="btn btn-info" onclick="cetakSertifikatIndividu('${jsonString}')" style="padding:4px 8px; font-size:0.75rem;" title="Cetak Sertifikat"><i class="fas fa-certificate"></i> Sertifikat</button>
+                <button class="btn btn-danger" onclick="hapusTrans('${d.id}')" style="padding:4px 8px; font-size:0.75rem;" title="Hapus Data"><i class="fas fa-trash"></i></button>
+              </td>
             `;
             tbodyDewasa.appendChild(tr);
           } else {
-            // Semua sasaran anak (termasuk usia > 2 tahun) tetap masuk ke Matriks Anak
             countAnak++;
             const tr = document.createElement('tr');
             let vCols = '';
@@ -1636,22 +1787,26 @@
               <td class="sticky-col-2">${d.tgl_lahir || '-'}</td>
               <td>${d.jk || '-'}</td>
               <td>${d.nama_ibu || '-'}</td>
+              <td>${d.wa_anak || '-'}</td>
               <td>${d.desa || '-'}</td>
               <td>${d.alamat_rt || '-'}</td>
               ${vCols}
               <td>${petugasKet}</td>
-              <td><button class="btn btn-danger" onclick="hapusTrans('${d.id}')" style="padding:4px 8px; font-size:0.75rem;"><i class="fas fa-trash"></i></button></td>
+              <td style="display:flex; gap:6px; justify-content:center;">
+                <button class="btn btn-info" onclick="cetakSertifikatIndividu('${jsonString}')" style="padding:4px 8px; font-size:0.75rem;" title="Cetak Sertifikat"><i class="fas fa-certificate"></i> Sertifikat</button>
+                <button class="btn btn-danger" onclick="hapusTrans('${d.id}')" style="padding:4px 8px; font-size:0.75rem;" title="Hapus Data"><i class="fas fa-trash"></i></button>
+              </td>
             `;
             tbodyAnak.appendChild(tr);
           }
         });
 
-        if (countAnak === 0) tbodyAnak.innerHTML = `<tr><td colspan="30" style="text-align:center;">Belum ada sasaran bayi/anak terdaftar di Desa ${currentInputDesa}.</td></tr>`;
-        if (countDewasa === 0) tbodyDewasa.innerHTML = `<tr><td colspan="15" style="text-align:center;">Belum ada sasaran Catin/Ibu Hamil terdaftar di Desa ${currentInputDesa}.</td></tr>`;
+        if (countAnak === 0) tbodyAnak.innerHTML = `<tr><td colspan="31" style="text-align:center;">Belum ada sasaran bayi/anak terdaftar di Desa ${currentInputDesa}.</td></tr>`;
+        if (countDewasa === 0) tbodyDewasa.innerHTML = `<tr><td colspan="16" style="text-align:center;">Belum ada sasaran Catin/Ibu Hamil terdaftar di Desa ${currentInputDesa}.</td></tr>`;
 
       } catch (err) { 
-        tbodyAnak.innerHTML = `<tr><td colspan="30" style="color:red;">Error: ${err.message}</td></tr>`;
-        tbodyDewasa.innerHTML = `<tr><td colspan="15" style="color:red;">Error: ${err.message}</td></tr>`;
+        tbodyAnak.innerHTML = `<tr><td colspan="31" style="color:red;">Error: ${err.message}</td></tr>`;
+        tbodyDewasa.innerHTML = `<tr><td colspan="16" style="color:red;">Error: ${err.message}</td></tr>`;
       }
     }
 
@@ -2068,29 +2223,37 @@
             }
           });
 
-          if (ageMonths >= 18 && d.peran !== 'Catin' && d.peran !== 'Bumil') {
+          if (ageMonths >= 18 && ageMonths <= 36 && d.peran !== 'Catin' && d.peran !== 'Bumil') {
             const dpt3Val = getVal("DPT-HB-Hib3"), dpt4Val = getVal("DPT-HB-Hib4");
             const mr1Val = getVal("Campak Rubela-1"), mr2Val = getVal("Campak Rubela-2");
 
-            let statusBaduta = [];
+            let needsBooster = [];
             let urgentFlag = false;
 
             if (dpt3Val && !dpt4Val) {
-              statusBaduta.push("Menunggak DPT4");
-              if (ageMonths > 24) urgentFlag = true;
+              const dpt3Date = new Date(dpt3Val);
+              const monthsSinceDpt3 = Math.floor((today - dpt3Date) / (1000 * 60 * 60 * 24 * 30.4375));
+              if (monthsSinceDpt3 >= 12) {
+                needsBooster.push(`DPT4 (Sdh ${monthsSinceDpt3} bln pasca DPT3)`);
+                if (ageMonths > 24) urgentFlag = true;
+              }
             }
 
             if (mr1Val && !mr2Val) {
-              statusBaduta.push("Menunggak MR2");
-              if (ageMonths > 24) urgentFlag = true;
+              const mr1Date = new Date(mr1Val);
+              const monthsSinceMr1 = Math.floor((today - mr1Date) / (1000 * 60 * 60 * 24 * 30.4375));
+              if (monthsSinceMr1 >= 12) {
+                needsBooster.push(`MR2 (Sdh ${monthsSinceMr1} bln pasca MR1)`);
+                if (ageMonths > 24) urgentFlag = true;
+              }
             }
 
-            if (statusBaduta.length > 0) {
+            if (needsBooster.length > 0) {
               listBaduta.push({
                 ...d,
                 ageMonths,
-                needs: statusBaduta.join(" & "),
-                urgent: urgentFlag ? "HARUS SEGERA DIBERIKAN (TERLEWAT >24 BLN)" : "Waktunya Booster (18-24 Bln)"
+                needs: needsBooster.join(" & "),
+                urgent: urgentFlag ? "Sangat Mendesak (Sdh > 2 Tahun)" : "Waktunya Booster (≥1 Thn Pasca Dosis Terakhir)"
               });
             }
           }
@@ -2126,10 +2289,10 @@
           </table>
         `;
 
-        p3.innerHTML = listBaduta.length === 0 ? '<p class="muted" style="text-align:center;">Seluruh sasaran anak telah menerima DPT4 & MR2 tepat waktu.</p>' : `
+        p3.innerHTML = listBaduta.length === 0 ? '<p class="muted" style="text-align:center;">Seluruh sasaran anak telah menerima DPT4 & MR2 tepat waktu (1 tahun pasca DPT3/MR1).</p>' : `
           <table class="kohort-table">
-            <thead><tr><th>Nama Sasaran</th><th>Usia</th><th>Desa</th><th>Orang Tua</th><th>Target Booster</th><th>Penanda Tindakan</th></tr></thead>
-            <tbody>${listBaduta.map(b => `<tr><td style="font-weight:700;">${b.nama_anak}</td><td>${b.ageMonths} Bln</td><td>${b.desa}</td><td>${b.nama_ibu}</td><td style="font-weight:700; color:var(--accent);">${b.needs}</td><td><span class="${b.urgent.includes('HARUS SEGERA') ? 'badge-urgent' : 'badge-warning-custom'}">${b.urgent}</span></td></tr>`).join('')}</tbody>
+            <thead><tr><th>Nama Sasaran</th><th>Usia</th><th>Desa</th><th>Orang Tua</th><th>Target Booster (Pasca 1 Thn)</th><th>Penanda Tindakan</th></tr></thead>
+            <tbody>${listBaduta.map(b => `<tr><td style="font-weight:700;">${b.nama_anak}</td><td>${b.ageMonths} Bln</td><td>${b.desa}</td><td>${b.nama_ibu}</td><td style="font-weight:700; color:var(--accent);">${b.needs}</td><td><span class="${b.urgent.includes('Sangat Mendesak') ? 'badge-urgent' : 'badge-warning-custom'}">${b.urgent}</span></td></tr>`).join('')}</tbody>
           </table>
         `;
 
@@ -2145,10 +2308,11 @@
 
     async function downloadCatchUpExcel() {
       const desaSel = document.getElementById('catchup_filter_desa').value;
+      const today = new Date();
       try {
         const snap = await getDocs(collection(db, COL_KOHORT));
         const excelData = [
-          ["No", "Kategori Panel", "Desa", "Nama Sasaran", "Usia (Bulan)", "Orang Tua / Suami", "Alamat / RT", "Status / Target Catch Up", "Vaksin / Keterangan Dosis"]
+          ["No", "Kategori Panel", "Desa", "Nama Sasaran", "Usia (Bulan)", "Orang Tua / Suami", "No. WhatsApp", "Alamat / RT", "Status / Target Catch Up", "Vaksin / Keterangan Dosis"]
         ];
 
         let idx = 1;
@@ -2173,15 +2337,26 @@
             if (ageMonths < 7 && !getVal("Rotavirus1") && ageMonths >= 2) missingBayi.push("RV1");
 
             if (missingBayi.length > 0) {
-              excelData.push([idx++, "Bayi < 1 Tahun", d.desa, d.nama_anak, ageMonths, d.nama_ibu, d.alamat_rt, "Menunggak Imunisasi (Usia Ideal & Interval 4 Mgg)", missingBayi.join(', ')]);
+              excelData.push([idx++, "Bayi < 1 Tahun", d.desa, d.nama_anak, ageMonths, d.nama_ibu, d.wa_anak || '-', d.alamat_rt, "Menunggak Imunisasi (Usia Ideal & Interval 4 Mgg)", missingBayi.join(', ')]);
             }
           }
 
-          if (ageMonths >= 18 && d.peran !== 'Catin' && d.peran !== 'Bumil') {
+          if (ageMonths >= 18 && ageMonths <= 36 && d.peran !== 'Catin' && d.peran !== 'Bumil') {
             const dpt3Val = getVal("DPT-HB-Hib3"), dpt4Val = getVal("DPT-HB-Hib4");
             const mr1Val = getVal("Campak Rubela-1"), mr2Val = getVal("Campak Rubela-2");
-            if ((dpt3Val && !dpt4Val) || (mr1Val && !mr2Val)) {
-              excelData.push([idx++, "Anak Lanjutan", d.desa, d.nama_anak, ageMonths, d.nama_ibu, d.alamat_rt, ageMonths > 24 ? "Harus Segera Diberikan (Terlewat >24 Bln)" : "Waktunya Booster", "Target DPT4 / MR2"]);
+            
+            let needsBooster = [];
+            if (dpt3Val && !dpt4Val) {
+              const m = Math.floor((today - new Date(dpt3Val)) / (1000 * 60 * 60 * 24 * 30.4375));
+              if (m >= 12) needsBooster.push(`DPT4 (${m} bln pasca DPT3)`);
+            }
+            if (mr1Val && !mr2Val) {
+              const m = Math.floor((today - new Date(mr1Val)) / (1000 * 60 * 60 * 24 * 30.4375));
+              if (m >= 12) needsBooster.push(`MR2 (${m} bln pasca MR1)`);
+            }
+
+            if (needsBooster.length > 0) {
+              excelData.push([idx++, "Anak 18 Bln - 3 Thn", d.desa, d.nama_anak, ageMonths, d.nama_ibu, d.wa_anak || '-', d.alamat_rt, ageMonths > 24 ? "Sangat Mendesak (>2 Thn)" : "Waktunya Booster (>=1 Thn Pasca Dosis Terakhir)", needsBooster.join(' & ')]);
             }
           }
         });
@@ -2330,6 +2505,7 @@
               <td class="sticky-col-2">${d.tgl_lahir || '-'}</td>
               <td>${d.jk || '-'}</td>
               <td>${d.nama_ibu || '-'}</td>
+              <td>${d.wa_anak || '-'}</td>
               <td>${d.desa || '-'}</td>
               ${vCols}
             </tr>
@@ -2360,6 +2536,7 @@
                 <th class="sticky-col-2" rowspan="2">Tgl Lahir</th>
                 <th rowspan="2">L/P</th>
                 <th rowspan="2">Orang Tua / Suami</th>
+                <th rowspan="2">No. WhatsApp</th>
                 <th rowspan="2">Desa</th>
                 <th colspan="${activeVaccineKeys.length}">Jenis Imunisasi Terfilter (${katSel})</th>
               </tr>
@@ -2368,12 +2545,12 @@
               </tr>
             </thead>
             <tbody>
-              ${rowsHtml || '<tr><td colspan="35" style="text-align:center;">Tidak ada data pada filter ini.</td></tr>'}
+              ${rowsHtml || '<tr><td colspan="36" style="text-align:center;">Tidak ada data pada filter ini.</td></tr>'}
             </tbody>
             <tfoot>
               <tr style="background:#E2E8F0; font-weight:bold;">
                 <td class="sticky-col-1" colspan="2" style="text-align:left; color:var(--accent);">TOTAL DOSIS DIBERIKAN:</td>
-                <td>-</td><td>-</td><td>-</td>
+                <td>-</td><td>-</td><td>-</td><td>-</td>
                 ${totalColsHtml}
               </tr>
             </tfoot>
@@ -2454,7 +2631,7 @@
         sheet1Data.push([`Periode Matriks: s/d ${monthNameStr} ${thn} | Wilayah: ${desaSel === 'ALL' ? 'Semua Desa' : desaSel} | Kategori: ${katSel}`]);
         sheet1Data.push([]);
 
-        const headerRow1 = ["No", "Desa", "Kegiatan / Posyandu", "Nama Sasaran", "Tanggal Lahir", "L/P", "Orang Tua / Suami", "Alamat / RT"];
+        const headerRow1 = ["No", "Desa", "Kegiatan / Posyandu", "Nama Sasaran", "Tanggal Lahir", "L/P", "Orang Tua / Suami", "No. WhatsApp", "Alamat / RT"];
         activeVaccineKeys.forEach(v => headerRow1.push(v));
         headerRow1.push("Penginput Terakhir");
         sheet1Data.push(headerRow1);
@@ -2472,6 +2649,7 @@
             d.tgl_lahir || '',
             d.jk || '',
             d.nama_ibu || '',
+            d.wa_anak || '-',
             d.alamat_rt || ''
           ];
 
@@ -2491,7 +2669,7 @@
           sheet1Data.push(row);
         });
 
-        const totalRow1 = ["TOTAL DOSIS (S/D PERIODE)", "", "", "", "", "", "", ""];
+        const totalRow1 = ["TOTAL DOSIS (S/D PERIODE)", "", "", "", "", "", "", "", ""];
         activeVaccineKeys.forEach(vKey => {
           totalRow1.push(vTotalSheet1[vKey]);
         });

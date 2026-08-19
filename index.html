@@ -1556,7 +1556,7 @@
       loadRecentTransactions();
     }
 
-    // FUNGSI GENERATE SERTIFIKAT IMUNISASI (2 HALAMAN A4 LANDSCAPE - WATERMARK TERLIHAT JELAS)
+    // FUNGSI GENERATE SERTIFIKAT IMUNISASI (TANPA LOGO KABUPATEN & WATERMARK JELAS TEGAS)
     window.cetakSertifikatIndividu = function(dataAnakJson) {
       if (typeof activePetugasName === 'undefined' || activePetugasName !== 'admin') {
         return alert("🔒 AKSES DITOLAK: Fitur cetak/generate Sertifikat Imunisasi Dasar Lengkap hanya dapat diakses pada Mode Admin!");
@@ -1608,7 +1608,7 @@
           const fieldKey = `vaksin_${item.key.replace(/[\s\(\)<>-]/g, '_')}`;
           const tgl = d[fieldKey] || (d.jenis_imunisasi === item.key ? d.tanggal_pelayanan : null);
           vGridHtml += `
-            <div style="border: 1.5px solid #CBD5E1; padding: 10px 14px; border-radius: 8px; background: rgba(255, 255, 255, 0.95); font-size: 13px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="border: 1.5px solid #CBD5E1; padding: 10px 14px; border-radius: 8px; background: rgba(255, 255, 255, 0.92); font-size: 13px; display: flex; justify-content: space-between; align-items: center;">
               <span style="font-weight: 700; color: #1E293B;">${item.label}</span>
               <span style="font-weight: 800; color: ${tgl ? '#065F46' : '#94A3B8'}; background: ${tgl ? '#D1FAE5' : '#F1F5F9'}; padding: 4px 10px; border-radius: 6px;">${tgl || 'Sudah Diberikan'}</span>
             </div>
@@ -1655,7 +1655,7 @@
                 border: 2px solid #FF5722;
                 height: 100%;
                 padding: 20px 32px;
-                background: rgba(255, 253, 251, 0.90);
+                background: rgba(255, 253, 251, 0.85);
                 display: flex;
                 flex-direction: column;
                 justify-content: space-between;
@@ -1663,35 +1663,32 @@
                 z-index: 2;
               }
 
-              /* Watermark Logo Jelas Presisi */
+              /* Watermark Logo Puskesmas Ditingkatkan Kecerahan dan Kontrasnya */
               .watermark-bg {
                 position: absolute;
                 top: 50%;
                 left: 50%;
                 transform: translate(-50%, -50%);
-                width: 420px;
+                width: 440px;
                 height: auto;
-                opacity: 0.22;
+                opacity: 0.38;
                 mix-blend-mode: multiply;
-                filter: contrast(130%) brightness(95%);
+                filter: contrast(160%) brightness(90%);
                 pointer-events: none;
                 z-index: 1;
               }
 
-              /* Kop Sertifikat */
+              /* Kop Sertifikat (Tanpa Logo Kab, Rata Tengah Bersih) */
               .kop-container {
-                display: flex;
-                align-items: center;
+                text-align: center;
                 border-bottom: 3px double #003366;
                 padding-bottom: 8px;
                 margin-bottom: 10px;
               }
-              .kop-logo { width: 75px; height: auto; flex-shrink: 0; }
-              .kop-text { flex-grow: 1; text-align: center; margin-right: 75px; }
-              .kop-text h3 { margin: 0; font-size: 15px; font-weight: 800; color: #003366; letter-spacing: 1px; }
-              .kop-text h2 { margin: 2px 0; font-size: 17px; font-weight: 800; color: #003366; letter-spacing: 1.5px; }
-              .kop-text h1 { margin: 2px 0; font-size: 21px; font-weight: 800; color: #003366; letter-spacing: 2px; }
-              .kop-text p { margin: 0; font-size: 11px; color: #334155; font-weight: 600; }
+              .kop-container h3 { margin: 0; font-size: 15px; font-weight: 800; color: #003366; letter-spacing: 1px; }
+              .kop-container h2 { margin: 2px 0; font-size: 17px; font-weight: 800; color: #003366; letter-spacing: 1.5px; }
+              .kop-container h1 { margin: 2px 0; font-size: 21px; font-weight: 800; color: #003366; letter-spacing: 2px; }
+              .kop-container p { margin: 0; font-size: 11px; color: #334155; font-weight: 600; }
 
               /* Content Halaman Depan */
               .content-body { text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
@@ -1704,7 +1701,7 @@
                 text-align: left;
                 font-size: 14px;
                 line-height: 1.7;
-                background: rgba(255, 255, 255, 0.95);
+                background: rgba(255, 255, 255, 0.92);
                 padding: 14px 22px;
                 border-radius: 10px;
                 border: 1px solid #CBD5E1;
@@ -1754,21 +1751,18 @@
             
             <!-- HALAMAN 1: KETERANGAN SERTIFIKAT DEPAN -->
             <div class="page">
-              <!-- Watermark Logo Puskesmas Jelas -->
+              <!-- Watermark Logo Puskesmas Jelas & Tegas -->
               <img class="watermark-bg" src="MELATA LOGO.jpg" alt="Watermark Puskesmas Melata">
 
               <div class="cert-outer">
                 <div class="cert-inner">
                   
-                  <!-- Kop Sertifikat -->
+                  <!-- Kop Sertifikat (Tanpa Logo Kabupaten) -->
                   <div class="kop-container">
-                    <img class="kop-logo" src="image_1d3605.png" alt="Logo Kab Lamandau">
-                    <div class="kop-text">
-                      <h3>PEMERINTAH KABUPATEN LAMANDAU</h3>
-                      <h2>DINAS KESEHATAN</h2>
-                      <h1>PUSKESMAS MELATA</h1>
-                      <p>Jln. Tri Setya No. 01 Ds. Melata Kec. Menthobi Raya Kab. Lamandau</p>
-                    </div>
+                    <h3>PEMERINTAH KABUPATEN LAMANDAU</h3>
+                    <h2>DINAS KESEHATAN</h2>
+                    <h1>PUSKESMAS MELATA</h1>
+                    <p>Jln. Tri Setya No. 01 Ds. Melata Kec. Menthobi Raya Kab. Lamandau</p>
                   </div>
 
                   <!-- Isi Utama Sertifikat -->

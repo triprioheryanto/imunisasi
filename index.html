@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Sistem Register Imunisasi & BIAS — Puskesmas Melata</title>
 
+  <!-- FAVICON GIF DNA PADA TAB BROWSER -->
+  <link rel="icon" type="image/gif" href="agp_studios-dna-23351_512.jpg">
+
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cinzel:wght@700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
@@ -42,24 +45,6 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* BINGKAI GIF DNA MEMANJANG DI TEPI KIRI DAN KANAN WEB */
-    body::before, body::after {
-      content: "";
-      position: fixed;
-      top: 0;
-      bottom: 0;
-      width: 45px;
-      z-index: 9999;
-      pointer-events: none;
-      background-image: url('agp_studios-dna-23351_512.jpg');
-      background-repeat: repeat-y;
-      background-size: contain;
-      background-position: center top;
-      opacity: 0.85;
-    }
-    body::before { left: 0; }
-    body::after { right: 0; }
-
     header.app-header {
       background: linear-gradient(135deg, var(--accent) 0%, #001F3F 100%);
       color: #fff; padding: 14px 20px 0 20px;
@@ -69,8 +54,14 @@
     }
 
     .brand-row { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1200px; margin: 0 auto; gap: 12px; }
-    .brand { display: flex; align-items: center; gap: 14px; font-weight: 800; font-size: 1.15rem; letter-spacing: -0.3px; }
+    .brand { display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 1.15rem; letter-spacing: -0.3px; }
     
+    /* STYLE UNTUK 1 GIF DNA DI HEADER SEBELUM LOGO SPUIT */
+    .header-dna-gif {
+      width: 38px; height: 38px; border-radius: 8px; object-fit: contain; flex-shrink: 0;
+      background: rgba(255,255,255,0.1); padding: 2px; border: 1px solid rgba(255,255,255,0.2);
+    }
+
     .brand-title-small { font-weight: 500; font-size: 0.78rem; opacity: 0.85; display: block; margin-top: 1px; }
     .header-actions { display: flex; align-items: center; gap: 10px; }
 
@@ -94,8 +85,7 @@
       box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
     }
 
-    /* PADDING KONTEN UTAMA SUPAYA TIDAK TERTUTUP BINGKAI DNA */
-    .wrap { width: 100%; max-width: 1200px; margin: 24px auto; padding: 0 55px; }
+    .wrap { width: 100%; max-width: 1200px; margin: 24px auto; padding: 0 20px; }
     .card { 
       background: var(--card); border-radius: var(--radius); padding: 24px; 
       box-shadow: var(--shadow-card); margin-bottom: var(--gap); 
@@ -142,11 +132,7 @@
     .form-row .form-group { flex: 1; }
 
     .vaccine-selection-box {
-      border: 2px solid #FFD8CC;
-      border-radius: var(--radius);
-      padding: 20px;
-      background: #FFFDFB;
-      margin-top: 8px;
+      border: 2px solid #FFD8CC; border-radius: var(--radius); padding: 20px; background: #FFFDFB; margin-top: 8px;
     }
 
     .vaccine-group-title {
@@ -156,9 +142,7 @@
     }
     .vaccine-group-title:first-child { margin-top: 0; }
 
-    .vaccine-checkbox-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px;
-    }
+    .vaccine-checkbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }
 
     .checkbox-item {
       display: flex; align-items: center; gap: 10px; background: #FFFFFF;
@@ -175,55 +159,23 @@
       margin-top: 14px; background: #FFF; box-shadow: var(--shadow-subtle);
     }
 
-    .kohort-table {
-      width: 100%; border-collapse: separate; border-spacing: 0;
-      font-size: 0.83rem; white-space: nowrap;
-    }
+    .kohort-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.83rem; white-space: nowrap; }
 
-    .kohort-table th, .kohort-table td {
-      border-right: 1px solid #F1F5F9; border-bottom: 1px solid #F1F5F9;
-      padding: 10px 12px; text-align: center;
-    }
+    .kohort-table th, .kohort-table td { border-right: 1px solid #F1F5F9; border-bottom: 1px solid #F1F5F9; padding: 10px 12px; text-align: center; }
+    .kohort-table thead tr:first-child th { background: var(--accent); color: #FFF; font-weight: 700; }
+    .kohort-table thead tr:nth-child(2) th { background: #002244; color: #E2E8F0; font-size: 0.78rem; font-weight: 600; }
 
-    .kohort-table thead tr:first-child th {
-      background: var(--accent); color: #FFF; font-weight: 700;
-    }
-
-    .kohort-table thead tr:nth-child(2) th {
-      background: #002244; color: #E2E8F0; font-size: 0.78rem; font-weight: 600;
-    }
-
-    .kohort-table .sticky-col-1 {
-      position: sticky; left: 0; z-index: 10; background: #F8FAFC; text-align: left; font-weight: 700; color: var(--accent); min-width: 150px;
-    }
-    .kohort-table .sticky-col-2 {
-      position: sticky; left: 150px; z-index: 10; background: #F8FAFC; text-align: left; min-width: 110px;
-    }
-
-    .kohort-table thead th.sticky-col-1, .kohort-table thead th.sticky-col-2 {
-      z-index: 20; background: var(--accent) !important; color: #FFF !important;
-    }
+    .kohort-table .sticky-col-1 { position: sticky; left: 0; z-index: 10; background: #F8FAFC; text-align: left; font-weight: 700; color: var(--accent); min-width: 150px; }
+    .kohort-table .sticky-col-2 { position: sticky; left: 150px; z-index: 10; background: #F8FAFC; text-align: left; min-width: 110px; }
+    .kohort-table thead th.sticky-col-1, .kohort-table thead th.sticky-col-2 { z-index: 20; background: var(--accent) !important; color: #FFF !important; }
 
     .kohort-table tbody tr:nth-child(even) { background: #F8FAFC; }
     .kohort-table tbody tr:hover { background: #F1F5F9; }
 
-    .v-given {
-      background: #D1FAE5; color: #065F46; font-weight: 700; padding: 4px 8px; border-radius: 6px; font-size: 0.78rem;
-    }
-
-    .badge-user {
-      background: rgba(255, 255, 255, 0.15); color: #FFF; padding: 6px 14px; border-radius: 20px; 
-      font-size: 0.82rem; font-weight: 700; display: inline-flex; align-items: center; gap: 8px;
-      backdrop-filter: blur(4px); border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .badge-urgent {
-      background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5; font-weight: 700; padding: 4px 8px; border-radius: 6px; font-size: 0.78rem; display: inline-block;
-    }
-
-    .badge-warning-custom {
-      background: #FEF3C7; color: #92400E; border: 1px solid #FCD34D; font-weight: 700; padding: 4px 8px; border-radius: 6px; font-size: 0.78rem; display: inline-block;
-    }
+    .v-given { background: #D1FAE5; color: #065F46; font-weight: 700; padding: 4px 8px; border-radius: 6px; font-size: 0.78rem; }
+    .badge-user { background: rgba(255, 255, 255, 0.15); color: #FFF; padding: 6px 14px; border-radius: 20px; font-size: 0.82rem; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; backdrop-filter: blur(4px); border: 1px solid rgba(255, 255, 255, 0.2); }
+    .badge-urgent { background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5; font-weight: 700; padding: 4px 8px; border-radius: 6px; font-size: 0.78rem; display: inline-block; }
+    .badge-warning-custom { background: #FEF3C7; color: #92400E; border: 1px solid #FCD34D; font-weight: 700; padding: 4px 8px; border-radius: 6px; font-size: 0.78rem; display: inline-block; }
 
     .actions { display: flex; gap: 12px; justify-content: flex-end; align-items: center; margin-top: 20px; flex-wrap: wrap; }
     .btn {
@@ -245,13 +197,11 @@
 
     .modal-overlay {
       position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75); z-index: 2000;
-      display: flex; align-items: center; justify-content: center; padding: 16px;
-      backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center; padding: 16px; backdrop-filter: blur(4px);
     }
 
     @media (max-width: 768px) {
-      body::before, body::after { width: 15px; }
-      .wrap { padding: 0 20px; margin: 16px auto; }
+      .wrap { padding: 0 16px; margin: 16px auto; }
       .card { padding: 18px; }
       .grid { grid-template-columns: 1fr !important; gap: 14px; }
       .full-width { grid-column: span 1 !important; }
@@ -297,7 +247,12 @@
   <header class="app-header">
     <div class="brand-row">
       <div class="brand">
-        <div class="logo" style="width:44px; height:44px; border-radius:12px; background:linear-gradient(135deg, var(--primary), #FF8A65); display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 4px 12px rgba(255, 87, 34, 0.4);"><i class="fas fa-syringe" style="font-size:20px;color:#fff"></i></div>
+        <!-- 1 GIF DNA DIBUAT DENGAN TAMPILAN PRESISI SEBELUM LOGO SPUIT -->
+        <img src="agp_studios-dna-23351_512.jpg" alt="DNA Animation" class="header-dna-gif">
+        
+        <div class="logo" style="width:40px; height:40px; border-radius:10px; background:linear-gradient(135deg, var(--primary), #FF8A65); display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 4px 12px rgba(255, 87, 34, 0.4);">
+          <i class="fas fa-syringe" style="font-size:18px;color:#fff"></i>
+        </div>
         <div>
           Sistem Register Imunisasi & BIAS<br>
           <span class="brand-title-small">Puskesmas Melata (Kohort Mode)</span>
@@ -1617,7 +1572,7 @@
       loadRecentTransactions();
     }
 
-    // FUNGSI SERTIFIKAT: NON-ADMIN HANYA DAPAT PREVIEW (NO PRINT/DOWNLOAD)
+    // FUNGSI SERTIFIKAT DENGAN TANDA TANGAN & CAP LENGKAP SERTA PROPORSIONAL CETAK A4
     window.cetakSertifikatIndividu = function(dataAnakJson) {
       try {
         const d = JSON.parse(decodeURIComponent(dataAnakJson));
@@ -1838,16 +1793,67 @@
                 letter-spacing: 2px;
               }
 
+              /* TATA LETAK PROPORSIONAL UNTUK TANDA TANGAN DAN CAP PEMERINTAH STANDAR A4 */
               .ttd-row {
                 display: flex;
                 justify-content: space-between;
                 align-items: flex-end;
-                margin-top: 12px;
+                margin-top: 10px;
+                position: relative;
               }
-              .ttd-box { width: 38%; text-align: center; font-size: 12px; }
-              .ttd-title { font-weight: 700; color: #003366; margin-bottom: 50px; }
-              .ttd-name { font-weight: 800; font-size: 13px; text-decoration: underline; color: #003366; }
-              .ttd-nip { font-size: 11px; color: #334155; font-weight: 600; margin-top: 1px; }
+              .ttd-box { 
+                width: 38%; 
+                text-align: center; 
+                font-size: 12px; 
+                position: relative;
+              }
+              .ttd-title { 
+                font-weight: 700; 
+                color: #003366; 
+                margin-bottom: 4px; 
+              }
+              .ttd-img-container {
+                height: 70px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+              }
+              .img-ttd-tri {
+                max-height: 65px;
+                width: auto;
+                filter: contrast(120%);
+              }
+              .img-ttd-anang {
+                max-height: 60px;
+                width: auto;
+                z-index: 2;
+                position: relative;
+                filter: contrast(120%);
+              }
+              .img-stempel-pkm {
+                position: absolute;
+                max-height: 90px; /* Ukuran standar diameter cap resmi ~4cm */
+                width: auto;
+                left: 15%;
+                top: -12px;
+                opacity: 0.85;
+                z-index: 1;
+                mix-blend-mode: multiply;
+              }
+              .ttd-name { 
+                font-weight: 800; 
+                font-size: 13px; 
+                text-decoration: underline; 
+                color: #003366; 
+                margin-top: 2px;
+              }
+              .ttd-nip { 
+                font-size: 11px; 
+                color: #334155; 
+                font-weight: 600; 
+                margin-top: 1px; 
+              }
 
               .back-title { font-family: 'Cinzel', serif; font-size: 20px; font-weight: 800; color: #003366; text-align: center; margin-bottom: 12px; border-bottom: 2px solid #003366; padding-bottom: 6px; }
               .v-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 8px; }
@@ -1906,15 +1912,23 @@
                     </div>
                   </div>
 
+                  <!-- AREA TANDA TANGAN & CAP / STEMPEL PRESISI -->
                   <div class="ttd-row">
                     <div class="ttd-box">
                       <div class="ttd-title">Koordinator Imunisasi,</div>
+                      <div class="ttd-img-container">
+                        <img src="ttd_tri.png" class="img-ttd-tri" alt="TTD Tri Prio Heryanto">
+                      </div>
                       <div class="ttd-name">Tri Prio Heryanto</div>
                     </div>
 
                     <div class="ttd-box">
                       <div style="font-size: 11px; margin-bottom: 2px;">Melata, ${nowFormatted}</div>
                       <div class="ttd-title">Mengetahui,<br>Kepala Puskesmas Melata</div>
+                      <div class="ttd-img-container">
+                        <img src="stempel_pkm.png" class="img-stempel-pkm" alt="Stempel Puskesmas Melata">
+                        <img src="ttd_dr_anang.png" class="img-ttd-anang" alt="TTD dr. Anang Argo Yuwono">
+                      </div>
                       <div class="ttd-name">dr. Anang Argo Yuwono</div>
                       <div class="ttd-nip">Pembina Tingkat I</div>
                       <div class="ttd-nip">NIP. 19830521 201403 003</div>

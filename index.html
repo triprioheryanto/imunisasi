@@ -52,12 +52,15 @@
 
     .brand-row { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1200px; margin: 0 auto; gap: 12px; }
     .brand { display: flex; align-items: center; gap: 14px; font-weight: 800; font-size: 1.15rem; letter-spacing: -0.3px; }
-    .brand .logo { 
-      width: 44px; height: 44px; border-radius: 12px; 
-      background: linear-gradient(135deg, var(--primary), #FF8A65); 
-      display: flex; align-items: center; justify-content: center; flex-shrink: 0; 
+    
+    /* Animasi GIF pada Header */
+    .brand-gif {
+      width: 48px; height: 48px; border-radius: 12px; 
+      object-fit: cover; background: #FFF;
       box-shadow: 0 4px 12px rgba(255, 87, 34, 0.4); 
+      border: 2px solid #FF8A65;
     }
+
     .brand-title-small { font-weight: 500; font-size: 0.78rem; opacity: 0.85; display: block; margin-top: 1px; }
     .header-actions { display: flex; align-items: center; gap: 10px; }
 
@@ -87,6 +90,7 @@
       box-shadow: var(--shadow-card); margin-bottom: var(--gap); 
       border: 1px solid var(--border-color); width: 100%; 
       transition: transform 0.2s ease, box-shadow 0.2s ease;
+      position: relative;
     }
 
     h2 { margin: 0 0 10px 0; color: var(--accent); font-size: 1.4rem; font-weight: 800; letter-spacing: -0.3px; display: flex; align-items: center; gap: 10px; }
@@ -99,6 +103,15 @@
       padding: 14px 18px; border-radius: var(--radius); font-size: 0.88rem;
       font-weight: 600; display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
       box-shadow: var(--shadow-subtle);
+    }
+
+    /* Animasi GIF Banner Kesehatan */
+    .health-gif-banner {
+      position: absolute; top: 20px; right: 20px;
+      width: 75px; height: 75px; border-radius: 50%;
+      object-fit: cover; border: 3px solid var(--primary);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      pointer-events: none;
     }
 
     .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; width: 100%; }
@@ -224,6 +237,7 @@
     .btn-info { background: var(--info); color: #fff; } 
     .btn-danger { background: var(--danger); color: #fff; }
     .btn-success { background: var(--success); color: #fff; }
+    .btn-warning { background: var(--warning); color: #fff; }
 
     .site-footer { text-align: center; margin-top: 40px; padding: 20px 0; color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--border-color); }
 
@@ -236,6 +250,7 @@
     @media (max-width: 768px) {
       .wrap { padding: 0 12px; margin: 16px auto; }
       .card { padding: 18px; }
+      .health-gif-banner { display: none; }
       .grid { grid-template-columns: 1fr !important; gap: 14px; }
       .full-width { grid-column: span 1 !important; }
       .form-row { flex-direction: column; gap: 12px; }
@@ -280,7 +295,8 @@
   <header class="app-header">
     <div class="brand-row">
       <div class="brand">
-        <div class="logo"><i class="fas fa-syringe" style="font-size:20px;color:#fff"></i></div>
+        <!-- ANIMASI GIF HEADER -->
+        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcXBsbm9kZmtyZnZpdDZ3MXI5eGN4YjF6Nm1iaHpoZnRxNDlueGN0OSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7TKSjRrfIPjeiVyM/giphy.gif" alt="Health Anim" class="brand-gif">
         <div>
           Sistem Register Imunisasi & BIAS<br>
           <span class="brand-title-small">Puskesmas Melata (Kohort Mode)</span>
@@ -350,7 +366,10 @@
         </div>
       </div>
 
-      <div class="card">
+      <div class="card" id="cardFormUtama">
+        <!-- ANIMASI GIF KESEHATAN ANAK DEKAT FORM -->
+        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcTYxejdzcW9iNzRremsycXRxbThvNHgwZjhhN3F6NHNrdmdyZzUzcyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/26AHONQ79kqAolwj6/giphy.gif" class="health-gif-banner" alt="Child Health Anim">
+
         <h2><i class="fas fa-id-card" style="color:var(--primary)"></i> Form Register Imunisasi (Bayi, Baduta, Catin & Bumil)</h2>
         <p class="lead">Isi data sasaran di bawah secara berurutan. Pilih peran sasaran terlebih dahulu untuk memicu penyesuaian otomatis checklist vaksin.</p>
 
@@ -1085,6 +1104,20 @@
         'SMP ISLAM AT-TANWIR': 'SMP', 'MTS RAUDHATUL ULUM': 'SMP', 'SMA NEGERI 1 MENTHOBI RAYA': 'SMA',
         'SMK NEGERI 1 MENTHOBI RAYA': 'SMA' 
     };
+
+    // PEMETAAN LOKASI DESA UNTUK VAKSIN BIAS SEKOLAH
+    const SCHOOL_DESA_MAP = {
+      'SD NEGERI MELATA': 'Melata', 'SD NEGERI NANUAH': 'Nanuah', 'SD NEGERI TOPALAN': 'Topalan',
+      'SD NEGERI BATU AMPAR': 'Batu Ampar', 'SD NEGERI LUBUK HIJU': 'Lubuk Hiju', 'SD NEGERI BUKIT MAKMUR': 'Bukit Makmur',
+      'SD NEGERI BUKIT RAYA': 'Bukit Raya', 'SD NEGERI MODANG MAS': 'Modang Mas', 'SD NEGERI MUKTI MANUNGGAL': 'Mukti Manunggal',
+      'SD NEGERI SUMBER JAYA': 'Sumber Jaya', 'SD NEGERI BUKIT HARUM': 'Bukit Harum', 'SD SWASTA TANJUNG SAWIT ABADI': 'PT. TSA',
+      'MIS RAUDHATUL ULUM': 'Melata', 'SMP NEGERI 1 MENTHOBI RAYA': 'Melata', 'SMP NEGERI 2 MENTHOBI RAYA': 'Batu Ampar',
+      'SMP NEGERI 3 MENTHOBI RAYA': 'Bukit Raya', 'SMP NEGERI 4 MENTHOBI RAYA': 'Mukti Manunggal',
+      'SMP NEGERI 5 MENTHOBI RAYA': 'Sumber Jaya', 'SMP NEGERI SATU ATAP 6 MENTHOBI RAYA': 'Lubuk Hiju',
+      'SMP ISLAM AT-TANWIR': 'Melata', 'MTS RAUDHATUL ULUM': 'Melata', 'SMA NEGERI 1 MENTHOBI RAYA': 'Melata',
+      'SMK NEGERI 1 MENTHOBI RAYA': 'Bukit Raya'
+    };
+
     const CLASS_MAP = { 'SD': [1, 2, 3, 4, 5, 6], 'SMP': [7, 8, 9], 'SMA': [10, 11, 12] };
     let classInputCounter = 0;
     let currentInputDesa = "";
@@ -1410,6 +1443,38 @@
       } catch (e) { console.error(e); }
     }
 
+    // FUNGSI EDIT DARI TABLE PREVIEW
+    window.editDataSasaran = function(dataAnakJson) {
+      try {
+        const data = JSON.parse(decodeURIComponent(dataAnakJson));
+        
+        document.getElementById('reg_desa').value = data.desa || "";
+        currentInputDesa = data.desa || "";
+        document.getElementById('reg_kegiatan').value = data.kegiatan || "";
+        document.getElementById('reg_nama_anak').value = data.nama_anak || "";
+        document.getElementById('reg_tgl_lahir').value = data.tgl_lahir || "";
+        document.getElementById('reg_jk').value = data.jk || "P";
+        document.getElementById('reg_peran').value = data.peran || "Bayi/Baduta";
+        document.getElementById('reg_nik_anak').value = data.nik_anak !== "-" ? data.nik_anak : "";
+        document.getElementById('reg_wa_anak').value = data.wa_anak || "";
+        document.getElementById('reg_nama_ibu').value = data.nama_ibu || "";
+        document.getElementById('reg_nik_ibu').value = data.nik_ibu !== "-" ? data.nik_ibu : "";
+        document.getElementById('reg_alamat').value = data.alamat_rt || "";
+
+        applyPeranUIFilter();
+        handleJkRules();
+
+        document.querySelectorAll('input[name="chk_vaksin"]').forEach(cb => {
+          const fieldKey = `vaksin_${cb.value.replace(/[\s\(\)<>-]/g, '_')}`;
+          if (data[fieldKey]) cb.checked = true;
+          else cb.checked = false;
+        });
+
+        const cardForm = document.getElementById('cardFormUtama');
+        cardForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } catch (e) { console.error("Error Edit:", e); }
+    };
+
     async function handleSaveKohortMatrix(e) {
       e.preventDefault();
 
@@ -1556,15 +1621,13 @@
       loadRecentTransactions();
     }
 
-    // FUNGSI GENERATE SERTIFIKAT IMUNISASI (TANPA LOGO KABUPATEN & WATERMARK JELAS TEGAS)
+    // FUNGSI GENERATE SERTIFIKAT IMUNISASI (DENGAN WATERMARK DRAFT UTK NON-ADMIN)
     window.cetakSertifikatIndividu = function(dataAnakJson) {
-      if (typeof activePetugasName === 'undefined' || activePetugasName !== 'admin') {
-        return alert("🔒 AKSES DITOLAK: Fitur cetak/generate Sertifikat Imunisasi Dasar Lengkap hanya dapat diakses pada Mode Admin!");
-      }
-
       try {
         const d = JSON.parse(decodeURIComponent(dataAnakJson));
         const win = window.open('', '_blank');
+
+        const isAdmin = (typeof activePetugasName !== 'undefined' && activePetugasName === 'admin');
 
         function getDesaCode(desaName) {
           if (!desaName) return "XX";
@@ -1617,6 +1680,8 @@
 
         const nowFormatted = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
+        const draftWatermarkHtml = !isAdmin ? `<div class="draft-watermark-big">DRAFT</div>` : '';
+
         const template = `
           <!DOCTYPE html>
           <html lang="id">
@@ -1663,7 +1728,7 @@
                 z-index: 2;
               }
 
-              /* Watermark Logo Puskesmas Ditingkatkan Kecerahan dan Kontrasnya */
+              /* Watermark Logo Puskesmas */
               .watermark-bg {
                 position: absolute;
                 top: 50%;
@@ -1678,7 +1743,27 @@
                 z-index: 1;
               }
 
-              /* Kop Sertifikat (Tanpa Logo Kab, Rata Tengah Bersih) */
+              /* WATERMARK DRAFT BESAR DIAGONAL UNTUK NON-ADMIN */
+              .draft-watermark-big {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%) rotate(-35deg);
+                font-size: 130px;
+                font-weight: 900;
+                color: rgba(239, 68, 68, 0.28);
+                letter-spacing: 18px;
+                text-transform: uppercase;
+                pointer-events: none;
+                z-index: 10;
+                white-space: nowrap;
+                user-select: none;
+                border: 12px dashed rgba(239, 68, 68, 0.28);
+                padding: 10px 40px;
+                border-radius: 20px;
+              }
+
+              /* Kop Sertifikat */
               .kop-container {
                 text-align: center;
                 border-bottom: 3px double #003366;
@@ -1751,13 +1836,12 @@
             
             <!-- HALAMAN 1: KETERANGAN SERTIFIKAT DEPAN -->
             <div class="page">
-              <!-- Watermark Logo Puskesmas Jelas & Tegas -->
               <img class="watermark-bg" src="MELATA LOGO.jpg" alt="Watermark Puskesmas Melata">
+              ${draftWatermarkHtml}
 
               <div class="cert-outer">
                 <div class="cert-inner">
                   
-                  <!-- Kop Sertifikat (Tanpa Logo Kabupaten) -->
                   <div class="kop-container">
                     <h3>PEMERINTAH KABUPATEN LAMANDAU</h3>
                     <h2>DINAS KESEHATAN</h2>
@@ -1765,7 +1849,6 @@
                     <p>Jln. Tri Setya No. 01 Ds. Melata Kec. Menthobi Raya Kab. Lamandau</p>
                   </div>
 
-                  <!-- Isi Utama Sertifikat -->
                   <div class="content-body">
                     <div class="cert-title">SERTIFIKAT</div>
                     <div class="cert-no">Nomor: ${noSertifikat}</div>
@@ -1799,7 +1882,6 @@
                     </div>
                   </div>
 
-                  <!-- Bagian Tanda Tangan Kiri & Kanan -->
                   <div class="ttd-row">
                     <div class="ttd-box">
                       <div class="ttd-title">
@@ -1825,8 +1907,8 @@
 
             <!-- HALAMAN 2: BAGIAN BELAKANG (JENIS VAKSIN DITERIMA) -->
             <div class="page">
-              <!-- Watermark Logo Puskesmas Halaman 2 -->
               <img class="watermark-bg" src="MELATA LOGO.jpg" alt="Watermark Puskesmas Melata">
+              ${draftWatermarkHtml}
 
               <div class="cert-outer">
                 <div class="cert-inner">
@@ -1932,6 +2014,7 @@
               ${vCols}
               <td>${petugasKet}</td>
               <td style="display:flex; gap:6px; justify-content:center;">
+                <button class="btn btn-warning" onclick="editDataSasaran('${jsonString}')" style="padding:4px 8px; font-size:0.75rem;" title="Edit Data"><i class="fas fa-edit"></i> Edit</button>
                 <button class="btn btn-info" onclick="cetakSertifikatIndividu('${jsonString}')" style="padding:4px 8px; font-size:0.75rem;" title="Cetak Sertifikat"><i class="fas fa-certificate"></i> Sertifikat</button>
                 <button class="btn btn-danger" onclick="hapusTrans('${d.id}')" style="padding:4px 8px; font-size:0.75rem;" title="Hapus Data"><i class="fas fa-trash"></i></button>
               </td>
@@ -1959,6 +2042,7 @@
               ${vCols}
               <td>${petugasKet}</td>
               <td style="display:flex; gap:6px; justify-content:center;">
+                <button class="btn btn-warning" onclick="editDataSasaran('${jsonString}')" style="padding:4px 8px; font-size:0.75rem;" title="Edit Data"><i class="fas fa-edit"></i> Edit</button>
                 <button class="btn btn-info" onclick="cetakSertifikatIndividu('${jsonString}')" style="padding:4px 8px; font-size:0.75rem;" title="Cetak Sertifikat"><i class="fas fa-certificate"></i> Sertifikat</button>
                 <button class="btn btn-danger" onclick="hapusTrans('${d.id}')" style="padding:4px 8px; font-size:0.75rem;" title="Hapus Data"><i class="fas fa-trash"></i></button>
               </td>
@@ -2561,23 +2645,29 @@
           
           snapBias.forEach(doc => {
             const d = doc.data();
-            if (isVaccineGivenExactMonth(d.tanggal, thn, bln)) biasRows.push(d);
+            const schoolDesa = SCHOOL_DESA_MAP[d.sekolah] || 'Melata';
+            const matchDesa = (desaSel === 'ALL' || schoolDesa.toLowerCase() === desaSel.toLowerCase());
+
+            if (matchDesa && isVaccineGivenExactMonth(d.tanggal, thn, bln)) {
+              biasRows.push({ ...d, desa: schoolDesa });
+            }
           });
 
           if (biasRows.length === 0) {
-            container.innerHTML = '<p style="text-align:center; padding:20px;">Tidak ada data pelaksanaan BIAS pada filter ini.</p>';
+            container.innerHTML = `<p style="text-align:center; padding:20px;">Tidak ada data BIAS untuk Desa ${desaSel === 'ALL' ? 'Semua Desa' : desaSel} pada periode ini.</p>`;
             return;
           }
 
           let biasHtml = `
             <div style="margin-bottom:12px; background:#F0F7FF; padding:12px 16px; border-radius:10px; border:1px solid #BAE6FD; font-size:0.88rem;">
               <strong>Periode BIAS:</strong> ${bln === 'ALL' ? 'Semua Bulan' : 'Bulan ' + BULAN_NAME_MAP[bln]} ${thn} | 
-              <strong>Total Laporan BIAS Sekolah:</strong> ${biasRows.length} Data Kelas
+              <strong>Desa Filter:</strong> ${desaSel === 'ALL' ? 'Semua Desa' : desaSel} | 
+              <strong>Total Laporan:</strong> ${biasRows.length} Data Kelas
             </div>
             <table class="kohort-table">
               <thead>
                 <tr>
-                  <th>Nama Sekolah</th><th>Kelas</th><th>Vaksin BIAS</th><th>Tanggal</th>
+                  <th>Nama Sekolah</th><th>Desa</th><th>Kelas</th><th>Vaksin BIAS</th><th>Tanggal</th>
                   <th>Sasaran L</th><th>Sasaran P</th><th>Capaian L</th><th>Capaian P</th><th>Total Capaian</th><th>Drop Out</th><th>Penginput</th>
                 </tr>
               </thead>
@@ -2596,6 +2686,7 @@
             biasHtml += `
               <tr>
                 <td style="text-align:left; font-weight:700;">${b.sekolah}</td>
+                <td>Desa ${b.desa}</td>
                 <td>Kelas ${b.kelas}</td>
                 <td><span class="v-given">${b.jenis_vaksin}</span></td>
                 <td>${b.tanggal}</td>
@@ -2611,7 +2702,7 @@
               </tbody>
               <tfoot>
                 <tr style="background:#E2E8F0; font-weight:bold;">
-                  <td colspan="4" style="text-align:left; color:var(--accent);">TOTAL KESELURUHAN BIAS:</td>
+                  <td colspan="5" style="text-align:left; color:var(--accent);">TOTAL KESELURUHAN BIAS:</td>
                   <td>${sumSasL}</td><td>${sumSasP}</td><td>${sumCapL}</td><td>${sumCapP}</td>
                   <td style="color:var(--primary); font-size:1rem;">${sumCapL + sumCapP}</td>
                   <td>${sumDO}</td>
@@ -2742,20 +2833,23 @@
           const snapBias = await getDocs(collection(db, COL_BIAS));
           const biasSheetData = [
             [`LAPORAN CAPAIAN BIAS (IMUNISASI ANAK SEKOLAH) - PUSKESMAS MELATA`],
-            [`Periode: ${monthNameStr} ${thn}`],
+            [`Periode: ${monthNameStr} ${thn} | Filter Desa: ${desaSel === 'ALL' ? 'Semua Desa' : desaSel}`],
             [],
-            ["No", "Nama Sekolah", "Kelas", "Vaksin BIAS", "Tanggal Pelaksanaan", "Sasaran (L)", "Sasaran (P)", "Total Sasaran", "Capaian (L)", "Capaian (P)", "Total Capaian", "Drop Out", "Penginput"]
+            ["No", "Nama Sekolah", "Desa", "Kelas", "Vaksin BIAS", "Tanggal Pelaksanaan", "Sasaran (L)", "Sasaran (P)", "Total Sasaran", "Capaian (L)", "Capaian (P)", "Total Capaian", "Drop Out", "Penginput"]
           ];
 
           let idx = 1;
           snapBias.forEach(doc => {
             const d = doc.data();
-            if (isVaccineGivenExactMonth(d.tanggal, thn, bln)) {
+            const schoolDesa = SCHOOL_DESA_MAP[d.sekolah] || 'Melata';
+            const matchDesa = (desaSel === 'ALL' || schoolDesa.toLowerCase() === desaSel.toLowerCase());
+
+            if (matchDesa && isVaccineGivenExactMonth(d.tanggal, thn, bln)) {
               const data = d.data || {};
               const capL = data.Capaian_L || 0, capP = data.Capaian_P || 0;
               const sasL = data.Sasaran_L || 0, sasP = data.Sasaran_P || 0;
               biasSheetData.push([
-                idx++, d.sekolah, d.kelas, d.jenis_vaksin, d.tanggal,
+                idx++, d.sekolah, schoolDesa, d.kelas, d.jenis_vaksin, d.tanggal,
                 sasL, sasP, sasL + sasP, capL, capP, capL + capP, data.DropOut || 0, d.last_updated_by || '-'
               ]);
             }
@@ -2763,9 +2857,9 @@
 
           const wb = XLSX.utils.book_new();
           const ws = XLSX.utils.aoa_to_sheet(biasSheetData);
-          ws['!cols'] = [ {wch: 5}, {wch: 32}, {wch: 10}, {wch: 15}, {wch: 20}, {wch: 12}, {wch: 12}, {wch: 14}, {wch: 12}, {wch: 12}, {wch: 14}, {wch: 10}, {wch: 18} ];
+          ws['!cols'] = [ {wch: 5}, {wch: 32}, {wch: 15}, {wch: 10}, {wch: 15}, {wch: 20}, {wch: 12}, {wch: 12}, {wch: 14}, {wch: 12}, {wch: 12}, {wch: 14}, {wch: 10}, {wch: 18} ];
           XLSX.utils.book_append_sheet(wb, ws, "Laporan BIAS Sekolah");
-          XLSX.writeFile(wb, `Laporan_BIAS_Puskesmas_${bln}_${thn}.xlsx`);
+          XLSX.writeFile(wb, `Laporan_BIAS_Puskesmas_${desaSel}_${bln}_${thn}.xlsx`);
           return;
         }
 

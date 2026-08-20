@@ -42,6 +42,24 @@
       -webkit-font-smoothing: antialiased;
     }
 
+    /* BINGKAI GIF DNA MEMANJANG DI TEPI KIRI DAN KANAN WEB */
+    body::before, body::after {
+      content: "";
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      width: 45px;
+      z-index: 9999;
+      pointer-events: none;
+      background-image: url('agp_studios-dna-23351_512.jpg');
+      background-repeat: repeat-y;
+      background-size: contain;
+      background-position: center top;
+      opacity: 0.85;
+    }
+    body::before { left: 0; }
+    body::after { right: 0; }
+
     header.app-header {
       background: linear-gradient(135deg, var(--accent) 0%, #001F3F 100%);
       color: #fff; padding: 14px 20px 0 20px;
@@ -53,14 +71,6 @@
     .brand-row { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1200px; margin: 0 auto; gap: 12px; }
     .brand { display: flex; align-items: center; gap: 14px; font-weight: 800; font-size: 1.15rem; letter-spacing: -0.3px; }
     
-    /* Animasi GIF pada Header */
-    .brand-gif {
-      width: 48px; height: 48px; border-radius: 12px; 
-      object-fit: cover; background: #FFF;
-      box-shadow: 0 4px 12px rgba(255, 87, 34, 0.4); 
-      border: 2px solid #FF8A65;
-    }
-
     .brand-title-small { font-weight: 500; font-size: 0.78rem; opacity: 0.85; display: block; margin-top: 1px; }
     .header-actions { display: flex; align-items: center; gap: 10px; }
 
@@ -84,7 +94,8 @@
       box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
     }
 
-    .wrap { width: 100%; max-width: 1200px; margin: 24px auto; padding: 0 16px; }
+    /* PADDING KONTEN UTAMA SUPAYA TIDAK TERTUTUP BINGKAI DNA */
+    .wrap { width: 100%; max-width: 1200px; margin: 24px auto; padding: 0 55px; }
     .card { 
       background: var(--card); border-radius: var(--radius); padding: 24px; 
       box-shadow: var(--shadow-card); margin-bottom: var(--gap); 
@@ -103,15 +114,6 @@
       padding: 14px 18px; border-radius: var(--radius); font-size: 0.88rem;
       font-weight: 600; display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
       box-shadow: var(--shadow-subtle);
-    }
-
-    /* Animasi GIF Banner Kesehatan */
-    .health-gif-banner {
-      position: absolute; top: 20px; right: 20px;
-      width: 75px; height: 75px; border-radius: 50%;
-      object-fit: cover; border: 3px solid var(--primary);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      pointer-events: none;
     }
 
     .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; width: 100%; }
@@ -248,9 +250,9 @@
     }
 
     @media (max-width: 768px) {
-      .wrap { padding: 0 12px; margin: 16px auto; }
+      body::before, body::after { width: 15px; }
+      .wrap { padding: 0 20px; margin: 16px auto; }
       .card { padding: 18px; }
-      .health-gif-banner { display: none; }
       .grid { grid-template-columns: 1fr !important; gap: 14px; }
       .full-width { grid-column: span 1 !important; }
       .form-row { flex-direction: column; gap: 12px; }
@@ -295,8 +297,7 @@
   <header class="app-header">
     <div class="brand-row">
       <div class="brand">
-        <!-- ANIMASI GIF HEADER -->
-        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcXBsbm9kZmtyZnZpdDZ3MXI5eGN4YjF6Nm1iaHpoZnRxNDlueGN0OSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7TKSjRrfIPjeiVyM/giphy.gif" alt="Health Anim" class="brand-gif">
+        <div class="logo" style="width:44px; height:44px; border-radius:12px; background:linear-gradient(135deg, var(--primary), #FF8A65); display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 4px 12px rgba(255, 87, 34, 0.4);"><i class="fas fa-syringe" style="font-size:20px;color:#fff"></i></div>
         <div>
           Sistem Register Imunisasi & BIAS<br>
           <span class="brand-title-small">Puskesmas Melata (Kohort Mode)</span>
@@ -367,9 +368,6 @@
       </div>
 
       <div class="card" id="cardFormUtama">
-        <!-- ANIMASI GIF KESEHATAN ANAK DEKAT FORM -->
-        <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcTYxejdzcW9iNzRremsycXRxbThvNHgwZjhhN3F6NHNrdmdyZzUzcyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/26AHONQ79kqAolwj6/giphy.gif" class="health-gif-banner" alt="Child Health Anim">
-
         <h2><i class="fas fa-id-card" style="color:var(--primary)"></i> Form Register Imunisasi (Bayi, Baduta, Catin & Bumil)</h2>
         <p class="lead">Isi data sasaran di bawah secara berurutan. Pilih peran sasaran terlebih dahulu untuk memicu penyesuaian otomatis checklist vaksin.</p>
 
@@ -1105,7 +1103,6 @@
         'SMK NEGERI 1 MENTHOBI RAYA': 'SMA' 
     };
 
-    // PEMETAAN LOKASI DESA UNTUK VAKSIN BIAS SEKOLAH
     const SCHOOL_DESA_MAP = {
       'SD NEGERI MELATA': 'Melata', 'SD NEGERI NANUAH': 'Nanuah', 'SD NEGERI TOPALAN': 'Topalan',
       'SD NEGERI BATU AMPAR': 'Batu Ampar', 'SD NEGERI LUBUK HIJU': 'Lubuk Hiju', 'SD NEGERI BUKIT MAKMUR': 'Bukit Makmur',
@@ -1443,7 +1440,6 @@
       } catch (e) { console.error(e); }
     }
 
-    // FUNGSI EDIT DARI TABLE PREVIEW
     window.editDataSasaran = function(dataAnakJson) {
       try {
         const data = JSON.parse(decodeURIComponent(dataAnakJson));
@@ -1621,7 +1617,7 @@
       loadRecentTransactions();
     }
 
-    // FUNGSI GENERATE SERTIFIKAT IMUNISASI (DENGAN WATERMARK DRAFT UTK NON-ADMIN)
+    // FUNGSI SERTIFIKAT: NON-ADMIN HANYA DAPAT PREVIEW (NO PRINT/DOWNLOAD)
     window.cetakSertifikatIndividu = function(dataAnakJson) {
       try {
         const d = JSON.parse(decodeURIComponent(dataAnakJson));
@@ -1680,7 +1676,37 @@
 
         const nowFormatted = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
+        const draftBannerHtml = !isAdmin ? `
+          <div class="draft-no-print-banner">
+            ⚠️ MODE PREVIEW DRAFT (DILARANG MENCETAK / MENYIMPAN DOKUMEN INI)
+          </div>
+        ` : '';
+
         const draftWatermarkHtml = !isAdmin ? `<div class="draft-watermark-big">DRAFT</div>` : '';
+
+        const printCSS = !isAdmin ? `
+          @media print {
+            body { display: none !important; }
+          }
+        ` : `
+          @media print {
+            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .draft-no-print-banner { display: none !important; }
+          }
+        `;
+
+        const printScript = isAdmin ? `
+          window.onload = function() {
+            window.print();
+          }
+        ` : `
+          window.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 's')) {
+              e.preventDefault();
+              alert('🔒 AKSES DITOLAK: Sertifikat mode DRAFT hanya untuk preview saja. Fitur simpan/cetak hanya terbuka untuk Admin!');
+            }
+          });
+        `;
 
         const template = `
           <!DOCTYPE html>
@@ -1692,8 +1718,14 @@
             <style>
               @page { size: A4 landscape; margin: 0; }
               *, *::before, *::after { box-sizing: border-box; }
-              body { font-family: 'Plus Jakarta Sans', sans-serif; color: #0F172A; margin: 0; padding: 0; background: #FFF; }
+              body { font-family: 'Plus Jakarta Sans', sans-serif; color: #0F172A; margin: 0; padding: 0; background: #FFF; user-select: none; }
               
+              .draft-no-print-banner {
+                background: #DC2626; color: #FFF; text-align: center; font-weight: 800;
+                padding: 10px; font-size: 14px; letter-spacing: 1px; position: sticky; top: 0; z-index: 9999;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+              }
+
               .page {
                 width: 297mm;
                 height: 210mm;
@@ -1728,7 +1760,6 @@
                 z-index: 2;
               }
 
-              /* Watermark Logo Puskesmas */
               .watermark-bg {
                 position: absolute;
                 top: 50%;
@@ -1743,7 +1774,6 @@
                 z-index: 1;
               }
 
-              /* WATERMARK DRAFT BESAR DIAGONAL UNTUK NON-ADMIN */
               .draft-watermark-big {
                 position: absolute;
                 top: 50%;
@@ -1757,13 +1787,11 @@
                 pointer-events: none;
                 z-index: 10;
                 white-space: nowrap;
-                user-select: none;
                 border: 12px dashed rgba(239, 68, 68, 0.28);
                 padding: 10px 40px;
                 border-radius: 20px;
               }
 
-              /* Kop Sertifikat */
               .kop-container {
                 text-align: center;
                 border-bottom: 3px double #003366;
@@ -1775,7 +1803,6 @@
               .kop-container h1 { margin: 2px 0; font-size: 21px; font-weight: 800; color: #003366; letter-spacing: 2px; }
               .kop-container p { margin: 0; font-size: 11px; color: #334155; font-weight: 600; }
 
-              /* Content Halaman Depan */
               .content-body { text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
               .cert-title { font-family: 'Cinzel', serif; font-size: 34px; font-weight: 800; color: #003366; letter-spacing: 6px; margin-bottom: 2px; }
               .cert-no { font-size: 13px; font-weight: 700; color: #475569; margin-bottom: 18px; }
@@ -1811,7 +1838,6 @@
                 letter-spacing: 2px;
               }
 
-              /* Tanda Tangan */
               .ttd-row {
                 display: flex;
                 justify-content: space-between;
@@ -1823,18 +1849,16 @@
               .ttd-name { font-weight: 800; font-size: 13px; text-decoration: underline; color: #003366; }
               .ttd-nip { font-size: 11px; color: #334155; font-weight: 600; margin-top: 1px; }
 
-              /* Layout Halaman Belakang */
               .back-title { font-family: 'Cinzel', serif; font-size: 20px; font-weight: 800; color: #003366; text-align: center; margin-bottom: 12px; border-bottom: 2px solid #003366; padding-bottom: 6px; }
               .v-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 8px; }
 
-              @media print {
-                body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-              }
+              ${printCSS}
             </style>
           </head>
-          <body>
+          <body oncontextmenu="return false;">
+            ${draftBannerHtml}
             
-            <!-- HALAMAN 1: KETERANGAN SERTIFIKAT DEPAN -->
+            <!-- HALAMAN 1 -->
             <div class="page">
               <img class="watermark-bg" src="MELATA LOGO.jpg" alt="Watermark Puskesmas Melata">
               ${draftWatermarkHtml}
@@ -1884,17 +1908,13 @@
 
                   <div class="ttd-row">
                     <div class="ttd-box">
-                      <div class="ttd-title">
-                        Koordinator Imunisasi,
-                      </div>
+                      <div class="ttd-title">Koordinator Imunisasi,</div>
                       <div class="ttd-name">Tri Prio Heryanto</div>
                     </div>
 
                     <div class="ttd-box">
                       <div style="font-size: 11px; margin-bottom: 2px;">Melata, ${nowFormatted}</div>
-                      <div class="ttd-title">
-                        Mengetahui,<br>Kepala Puskesmas Melata
-                      </div>
+                      <div class="ttd-title">Mengetahui,<br>Kepala Puskesmas Melata</div>
                       <div class="ttd-name">dr. Anang Argo Yuwono</div>
                       <div class="ttd-nip">Pembina Tingkat I</div>
                       <div class="ttd-nip">NIP. 19830521 201403 003</div>
@@ -1905,7 +1925,7 @@
               </div>
             </div>
 
-            <!-- HALAMAN 2: BAGIAN BELAKANG (JENIS VAKSIN DITERIMA) -->
+            <!-- HALAMAN 2 -->
             <div class="page">
               <img class="watermark-bg" src="MELATA LOGO.jpg" alt="Watermark Puskesmas Melata">
               ${draftWatermarkHtml}
@@ -1933,9 +1953,7 @@
             </div>
 
             <script>
-              window.onload = function() {
-                window.print();
-              }
+              ${printScript}
             <\/script>
           </body>
           </html>

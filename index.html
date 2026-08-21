@@ -28,7 +28,6 @@
       --warning: #F59E0B;
       
       --radius: 12px;
-      --gap: 20px;
       --shadow-subtle: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
       --shadow-card: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
     }
@@ -192,7 +191,6 @@
       display: flex; align-items: center; justify-content: center; padding: 16px; backdrop-filter: blur(4px);
     }
 
-    /* OPTIMISASI RESPONSIF LAYAR HP/SMARTPHONE */
     @media (max-width: 768px) {
       header.app-header { padding: 10px 12px 0 12px; }
       .brand-title-small { display: none; }
@@ -1049,13 +1047,7 @@
     const AUTH_ADMIN_USER = "admin";
     const AUTH_ADMIN_PASS = "adminsri26";
 
-    // SVG EMBEDDED INLINE MODEL PRESISI OTENTIK UNTUK CAP STEMPEL DAN TANDA TANGAN KALIGRAFI
-    const BASE64_STEMPEL_PKM = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'><circle cx='80' cy='80' r='75' fill='none' stroke='%23002288' stroke-width='3.5'/><circle cx='80' cy='80' r='71' fill='none' stroke='%23002288' stroke-width='1.5'/><circle cx='80' cy='80' r='48' fill='none' stroke='%23002288' stroke-width='2'/><path id='textArcTop' fill='none' d='M 18 80 A 62 62 0 1 1 142 80'/><text fill='%23002288' font-size='9.5' font-weight='800' font-family='Arial, sans-serif' letter-spacing='0.5px'><textPath href='%23textArcTop' startOffset='50%' text-anchor='middle'>PEMERINTAH KABUPATEN LAMANDAU</textPath></text><path id='textArcBottom' fill='none' d='M 142 80 A 62 62 0 0 1 18 80'/><text fill='%23002288' font-size='10' font-weight='800' font-family='Arial, sans-serif' letter-spacing='0.5px'><textPath href='%23textArcBottom' startOffset='50%' text-anchor='middle'>DINAS KESEHATAN</textPath></text><polygon points='80,42 83,52 93,52 85,58 88,68 80,62 72,68 75,58 67,52 77,52' fill='%23002288'/><text x='80' y='83' text-anchor='middle' fill='%23002288' font-size='11' font-weight='900' font-family='Arial, sans-serif'>PUSKESMAS</text><text x='80' y='97' text-anchor='middle' fill='%23002288' font-size='12' font-weight='900' font-family='Arial, sans-serif' letter-spacing='1px'>MELATA</text><path d='M 28 80 L 46 80 M 114 80 L 132 80' stroke='%23002288' stroke-width='2'/></svg>";
-
-    const BASE64_TTD_TRI = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='80' viewBox='0 0 180 80'><path d='M 25 55 C 20 20, 35 10, 45 35 C 55 60, 65 25, 75 45 C 80 55, 90 40, 100 45 C 110 50, 120 30, 130 50 M 20 40 L 150 38 M 55 18 L 55 62 M 125 25 Q 145 15, 160 30 T 140 55' fill='none' stroke='%230a192f' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'/></svg>";
-
-    const BASE64_TTD_ANANG = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='80' viewBox='0 0 180 80'><path d='M 20 45 C 30 15, 45 5, 55 35 Q 70 70, 80 25 T 110 40 T 135 20 C 145 30, 155 50, 165 35 M 35 60 C 75 68, 115 62, 150 50' fill='none' stroke='%230a192f' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/></svg>";
-
+    // WATERMARK LOGO RESMI
     const BASE64_LOGO_WATERMARK = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300'><circle cx='150' cy='150' r='130' fill='none' stroke='%23003366' stroke-width='8'/><path d='M 150 40 L 150 260 M 40 150 L 260 150' stroke='%23ff5722' stroke-width='24'/><circle cx='150' cy='150' r='45' fill='%23003366'/></svg>";
 
     function isVaccineGivenExactMonth(vaccineDateStr, targetYear, targetMonth) {
@@ -1546,12 +1538,11 @@
       loadRecentTransactions();
     }
 
+    /* FUNGSI CETAK SERTIFIKAT DENGAN AREA TANDATANGAN & CAP MANUAL */
     window.cetakSertifikatIndividu = function(dataAnakJson) {
       try {
         const d = JSON.parse(decodeURIComponent(dataAnakJson));
         const win = window.open('', '_blank');
-
-        const isAdmin = (typeof activePetugasName !== 'undefined' && activePetugasName === 'admin');
 
         function getDesaCode(desaName) {
           if (!desaName) return "XX";
@@ -1604,38 +1595,6 @@
 
         const nowFormatted = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
-        const draftBannerHtml = !isAdmin ? `
-          <div class="draft-no-print-banner">
-            ⚠️ MODE PREVIEW DRAFT (DILARANG MENCETAK / MENYIMPAN DOKUMEN INI)
-          </div>
-        ` : '';
-
-        const draftWatermarkHtml = !isAdmin ? `<div class="draft-watermark-big">DRAFT</div>` : '';
-
-        const printCSS = !isAdmin ? `
-          @media print {
-            body { display: none !important; }
-          }
-        ` : `
-          @media print {
-            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .draft-no-print-banner { display: none !important; }
-          }
-        `;
-
-        const printScript = isAdmin ? `
-          window.onload = function() {
-            window.print();
-          }
-        ` : `
-          window.addEventListener('keydown', function(e) {
-            if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 's')) {
-              e.preventDefault();
-              alert('🔒 AKSES DITOLAK: Sertifikat mode DRAFT hanya untuk preview.');
-            }
-          });
-        `;
-
         const template = `
           <!DOCTYPE html>
           <html lang="id">
@@ -1646,12 +1605,7 @@
             <style>
               @page { size: A4 landscape; margin: 0; }
               *, *::before, *::after { box-sizing: border-box; }
-              body { font-family: 'Plus Jakarta Sans', sans-serif; color: #0F172A; margin: 0; padding: 0; background: #FFF; user-select: none; }
-              
-              .draft-no-print-banner {
-                background: #DC2626; color: #FFF; text-align: center; font-weight: 800;
-                padding: 8px; font-size: 13px; letter-spacing: 1px; position: sticky; top: 0; z-index: 9999;
-              }
+              body { font-family: 'Plus Jakarta Sans', sans-serif; color: #0F172A; margin: 0; padding: 0; background: #FFF; }
 
               .page {
                 width: 297mm;
@@ -1697,24 +1651,6 @@
                 opacity: 0.1;
                 pointer-events: none;
                 z-index: 1;
-              }
-
-              .draft-watermark-big {
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%) rotate(-35deg);
-                font-size: 110px;
-                font-weight: 900;
-                color: rgba(239, 68, 68, 0.25);
-                letter-spacing: 12px;
-                text-transform: uppercase;
-                pointer-events: none;
-                z-index: 10;
-                white-space: nowrap;
-                border: 10px dashed rgba(239, 68, 68, 0.25);
-                padding: 8px 30px;
-                border-radius: 16px;
               }
 
               .kop-container {
@@ -1767,44 +1703,19 @@
                 justify-content: space-between;
                 align-items: flex-end;
                 margin-top: 6px;
-                position: relative;
               }
               .ttd-box { 
                 width: 38%; 
                 text-align: center; 
                 font-size: 11.5px; 
-                position: relative;
               }
               .ttd-title { 
                 font-weight: 700; 
                 color: #003366; 
                 margin-bottom: 2px; 
               }
-              .ttd-img-container {
-                height: 75px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                position: relative;
-              }
-              .img-ttd-tri {
-                max-height: 70px;
-                width: auto;
-              }
-              .img-ttd-anang {
-                max-height: 65px;
-                width: auto;
-                z-index: 2;
-                position: relative;
-              }
-              .img-stempel-pkm {
-                position: absolute;
-                max-height: 110px;
-                width: auto;
-                left: 10%;
-                top: -18px;
-                opacity: 0.88;
-                z-index: 1;
+              .ttd-space {
+                height: 70px; /* Ruang kosong khusus untuk TTD & Cap Manual */
               }
               .ttd-name { 
                 font-weight: 800; 
@@ -1823,16 +1734,16 @@
               .back-title { font-family: 'Cinzel', serif; font-size: 18px; font-weight: 800; color: #003366; text-align: center; margin-bottom: 10px; border-bottom: 2px solid #003366; padding-bottom: 4px; }
               .v-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 6px; }
 
-              ${printCSS}
+              @media print {
+                body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+              }
             </style>
           </head>
-          <body oncontextmenu="return false;">
-            ${draftBannerHtml}
+          <body>
             
             <!-- HALAMAN 1 -->
             <div class="page">
               <img class="watermark-bg" src="${BASE64_LOGO_WATERMARK}" alt="Watermark Puskesmas Melata">
-              ${draftWatermarkHtml}
 
               <div class="cert-outer">
                 <div class="cert-inner">
@@ -1880,19 +1791,14 @@
                   <div class="ttd-row">
                     <div class="ttd-box">
                       <div class="ttd-title">Koordinator Imunisasi,</div>
-                      <div class="ttd-img-container">
-                        <img src="${BASE64_TTD_TRI}" class="img-ttd-tri" alt="TTD Tri Prio Heryanto">
-                      </div>
+                      <div class="ttd-space"></div>
                       <div class="ttd-name">Tri Prio Heryanto</div>
                     </div>
 
                     <div class="ttd-box">
                       <div style="font-size: 10.5px; margin-bottom: 2px;">Melata, ${nowFormatted}</div>
                       <div class="ttd-title">Mengetahui,<br>Kepala Puskesmas Melata</div>
-                      <div class="ttd-img-container">
-                        <img src="${BASE64_STEMPEL_PKM}" class="img-stempel-pkm" alt="Stempel Puskesmas Melata">
-                        <img src="${BASE64_TTD_ANANG}" class="img-ttd-anang" alt="TTD dr. Anang Argo Yuwono">
-                      </div>
+                      <div class="ttd-space"></div>
                       <div class="ttd-name">dr. Anang Argo Yuwono</div>
                       <div class="ttd-nip">Pembina Tingkat I</div>
                       <div class="ttd-nip">NIP. 19830521 201403 003</div>
@@ -1906,7 +1812,6 @@
             <!-- HALAMAN 2 -->
             <div class="page">
               <img class="watermark-bg" src="${BASE64_LOGO_WATERMARK}" alt="Watermark Puskesmas Melata">
-              ${draftWatermarkHtml}
 
               <div class="cert-outer">
                 <div class="cert-inner">
@@ -1931,7 +1836,9 @@
             </div>
 
             <script>
-              ${printScript}
+              window.onload = function() {
+                window.print();
+              }
             <\/script>
           </body>
           </html>
@@ -2431,7 +2338,7 @@
                 missingBayi.push("Rotavirus1");
               } else if (rv1Date && !rv2Date && ageMonths >= 3 && hasMinInterval4Weeks(rv1Date, today)) {
                 missingBayi.push("Rotavirus2");
-              } else if (rv2Date && !getVal("Rotavirus3") && ageMonths >= 4 && hasMinInterval4Weeks(rv2Date, today)) {
+              } else if (rv2Date && !getVal("Rotavirus3") && ageMonths >= 4 && hasMinInterval4Weeks(rv1Date, today)) {
                 missingBayi.push("Rotavirus3");
               }
             }

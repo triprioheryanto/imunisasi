@@ -1538,7 +1538,7 @@
       loadRecentTransactions();
     }
 
-    /* FUNGSI CETAK SERTIFIKAT DENGAN WATERMARK DRAFT & HAK AKSES VIEW-ONLY NON-ADMIN */
+    /* FUNGSI CETAK SERTIFIKAT DENGAN WATERMARK DRAFT, HEMAT TINTA (LATAR PUTIH/TRANSPARAN) & HAK AKSES VIEW-ONLY NON-ADMIN */
     window.cetakSertifikatIndividu = function(dataAnakJson) {
       try {
         const d = JSON.parse(decodeURIComponent(dataAnakJson));
@@ -1588,9 +1588,9 @@
           const fieldKey = `vaksin_${item.key.replace(/[\s\(\)<>-]/g, '_')}`;
           const tgl = d[fieldKey] || (d.jenis_imunisasi === item.key ? d.tanggal_pelayanan : null);
           vGridHtml += `
-            <div style="border: 1.5px solid #CBD5E1; padding: 8px 12px; border-radius: 8px; background: rgba(255, 255, 255, 0.95); font-size: 12px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="border: 1.5px solid #CBD5E1; padding: 8px 12px; border-radius: 8px; background: #FFFFFF; font-size: 12px; display: flex; justify-content: space-between; align-items: center;">
               <span style="font-weight: 700; color: #1E293B;">${item.label}</span>
-              <span style="font-weight: 800; color: ${tgl ? '#065F46' : '#94A3B8'}; background: ${tgl ? '#D1FAE5' : '#F1F5F9'}; padding: 3px 8px; border-radius: 6px;">${tgl || 'Sudah Diberikan'}</span>
+              <span style="font-weight: 800; color: ${tgl ? '#065F46' : '#94A3B8'}; background: transparent; padding: 3px 8px; border-radius: 6px;">${tgl || 'Sudah Diberikan'}</span>
             </div>
           `;
         });
@@ -1638,7 +1638,7 @@
             <style>
               @page { size: A4 landscape; margin: 0; }
               *, *::before, *::after { box-sizing: border-box; }
-              body { font-family: 'Plus Jakarta Sans', sans-serif; color: #0F172A; margin: 0; padding: 0; background: #FFF; user-select: none; }
+              body { font-family: 'Plus Jakarta Sans', sans-serif; color: #0F172A; margin: 0; padding: 0; background: #FFFFFF; user-select: none; }
               
               .draft-no-print-banner {
                 background: #DC2626; color: #FFF; text-align: center; font-weight: 800;
@@ -1656,6 +1656,7 @@
                 justify-content: space-between;
                 position: relative;
                 overflow: hidden;
+                background: #FFFFFF;
               }
 
               .cert-outer {
@@ -1665,13 +1666,14 @@
                 box-sizing: border-box;
                 position: relative;
                 z-index: 2;
+                background: transparent;
               }
 
               .cert-inner {
                 border: 2px solid #FF5722;
                 height: 100%;
                 padding: 18px 28px;
-                background: rgba(255, 253, 251, 0.95);
+                background: #FFFFFF;
                 display: flex;
                 flex-direction: column;
                 justify-content: space-between;

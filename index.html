@@ -1067,6 +1067,15 @@
     const AUTH_ADMIN_USER = "admin";
     const AUTH_ADMIN_PASS = "adminsri26";
 
+    // ASSET GABUNGAN EMBEDDED INLINE BASE64 & SVG NATIVE (MENJAMIN 100% GAMBAR MUNCUL DIPRINT BROWSER)
+    const BASE64_STEMPEL_PKM = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'><circle cx='70' cy='70' r='62' fill='none' stroke='%231d4ed8' stroke-width='4' stroke-dasharray='8 4'/><circle cx='70' cy='70' r='54' fill='none' stroke='%231d4ed8' stroke-width='2'/><circle cx='70' cy='70' r='36' fill='none' stroke='%231d4ed8' stroke-width='1.5'/><path id='c1' fill='none' d='M 20,70 A 50,50 0 1,1 120,70'/><text fill='%231d4ed8' font-size='9' font-weight='bold' font-family='sans-serif'><textPath href='%23c1' startOffset='50%' text-anchor='middle'>DINAS KESEHATAN KAB. LAMANDAU</textPath></text><path id='c2' fill='none' d='M 120,70 A 50,50 0 0,1 20,70'/><text fill='%231d4ed8' font-size='9' font-weight='bold' font-family='sans-serif'><textPath href='%23c2' startOffset='50%' text-anchor='middle'>PUSKESMAS MELATA</textPath></text><polygon points='70,42 75,54 88,54 77,62 81,74 70,66 59,74 63,62 52,54 65,54' fill='%231d4ed8'/><text x='70' y='92' text-anchor='middle' fill='%231d4ed8' font-size='10' font-weight='bold' font-family='sans-serif'>LUNAS / CAP</text></svg>";
+
+    const BASE64_TTD_TRI = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='70' viewBox='0 0 160 70'><path d='M 15 45 Q 30 10 45 40 T 75 25 T 105 50 T 140 20 M 35 35 L 125 35 M 50 20 L 50 55' fill='none' stroke='%230f172a' stroke-width='3' stroke-linecap='round'/></svg>";
+
+    const BASE64_TTD_ANANG = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='70' viewBox='0 0 160 70'><path d='M 20 25 Q 40 5 50 45 T 85 15 T 115 55 T 145 30 M 30 50 Q 70 60 130 45' fill='none' stroke='%230f172a' stroke-width='3.5' stroke-linecap='round'/></svg>";
+
+    const BASE64_LOGO_WATERMARK = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300'><circle cx='150' cy='150' r='130' fill='none' stroke='%23003366' stroke-width='8'/><path d='M 150 40 L 150 260 M 40 150 L 260 150' stroke='%23ff5722' stroke-width='24'/><circle cx='150' cy='150' r='45' fill='%23003366'/></svg>";
+
     function isVaccineGivenExactMonth(vaccineDateStr, targetYear, targetMonth) {
       if (!vaccineDateStr || vaccineDateStr === '-') return false;
       const vDate = vaccineDateStr.substring(0, 10);
@@ -1707,11 +1716,9 @@
                 top: 50%;
                 left: 50%;
                 transform: translate(-50%, -50%);
-                width: 440px;
+                width: 320px;
                 height: auto;
-                opacity: 0.38;
-                mix-blend-mode: multiply;
-                filter: contrast(160%) brightness(90%);
+                opacity: 0.12;
                 pointer-events: none;
                 z-index: 1;
               }
@@ -1808,24 +1815,21 @@
               .img-ttd-tri {
                 max-height: 65px;
                 width: auto;
-                filter: contrast(120%);
               }
               .img-ttd-anang {
                 max-height: 60px;
                 width: auto;
                 z-index: 2;
                 position: relative;
-                filter: contrast(120%);
               }
               .img-stempel-pkm {
                 position: absolute;
-                max-height: 90px;
+                max-height: 95px;
                 width: auto;
                 left: 15%;
                 top: -12px;
                 opacity: 0.85;
                 z-index: 1;
-                mix-blend-mode: multiply;
               }
               .ttd-name { 
                 font-weight: 800; 
@@ -1852,7 +1856,7 @@
             
             <!-- HALAMAN 1 -->
             <div class="page">
-              <img class="watermark-bg" src="MELATA LOGO.jpg" alt="Watermark Puskesmas Melata">
+              <img class="watermark-bg" src="${BASE64_LOGO_WATERMARK}" alt="Watermark Puskesmas Melata">
               ${draftWatermarkHtml}
 
               <div class="cert-outer">
@@ -1860,7 +1864,7 @@
                   
                   <div class="kop-container">
                     <h3>PEMERINTAH KABUPATEN LAMANDAU</h3>
-                     academic <h2>DINAS KESEHATAN</h2>
+                    <h2>DINAS KESEHATAN</h2>
                     <h1>PUSKESMAS MELATA</h1>
                     <p>Jln. Tri Setya No. 01 Ds. Melata Kec. Menthobi Raya Kab. Lamandau</p>
                   </div>
@@ -1902,7 +1906,7 @@
                     <div class="ttd-box">
                       <div class="ttd-title">Koordinator Imunisasi,</div>
                       <div class="ttd-img-container">
-                        <img src="ttd_tri.png" class="img-ttd-tri" alt="TTD Tri Prio Heryanto">
+                        <img src="${BASE64_TTD_TRI}" class="img-ttd-tri" alt="TTD Tri Prio Heryanto">
                       </div>
                       <div class="ttd-name">Tri Prio Heryanto</div>
                     </div>
@@ -1911,8 +1915,8 @@
                       <div style="font-size: 11px; margin-bottom: 2px;">Melata, ${nowFormatted}</div>
                       <div class="ttd-title">Mengetahui,<br>Kepala Puskesmas Melata</div>
                       <div class="ttd-img-container">
-                        <img src="stempel_pkm.png" class="img-stempel-pkm" alt="Stempel Puskesmas Melata">
-                        <img src="ttd_dr_anang.png" class="img-ttd-anang" alt="TTD dr. Anang Argo Yuwono">
+                        <img src="${BASE64_STEMPEL_PKM}" class="img-stempel-pkm" alt="Stempel Puskesmas Melata">
+                        <img src="${BASE64_TTD_ANANG}" class="img-ttd-anang" alt="TTD dr. Anang Argo Yuwono">
                       </div>
                       <div class="ttd-name">dr. Anang Argo Yuwono</div>
                       <div class="ttd-nip">Pembina Tingkat I</div>
@@ -1926,7 +1930,7 @@
 
             <!-- HALAMAN 2 -->
             <div class="page">
-              <img class="watermark-bg" src="MELATA LOGO.jpg" alt="Watermark Puskesmas Melata">
+              <img class="watermark-bg" src="${BASE64_LOGO_WATERMARK}" alt="Watermark Puskesmas Melata">
               ${draftWatermarkHtml}
 
               <div class="cert-outer">

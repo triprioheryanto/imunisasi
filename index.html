@@ -1047,7 +1047,7 @@
     const AUTH_ADMIN_USER = "admin";
     const AUTH_ADMIN_PASS = "adminsri26";
 
-    // WATERMARK LOGO RESMI
+    // WATERMARK LOGO RESMI PUSKESMAS
     const BASE64_LOGO_WATERMARK = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300'><circle cx='150' cy='150' r='130' fill='none' stroke='%23003366' stroke-width='8'/><path d='M 150 40 L 150 260 M 40 150 L 260 150' stroke='%23ff5722' stroke-width='24'/><circle cx='150' cy='150' r='45' fill='%23003366'/></svg>";
 
     function isVaccineGivenExactMonth(vaccineDateStr, targetYear, targetMonth) {
@@ -1538,11 +1538,13 @@
       loadRecentTransactions();
     }
 
-    /* FUNGSI CETAK SERTIFIKAT DENGAN AREA TANDATANGAN & CAP MANUAL */
+    /* FUNGSI CETAK SERTIFIKAT DENGAN WATERMARK DRAFT & HAK AKSES VIEW-ONLY NON-ADMIN */
     window.cetakSertifikatIndividu = function(dataAnakJson) {
       try {
         const d = JSON.parse(decodeURIComponent(dataAnakJson));
         const win = window.open('', '_blank');
+
+        const isAdmin = (typeof activePetugasName !== 'undefined' && activePetugasName.toLowerCase() === 'admin');
 
         function getDesaCode(desaName) {
           if (!desaName) return "XX";
@@ -1595,6 +1597,37 @@
 
         const nowFormatted = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
+        const draftBannerHtml = !isAdmin ? `
+          <div class="draft-no-print-banner">
+            ⚠️ MODE PREVIEW VIEW-ONLY (KHUSUS DRAFT - TIDAK UNTUK DICETAK / DISIMPAN)
+          </div>
+        ` : '';
+
+        const draftWatermarkHtml = !isAdmin ? `<div class="draft-watermark-big">DRAFT</div>` : '';
+
+        const printCSS = !isAdmin ? `
+          @media print {
+            body { display: none !important; }
+          }
+        ` : `
+          @media print {
+            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          }
+        `;
+
+        const printScript = isAdmin ? `
+          window.onload = function() {
+            window.print();
+          }
+        ` : `
+          window.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 's')) {
+              e.preventDefault();
+              alert('🔒 AKSES DITOLAK: Mode View-Only. Cetak sertifikat resmi hanya dapat dilakukan oleh Admin.');
+            }
+          });
+        `;
+
         const template = `
           <!DOCTYPE html>
           <html lang="id">
@@ -1605,7 +1638,12 @@
             <style>
               @page { size: A4 landscape; margin: 0; }
               *, *::before, *::after { box-sizing: border-box; }
-              body { font-family: 'Plus Jakarta Sans', sans-serif; color: #0F172A; margin: 0; padding: 0; background: #FFF; }
+              body { font-family: 'Plus Jakarta Sans', sans-serif; color: #0F172A; margin: 0; padding: 0; background: #FFF; user-select: none; }
+              
+              .draft-no-print-banner {
+                background: #DC2626; color: #FFF; text-align: center; font-weight: 800;
+                padding: 8px; font-size: 13px; letter-spacing: 1px; position: sticky; top: 0; z-index: 9999;
+              }
 
               .page {
                 width: 297mm;
@@ -1651,6 +1689,24 @@
                 opacity: 0.1;
                 pointer-events: none;
                 z-index: 1;
+              }
+
+              .draft-watermark-big {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%) rotate(-30deg);
+                font-size: 110px;
+                font-weight: 900;
+                color: rgba(239, 68, 68, 0.22);
+                letter-spacing: 12px;
+                text-transform: uppercase;
+                pointer-events: none;
+                z-index: 10;
+                white-space: nowrap;
+                border: 10px dashed rgba(239, 68, 68, 0.22);
+                padding: 8px 30px;
+                border-radius: 16px;
               }
 
               .kop-container {
@@ -1715,7 +1771,7 @@
                 margin-bottom: 2px; 
               }
               .ttd-space {
-                height: 70px; /* Ruang kosong khusus untuk TTD & Cap Manual */
+                height: 70px;
               }
               .ttd-name { 
                 font-weight: 800; 
@@ -1734,16 +1790,16 @@
               .back-title { font-family: 'Cinzel', serif; font-size: 18px; font-weight: 800; color: #003366; text-align: center; margin-bottom: 10px; border-bottom: 2px solid #003366; padding-bottom: 4px; }
               .v-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 6px; }
 
-              @media print {
-                body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-              }
+              ${printCSS}
             </style>
           </head>
-          <body>
+          <body oncontextmenu="return false;">
+            ${draftBannerHtml}
             
             <!-- HALAMAN 1 -->
             <div class="page">
               <img class="watermark-bg" src="${BASE64_LOGO_WATERMARK}" alt="Watermark Puskesmas Melata">
+              ${draftWatermarkHtml}
 
               <div class="cert-outer">
                 <div class="cert-inner">
@@ -1812,6 +1868,7 @@
             <!-- HALAMAN 2 -->
             <div class="page">
               <img class="watermark-bg" src="${BASE64_LOGO_WATERMARK}" alt="Watermark Puskesmas Melata">
+              ${draftWatermarkHtml}
 
               <div class="cert-outer">
                 <div class="cert-inner">
@@ -1836,9 +1893,7 @@
             </div>
 
             <script>
-              window.onload = function() {
-                window.print();
-              }
+              ${printScript}
             <\/script>
           </body>
           </html>
@@ -2338,7 +2393,7 @@
                 missingBayi.push("Rotavirus1");
               } else if (rv1Date && !rv2Date && ageMonths >= 3 && hasMinInterval4Weeks(rv1Date, today)) {
                 missingBayi.push("Rotavirus2");
-              } else if (rv2Date && !getVal("Rotavirus3") && ageMonths >= 4 && hasMinInterval4Weeks(rv1Date, today)) {
+              } else if (rv2Date && !getVal("Rotavirus3") && ageMonths >= 4 && hasMinInterval4Weeks(rv2Date, today)) {
                 missingBayi.push("Rotavirus3");
               }
             }

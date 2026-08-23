@@ -147,6 +147,7 @@
     }
     .search-result-item:last-child { border-bottom: none; }
     .search-result-item:hover { background: #FFF5F2; }
+    .highlight-text { background-color: #FFE082; font-weight: 800; border-radius: 2px; padding: 0 2px; }
 
     .form-row { display: flex; gap: 10px; width: 100%; }
     .form-row .form-group { flex: 1; margin-bottom: 0; }
@@ -347,10 +348,10 @@
         
         <div class="grid">
           <div class="form-group full-width" style="margin-bottom: 6px;">
-            <label><i class="fas fa-search-location" style="color:var(--primary);"></i> Cari Nama Sasaran </label>
-            <input type="text" id="input_search_sasaran" placeholder="Ketik minimal 4 huruf nama sasaran (misal: 'Aria')..." autocomplete="off">
+            <label><i class="fas fa-search-location" style="color:var(--primary);"></i> Cari Nama Sasaran (Mulai 2 Huruf)</label>
+            <input type="text" id="input_search_sasaran" placeholder="Ketik minimal 2 huruf nama sasaran (misal: 'Ar')..." autocomplete="off">
             <div id="liveSearchResults" class="search-results-dropdown"></div>
-            <small style="font-size:0.72rem; color:var(--muted); margin-top:3px;"><i class="fas fa-info-circle"></i> Mengetik &ge; 4 huruf akan mencocokkan data di database untuk membandingkan TTL & nama ibu.</small>
+            <small style="font-size:0.72rem; color:var(--muted); margin-top:3px;"><i class="fas fa-info-circle"></i> Mengetik &ge; 2 huruf akan memfilter daftar saran secara real-time dan mencocokkan TTL & nama ibu.</small>
           </div>
 
           <div class="form-group">
@@ -1305,7 +1306,7 @@
 
       document.getElementById('select_anak_registered').addEventListener('change', fillFormWithSelectedAnak);
 
-      /* Inisialisasi Fitur Live Search & Pengecekan Duplikasi */
+      /* Inisialisasi Fitur Live Search Mulai 2 Huruf & Dynamic Relevansi */
       setupLiveSearchAndDuplicateDetection();
 
       document.getElementById('btnExportFilteredJSON').addEventListener('click', () => doExportFiltered('json'));
@@ -1318,7 +1319,7 @@
       window.addEventListener('online', syncOfflineQueueToCloud);
     });
 
-    /* KODE TAMBAHAN: FITUR LIVE SEARCH DAN DETEKSI ANTI-DUPLIKASI DAN PEMBANDING 4 HURUF */
+    /* FITUR LIVE SEARCH DARI 2 HURUF & URUTAN RELEVANSI DINAMIS */
     async function refreshCacheGlobalData() {
       try {
         if (navigator.onLine) {
@@ -1336,51 +1337,66 @@
       const resultsDiv = document.getElementById('liveSearchResults');
       const regNamaInput = document.getElementById('reg_nama_anak');
 
-      // Live search di kolom pencarian khusus
+      // Live search bekerja mulai 2 huruf
       searchInput.addEventListener('input', (e) => {
         const query = e.target.value.trim().toLowerCase();
         const desaSel = document.getElementById('search_desa_anak').value;
 
-        if (query.length < 4) {
+        if (query.length < 2) {
           resultsDiv.style.display = 'none';
           resultsDiv.innerHTML = '';
           return;
         }
 
+        // Filter data berdasarkan kueri & urutkan berdasarkan peringkat relevansi
         const matches = cachedGlobalKohortData.filter(item => {
           const nameMatch = item.nama_anak && item.nama_anak.toLowerCase().includes(query);
           const desaMatch = !desaSel || (item.desa && item.desa.toLowerCase() === desaSel.toLowerCase());
           return nameMatch && desaMatch;
+        }).sort((a, b) => {
+          const aName = a.nama_anak.toLowerCase();
+          const bName = b.nama_anak.toLowerCase();
+          const aStartsWith = aName.startsWith(query);
+          const bStartsWith = bName.startsWith(query);
+
+          if (aStartsWith && !bStartsWith) return -1;
+          if (!aStartsWith && bStartsWith) return 1;
+          return aName.localeCompare(bName);
         });
 
         if (matches.length === 0) {
-          resultsDiv.innerHTML = `<div class="search-result-item" style="color:var(--muted); text-align:center;">Tidak ditemukan sasaran dengan nama mirip "${query}"</div>`;
+          resultsDiv.innerHTML = `<div class="search-result-item" style="color:var(--muted); text-align:center;">Tidak ditemukan sasaran mengandung "${query}"</div>`;
         } else {
-          resultsDiv.innerHTML = matches.map(item => `
-            <div class="search-result-item" onclick="selectFromLiveSearch('${encodeURIComponent(JSON.stringify(item))}')">
-              <div style="font-weight:800; color:var(--accent);">${item.nama_anak} <span style="font-weight:normal; font-size:0.75rem; color:var(--muted);">(${item.desa || '-'})</span></div>
-              <div style="font-size:0.75rem; color:#475569;">
-                <i class="fas fa-calendar-alt"></i> Lahir: <strong>${item.tgl_lahir || '-'}</strong> | 
-                <i class="fas fa-female"></i> Ortu/Ibu: <strong>${item.nama_ibu || '-'}</strong>
+          resultsDiv.innerHTML = matches.map(item => {
+            const regex = new RegExp(`(${query})`, 'gi');
+            const highlightedName = item.nama_anak.replace(regex, '<span class="highlight-text">$1</span>');
+
+            return `
+              <div class="search-result-item" onclick="selectFromLiveSearch('${encodeURIComponent(JSON.stringify(item))}')">
+                <div style="font-weight:800; color:var(--accent);">${highlightedName} <span style="font-weight:normal; font-size:0.75rem; color:var(--muted);">(${item.desa || '-'})</span></div>
+                <div style="font-size:0.75rem; color:#475569;">
+                  <i class="fas fa-calendar-alt"></i> Lahir: <strong>${item.tgl_lahir || '-'}</strong> | 
+                  <i class="fas fa-female"></i> Ortu/Ibu: <strong>${item.nama_ibu || '-'}</strong>
+                </div>
               </div>
-            </div>
-          `).join('');
+            `;
+          }).join('');
         }
         resultsDiv.style.display = 'block';
       });
 
-      // Sembunyikan hasil pencarian saat klik di luar
+      // Sembunyikan hasil pencarian saat klik luar
       document.addEventListener('click', (e) => {
         if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) {
           resultsDiv.style.display = 'none';
         }
       });
 
-      // Deteksi otomatis duplikasi saat pengetikan di Form Register
+      // Deteksi otomatis duplikasi saat mengetik di Form Register (mulai 2 huruf)
       let typingTimer;
       regNamaInput.addEventListener('keyup', () => {
         clearTimeout(typingTimer);
-        typingTimer = setTimeout(checkDuplicateOnFormInput, 600);
+        typingTimer = setTimeout(checkDuplicateOnFormInput, 500);
       });
     }
 
@@ -1393,11 +1409,11 @@
 
     function checkDuplicateOnFormInput() {
       const nameVal = document.getElementById('reg_nama_anak').value.trim();
-      if (nameVal.length < 4) return;
+      if (nameVal.length < 2) return;
 
-      const subKey = nameVal.substring(0, 4).toLowerCase();
+      const query = nameVal.toLowerCase();
       const duplicates = cachedGlobalKohortData.filter(item => {
-        return item.nama_anak && item.nama_anak.toLowerCase().includes(subKey);
+        return item.nama_anak && item.nama_anak.toLowerCase().includes(query);
       });
 
       if (duplicates.length > 0) {
@@ -1407,7 +1423,7 @@
 
     function showCompareModal(duplicatesList, typedName) {
       const container = document.getElementById('duplicateListContainer');
-      let html = `<p style="font-size:0.8rem; font-weight:700; color:var(--accent); margin-bottom:8px;">Mencocokkan pencarian: "<u>${typedName}</u>"</p>`;
+      let html = `<p style="font-size:0.8rem; font-weight:700; color:var(--accent); margin-bottom:8px;">Mencocokkan pengetikan: "<u>${typedName}</u>" (${duplicatesList.length} mirip)</p>`;
 
       duplicatesList.forEach(item => {
         const itemJson = encodeURIComponent(JSON.stringify(item));

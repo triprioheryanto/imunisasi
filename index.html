@@ -348,8 +348,8 @@
         
         <div class="grid">
           <div class="form-group full-width" style="margin-bottom: 6px;">
-            <label><i class="fas fa-search-location" style="color:var(--primary);"></i> Cari Nama Sasaran </label>
-            <input type="text" id="input_search_sasaran" placeholder="Ketik nama sasaran (misal: 'Ar')..." autocomplete="off">
+            <label><i class="fas fa-search-location" style="color:var(--primary);"></i> Cari Nama Sasaran (Mulai 2 Huruf)</label>
+            <input type="text" id="input_search_sasaran" placeholder="Ketik minimal 2 huruf nama sasaran (misal: 'Ar')..." autocomplete="off">
             <div id="liveSearchResults" class="search-results-dropdown"></div>
             <small style="font-size:0.72rem; color:var(--muted); margin-top:3px;"><i class="fas fa-info-circle"></i> Mengetik &ge; 2 huruf akan memfilter daftar saran secara real-time dan mencocokkan TTL & nama ibu.</small>
           </div>
@@ -436,9 +436,11 @@
               <label>Tgl Lahir & Gender <span class="req">*</span></label>
               <div class="form-row">
                 <input type="date" id="reg_tgl_lahir" required>
-                <select id="reg_jk" required style="width:90px; flex:none;">
-                  <option value="P">P</option>
-                  <option value="L">L</option>
+                <!-- Jenis Kelamin Kosong Secara Default & Wajib Diisi -->
+                <select id="reg_jk" required style="width:130px; flex:none;">
+                  <option value="" disabled selected>-- Pilih L/P --</option>
+                  <option value="L">L (Laki-Laki)</option>
+                  <option value="P">P (Perempuan)</option>
                 </select>
               </div>
             </div>
@@ -528,7 +530,9 @@
             </div>
           </div>
 
+          <!-- Tombol Bersihkan Form Ditambahkan Di Sini -->
           <div class="actions">
+            <button type="button" class="btn btn-warning" onclick="resetFormRegisterIndividu()"><i class="fas fa-eraser"></i> Bersihkan Form</button>
             <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Simpan Ke Kohort</button>
           </div>
         </form>
@@ -1114,6 +1118,28 @@
     // WATERMARK LOGO RESMI PUSKESMAS
     const BASE64_LOGO_WATERMARK = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300'><circle cx='150' cy='150' r='130' fill='none' stroke='%23003366' stroke-width='8'/><path d='M 150 40 L 150 260 M 40 150 L 260 150' stroke='%23ff5722' stroke-width='24'/><circle cx='150' cy='150' r='45' fill='%23003366'/></svg>";
 
+    /* FUNGSI BERSIHKAN FORM REGISTER INDIVIDU secara lengkap */
+    window.resetFormRegisterIndividu = function() {
+      const form = document.getElementById('formRegisterIndividu');
+      if (form) form.reset();
+      
+      // Kosongkan ulang JK ke default (kosong/unselected)
+      document.getElementById('reg_jk').value = "";
+      
+      // Setel ulang Tanggal Pelayanan ke Hari Ini
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('reg_tgl_pelayanan').value = today;
+
+      // Hapus status centang imunisasi
+      document.querySelectorAll('input[name="chk_vaksin"]').forEach(cb => {
+        cb.checked = false;
+        cb.disabled = false;
+      });
+
+      // Kembalikan filter peranan ke default
+      applyPeranUIFilter();
+    };
+
     function isVaccineGivenExactMonth(vaccineDateStr, targetYear, targetMonth) {
       if (!vaccineDateStr || vaccineDateStr === '-') return false;
       const vDate = vaccineDateStr.substring(0, 10);
@@ -1293,17 +1319,21 @@
       document.getElementById('btnHitungCapaian').addEventListener('click', loadCapanTabContent);
       document.getElementById('formTargetSasaran').addEventListener('submit', handleSaveTargetSasaran);
 
+      // Event listener ganti Desa filter pencarian (otomatis bersihkan form jika dikosongkan/diganti)
       document.getElementById('search_desa_anak').addEventListener('change', (e) => {
         currentInputDesa = e.target.value;
+        resetFormRegisterIndividu();
         populateAnakByDesa();
         loadRecentTransactions();
       });
 
+      // Event listener ganti Desa di Form Register
       document.getElementById('reg_desa').addEventListener('change', (e) => {
         currentInputDesa = e.target.value;
         loadRecentTransactions();
       });
 
+      // Event listener ganti Pilihan Sasaran Terdaftar (kosongkan form jika unselected)
       document.getElementById('select_anak_registered').addEventListener('change', fillFormWithSelectedAnak);
 
       /* Inisialisasi Fitur Live Search Mulai 2 Huruf & Dynamic Relevansi */
@@ -1345,6 +1375,11 @@
         if (query.length < 2) {
           resultsDiv.style.display = 'none';
           resultsDiv.innerHTML = '';
+
+          // Jika pencarian dikosongkan kembali / diketik < 2 huruf tanpa sasaran terpilih, bersihkan form
+          if (query.length === 0 && !document.getElementById('select_anak_registered').value) {
+            resetFormRegisterIndividu();
+          }
           return;
         }
 
@@ -1531,7 +1566,11 @@
 
     function fillFormWithSelectedAnak() {
       const val = document.getElementById('select_anak_registered').value;
-      if (!val) return;
+      // Jika sasaran dikosongkan/unselect, bersihkan seluruh form agar tidak ada data tertinggal
+      if (!val) {
+        resetFormRegisterIndividu();
+        return;
+      }
       try {
         const data = JSON.parse(val);
         document.getElementById('reg_desa').value = data.desa || "";
@@ -1539,7 +1578,7 @@
         document.getElementById('reg_kegiatan').value = data.kegiatan || "";
         document.getElementById('reg_nama_anak').value = data.nama_anak || "";
         document.getElementById('reg_tgl_lahir').value = data.tgl_lahir || "";
-        document.getElementById('reg_jk').value = data.jk || "P";
+        document.getElementById('reg_jk').value = data.jk || ""; // Mengisi JK sasaran yang dipilih
         document.getElementById('reg_peran').value = data.peran || "Bayi/Baduta";
         document.getElementById('reg_nik_anak').value = data.nik_anak !== "-" ? data.nik_anak : "";
         document.getElementById('reg_wa_anak').value = data.wa_anak || "";
@@ -1569,7 +1608,7 @@
         document.getElementById('reg_kegiatan').value = data.kegiatan || "";
         document.getElementById('reg_nama_anak').value = data.nama_anak || "";
         document.getElementById('reg_tgl_lahir').value = data.tgl_lahir || "";
-        document.getElementById('reg_jk').value = data.jk || "P";
+        document.getElementById('reg_jk').value = data.jk || ""; // Isi gender yang tersimpan
         document.getElementById('reg_peran').value = data.peran || "Bayi/Baduta";
         document.getElementById('reg_nik_anak').value = data.nik_anak !== "-" ? data.nik_anak : "";
         document.getElementById('reg_wa_anak').value = data.wa_anak || "";
@@ -1600,6 +1639,10 @@
       }
 
       const jk = document.getElementById('reg_jk').value;
+      if (!jk) {
+        return alert("⚠️ Peringatan: Jenis Kelamin (JK) wajib dipilih (Laki-Laki / Perempuan)!");
+      }
+
       const selectedVaccines = Array.from(document.querySelectorAll('input[name="chk_vaksin"]:checked')).map(cb => cb.value);
       
       if (selectedVaccines.length === 0) {
@@ -1701,11 +1744,7 @@
           alert(`🌐 Offline. Data ${namaAnak} tersimpan di memori lokal!`);
         }
         
-        document.querySelectorAll('input[name="chk_vaksin"]:checked').forEach(cb => cb.checked = false);
-        document.getElementById('reg_nama_anak').value = "";
-        document.getElementById('reg_nik_anak').value = "";
-        document.getElementById('reg_wa_anak').value = "";
-        
+        resetFormRegisterIndividu();
         refreshCacheGlobalData();
         loadRecentTransactions();
       } catch (err) { 
@@ -2029,7 +2068,7 @@
                       </div>
                       <div class="bio-row">
                         <div class="bio-label">Tanggal Lahir / JK</div>
-                        <div>: ${d.tgl_lahir || '-'} (${d.jk === 'L' ? 'Laki-Laki' : 'Perempuan'})</div>
+                        <div>: ${d.tgl_lahir || '-'} (${d.jk === 'L' ? 'Laki-Laki' : d.jk === 'P' ? 'Perempuan' : '-'})</div>
                       </div>
                       <div class="bio-row">
                         <div class="bio-label">Nama Orang Tua / Ibu</div>

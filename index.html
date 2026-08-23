@@ -41,6 +41,20 @@
       -webkit-font-smoothing: antialiased;
     }
 
+    /* Animasi Keyframes */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulseGlow {
+      0% { box-shadow: 0 0 0 0 rgba(255, 87, 34, 0.4); }
+      70% { box-shadow: 0 0 0 8px rgba(255, 87, 34, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 87, 34, 0); }
+    }
+
+    .tab-panel { animation: fadeIn 0.35s ease-in-out; }
+
     header.app-header {
       background: linear-gradient(135deg, var(--accent) 0%, #001F3F 100%);
       color: #fff; padding: 12px 16px 0 16px;
@@ -67,9 +81,9 @@
       padding: 10px 14px; border-radius: var(--radius) var(--radius) 0 0;
       cursor: pointer; font-weight: 600; display: inline-flex; align-items: center;
       gap: 6px; font-size: 0.82rem; border-bottom: 3px solid transparent;
-      transition: all 0.25s ease;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .app-nav-tabs .tab:hover { color: #E2E8F0; background: rgba(255,255,255,0.05); }
+    .app-nav-tabs .tab:hover { color: #E2E8F0; background: rgba(255,255,255,0.08); transform: translateY(-2px); }
     .app-nav-tabs .tab.active { 
       background: var(--card); color: var(--accent); font-weight: 700; 
       border-bottom: 3px solid var(--primary); 
@@ -81,9 +95,10 @@
       background: var(--card); border-radius: var(--radius); padding: 20px; 
       box-shadow: var(--shadow-card); margin-bottom: 16px; 
       border: 1px solid var(--border-color); width: 100%; 
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
       position: relative;
     }
+    .card:hover { transform: translateY(-2px); box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.08); }
 
     h2 { margin: 0 0 10px 0; color: var(--accent); font-size: 1.25rem; font-weight: 800; letter-spacing: -0.3px; display: flex; align-items: center; gap: 8px; }
     h3 { color: var(--accent); font-weight: 700; font-size: 1.1rem; }
@@ -98,7 +113,7 @@
     }
 
     .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; width: 100%; }
-    .form-group { margin-bottom: 12px; display: flex; flex-direction: column; width: 100%; }
+    .form-group { margin-bottom: 12px; display: flex; flex-direction: column; width: 100%; position: relative; }
     .full-width { grid-column: span 2; }
 
     label { font-weight: 700; color: #334155; margin-bottom: 6px; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; }
@@ -118,6 +133,20 @@
       box-shadow: 0 0 0 3px rgba(255, 87, 34, 0.15); 
       border-color: var(--primary); background: #FFFFFF;
     }
+
+    /* Live Search Results Dropdown */
+    .search-results-dropdown {
+      position: absolute; top: 100%; left: 0; right: 0; z-index: 1050;
+      background: #FFFFFF; border: 1.5px solid var(--primary); border-radius: 8px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15); max-height: 250px; overflow-y: auto;
+      margin-top: 4px; display: none; animation: fadeIn 0.2s ease-out;
+    }
+    .search-result-item {
+      padding: 10px 12px; border-bottom: 1px solid var(--border-color); cursor: pointer;
+      transition: background 0.15s ease; font-size: 0.82rem;
+    }
+    .search-result-item:last-child { border-bottom: none; }
+    .search-result-item:hover { background: #FFF5F2; }
 
     .form-row { display: flex; gap: 10px; width: 100%; }
     .form-row .form-group { flex: 1; margin-bottom: 0; }
@@ -141,7 +170,7 @@
       cursor: pointer; font-size: 0.82rem; font-weight: 600; color: #334155;
       transition: all 0.2s ease; user-select: none;
     }
-    .checkbox-item:hover { border-color: var(--primary); background: #FFF5F2; }
+    .checkbox-item:hover { border-color: var(--primary); background: #FFF5F2; transform: scale(1.02); }
     .checkbox-item input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--primary); cursor: pointer; }
 
     .table-container {
@@ -172,9 +201,10 @@
     .btn {
       padding: 10px 16px; border-radius: 8px; border: 0; font-weight: 700; cursor: pointer;
       display: inline-flex; gap: 6px; align-items: center; justify-content: center; font-size: 0.85rem;
-      box-shadow: var(--shadow-subtle); transition: all 0.2s ease; font-family: inherit;
+      box-shadow: var(--shadow-subtle); transition: all 0.25s ease; font-family: inherit;
     }
-    .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.12); }
+    .btn:active { transform: translateY(0); }
     .btn-primary { background: var(--primary); color: #fff; }
     .btn-primary:hover { background: var(--primary-hover); }
     .btn-ghost { background: transparent; border: 1.5px solid var(--border-color); color: var(--accent); }
@@ -189,6 +219,7 @@
     .modal-overlay {
       position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75); z-index: 2000;
       display: flex; align-items: center; justify-content: center; padding: 16px; backdrop-filter: blur(4px);
+      animation: fadeIn 0.25s ease-out;
     }
 
     @media (max-width: 768px) {
@@ -244,10 +275,34 @@
     </div>
   </div>
 
+  <!-- MODAL PERBANDINGAN SASARAN IDENTIK (ANTI DUPLIKASI) -->
+  <div id="duplicateCompareModal" class="modal-overlay" style="display:none;">
+    <div style="background:#fff; padding:20px; border-radius:16px; max-width:650px; width:95%; box-shadow:0 20px 30px rgba(0,0,0,0.25); max-height:85vh; display:flex; flex-direction:column;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1.5px solid var(--border-color); padding-bottom:8px;">
+        <h3 style="margin:0; color:var(--primary); font-size:1.1rem; display:flex; align-items:center; gap:8px;">
+          <i class="fas fa-copy"></i> Ditemukan Data Kemiripan Nama!
+        </h3>
+        <button class="btn btn-ghost" onclick="closeCompareModal()" style="padding:4px 8px; font-size:0.8rem;"><i class="fas fa-times"></i> Tutup</button>
+      </div>
+      
+      <p style="font-size:0.82rem; color:var(--muted); margin-top:0; margin-bottom:10px;">
+        Berikut sasaran terdaftar dengan nama mirip/identik. Silakan periksa <strong>Tanggal Lahir</strong> dan <strong>Nama Orang Tua / Ibu</strong> untuk mencegah duplikasi:
+      </p>
+
+      <div style="overflow-y:auto; flex:1; border:1px solid var(--border-color); border-radius:8px; padding:8px; background:#F8FAFC;" id="duplicateListContainer">
+        <!-- List item sasaran identik dimasukkan via JS -->
+      </div>
+
+      <div style="margin-top:14px; text-align:right;">
+        <button class="btn btn-ghost" onclick="closeCompareModal()"><i class="fas fa-plus-circle"></i> Tetap Buat Baru</button>
+      </div>
+    </div>
+  </div>
+
   <header class="app-header">
     <div class="brand-row">
       <div class="brand">
-        <div class="logo" style="width:36px; height:36px; border-radius:8px; background:linear-gradient(135deg, var(--primary), #FF8A65); display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 4px 10px rgba(255, 87, 34, 0.4);">
+        <div class="logo" style="width:36px; height:36px; border-radius:8px; background:linear-gradient(135deg, var(--primary), #FF8A65); display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 4px 10px rgba(255, 87, 34, 0.4); animation: pulseGlow 2s infinite;">
           <i class="fas fa-syringe" style="font-size:16px;color:#fff"></i>
         </div>
         <div>
@@ -286,15 +341,22 @@
         </div>
       </div>
 
-      <div class="card" style="background:#F0F7FF; border:1.5px solid #BAE6FD;">
+      <div class="card" style="background: linear-gradient(135deg, #F0F7FF 0%, #E6F0FA 100%); border:1.5px solid #BAE6FD;">
         <h2><i class="fas fa-search" style="color:var(--info)"></i> Cari / Update Sasaran Registered</h2>
-        <p class="lead" style="font-size:0.82rem; margin-bottom:10px;">Pilih desa untuk memilih sasaran terdaftar guna memperbarui imunisasi.</p>
+        <p class="lead" style="font-size:0.82rem; margin-bottom:10px;">Gunakan pencarian nama untuk menemukan sasaran secara presisi (global atau per desa) guna menghindari duplikasi.</p>
         
         <div class="grid">
+          <div class="form-group full-width" style="margin-bottom: 6px;">
+            <label><i class="fas fa-search-location" style="color:var(--primary);"></i> Cari Nama Sasaran (Global / Sesuai Desa Filter)</label>
+            <input type="text" id="input_search_sasaran" placeholder="Ketik minimal 4 huruf nama sasaran (misal: 'Aria')..." autocomplete="off">
+            <div id="liveSearchResults" class="search-results-dropdown"></div>
+            <small style="font-size:0.72rem; color:var(--muted); margin-top:3px;"><i class="fas fa-info-circle"></i> Mengetik &ge; 4 huruf akan mencocokkan data di database untuk membandingkan TTL & nama ibu.</small>
+          </div>
+
           <div class="form-group">
-            <label>Pilih Desa Sasaran <span class="req">*</span></label>
+            <label>Pilih Desa Sasaran (Filter)</label>
             <select id="search_desa_anak">
-              <option value="">-- Pilih Desa --</option>
+              <option value="">-- Semua Desa (Global Database) --</option>
               <option value="Melata">Melata</option>
               <option value="Nanuah">Nanuah</option>
               <option value="Topalan">Topalan</option>
@@ -311,9 +373,9 @@
             </select>
           </div>
           <div class="form-group">
-            <label>Pilih Nama Sasaran</label>
+            <label>Pilih Nama Sasaran Terdaftar</label>
             <select id="select_anak_registered">
-              <option value="">-- Pilih Desa Terlebih Dahulu --</option>
+              <option value="">-- Ketik Di Atas / Pilih Desa Terlebih Dahulu --</option>
             </select>
           </div>
         </div>
@@ -366,7 +428,7 @@
 
             <div class="form-group">
               <label>Nama Sasaran <span class="req">*</span></label>
-              <input type="text" id="reg_nama_anak" placeholder="Nama lengkap sasaran" required>
+              <input type="text" id="reg_nama_anak" placeholder="Nama lengkap sasaran" required autocomplete="off">
             </div>
 
             <div class="form-group">
@@ -913,7 +975,7 @@
         <button class="btn btn-ghost" onclick="document.getElementById('helpModal').style.display='none'">Tutup</button>
       </div>
       <hr style="margin: 10px 0; border:0; border-top:1px solid var(--border-color);">
-      <p class="lead">Sistem dilengkapi jejak audit otomatis per petugas untuk pencatatan riwayat transaksi.</p>
+      <p class="lead">Sistem dilengkapi jejak audit otomatis per petugas untuk pencatatan riwayat transaksi serta fitur penyeleksian anti-duplikasi sasaran.</p>
     </div>
   </div>
 
@@ -1042,6 +1104,7 @@
     let classInputCounter = 0;
     let currentInputDesa = "";
     let activePetugasName = "";
+    let cachedGlobalKohortData = [];
 
     const AUTH_PASSWORD_PETUGAS = "sri26";
     const AUTH_ADMIN_USER = "admin";
@@ -1242,6 +1305,9 @@
 
       document.getElementById('select_anak_registered').addEventListener('change', fillFormWithSelectedAnak);
 
+      /* Inisialisasi Fitur Live Search & Pengecekan Duplikasi */
+      setupLiveSearchAndDuplicateDetection();
+
       document.getElementById('btnExportFilteredJSON').addEventListener('click', () => doExportFiltered('json'));
       document.getElementById('btnExportFilteredExcel').addEventListener('click', downloadExcel2Sheets);
 
@@ -1251,6 +1317,129 @@
 
       window.addEventListener('online', syncOfflineQueueToCloud);
     });
+
+    /* KODE TAMBAHAN: FITUR LIVE SEARCH DAN DETEKSI ANTI-DUPLIKASI DAN PEMBANDING 4 HURUF */
+    async function refreshCacheGlobalData() {
+      try {
+        if (navigator.onLine) {
+          const snap = await getDocs(collection(db, COL_KOHORT));
+          cachedGlobalKohortData = [];
+          snap.forEach(d => cachedGlobalKohortData.push({ id: d.id, ...d.data() }));
+        }
+      } catch (e) { console.error("Error Caching Data:", e); }
+    }
+
+    function setupLiveSearchAndDuplicateDetection() {
+      refreshCacheGlobalData();
+
+      const searchInput = document.getElementById('input_search_sasaran');
+      const resultsDiv = document.getElementById('liveSearchResults');
+      const regNamaInput = document.getElementById('reg_nama_anak');
+
+      // Live search di kolom pencarian khusus
+      searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.trim().toLowerCase();
+        const desaSel = document.getElementById('search_desa_anak').value;
+
+        if (query.length < 4) {
+          resultsDiv.style.display = 'none';
+          resultsDiv.innerHTML = '';
+          return;
+        }
+
+        const matches = cachedGlobalKohortData.filter(item => {
+          const nameMatch = item.nama_anak && item.nama_anak.toLowerCase().includes(query);
+          const desaMatch = !desaSel || (item.desa && item.desa.toLowerCase() === desaSel.toLowerCase());
+          return nameMatch && desaMatch;
+        });
+
+        if (matches.length === 0) {
+          resultsDiv.innerHTML = `<div class="search-result-item" style="color:var(--muted); text-align:center;">Tidak ditemukan sasaran dengan nama mirip "${query}"</div>`;
+        } else {
+          resultsDiv.innerHTML = matches.map(item => `
+            <div class="search-result-item" onclick="selectFromLiveSearch('${encodeURIComponent(JSON.stringify(item))}')">
+              <div style="font-weight:800; color:var(--accent);">${item.nama_anak} <span style="font-weight:normal; font-size:0.75rem; color:var(--muted);">(${item.desa || '-'})</span></div>
+              <div style="font-size:0.75rem; color:#475569;">
+                <i class="fas fa-calendar-alt"></i> Lahir: <strong>${item.tgl_lahir || '-'}</strong> | 
+                <i class="fas fa-female"></i> Ortu/Ibu: <strong>${item.nama_ibu || '-'}</strong>
+              </div>
+            </div>
+          `).join('');
+        }
+        resultsDiv.style.display = 'block';
+      });
+
+      // Sembunyikan hasil pencarian saat klik di luar
+      document.addEventListener('click', (e) => {
+        if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) {
+          resultsDiv.style.display = 'none';
+        }
+      });
+
+      // Deteksi otomatis duplikasi saat pengetikan di Form Register
+      let typingTimer;
+      regNamaInput.addEventListener('keyup', () => {
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(checkDuplicateOnFormInput, 600);
+      });
+    }
+
+    window.selectFromLiveSearch = function(encodedJson) {
+      const data = JSON.parse(decodeURIComponent(encodedJson));
+      document.getElementById('input_search_sasaran').value = data.nama_anak;
+      document.getElementById('liveSearchResults').style.display = 'none';
+      editDataSasaran(encodedJson);
+    };
+
+    function checkDuplicateOnFormInput() {
+      const nameVal = document.getElementById('reg_nama_anak').value.trim();
+      if (nameVal.length < 4) return;
+
+      const subKey = nameVal.substring(0, 4).toLowerCase();
+      const duplicates = cachedGlobalKohortData.filter(item => {
+        return item.nama_anak && item.nama_anak.toLowerCase().includes(subKey);
+      });
+
+      if (duplicates.length > 0) {
+        showCompareModal(duplicates, nameVal);
+      }
+    }
+
+    function showCompareModal(duplicatesList, typedName) {
+      const container = document.getElementById('duplicateListContainer');
+      let html = `<p style="font-size:0.8rem; font-weight:700; color:var(--accent); margin-bottom:8px;">Mencocokkan pencarian: "<u>${typedName}</u>"</p>`;
+
+      duplicatesList.forEach(item => {
+        const itemJson = encodeURIComponent(JSON.stringify(item));
+        html += `
+          <div style="background:#FFF; border:1px solid var(--border-color); padding:10px 12px; border-radius:8px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+            <div>
+              <div style="font-weight:800; color:var(--accent); font-size:0.9rem;">${item.nama_anak} <span class="v-given">${item.desa}</span></div>
+              <div style="font-size:0.78rem; color:#334155; margin-top:2px;">
+                <i class="fas fa-calendar"></i> TTL: <strong>${item.tgl_lahir || '-'}</strong> | 
+                <i class="fas fa-user-friends"></i> Ortu/Ibu: <strong>${item.nama_ibu || '-'}</strong> | 
+                Alamat: ${item.alamat_rt || '-'}
+              </div>
+            </div>
+            <button type="button" class="btn btn-warning" onclick="selectDuplicateMatch('${itemJson}')" style="padding:4px 8px; font-size:0.75rem;">
+              <i class="fas fa-check-circle"></i> Gunakan Data Ini
+            </button>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+      document.getElementById('duplicateCompareModal').style.display = 'flex';
+    }
+
+    window.closeCompareModal = function() {
+      document.getElementById('duplicateCompareModal').style.display = 'none';
+    };
+
+    window.selectDuplicateMatch = function(encodedJson) {
+      closeCompareModal();
+      editDataSasaran(encodedJson);
+    };
 
     function setupVaccineAutoFillListeners() {
       const checkboxes = document.querySelectorAll('input[name="chk_vaksin"]');
@@ -1298,18 +1487,12 @@
       const selectAnak = document.getElementById('select_anak_registered');
       selectAnak.innerHTML = '<option value="">-- Memuat Data Sasaran... --</option>';
 
-      if (!desaSel) {
-        selectAnak.innerHTML = '<option value="">-- Pilih Desa Terlebih Dahulu --</option>';
-        return;
-      }
-
       try {
-        const snap = await getDocs(collection(db, COL_KOHORT));
+        if (cachedGlobalKohortData.length === 0) await refreshCacheGlobalData();
         const anakMap = new Map();
 
-        snap.forEach(d => {
-          const data = d.data();
-          if (data.desa && data.desa.toLowerCase() === desaSel.toLowerCase()) {
+        cachedGlobalKohortData.forEach(data => {
+          if (!desaSel || (data.desa && data.desa.toLowerCase() === desaSel.toLowerCase())) {
             const key = `${data.nama_anak}_${data.tgl_lahir}`.toLowerCase();
             if (!anakMap.has(key)) anakMap.set(key, data);
           }
@@ -1317,14 +1500,14 @@
 
         selectAnak.innerHTML = '<option value="">-- Pilih Nama Sasaran Untuk Update --</option>';
         if (anakMap.size === 0) {
-          selectAnak.innerHTML = '<option value="">-- Belum ada sasaran terdaftar di desa ini --</option>';
+          selectAnak.innerHTML = '<option value="">-- Belum ada sasaran terdaftar --</option>';
           return;
         }
 
         anakMap.forEach((data) => {
           const opt = document.createElement('option');
           opt.value = JSON.stringify(data);
-          opt.textContent = `${data.nama_anak} (${data.tgl_lahir}) - Ortu: ${data.nama_ibu}`;
+          opt.textContent = `${data.nama_anak} (${data.tgl_lahir}) - Desa: ${data.desa || '-'}, Ortu: ${data.nama_ibu}`;
           selectAnak.appendChild(opt);
         });
       } catch (err) { selectAnak.innerHTML = `<option value="">Error: ${err.message}</option>`; }
@@ -1507,6 +1690,7 @@
         document.getElementById('reg_nik_anak').value = "";
         document.getElementById('reg_wa_anak').value = "";
         
+        refreshCacheGlobalData();
         loadRecentTransactions();
       } catch (err) { 
         saveToOfflineQueue(payload);
@@ -1535,6 +1719,7 @@
       }
       localStorage.removeItem('pkm_offline_queue');
       alert("✅ Online kembali! Data offline berhasil diunggah ke Cloud.");
+      refreshCacheGlobalData();
       loadRecentTransactions();
     }
 
@@ -2030,6 +2215,7 @@
         if (navigator.onLine && docId !== 'offline') {
           await deleteDoc(doc(db, COL_KOHORT, docId));
         }
+        refreshCacheGlobalData();
         loadRecentTransactions();
       }
     };
@@ -3170,6 +3356,7 @@
               }
             }
             status.innerHTML = `<div class="alert-banner" style="background:#D1FAE5; color:#065F46; border-color:#6EE7B7;">Sinkronisasi ${count} data berhasil!</div>`;
+            refreshCacheGlobalData();
             loadRecentTransactions();
           } catch (err) { status.innerHTML = `<div class="alert-banner" style="background:#FEE2E2; color:#991B1B; border-color:#FCA5A5;">Error Import: ${err.message}</div>`; }
         };

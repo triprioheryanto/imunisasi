@@ -41,7 +41,6 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Animasi Keyframes */
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
@@ -134,7 +133,6 @@
       border-color: var(--primary); background: #FFFFFF;
     }
 
-    /* Live Search Results Dropdown */
     .search-results-dropdown {
       position: absolute; top: 100%; left: 0; right: 0; z-index: 1050;
       background: #FFFFFF; border: 1.5px solid var(--primary); border-radius: 8px;
@@ -291,7 +289,6 @@
       </p>
 
       <div style="overflow-y:auto; flex:1; border:1px solid var(--border-color); border-radius:8px; padding:8px; background:#F8FAFC;" id="duplicateListContainer">
-        <!-- List item sasaran identik dimasukkan via JS -->
       </div>
 
       <div style="margin-top:14px; text-align:right;">
@@ -348,8 +345,8 @@
         
         <div class="grid">
           <div class="form-group full-width" style="margin-bottom: 6px;">
-            <label><i class="fas fa-search-location" style="color:var(--primary);"></i> Cari Nama Sasaran </label>
-            <input type="text" id="input_search_sasaran" placeholder="Ketik nama sasaran (misal: 'Ar')..." autocomplete="off">
+            <label><i class="fas fa-search-location" style="color:var(--primary);"></i> Cari Nama Sasaran (Mulai 2 Huruf)</label>
+            <input type="text" id="input_search_sasaran" placeholder="Ketik minimal 2 huruf nama sasaran (misal: 'Ar')..." autocomplete="off">
             <div id="liveSearchResults" class="search-results-dropdown"></div>
             <small style="font-size:0.72rem; color:var(--muted); margin-top:3px;"><i class="fas fa-info-circle"></i> Mengetik &ge; 2 huruf akan memfilter daftar saran secara real-time dan mencocokkan TTL & nama ibu.</small>
           </div>
@@ -436,9 +433,8 @@
               <label>Tgl Lahir & Gender <span class="req">*</span></label>
               <div class="form-row">
                 <input type="date" id="reg_tgl_lahir" required>
-                <!-- Jenis Kelamin Kosong Secara Default & Wajib Diisi -->
                 <select id="reg_jk" required style="width:130px; flex:none;">
-                  <option value="" disabled selected>- Pilih  L/P -</option>
+                  <option value="" disabled selected>-- Pilih L/P --</option>
                   <option value="L">L (Laki-Laki)</option>
                   <option value="P">P (Perempuan)</option>
                 </select>
@@ -530,7 +526,6 @@
             </div>
           </div>
 
-          <!-- Tombol Bersihkan Form Ditambahkan Di Sini -->
           <div class="actions">
             <button type="button" class="btn btn-warning" onclick="resetFormRegisterIndividu()"><i class="fas fa-eraser"></i> Bersihkan Form</button>
             <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Simpan Ke Kohort</button>
@@ -1115,28 +1110,22 @@
     const AUTH_ADMIN_USER = "admin";
     const AUTH_ADMIN_PASS = "adminsri26";
 
-    // WATERMARK LOGO RESMI PUSKESMAS
     const BASE64_LOGO_WATERMARK = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300'><circle cx='150' cy='150' r='130' fill='none' stroke='%23003366' stroke-width='8'/><path d='M 150 40 L 150 260 M 40 150 L 260 150' stroke='%23ff5722' stroke-width='24'/><circle cx='150' cy='150' r='45' fill='%23003366'/></svg>";
 
-    /* FUNGSI BERSIHKAN FORM REGISTER INDIVIDU secara lengkap */
     window.resetFormRegisterIndividu = function() {
       const form = document.getElementById('formRegisterIndividu');
       if (form) form.reset();
       
-      // Kosongkan ulang JK ke default (kosong/unselected)
       document.getElementById('reg_jk').value = "";
       
-      // Setel ulang Tanggal Pelayanan ke Hari Ini
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('reg_tgl_pelayanan').value = today;
 
-      // Hapus status centang imunisasi
       document.querySelectorAll('input[name="chk_vaksin"]').forEach(cb => {
         cb.checked = false;
         cb.disabled = false;
       });
 
-      // Kembalikan filter peranan ke default
       applyPeranUIFilter();
     };
 
@@ -1319,7 +1308,6 @@
       document.getElementById('btnHitungCapaian').addEventListener('click', loadCapanTabContent);
       document.getElementById('formTargetSasaran').addEventListener('submit', handleSaveTargetSasaran);
 
-      // Event listener ganti Desa filter pencarian (otomatis bersihkan form jika dikosongkan/diganti)
       document.getElementById('search_desa_anak').addEventListener('change', (e) => {
         currentInputDesa = e.target.value;
         resetFormRegisterIndividu();
@@ -1327,16 +1315,13 @@
         loadRecentTransactions();
       });
 
-      // Event listener ganti Desa di Form Register
       document.getElementById('reg_desa').addEventListener('change', (e) => {
         currentInputDesa = e.target.value;
         loadRecentTransactions();
       });
 
-      // Event listener ganti Pilihan Sasaran Terdaftar (kosongkan form jika unselected)
       document.getElementById('select_anak_registered').addEventListener('change', fillFormWithSelectedAnak);
 
-      /* Inisialisasi Fitur Live Search Mulai 2 Huruf & Dynamic Relevansi */
       setupLiveSearchAndDuplicateDetection();
 
       document.getElementById('btnExportFilteredJSON').addEventListener('click', () => doExportFiltered('json'));
@@ -1349,7 +1334,6 @@
       window.addEventListener('online', syncOfflineQueueToCloud);
     });
 
-    /* FITUR LIVE SEARCH DARI 2 HURUF & URUTAN RELEVANSI DINAMIS */
     async function refreshCacheGlobalData() {
       try {
         if (navigator.onLine) {
@@ -1367,7 +1351,6 @@
       const resultsDiv = document.getElementById('liveSearchResults');
       const regNamaInput = document.getElementById('reg_nama_anak');
 
-      // Live search bekerja mulai 2 huruf
       searchInput.addEventListener('input', (e) => {
         const query = e.target.value.trim().toLowerCase();
         const desaSel = document.getElementById('search_desa_anak').value;
@@ -1376,14 +1359,12 @@
           resultsDiv.style.display = 'none';
           resultsDiv.innerHTML = '';
 
-          // Jika pencarian dikosongkan kembali / diketik < 2 huruf tanpa sasaran terpilih, bersihkan form
           if (query.length === 0 && !document.getElementById('select_anak_registered').value) {
             resetFormRegisterIndividu();
           }
           return;
         }
 
-        // Filter data berdasarkan kueri & urutkan berdasarkan peringkat relevansi
         const matches = cachedGlobalKohortData.filter(item => {
           const nameMatch = item.nama_anak && item.nama_anak.toLowerCase().includes(query);
           const desaMatch = !desaSel || (item.desa && item.desa.toLowerCase() === desaSel.toLowerCase());
@@ -1420,14 +1401,12 @@
         resultsDiv.style.display = 'block';
       });
 
-      // Sembunyikan hasil pencarian saat klik luar
       document.addEventListener('click', (e) => {
         if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) {
           resultsDiv.style.display = 'none';
         }
       });
 
-      // Deteksi otomatis duplikasi saat mengetik di Form Register (mulai 2 huruf)
       let typingTimer;
       regNamaInput.addEventListener('keyup', () => {
         clearTimeout(typingTimer);
@@ -1566,7 +1545,6 @@
 
     function fillFormWithSelectedAnak() {
       const val = document.getElementById('select_anak_registered').value;
-      // Jika sasaran dikosongkan/unselect, bersihkan seluruh form agar tidak ada data tertinggal
       if (!val) {
         resetFormRegisterIndividu();
         return;
@@ -1578,7 +1556,7 @@
         document.getElementById('reg_kegiatan').value = data.kegiatan || "";
         document.getElementById('reg_nama_anak').value = data.nama_anak || "";
         document.getElementById('reg_tgl_lahir').value = data.tgl_lahir || "";
-        document.getElementById('reg_jk').value = data.jk || ""; // Mengisi JK sasaran yang dipilih
+        document.getElementById('reg_jk').value = data.jk || "";
         document.getElementById('reg_peran').value = data.peran || "Bayi/Baduta";
         document.getElementById('reg_nik_anak').value = data.nik_anak !== "-" ? data.nik_anak : "";
         document.getElementById('reg_wa_anak').value = data.wa_anak || "";
@@ -1608,7 +1586,7 @@
         document.getElementById('reg_kegiatan').value = data.kegiatan || "";
         document.getElementById('reg_nama_anak').value = data.nama_anak || "";
         document.getElementById('reg_tgl_lahir').value = data.tgl_lahir || "";
-        document.getElementById('reg_jk').value = data.jk || ""; // Isi gender yang tersimpan
+        document.getElementById('reg_jk').value = data.jk || "";
         document.getElementById('reg_peran').value = data.peran || "Bayi/Baduta";
         document.getElementById('reg_nik_anak').value = data.nik_anak !== "-" ? data.nik_anak : "";
         document.getElementById('reg_wa_anak').value = data.wa_anak || "";
@@ -1778,7 +1756,6 @@
       loadRecentTransactions();
     }
 
-    /* FUNGSI CETAK SERTIFIKAT DENGAN WATERMARK DRAFT, HEMAT TINTA (LATAR PUTIH/TRANSPARAN) & HAK AKSES VIEW-ONLY NON-ADMIN */
     window.cetakSertifikatIndividu = function(dataAnakJson) {
       try {
         const d = JSON.parse(decodeURIComponent(dataAnakJson));
@@ -2038,7 +2015,6 @@
           <body oncontextmenu="return false;">
             ${draftBannerHtml}
             
-            <!-- HALAMAN 1 -->
             <div class="page">
               <img class="watermark-bg" src="${BASE64_LOGO_WATERMARK}" alt="Watermark Puskesmas Melata">
               ${draftWatermarkHtml}
@@ -2107,7 +2083,6 @@
               </div>
             </div>
 
-            <!-- HALAMAN 2 -->
             <div class="page">
               <img class="watermark-bg" src="${BASE64_LOGO_WATERMARK}" alt="Watermark Puskesmas Melata">
               ${draftWatermarkHtml}
@@ -2581,6 +2556,30 @@
       } catch (err) { alert("Error Capaian: " + err.message); }
     }
 
+    function getDropoutColorBadge(delayMonths) {
+      if (delayMonths <= 1) {
+        return {
+          style: "background-color: #FEF08A; color: #854D0E; border: 1px solid #FDE047; font-weight: 700; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem;",
+          label: "Telat 1 Bln (Peringatan Awal)"
+        };
+      } else if (delayMonths === 2) {
+        return {
+          style: "background-color: #FACC15; color: #713F12; border: 1px solid #EAB308; font-weight: 800; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem;",
+          label: "Telat 2 Bln (Risiko DO)"
+        };
+      } else if (delayMonths === 3) {
+        return {
+          style: "background-color: #FB923C; color: #FFFFFF; font-weight: 800; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem;",
+          label: "Telat 3 Bln (Tinggi)"
+        };
+      } else {
+        return {
+          style: "background-color: #EF4444; color: #FFFFFF; font-weight: 800; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem;",
+          label: `Telat ${delayMonths} Bln (Drop Out Heavy)`
+        };
+      }
+    }
+
     async function loadCatchUpAnalysis() {
       const desaSel = document.getElementById('catchup_filter_desa').value;
       const today = new Date();
@@ -2590,7 +2589,7 @@
       const p3 = document.getElementById('panel_baduta_container');
       const p4 = document.getElementById('panel_dewasa_container');
 
-      [p1, p2, p3, p4].forEach(p => p.innerHTML = '<p class="muted" style="text-align:center; padding:12px;"><i class="fas fa-spinner fa-spin"></i> Menganalisis...</p>');
+      [p1, p2, p3, p4].forEach(p => p.innerHTML = '<p class="muted" style="text-align:center; padding:12px;"><i class="fas fa-spinner fa-spin"></i> Menganalisis data catch up...</p>');
 
       try {
         const snap = await getDocs(collection(db, COL_KOHORT));
@@ -2611,7 +2610,6 @@
 
           if (ageMonths < 12) {
             let missingBayi = [];
-            
             if (!hasHb0 && ageMonths >= 1) missingBayi.push("HBO");
             if (!getVal("BCG") && ageMonths >= 1) missingBayi.push("BCG");
             if (!getVal("OPV1") && ageMonths >= 1) missingBayi.push("OPV1");
@@ -2656,18 +2654,26 @@
                 if (group.name === "Rotavirus" && ageMonths >= 7) continue;
 
                 const currentDate = new Date(currentVal);
-                const diffDays = Math.floor((today - currentDate) / (1000 * 60 * 60 * 24));
-                const diffMonths = Math.floor(diffDays / 30);
+                
+                let idealDueDate = new Date(currentDate);
+                if (group.items[i+1].key === "DPT-HB-Hib4" || group.items[i+1].key === "Campak Rubela-2") {
+                  idealDueDate.setFullYear(idealDueDate.getFullYear() + 1);
+                } else {
+                  idealDueDate.setDate(idealDueDate.getDate() + 28);
+                }
 
-                if (diffDays >= 28) {
+                if (today >= idealDueDate) {
+                  const overdueDays = Math.floor((today - idealDueDate) / (1000 * 60 * 60 * 24));
+                  const delayMonths = Math.max(1, Math.floor(overdueDays / 30));
+
                   listBerkesinambungan.push({
                     ...d,
                     ageMonths,
                     antigen: group.items[i+1].key,
                     lastDose: group.items[i].key,
                     lastDate: currentVal,
-                    delayMonths: diffMonths || 1,
-                    status: diffMonths >= 3 ? "Drop Out" : "Risiko DO"
+                    idealDate: idealDueDate.toISOString().split('T')[0],
+                    delayMonths: delayMonths
                   });
                 }
               }
@@ -2683,18 +2689,20 @@
 
             if (dpt3Val && !dpt4Val) {
               const dpt3Date = new Date(dpt3Val);
-              const monthsSinceDpt3 = Math.floor((today - dpt3Date) / (1000 * 60 * 60 * 24 * 30.4375));
-              if (monthsSinceDpt3 >= 12) {
-                needsBooster.push(`DPT4 Pasca ${monthsSinceDpt3} Bln`);
+              const daysSinceDpt3 = Math.floor((today - dpt3Date) / (1000 * 60 * 60 * 24));
+              if (daysSinceDpt3 >= 365) {
+                const m = Math.floor(daysSinceDpt3 / 30.4375);
+                needsBooster.push(`DPT4 (${m} Bln Pasca DPT3)`);
                 if (ageMonths > 24) urgentFlag = true;
               }
             }
 
             if (mr1Val && !mr2Val) {
               const mr1Date = new Date(mr1Val);
-              const monthsSinceMr1 = Math.floor((today - mr1Date) / (1000 * 60 * 60 * 24 * 30.4375));
-              if (monthsSinceMr1 >= 12) {
-                needsBooster.push(`MR2 Pasca ${monthsSinceMr1} Bln`);
+              const daysSinceMr1 = Math.floor((today - mr1Date) / (1000 * 60 * 60 * 24));
+              if (daysSinceMr1 >= 365) {
+                const m = Math.floor(daysSinceMr1 / 30.4375);
+                needsBooster.push(`MR2 (${m} Bln Pasca MR1)`);
                 if (ageMonths > 24) urgentFlag = true;
               }
             }
@@ -2704,7 +2712,7 @@
                 ...d,
                 ageMonths,
                 needs: needsBooster.join(" & "),
-                urgent: urgentFlag ? "Mendesak (>2 Thn)" : "Booster Pasca 1 Thn"
+                urgent: urgentFlag ? "Mendesak (>2 Thn)" : "Jatuh Tempo Booster (>1 Thn)"
               });
             }
           }
@@ -2733,10 +2741,37 @@
           </table>
         `;
 
-        p2.innerHTML = listBerkesinambungan.length === 0 ? '<p class="muted" style="text-align:center;">Tidak ada risiko drop out.</p>' : `
+        p2.innerHTML = listBerkesinambungan.length === 0 ? '<p class="muted" style="text-align:center; padding:15px;">Tidak ada sasaran berisiko drop out.</p>' : `
           <table class="kohort-table">
-            <thead><tr><th>Nama Sasaran</th><th>Usia</th><th>Desa</th><th>Dosis Terakhir</th><th>Tgl Terakhir</th><th>Target Dosis</th><th>Status</th></tr></thead>
-            <tbody>${listBerkesinambungan.map(b => `<tr><td style="font-weight:700;">${b.nama_anak}</td><td>${b.ageMonths} Bln</td><td>${b.desa}</td><td>${b.lastDose}</td><td>${b.lastDate}</td><td style="color:var(--primary); font-weight:700;">${b.antigen}</td><td><span class="${b.status.includes('Drop Out') ? 'badge-urgent' : 'badge-warning-custom'}">${b.status}</span></td></tr>`).join('')}</tbody>
+            <thead>
+              <tr>
+                <th>Nama Sasaran</th>
+                <th>Usia</th>
+                <th>Desa</th>
+                <th>Dosis Terakhir</th>
+                <th>Tgl Terima</th>
+                <th>Tgl Ideal Dosis Lanjutan</th>
+                <th>Target Dosis</th>
+                <th>Status Keterlambatan</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${listBerkesinambungan.map(b => {
+                const badgeInfo = getDropoutColorBadge(b.delayMonths);
+                return `
+                  <tr>
+                    <td style="font-weight:700; text-align:left;">${b.nama_anak}</td>
+                    <td>${b.ageMonths} Bln</td>
+                    <td>${b.desa}</td>
+                    <td><span class="v-given">${b.lastDose}</span></td>
+                    <td>${b.lastDate}</td>
+                    <td><strong style="color:var(--accent);">${b.idealDate}</strong></td>
+                    <td style="color:var(--primary); font-weight:800;">${b.antigen}</td>
+                    <td><span style="${badgeInfo.style}">${badgeInfo.label}</span></td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
           </table>
         `;
 

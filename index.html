@@ -621,7 +621,6 @@
           <div class="form-group">
             <label>Tahun Spesifik</label>
             <select id="exp_filter_tahun">
-              <option value="ALL">-- Semua Tahun --</option>
               <option value="2026">2026</option>
               <option value="2025">2025</option>
             </select>
@@ -903,8 +902,9 @@
   </div>
 
   <script type="module">
+    // TAMBAHKAN query dan where di sini
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, setDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, setDoc, arrayUnion, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAAyGTFyAkfua9wazWH6FFkYYmnGFTEh4",
@@ -1047,7 +1047,11 @@
     let classInputCounter = 0;
     let currentInputDesa = "";
     let activePetugasName = "";
+    
+    // VARIABEL GLOBAL BARU UNTUK SMART CACHING
     let cachedGlobalKohortData = [];
+    let loadedYears = new Set();
+    let currentAppYear = new Date().getFullYear().toString(); // Default 2026
 
     const AUTH_PASSWORD_PETUGAS = "sri26";
     const AUTH_ADMIN_USER = "admin";
@@ -1218,6 +1222,7 @@
       e.currentTarget.classList.add('active');
       document.querySelectorAll('.tab-panel').forEach(p => p.style.display='none');
       document.getElementById(target).style.display = 'block';
+      
       if (target === 'imunisasi') loadRecentTransactions();
       if (target === 'catchup') loadCatchUpAnalysis();
       if (target === 'capaian') loadCapanTabContent();
@@ -1278,18 +1283,34 @@
       window.addEventListener('online', syncOfflineQueueToCloud);
     });
 
-    async function refreshCacheGlobalData() {
+    // FUNGSI UTAMA SMART CACHING (HANYA TARIK TAHUN SPESIFIK)
+    async function refreshCacheGlobalData(targetYear) {
+      const yearToLoad = targetYear || currentAppYear;
+      
+      // Jika tahun ini sudah pernah diunduh, jangan buang kuota. Langsung keluar fungsi.
+      if (loadedYears.has(yearToLoad)) return; 
+
       try {
         if (navigator.onLine) {
-          const snap = await getDocs(collection(db, COL_KOHORT));
-          cachedGlobalKohortData = [];
-          snap.forEach(d => cachedGlobalKohortData.push({ id: d.id, ...d.data() }));
+          // Hanya cari data yang kolom 'tahun' nya sama dengan tahun permintaan
+          const q = query(collection(db, COL_KOHORT), where("tahun", "==", yearToLoad));
+          const snap = await getDocs(q);
+          
+          snap.forEach(d => {
+            // Cek agar tidak ada data duplikat yang terdorong masuk ke cache
+            if (!cachedGlobalKohortData.some(item => item.id === d.id)) {
+              cachedGlobalKohortData.push({ id: d.id, ...d.data() });
+            }
+          });
+          
+          loadedYears.add(yearToLoad); // Tandai tahun ini "Sudah Ditarik"
         }
       } catch (e) { console.error("Error Caching Data:", e); }
     }
 
     function setupLiveSearchAndDuplicateDetection() {
-      refreshCacheGlobalData();
+      // Fitur pencarian awal difokuskan di tahun yang berjalan
+      refreshCacheGlobalData(currentAppYear);
 
       const searchInput = document.getElementById('input_search_sasaran');
       const resultsDiv = document.getElementById('liveSearchResults');
@@ -1462,7 +1483,7 @@
       selectAnak.innerHTML = '<option value="">-- Memuat Data Sasaran... --</option>';
 
       try {
-        if (cachedGlobalKohortData.length === 0) await refreshCacheGlobalData();
+        await refreshCacheGlobalData(currentAppYear);
         const anakMap = new Map();
 
         cachedGlobalKohortData.forEach(data => {
@@ -1579,6 +1600,7 @@
       const tglLahir = document.getElementById('reg_tgl_lahir').value;
       const namaAnak = document.getElementById('reg_nama_anak').value.trim();
       const desa = document.getElementById('reg_desa').value;
+      const currentYearInput = tglPelayananInput.substring(0, 4); // Tahun saat menginput form
       currentInputDesa = desa;
 
       const uniqueChildId = `${desa}_${namaAnak}_${tglLahir}`.replace(/[\s\/]/g, '_').toLowerCase();
@@ -1636,7 +1658,7 @@
         kegiatan: document.getElementById('reg_kegiatan').value,
         tanggal_pelayanan: tglPelayananInput,
         bulan_tahun: tglPelayananInput.substring(0, 7),
-        tahun: tglPelayananInput.substring(0, 4),
+        tahun: currentYearInput, // Dipakai oleh cache server
         nama_anak: namaAnak,
         tgl_lahir: tglLahir,
         jk: jk,
@@ -1672,6 +1694,7 @@
         } else {
           cachedGlobalKohortData.push(payload);
         }
+        loadedYears.add(currentYearInput); // Pastikan tahun data yang diinput dicap "Telah Diload" agar tak ganda
 
         resetFormRegisterIndividu();
         loadRecentTransactions();
@@ -1702,7 +1725,11 @@
       }
       localStorage.removeItem('pkm_offline_queue');
       alert("✅ Online kembali! Data offline berhasil diunggah ke Cloud.");
-      refreshCacheGlobalData();
+      
+      // Hapus memori cache lokal untuk diunduh ulang versi terbersihnya
+      loadedYears.clear();
+      cachedGlobalKohortData = [];
+      refreshCacheGlobalData(currentAppYear);
       loadRecentTransactions();
     }
 
@@ -2090,7 +2117,7 @@
       tbodyDewasa.innerHTML = '<tr><td colspan="16" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Memuat...</td></tr>';
 
       try {
-        if (cachedGlobalKohortData.length === 0) await refreshCacheGlobalData();
+        await refreshCacheGlobalData(currentAppYear);
         let docs = [];
 
         cachedGlobalKohortData.forEach(data => {
@@ -2249,8 +2276,10 @@
           if (t.tahun === thn) targetMap.set(t.desa.toLowerCase(), t);
         });
 
-        if (cachedGlobalKohortData.length === 0) await refreshCacheGlobalData();
-        const kohortDocs = cachedGlobalKohortData;
+        await refreshCacheGlobalData(thn);
+        
+        // Filter spesifik tahun dari cache
+        const kohortDocs = cachedGlobalKohortData.filter(d => d.tahun === thn);
 
         const exactCounts = {};
         const kumulatifCounts = {};
@@ -2540,7 +2569,7 @@
       [p1, p2, p3, p4].forEach(p => p.innerHTML = '<p class="muted" style="text-align:center; padding:12px;"><i class="fas fa-spinner fa-spin"></i> Menganalisis data catch up...</p>');
 
       try {
-        if (cachedGlobalKohortData.length === 0) await refreshCacheGlobalData();
+        await refreshCacheGlobalData(currentAppYear);
         let listBayi = [], listBerkesinambungan = [], listBaduta = [], listDewasa = [];
 
         cachedGlobalKohortData.forEach(d => {
@@ -2743,7 +2772,7 @@
       const desaSel = document.getElementById('catchup_filter_desa').value;
       const today = new Date();
       try {
-        if (cachedGlobalKohortData.length === 0) await refreshCacheGlobalData();
+        await refreshCacheGlobalData(currentAppYear);
         const excelData = [
           ["No", "Kategori Panel", "Desa", "Nama Sasaran", "Usia (Bulan)", "Orang Tua / Suami", "WhatsApp", "Alamat / RT", "Status Catch Up", "Keterangan Dosis"]
         ];
@@ -2897,11 +2926,14 @@
           return;
         }
 
-        if (cachedGlobalKohortData.length === 0) await refreshCacheGlobalData();
+        await refreshCacheGlobalData(thn);
         let activeVaccineKeys = getActiveVaccineKeysByCategory(katSel);
         let filteredDocs = [];
 
+        // Hanya cek data di cache yang sesuai dengan tahun filter
         cachedGlobalKohortData.forEach(d => {
+          if (d.tahun !== thn) return;
+
           const matchDesa = (desaSel === 'ALL' || (d.desa && d.desa.toLowerCase() === desaSel.toLowerCase()));
 
           let hasMatchingVaccineInKat = false;
@@ -3042,9 +3074,9 @@
           return;
         }
 
-        if (cachedGlobalKohortData.length === 0) await refreshCacheGlobalData();
+        await refreshCacheGlobalData(thn);
         let activeVaccineKeys = getActiveVaccineKeysByCategory(katSel);
-        let allDocsInDb = cachedGlobalKohortData;
+        let allDocsInDb = cachedGlobalKohortData.filter(d => d.tahun === thn);
 
         let filteredDocsForSheet1 = allDocsInDb.filter(d => {
           const matchDesa = (desaSel === 'ALL' || (d.desa && d.desa.toLowerCase() === desaSel.toLowerCase()));
@@ -3337,7 +3369,7 @@
 
     async function exportDatabase() {
       try {
-        if (cachedGlobalKohortData.length === 0) await refreshCacheGlobalData();
+        await refreshCacheGlobalData(currentAppYear);
         const backup = { register_imunisasi: cachedGlobalKohortData, date: new Date().toISOString() };
         
         const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
@@ -3387,7 +3419,9 @@
               }
             }
             status.innerHTML = `<div class="alert-banner" style="background:#D1FAE5; color:#065F46; border-color:#6EE7B7;">Sinkronisasi ${count} data berhasil!</div>`;
-            refreshCacheGlobalData();
+            loadedYears.clear();
+            cachedGlobalKohortData = [];
+            refreshCacheGlobalData(currentAppYear);
             loadRecentTransactions();
           } catch (err) { status.innerHTML = `<div class="alert-banner" style="background:#FEE2E2; color:#991B1B; border-color:#FCA5A5;">Error Import: ${err.message}</div>`; }
         };

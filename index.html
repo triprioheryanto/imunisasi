@@ -3185,6 +3185,7 @@
 
         function calculateLogistikVial(vKey, totalDosisExact) {
           if (totalDosisExact <= 0) return 0;
+          if (vKey.includes("HBO") || vKey.includes("HB-0") || vKey.includes("HB0")) return totalDosisExact;
           if (vKey.includes("DPT-HB-Hib")) return Math.ceil(totalDosisExact / 9);
           if (vKey.includes("OPV")) return Math.ceil(totalDosisExact / 9);
           if (vKey.includes("PCV")) return Math.ceil(totalDosisExact / 4);
@@ -3260,7 +3261,8 @@
             sumTotalVialLogistik += totalVialLogistik;
 
             let kemasanStr = "9 Dosis/Vial";
-            if (vKey.includes("PCV") || vKey.includes("IPV") || vKey.includes("Rotavirus")) kemasanStr = "4 Dosis/Vial";
+            if (vKey.includes("HBO") || vKey.includes("HB-0") || vKey.includes("HB0")) kemasanStr = "1 Dosis/Uniject";
+            else if (vKey.includes("PCV") || vKey.includes("IPV") || vKey.includes("Rotavirus")) kemasanStr = "4 Dosis/Vial";
             else if (vKey.includes("BCG")) kemasanStr = "2-15 Dosis/Vial";
             else if (vKey.includes("MR") || vKey.includes("Campak")) kemasanStr = "1-9 Dosis/Vial";
             else if (vKey.includes("HPV")) kemasanStr = "1 Dosis/Vial";
@@ -3269,7 +3271,7 @@
               s2Idx++, cat, vKey,
               c.exL, c.exP, c.exTotal,
               c.kumL, c.kumP, c.kumTotal,
-              c.exTotal, kemasanStr, `${totalVialLogistik} Vial`
+              c.exTotal, kemasanStr, `${totalVialLogistik} ${vKey.includes("HBO") || vKey.includes("HB-0") || vKey.includes("HB0") ? 'Uniject' : 'Vial'}`
             ]);
           });
 
@@ -3277,7 +3279,7 @@
             "", "SUBTOTAL / TOTAL", titleRekap,
             sumExL, sumExP, sumExTot,
             sumKumL, sumKumP, sumKumTot,
-            sumExTot, "-", `${sumTotalVialLogistik} Vial`
+            sumExTot, "-", `${sumTotalVialLogistik} Vial/Uniject`
           ]);
           sheet2Data.push([]);
         }

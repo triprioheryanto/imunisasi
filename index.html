@@ -345,8 +345,8 @@
         
         <div class="grid">
           <div class="form-group full-width" style="margin-bottom: 6px;">
-            <label><i class="fas fa-search-location" style="color:var(--primary);"></i> Cari Nama Sasaran </label>
-            <input type="text" id="input_search_sasaran" placeholder="Ketik nama sasaran" autocomplete="off">
+            <label><i class="fas fa-search-location" style="color:var(--primary);"></i> Cari Nama Sasaran (Mulai 2 Huruf)</label>
+            <input type="text" id="input_search_sasaran" placeholder="Ketik minimal 2 huruf nama sasaran (misal: 'Ar')..." autocomplete="off">
             <div id="liveSearchResults" class="search-results-dropdown"></div>
             <small style="font-size:0.72rem; color:var(--muted); margin-top:3px;"><i class="fas fa-info-circle"></i> Mengetik &ge; 2 huruf akan memfilter daftar saran secara real-time dan mencocokkan TTL & nama ibu.</small>
           </div>
@@ -355,12 +355,25 @@
             <label>Pilih Desa Sasaran (Filter)</label>
             <select id="search_desa_anak">
               <option value="">-- Semua Desa (Global Database) --</option>
+              <option value="Melata">Melata</option>
+              <option value="Nanuah">Nanuah</option>
+              <option value="Topalan">Topalan</option>
+              <option value="Batu Ampar">Batu Ampar</option>
+              <option value="Lubuk Hiju">Lubuk Hiju</option>
+              <option value="Bukit Makmur">Bukit Makmur</option>
+              <option value="Bukit Raya">Bukit Raya</option>
+              <option value="Modang Mas">Modang Mas</option>
+              <option value="Mukti Manunggal">Mukti Manunggal</option>
+              <option value="Sumber Jaya">Sumber Jaya</option>
+              <option value="Bukit Harum">Bukit Harum</option>
+              <option value="PT. TSA">PT. TSA</option>
+              <option value="PT. SHS">PT. SHS</option>
             </select>
           </div>
           <div class="form-group">
             <label>Pilih Nama Sasaran Terdaftar</label>
             <select id="select_anak_registered">
-              <option value="">-- Ketik di Atas / Pilih Desa Terlebih Dahulu --</option>
+              <option value="">-- Ketik Di Atas / Pilih Desa Terlebih Dahulu --</option>
             </select>
           </div>
         </div>
@@ -376,6 +389,19 @@
               <label>Desa / Kelurahan <span class="req">*</span></label>
               <select id="reg_desa" required>
                 <option value="">-- Pilih Desa --</option>
+                <option value="Melata">Melata</option>
+                <option value="Nanuah">Nanuah</option>
+                <option value="Topalan">Topalan</option>
+                <option value="Batu Ampar">Batu Ampar</option>
+                <option value="Lubuk Hiju">Lubuk Hiju</option>
+                <option value="Bukit Makmur">Bukit Makmur</option>
+                <option value="Bukit Raya">Bukit Raya</option>
+                <option value="Modang Mas">Modang Mas</option>
+                <option value="Mukti Manunggal">Mukti Manunggal</option>
+                <option value="Sumber Jaya">Sumber Jaya</option>
+                <option value="Bukit Harum">Bukit Harum</option>
+                <option value="PT. TSA">PT. TSA</option>
+                <option value="PT. SHS">PT. SHS</option>
               </select>
             </div>
 
@@ -408,7 +434,7 @@
               <div class="form-row">
                 <input type="date" id="reg_tgl_lahir" required>
                 <select id="reg_jk" required style="width:130px; flex:none;">
-                  <option value="" disabled selected>- Pilih L/P -</option>
+                  <option value="" disabled selected>-- Pilih L/P --</option>
                   <option value="L">L (Laki-Laki)</option>
                   <option value="P">P (Perempuan)</option>
                 </select>
@@ -610,6 +636,19 @@
             <label>Pilih Desa</label>
             <select id="exp_filter_desa">
               <option value="ALL">-- Semua Desa --</option>
+              <option value="Melata">Melata</option>
+              <option value="Nanuah">Nanuah</option>
+              <option value="Topalan">Topalan</option>
+              <option value="Batu Ampar">Batu Ampar</option>
+              <option value="Lubuk Hiju">Lubuk Hiju</option>
+              <option value="Bukit Makmur">Bukit Makmur</option>
+              <option value="Bukit Raya">Bukit Raya</option>
+              <option value="Modang Mas">Modang Mas</option>
+              <option value="Mukti Manunggal">Mukti Manunggal</option>
+              <option value="Sumber Jaya">Sumber Jaya</option>
+              <option value="Bukit Harum">Bukit Harum</option>
+              <option value="PT. TSA">PT. TSA</option>
+              <option value="PT. SHS">PT. SHS</option>
             </select>
           </div>
 
@@ -621,6 +660,7 @@
           <div class="form-group">
             <label>Tahun Spesifik</label>
             <select id="exp_filter_tahun">
+              <option value="ALL">-- Semua Tahun --</option>
               <option value="2026">2026</option>
               <option value="2025">2025</option>
             </select>
@@ -682,6 +722,19 @@
             <label>Pilih Desa / Kelurahan</label>
             <select id="catchup_filter_desa">
               <option value="ALL">-- Semua Desa --</option>
+              <option value="Melata">Melata</option>
+              <option value="Nanuah">Nanuah</option>
+              <option value="Topalan">Topalan</option>
+              <option value="Batu Ampar">Batu Ampar</option>
+              <option value="Lubuk Hiju">Lubuk Hiju</option>
+              <option value="Bukit Makmur">Bukit Makmur</option>
+              <option value="Bukit Raya">Bukit Raya</option>
+              <option value="Modang Mas">Modang Mas</option>
+              <option value="Mukti Manunggal">Mukti Manunggal</option>
+              <option value="Sumber Jaya">Sumber Jaya</option>
+              <option value="Bukit Harum">Bukit Harum</option>
+              <option value="PT. TSA">PT. TSA</option>
+              <option value="PT. SHS">PT. SHS</option>
             </select>
           </div>
         </div>
@@ -768,6 +821,19 @@
             <label>Desa</label>
             <select id="filter_desa">
               <option value="ALL">-- Semua Desa --</option>
+              <option value="Melata">Melata</option>
+              <option value="Nanuah">Nanuah</option>
+              <option value="Topalan">Topalan</option>
+              <option value="Batu Ampar">Batu Ampar</option>
+              <option value="Lubuk Hiju">Lubuk Hiju</option>
+              <option value="Bukit Makmur">Bukit Makmur</option>
+              <option value="Bukit Raya">Bukit Raya</option>
+              <option value="Modang Mas">Modang Mas</option>
+              <option value="Mukti Manunggal">Mukti Manunggal</option>
+              <option value="Sumber Jaya">Sumber Jaya</option>
+              <option value="Bukit Harum">Bukit Harum</option>
+              <option value="PT. TSA">PT. TSA</option>
+              <option value="PT. SHS">PT. SHS</option>
             </select>
           </div>
         </div>
@@ -801,7 +867,19 @@
             <div class="form-group">
               <label>Desa <span class="req">*</span></label>
               <select id="sas_desa" required>
-                <option value="">-- Pilih Desa --</option>
+                <option value="Melata">Melata</option>
+                <option value="Nanuah">Nanuah</option>
+                <option value="Topalan">Topalan</option>
+                <option value="Batu Ampar">Batu Ampar</option>
+                <option value="Lubuk Hiju">Lubuk Hiju</option>
+                <option value="Bukit Makmur">Bukit Makmur</option>
+                <option value="Bukit Raya">Bukit Raya</option>
+                <option value="Modang Mas">Modang Mas</option>
+                <option value="Mukti Manunggal">Mukti Manunggal</option>
+                <option value="Sumber Jaya">Sumber Jaya</option>
+                <option value="Bukit Harum">Bukit Harum</option>
+                <option value="PT. TSA">PT. TSA</option>
+                <option value="PT. SHS">PT. SHS</option>
               </select>
             </div>
             <div class="form-group">
@@ -902,9 +980,8 @@
   </div>
 
   <script type="module">
-    // TAMBAHKAN query dan where di sini
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, setDoc, arrayUnion, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, setDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAAyGTFyAkfua9wazWH6FFkYYmnGFTEh4",
@@ -939,6 +1016,12 @@
       '05': 'Mei', '06': 'Juni', '07': 'Juli', '08': 'Agustus',
       '09': 'September', '10': 'Oktober', '11': 'November', '12': 'Desember',
       'ALL': 'Semua Bulan'
+    };
+
+    const DAYS_IN_MONTH = {
+      '01': '31', '02': '28', '03': '31', '04': '30', '05': '31', '06': '30',
+      '07': '31', '08': '31', '09': '30', '10': '31', '11': '30', '12': '31',
+      'ALL': '31'
     };
 
     const SERIES_SEQUENCES = [
@@ -999,26 +1082,6 @@
     const DESA_LUAR_WILAYAH = ["PT. TSA", "PT. SHS"];
     const ALL_DESA_LIST = [...DESA_DALAM_WILAYAH, ...DESA_LUAR_WILAYAH];
 
-    function initDesaDropdowns() {
-      const selectConfigs = [
-        { id: 'search_desa_anak', defaultOpt: '<option value="">-- Semua Desa (Global Database) --</option>' },
-        { id: 'reg_desa', defaultOpt: '<option value="">-- Pilih Desa --</option>' },
-        { id: 'exp_filter_desa', defaultOpt: '<option value="ALL">-- Semua Desa --</option>' },
-        { id: 'catchup_filter_desa', defaultOpt: '<option value="ALL">-- Semua Desa --</option>' },
-        { id: 'filter_desa', defaultOpt: '<option value="ALL">-- Semua Desa --</option>' },
-        { id: 'sas_desa', defaultOpt: '<option value="">-- Pilih Desa --</option>' }
-      ];
-
-      let optionsHtml = '';
-      DESA_DALAM_WILAYAH.forEach(d => optionsHtml += `<option value="${d}">${d}</option>`);
-      DESA_LUAR_WILAYAH.forEach(d => optionsHtml += `<option value="${d}">${d}</option>`);
-
-      selectConfigs.forEach(config => {
-        const el = document.getElementById(config.id);
-        if (el) el.innerHTML = config.defaultOpt + optionsHtml;
-      });
-    }
-
     const SCHOOL_DATA = {
         'SD NEGERI MELATA': 'SD', 'SD NEGERI NANUAH': 'SD', 'SD NEGERI TOPALAN': 'SD', 
         'SD NEGERI BATU AMPAR': 'SD', 'SD NEGERI LUBUK HIJU': 'SD', 'SD NEGERI BUKIT MAKMUR': 'SD',
@@ -1047,11 +1110,7 @@
     let classInputCounter = 0;
     let currentInputDesa = "";
     let activePetugasName = "";
-    
-    // VARIABEL GLOBAL BARU UNTUK SMART CACHING
     let cachedGlobalKohortData = [];
-    let loadedYears = new Set();
-    let currentAppYear = new Date().getFullYear().toString(); // Default 2026
 
     const AUTH_PASSWORD_PETUGAS = "sri26";
     const AUTH_ADMIN_USER = "admin";
@@ -1222,7 +1281,6 @@
       e.currentTarget.classList.add('active');
       document.querySelectorAll('.tab-panel').forEach(p => p.style.display='none');
       document.getElementById(target).style.display = 'block';
-      
       if (target === 'imunisasi') loadRecentTransactions();
       if (target === 'catchup') loadCatchUpAnalysis();
       if (target === 'capaian') loadCapanTabContent();
@@ -1231,7 +1289,6 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       initUserAuthCheck();
-      initDesaDropdowns(); 
 
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('reg_tgl_pelayanan').value = today;
@@ -1283,34 +1340,18 @@
       window.addEventListener('online', syncOfflineQueueToCloud);
     });
 
-    // FUNGSI UTAMA SMART CACHING (HANYA TARIK TAHUN SPESIFIK)
-    async function refreshCacheGlobalData(targetYear) {
-      const yearToLoad = targetYear || currentAppYear;
-      
-      // Jika tahun ini sudah pernah diunduh, jangan buang kuota. Langsung keluar fungsi.
-      if (loadedYears.has(yearToLoad)) return; 
-
+    async function refreshCacheGlobalData() {
       try {
         if (navigator.onLine) {
-          // Hanya cari data yang kolom 'tahun' nya sama dengan tahun permintaan
-          const q = query(collection(db, COL_KOHORT), where("tahun", "==", yearToLoad));
-          const snap = await getDocs(q);
-          
-          snap.forEach(d => {
-            // Cek agar tidak ada data duplikat yang terdorong masuk ke cache
-            if (!cachedGlobalKohortData.some(item => item.id === d.id)) {
-              cachedGlobalKohortData.push({ id: d.id, ...d.data() });
-            }
-          });
-          
-          loadedYears.add(yearToLoad); // Tandai tahun ini "Sudah Ditarik"
+          const snap = await getDocs(collection(db, COL_KOHORT));
+          cachedGlobalKohortData = [];
+          snap.forEach(d => cachedGlobalKohortData.push({ id: d.id, ...d.data() }));
         }
       } catch (e) { console.error("Error Caching Data:", e); }
     }
 
     function setupLiveSearchAndDuplicateDetection() {
-      // Fitur pencarian awal difokuskan di tahun yang berjalan
-      refreshCacheGlobalData(currentAppYear);
+      refreshCacheGlobalData();
 
       const searchInput = document.getElementById('input_search_sasaran');
       const resultsDiv = document.getElementById('liveSearchResults');
@@ -1483,7 +1524,7 @@
       selectAnak.innerHTML = '<option value="">-- Memuat Data Sasaran... --</option>';
 
       try {
-        await refreshCacheGlobalData(currentAppYear);
+        if (cachedGlobalKohortData.length === 0) await refreshCacheGlobalData();
         const anakMap = new Map();
 
         cachedGlobalKohortData.forEach(data => {
@@ -1600,7 +1641,6 @@
       const tglLahir = document.getElementById('reg_tgl_lahir').value;
       const namaAnak = document.getElementById('reg_nama_anak').value.trim();
       const desa = document.getElementById('reg_desa').value;
-      const currentYearInput = tglPelayananInput.substring(0, 4); // Tahun saat menginput form
       currentInputDesa = desa;
 
       const uniqueChildId = `${desa}_${namaAnak}_${tglLahir}`.replace(/[\s\/]/g, '_').toLowerCase();
@@ -1658,7 +1698,7 @@
         kegiatan: document.getElementById('reg_kegiatan').value,
         tanggal_pelayanan: tglPelayananInput,
         bulan_tahun: tglPelayananInput.substring(0, 7),
-        tahun: currentYearInput, // Dipakai oleh cache server
+        tahun: tglPelayananInput.substring(0, 4),
         nama_anak: namaAnak,
         tgl_lahir: tglLahir,
         jk: jk,
@@ -1688,15 +1728,8 @@
           alert(`🌐 Offline. Data ${namaAnak} tersimpan di memori lokal!`);
         }
         
-        const existingIdx = cachedGlobalKohortData.findIndex(item => item.id === uniqueChildId);
-        if (existingIdx > -1) {
-          cachedGlobalKohortData[existingIdx] = payload;
-        } else {
-          cachedGlobalKohortData.push(payload);
-        }
-        loadedYears.add(currentYearInput); // Pastikan tahun data yang diinput dicap "Telah Diload" agar tak ganda
-
         resetFormRegisterIndividu();
+        refreshCacheGlobalData();
         loadRecentTransactions();
       } catch (err) { 
         saveToOfflineQueue(payload);
@@ -1725,11 +1758,7 @@
       }
       localStorage.removeItem('pkm_offline_queue');
       alert("✅ Online kembali! Data offline berhasil diunggah ke Cloud.");
-      
-      // Hapus memori cache lokal untuk diunduh ulang versi terbersihnya
-      loadedYears.clear();
-      cachedGlobalKohortData = [];
-      refreshCacheGlobalData(currentAppYear);
+      refreshCacheGlobalData();
       loadRecentTransactions();
     }
 
@@ -2117,14 +2146,16 @@
       tbodyDewasa.innerHTML = '<tr><td colspan="16" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Memuat...</td></tr>';
 
       try {
-        await refreshCacheGlobalData(currentAppYear);
         let docs = [];
-
-        cachedGlobalKohortData.forEach(data => {
-          if (data.desa && data.desa.toLowerCase() === currentInputDesa.toLowerCase()) {
-            docs.push(data);
-          }
-        });
+        if (navigator.onLine) {
+          const snap = await getDocs(collection(db, COL_KOHORT));
+          snap.forEach(d => {
+            const data = d.data();
+            if (data.desa && data.desa.toLowerCase() === currentInputDesa.toLowerCase()) {
+              docs.push({id: d.id, ...data});
+            }
+          });
+        }
 
         let offlineQueue = JSON.parse(localStorage.getItem('pkm_offline_queue') || '[]');
         offlineQueue.forEach(item => {
@@ -2220,8 +2251,7 @@
         if (navigator.onLine && docId !== 'offline') {
           await deleteDoc(doc(db, COL_KOHORT, docId));
         }
-        
-        cachedGlobalKohortData = cachedGlobalKohortData.filter(item => item.id !== docId);
+        refreshCacheGlobalData();
         loadRecentTransactions();
       }
     };
@@ -2276,10 +2306,9 @@
           if (t.tahun === thn) targetMap.set(t.desa.toLowerCase(), t);
         });
 
-        await refreshCacheGlobalData(thn);
-        
-        // Filter spesifik tahun dari cache
-        const kohortDocs = cachedGlobalKohortData.filter(d => d.tahun === thn);
+        const snapKohort = await getDocs(collection(db, COL_KOHORT));
+        const kohortDocs = [];
+        snapKohort.forEach(d => kohortDocs.push(d.data()));
 
         const exactCounts = {};
         const kumulatifCounts = {};
@@ -2569,10 +2598,11 @@
       [p1, p2, p3, p4].forEach(p => p.innerHTML = '<p class="muted" style="text-align:center; padding:12px;"><i class="fas fa-spinner fa-spin"></i> Menganalisis data catch up...</p>');
 
       try {
-        await refreshCacheGlobalData(currentAppYear);
+        const snap = await getDocs(collection(db, COL_KOHORT));
         let listBayi = [], listBerkesinambungan = [], listBaduta = [], listDewasa = [];
 
-        cachedGlobalKohortData.forEach(d => {
+        snap.forEach(doc => {
+          const d = doc.data();
           const matchDesa = (desaSel === 'ALL' || (d.desa && d.desa.toLowerCase() === desaSel.toLowerCase()));
           if (!matchDesa) return;
 
@@ -2772,14 +2802,15 @@
       const desaSel = document.getElementById('catchup_filter_desa').value;
       const today = new Date();
       try {
-        await refreshCacheGlobalData(currentAppYear);
+        const snap = await getDocs(collection(db, COL_KOHORT));
         const excelData = [
           ["No", "Kategori Panel", "Desa", "Nama Sasaran", "Usia (Bulan)", "Orang Tua / Suami", "WhatsApp", "Alamat / RT", "Status Catch Up", "Keterangan Dosis"]
         ];
 
         let idx = 1;
 
-        cachedGlobalKohortData.forEach(d => {
+        snap.forEach(doc => {
+          const d = doc.data();
           const matchDesa = (desaSel === 'ALL' || (d.desa && d.desa.toLowerCase() === desaSel.toLowerCase()));
           if (!matchDesa) return;
 
@@ -2926,14 +2957,12 @@
           return;
         }
 
-        await refreshCacheGlobalData(thn);
+        const snap = await getDocs(collection(db, COL_KOHORT));
         let activeVaccineKeys = getActiveVaccineKeysByCategory(katSel);
         let filteredDocs = [];
 
-        // Hanya cek data di cache yang sesuai dengan tahun filter
-        cachedGlobalKohortData.forEach(d => {
-          if (d.tahun !== thn) return;
-
+        snap.forEach(doc => {
+          const d = doc.data();
           const matchDesa = (desaSel === 'ALL' || (d.desa && d.desa.toLowerCase() === desaSel.toLowerCase()));
 
           let hasMatchingVaccineInKat = false;
@@ -3036,8 +3065,10 @@
       const katSel = document.getElementById('filter_kategori').value || 'ALL';
 
       const monthNameStr = BULAN_NAME_MAP[bln] || bln;
-      const monthExactHeader = bln === 'ALL' ? 'total dosis' : `total dosis ${monthNameStr.toLowerCase()}`;
-      const monthKumulatifHeader = bln === 'ALL' ? 'total dosis s/d akhir tahun' : `total dosis s/d ${monthNameStr.toLowerCase()}`;
+      const endDayStr = DAYS_IN_MONTH[bln] || '31';
+      
+      const labelTglBulan = bln === 'ALL' ? `01/01/${thn} - 31/12/${thn}` : `01/${bln}/${thn} - ${endDayStr}/${bln}/${thn}`;
+      const labelTglKumulatif = bln === 'ALL' ? `01/01/${thn} - 31/12/${thn}` : `01/01/${thn} - ${endDayStr}/${bln}/${thn}`;
 
       try {
         if (katSel === 'BIAS') {
@@ -3068,15 +3099,19 @@
 
           const wb = XLSX.utils.book_new();
           const ws = XLSX.utils.aoa_to_sheet(biasSheetData);
-          ws['!cols'] = [ {wch: 5}, {wch: 32}, {wch: 15}, {wch: 10}, {wch: 15}, {wch: 20}, {wch: 12}, {wch: 12}, {wch: 14}, {wch: 12}, {wch: 12}, {wch: 14}, {wch: 10}, {wch: 18} ];
+          ws['!cols'] = [ {wch: 4}, {wch: 32}, {wch: 15}, {wch: 10}, {wch: 15}, {wch: 20}, {wch: 12}, {wch: 12}, {wch: 14}, {wch: 12}, {wch: 12}, {wch: 14}, {wch: 10}, {wch: 18} ];
           XLSX.utils.book_append_sheet(wb, ws, "Laporan BIAS Sekolah");
           XLSX.writeFile(wb, `Laporan_BIAS_Puskesmas_${desaSel}_${bln}_${thn}.xlsx`);
           return;
         }
 
-        await refreshCacheGlobalData(thn);
+        const snap = await getDocs(collection(db, COL_KOHORT));
         let activeVaccineKeys = getActiveVaccineKeysByCategory(katSel);
-        let allDocsInDb = cachedGlobalKohortData.filter(d => d.tahun === thn);
+        let allDocsInDb = [];
+
+        snap.forEach(doc => {
+          allDocsInDb.push(doc.data());
+        });
 
         let filteredDocsForSheet1 = allDocsInDb.filter(d => {
           const matchDesa = (desaSel === 'ALL' || (d.desa && d.desa.toLowerCase() === desaSel.toLowerCase()));
@@ -3144,9 +3179,24 @@
         sheet1Data.push(totalRow1);
 
         const sheet2Data = [];
-        sheet2Data.push([`REKAPITULASI TOTAL PENERIMA VAKSIN - PUSKESMAS MELATA`]);
-        sheet2Data.push([`Periode Filter: ${monthNameStr} ${thn} | Wilayah: ${desaSel === 'ALL' ? 'Semua Desa (Per Rekap Desa)' : desaSel}`]);
+        sheet2Data.push([`REKAPITULASI TOTAL PENERIMA VAKSIN & ESTIMASI PEMAKAIAN LOGISTIK - PUSKESMAS MELATA`]);
+        sheet2Data.push([`Periode Bulan: ${labelTglBulan} | Periode Kumulatif: ${labelTglKumulatif} | Wilayah: ${desaSel === 'ALL' ? 'Semua Desa (Per Rekap Desa)' : desaSel}`]);
         sheet2Data.push([]);
+
+        function calculateLogistikVial(vKey, totalDosisExact) {
+          if (totalDosisExact <= 0) return 0;
+          if (vKey.includes("DPT-HB-Hib")) return Math.ceil(totalDosisExact / 9);
+          if (vKey.includes("OPV")) return Math.ceil(totalDosisExact / 9);
+          if (vKey.includes("PCV")) return Math.ceil(totalDosisExact / 4);
+          if (vKey.includes("IPV")) return Math.ceil(totalDosisExact / 4);
+          if (vKey.includes("BCG")) return totalDosisExact >= 1 ? 1 : 0;
+          if (vKey.includes("Campak") || vKey.includes("MR")) return totalDosisExact >= 1 ? 1 : 0;
+          if (vKey.includes("Rotavirus")) return Math.ceil(totalDosisExact / 4);
+          if (vKey.includes("HPV")) return totalDosisExact;
+          if (vKey.includes("DT") || vKey.includes("Dt")) return Math.ceil(totalDosisExact / 9);
+          if (vKey.includes("Td") || vKey.includes("TT")) return Math.ceil(totalDosisExact / 9);
+          return Math.ceil(totalDosisExact / 10);
+        }
 
         function buildRekapTableForDocs(docsList, titleRekap) {
           sheet2Data.push([`=== ${titleRekap.toUpperCase()} ===`]);
@@ -3154,12 +3204,15 @@
             "No",
             "Kategori Sasaran / Usia",
             "Jenis Imunisasi / Antigen",
-            `${monthExactHeader.toUpperCase()} (L)`,
-            `${monthExactHeader.toUpperCase()} (P)`,
-            `${monthExactHeader.toUpperCase()} (TOTAL)`,
-            `${monthKumulatifHeader.toUpperCase()} (L)`,
-            `${monthKumulatifHeader.toUpperCase()} (P)`,
-            `${monthKumulatifHeader.toUpperCase()} (TOTAL)`
+            labelTglBulan, "", "",
+            labelTglKumulatif, "", "",
+            "=== LOGISTIK VAKSIN ===", "", ""
+          ]);
+          sheet2Data.push([
+            "", "", "",
+            "(L)", "(P)", "(TOTAL)",
+            "(L)", "(P)", "(TOTAL)",
+            "Total Dosis Digunakan", "Kemasan Vial/Ampul", "Estimasi Pemakaian Logistik"
           ]);
 
           const counts = {};
@@ -3189,6 +3242,7 @@
 
           let sumExL = 0, sumExP = 0, sumExTot = 0;
           let sumKumL = 0, sumKumP = 0, sumKumTot = 0;
+          let sumTotalVialLogistik = 0;
           let s2Idx = 1;
 
           activeVaccineKeys.forEach(vKey => {
@@ -3202,17 +3256,28 @@
             sumExL += c.exL; sumExP += c.exP; sumExTot += c.exTotal;
             sumKumL += c.kumL; sumKumP += c.kumP; sumKumTot += c.kumTotal;
 
+            const totalVialLogistik = calculateLogistikVial(vKey, c.exTotal);
+            sumTotalVialLogistik += totalVialLogistik;
+
+            let kemasanStr = "9 Dosis/Vial";
+            if (vKey.includes("PCV") || vKey.includes("IPV") || vKey.includes("Rotavirus")) kemasanStr = "4 Dosis/Vial";
+            else if (vKey.includes("BCG")) kemasanStr = "2-15 Dosis/Vial";
+            else if (vKey.includes("MR") || vKey.includes("Campak")) kemasanStr = "1-9 Dosis/Vial";
+            else if (vKey.includes("HPV")) kemasanStr = "1 Dosis/Vial";
+
             sheet2Data.push([
               s2Idx++, cat, vKey,
               c.exL, c.exP, c.exTotal,
-              c.kumL, c.kumP, c.kumTotal
+              c.kumL, c.kumP, c.kumTotal,
+              c.exTotal, kemasanStr, `${totalVialLogistik} Vial`
             ]);
           });
 
           sheet2Data.push([
             "", "SUBTOTAL / TOTAL", titleRekap,
             sumExL, sumExP, sumExTot,
-            sumKumL, sumKumP, sumKumTot
+            sumKumL, sumKumP, sumKumTot,
+            sumExTot, "-", `${sumTotalVialLogistik} Vial`
           ]);
           sheet2Data.push([]);
         }
@@ -3234,6 +3299,7 @@
         const ws2 = XLSX.utils.aoa_to_sheet(sheet2Data);
 
         ws1['!cols'] = headerRow1.map((_, colIdx) => {
+          if (colIdx === 0) return { wch: 4 };
           let maxLen = 10;
           sheet1Data.forEach((row, rIdx) => {
             if (rIdx < 3) return;
@@ -3244,15 +3310,16 @@
         });
 
         ws2['!cols'] = [
-          { wch: 6 },
-          { wch: 32 },
-          { wch: 25 },
-          { wch: 18 }, { wch: 18 }, { wch: 18 },
-          { wch: 22 }, { wch: 22 }, { wch: 22 }
+          { wch: 4 },
+          { wch: 30 },
+          { wch: 22 },
+          { wch: 8 }, { wch: 8 }, { wch: 10 },
+          { wch: 8 }, { wch: 8 }, { wch: 10 },
+          { wch: 22 }, { wch: 20 }, { wch: 26 }
         ];
 
         XLSX.utils.book_append_sheet(wb, ws1, "Register Kohort Matriks");
-        XLSX.utils.book_append_sheet(wb, ws2, "Rekapan Total Vaksin");
+        XLSX.utils.book_append_sheet(wb, ws2, "Rekapan Total & Logistik");
 
         const filename = `Kohort_Matriks_${desaSel}_${bln}_${thn}_${katSel}.xlsx`;
         XLSX.writeFile(wb, filename);
@@ -3369,9 +3436,9 @@
 
     async function exportDatabase() {
       try {
-        await refreshCacheGlobalData(currentAppYear);
-        const backup = { register_imunisasi: cachedGlobalKohortData, date: new Date().toISOString() };
-        
+        const snap = await getDocs(collection(db, COL_KOHORT));
+        const backup = { register_imunisasi: [], date: new Date().toISOString() };
+        snap.forEach(d => backup.register_imunisasi.push(d.data()));
         const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
         const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Backup_Kohort_Firebase_${new Date().toISOString().slice(0,10)}.json`; a.click();
       } catch (err) { alert("Gagal Backup: " + err.message); }
@@ -3419,9 +3486,7 @@
               }
             }
             status.innerHTML = `<div class="alert-banner" style="background:#D1FAE5; color:#065F46; border-color:#6EE7B7;">Sinkronisasi ${count} data berhasil!</div>`;
-            loadedYears.clear();
-            cachedGlobalKohortData = [];
-            refreshCacheGlobalData(currentAppYear);
+            refreshCacheGlobalData();
             loadRecentTransactions();
           } catch (err) { status.innerHTML = `<div class="alert-banner" style="background:#FEE2E2; color:#991B1B; border-color:#FCA5A5;">Error Import: ${err.message}</div>`; }
         };

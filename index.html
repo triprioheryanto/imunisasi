@@ -1011,6 +1011,21 @@
 
     const ALL_VAKSIN_KEYS = [...VAKSIN_ANAK_KEYS, ...VAKSIN_DEWASA_KEYS];
 
+    const ANTIGEN_GROUPS = [
+      { name: "Hepatitis B (HB-0)", group_key: "HBO", doses_per_vial: 1, unit: "Uniject", kemasan: "1 Dosis/Uniject" },
+      { name: "BCG", group_key: "BCG", doses_per_vial: 10, unit: "Vial", kemasan: "10 Dosis/Vial" },
+      { name: "DPT-HB-Hib", group_key: "DPT-HB-Hib", doses_per_vial: 4, unit: "Vial", kemasan: "4 Dosis/Vial" },
+      { name: "Polio Oral (OPV)", group_key: "OPV", doses_per_vial: 7, unit: "Vial", kemasan: "7 Dosis/Vial" },
+      { name: "PCV", group_key: "PCV", doses_per_vial: 3, unit: "Vial", kemasan: "3 Dosis/Vial" },
+      { name: "Rotavirus", group_key: "Rotavirus", doses_per_vial: 4, unit: "Vial", kemasan: "4 Dosis/Vial" },
+      { name: "Polio Suntik (IPV)", group_key: "IPV", doses_per_vial: 4, unit: "Vial", kemasan: "4 Dosis/Vial" },
+      { name: "Campak Rubela (MR)", group_key: "Campak/MR", doses_per_vial: 8, unit: "Vial", kemasan: "8 Dosis/Vial" },
+      { name: "JE", group_key: "JE", doses_per_vial: 1, unit: "Vial", kemasan: "1 Dosis/Vial" },
+      { name: "DT", group_key: "DT", doses_per_vial: 8, unit: "Vial", kemasan: "8 Dosis/Vial" },
+      { name: "Td / TT", group_key: "Td/TT", doses_per_vial: 8, unit: "Vial", kemasan: "8 Dosis/Vial" },
+      { name: "HPV", group_key: "HPV", doses_per_vial: 1, unit: "Pcs", kemasan: "1 Dosis/Pcs" }
+    ];
+
     const BULAN_NAME_MAP = {
       '01': 'Januari', '02': 'Februari', '03': 'Maret', '04': 'April',
       '05': 'Mei', '06': 'Juni', '07': 'Juli', '08': 'Agustus',
@@ -1200,6 +1215,22 @@
       if (katSel === 'CATIN') return VAKSIN_DEWASA_KEYS.slice(0, 2);
       if (katSel === 'BUMIL') return VAKSIN_DEWASA_KEYS.slice(2, 7);
       return ALL_VAKSIN_KEYS;
+    }
+
+    function getGroupKey(vKey) {
+      if (vKey.includes("HBO") || vKey.includes("HB-0") || vKey.includes("HB0")) return "HBO";
+      if (vKey.includes("DPT-HB-Hib")) return "DPT-HB-Hib";
+      if (vKey.includes("PCV")) return "PCV";
+      if (vKey.includes("OPV")) return "OPV";
+      if (vKey.includes("IPV")) return "IPV";
+      if (vKey.includes("Campak") || vKey.includes("MR")) return "Campak/MR";
+      if (vKey.includes("BCG")) return "BCG";
+      if (vKey.includes("Rotavirus")) return "Rotavirus";
+      if (vKey.includes("DT") || vKey.includes("Dt")) return "DT";
+      if (vKey.includes("Td") || vKey.includes("TT")) return "Td/TT";
+      if (vKey.includes("HPV")) return "HPV";
+      if (vKey.includes("JE")) return "JE";
+      return "LAINNYA";
     }
 
     function initUserAuthCheck() {
@@ -2030,7 +2061,7 @@
                   
                   <div class="kop-container">
                     <h3>PEMERINTAH KABUPATEN LAMANDAU</h3>
-                    <h2>DINAS KESEHATAN</h2>
+                    2<h2>DINAS KESEHATAN</h2>
                     <h1>PUSKESMAS MELATA</h1>
                     <p>Jln. Tri Setya No. 01 Ds. Melata Kec. Menthobi Raya Kab. Lamandau</p>
                   </div>
@@ -3183,63 +3214,26 @@
         sheet2Data.push([`Periode Bulan: ${labelTglBulan} | Periode Kumulatif: ${labelTglKumulatif} | Wilayah: ${desaSel === 'ALL' ? 'Semua Desa (Per Rekap Desa)' : desaSel}`]);
         sheet2Data.push([]);
 
-        function calculateLogistikVial(vKey, totalDosisExact) {
-          if (totalDosisExact <= 0) return 0;
-
-          // Single Dose (1 Dosis = 1 Uniject / Vial / Pcs)
-          if (vKey.includes("HBO") || vKey.includes("HB-0") || vKey.includes("HB0")) return totalDosisExact;
-          if (vKey.includes("HPV") || vKey.includes("JE")) return totalDosisExact;
-
-          // DPT-HB-Hib 1-4 (4 Dosis = 1 Vial)
-          if (vKey.includes("DPT-HB-Hib")) return Math.ceil(totalDosisExact / 4);
-
-          // PCV 1-3 (3 Dosis = 1 Vial)
-          if (vKey.includes("PCV")) return Math.ceil(totalDosisExact / 3);
-
-          // OPV 1-4 (1-7 Dosis = 1 Vial)
-          if (vKey.includes("OPV")) return Math.ceil(totalDosisExact / 7);
-
-          // IPV 1-2 (4 Dosis = 1 Vial)
-          if (vKey.includes("IPV")) return Math.ceil(totalDosisExact / 4);
-
-          // MR / Campak Rubela 1-2 (1-8 Dosis = 1 Vial)
-          if (vKey.includes("Campak") || vKey.includes("MR")) return Math.ceil(totalDosisExact / 8);
-
-          // BCG (1-10 Dosis = 1 Vial)
-          if (vKey.includes("BCG")) return Math.ceil(totalDosisExact / 10);
-
-          // Rotavirus 1-3 (1-4 Dosis = 1 Vial)
-          if (vKey.includes("Rotavirus")) return Math.ceil(totalDosisExact / 4);
-
-          // DT (8 Dosis = 1 Vial)
-          if (vKey.includes("DT") || vKey.includes("Dt")) return Math.ceil(totalDosisExact / 8);
-
-          // Td / TT Catin & Bumil 1-5 (2-8 Dosis = 1 Vial)
-          if (vKey.includes("Td") || vKey.includes("TT")) return Math.ceil(totalDosisExact / 8);
-
-          return Math.ceil(totalDosisExact / 10);
-        }
-
         function buildRekapTableForDocs(docsList, titleRekap) {
           sheet2Data.push([`=== ${titleRekap.toUpperCase()} ===`]);
           sheet2Data.push([
             "No",
-            "Kategori Sasaran / Usia",
-            "Jenis Imunisasi / Antigen",
+            "Nama Antigen Vaksin",
+            "Kemasan Dosis / Kemasan",
             labelTglBulan, "", "",
             labelTglKumulatif, "", "",
             "=== LOGISTIK VAKSIN ===", "", ""
           ]);
           sheet2Data.push([
             "", "", "",
-            "(L)", "(P)", "(TOTAL)",
-            "(L)", "(P)", "(TOTAL)",
-            "Total Dosis Digunakan", "Kemasan Vial/Ampul", "Estimasi Pemakaian Logistik"
+            "(L)", "(P)", "(TOTAL DOSIS)",
+            "(L)", "(P)", "(TOTAL DOSIS)",
+            "Total Dosis Terpakai", "Kebutuhan Logistik", "Estimasi Kemasan Terpakai"
           ]);
 
-          const counts = {};
-          activeVaccineKeys.forEach(v => {
-            counts[v] = {
+          const groupCounts = {};
+          ANTIGEN_GROUPS.forEach(g => {
+            groupCounts[g.group_key] = {
               exL: 0, exP: 0, exTotal: 0,
               kumL: 0, kumP: 0, kumTotal: 0
             };
@@ -3247,68 +3241,55 @@
 
           docsList.forEach(d => {
             const jk = d.jk === 'L' ? 'L' : 'P';
-            activeVaccineKeys.forEach(vKey => {
+            ALL_VAKSIN_KEYS.forEach(vKey => {
               const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
               const val = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
+              const gKey = getGroupKey(vKey);
 
-              if (isVaccineGivenExactMonth(val, thn, bln)) {
-                if (jk === 'L') counts[vKey].exL++; else counts[vKey].exP++;
-                counts[vKey].exTotal++;
-              }
-              if (isVaccineGivenUpToMonth(val, thn, bln)) {
-                if (jk === 'L') counts[vKey].kumL++; else counts[vKey].kumP++;
-                counts[vKey].kumTotal++;
+              if (groupCounts[gKey]) {
+                if (isVaccineGivenExactMonth(val, thn, bln)) {
+                  if (jk === 'L') groupCounts[gKey].exL++; else groupCounts[gKey].exP++;
+                  groupCounts[gKey].exTotal++;
+                }
+
+                if (isVaccineGivenUpToMonth(val, thn, bln)) {
+                  if (jk === 'L') groupCounts[gKey].kumL++; else groupCounts[gKey].kumP++;
+                  groupCounts[gKey].kumTotal++;
+                }
               }
             });
           });
 
           let sumExL = 0, sumExP = 0, sumExTot = 0;
           let sumKumL = 0, sumKumP = 0, sumKumTot = 0;
-          let sumTotalVialLogistik = 0;
+          let sumTotalKemasan = 0;
           let s2Idx = 1;
 
-          activeVaccineKeys.forEach(vKey => {
-            let cat = "0 - 12 Bulan (Imunisasi Dasar)";
-            const idx = ALL_VAKSIN_KEYS.indexOf(vKey);
-            if (idx >= 19 && idx <= 21) cat = "12 - 24 Bulan / Kejar Anak";
-            else if (idx >= 22 && idx <= 23) cat = "TT Calon Pengantin (Catin)";
-            else if (idx >= 24) cat = "TT Ibu Hamil (Bumil)";
-
-            const c = counts[vKey];
+          ANTIGEN_GROUPS.forEach(g => {
+            const c = groupCounts[g.group_key];
             sumExL += c.exL; sumExP += c.exP; sumExTot += c.exTotal;
             sumKumL += c.kumL; sumKumP += c.kumP; sumKumTot += c.kumTotal;
 
-            const totalVialLogistik = calculateLogistikVial(vKey, c.exTotal);
-            sumTotalVialLogistik += totalVialLogistik;
-
-            let kemasanStr = "10 Dosis/Vial";
-            if (vKey.includes("HBO") || vKey.includes("HB-0") || vKey.includes("HB0")) kemasanStr = "1 Dosis/Uniject";
-            else if (vKey.includes("DPT-HB-Hib")) kemasanStr = "4 Dosis/Vial";
-            else if (vKey.includes("PCV")) kemasanStr = "3 Dosis/Vial";
-            else if (vKey.includes("OPV")) kemasanStr = "7 Dosis/Vial";
-            else if (vKey.includes("IPV")) kemasanStr = "4 Dosis/Vial";
-            else if (vKey.includes("Campak") || vKey.includes("MR")) kemasanStr = "8 Dosis/Vial";
-            else if (vKey.includes("BCG")) kemasanStr = "10 Dosis/Vial";
-            else if (vKey.includes("Rotavirus")) kemasanStr = "4 Dosis/Vial";
-            else if (vKey.includes("DT") || vKey.includes("Dt")) kemasanStr = "8 Dosis/Vial";
-            else if (vKey.includes("Td") || vKey.includes("TT")) kemasanStr = "8 Dosis/Vial";
-            else if (vKey.includes("HPV") || vKey.includes("JE")) kemasanStr = "1 Dosis/Vial";
-
-            let unitStr = vKey.includes("HBO") || vKey.includes("HB-0") || vKey.includes("HB0") ? "Uniject" : (vKey.includes("HPV") || vKey.includes("JE") ? "Pcs" : "Vial");
+            const jumlahKemasanTerpakai = Math.ceil(c.exTotal / g.doses_per_vial);
+            sumTotalKemasan += jumlahKemasanTerpakai;
 
             sheet2Data.push([
-              s2Idx++, cat, vKey,
+              s2Idx++,
+              g.name,
+              g.kemasan,
               c.exL, c.exP, c.exTotal,
               c.kumL, c.kumP, c.kumTotal,
-              c.exTotal, kemasanStr, `${totalVialLogistik} ${unitStr}`
+              c.exTotal,
+              g.unit,
+              `${jumlahKemasanTerpakai} ${g.unit}`
             ]);
           });
 
           sheet2Data.push([
-            "", "SUBTOTAL / TOTAL", titleRekap,
+            "", "SUBTOTAL / TOTAL", "-",
             sumExL, sumExP, sumExTot,
             sumKumL, sumKumP, sumKumTot,
-            sumExTot, "-", `${sumTotalVialLogistik} Vial/Uniject`
+            sumExTot, "-", `${sumTotalKemasan} Vial/Uniject/Pcs`
           ]);
           sheet2Data.push([]);
         }
@@ -3342,11 +3323,11 @@
 
         ws2['!cols'] = [
           { wch: 4 },
-          { wch: 30 },
-          { wch: 22 },
-          { wch: 8 }, { wch: 8 }, { wch: 10 },
-          { wch: 8 }, { wch: 8 }, { wch: 10 },
-          { wch: 22 }, { wch: 20 }, { wch: 26 }
+          { wch: 26 },
+          { wch: 20 },
+          { wch: 8 }, { wch: 8 }, { wch: 14 },
+          { wch: 8 }, { wch: 8 }, { wch: 14 },
+          { wch: 20 }, { wch: 18 }, { wch: 26 }
         ];
 
         XLSX.utils.book_append_sheet(wb, ws1, "Register Kohort Matriks");

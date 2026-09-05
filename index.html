@@ -325,7 +325,7 @@
       <button class="tab" data-tab="import" onclick="switchTab(event)"><i class="fas fa-upload"></i> IMPORT</button>
       <button class="tab" data-tab="catchup" onclick="switchTab(event)"><i class="fas fa-exclamation-circle" style="color:#ffc107;"></i> CATCH UP</button>
       <button class="tab" data-tab="kumulatif" onclick="switchTab(event)"><i class="fas fa-chart-line"></i> KUMULATIF</button>
-      <button class="tab" data-tab="capaian" onclick="switchTab(event)"><i class="fas fa-award" style="color:#10B981;"></i> CAPAIAN</button>
+      <button class="tab" data-tab="capaian" onclick="switchTab(event)"><i class="fas fa-award" style="color:#10B981;"></i> CAPAIAN & ADMIN</button>
     </div>
   </header>
 
@@ -629,7 +629,7 @@
     <section id="export" class="tab-panel" style="display:none">
       <div class="card">
         <h2><i class="fas fa-file-export" style="color:var(--info)"></i> Ekspor Data Spesifik</h2>
-        <p class="lead">Ekspor data register kohort desa/bulan/tahun tertentu dalam format **Excel (.xlsx) 2 Sheet**.</p>
+        <p class="lead">Ekspor data register kohort desa/bulan/tahun tertentu dalam format **Excel (.xlsx) 3 Sheet** (Sheet 1: Kohort Matriks, Sheet 2: Rekap Dosis Penggunaan, Sheet 3: Rekap Logistik Kemasan Vaksin).</p>
 
         <div class="grid">
           <div class="form-group">
@@ -688,7 +688,7 @@
 
         <div class="actions">
           <button class="btn btn-primary" id="btnExportFilteredJSON"><i class="fas fa-download"></i> Ekspor JSON</button>
-          <button class="btn btn-success" id="btnExportFilteredExcel"><i class="fas fa-file-excel"></i> Ekspor Excel (.xlsx)</button>
+          <button class="btn btn-success" id="btnExportFilteredExcel"><i class="fas fa-file-excel"></i> Ekspor Excel 3 Sheet (.xlsx)</button>
         </div>
       </div>
 
@@ -840,7 +840,7 @@
 
         <div class="actions">
           <button class="btn btn-primary" id="btnApplyFilter"><i class="fas fa-search"></i> Hitung Laporan</button>
-          <button class="btn btn-success" id="btnDownloadExcelFilter"><i class="fas fa-file-excel"></i> Download Excel 2 Sheet</button>
+          <button class="btn btn-success" id="btnDownloadExcelFilter"><i class="fas fa-file-excel"></i> Download Excel 3 Sheet</button>
         </div>
       </div>
 
@@ -852,57 +852,76 @@
       </div>
     </section>
 
-    <!-- TAB 7: CAPAIAN -->
+    <!-- TAB 7: CAPAIAN & MODE ADMIN -->
     <section id="capaian" class="tab-panel" style="display:none">
       <div class="card" style="background:#FFFBEB; border:1.5px solid #FCD34D;">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
           <div>
-            <h3 style="margin:0; color:#92400E; font-size:0.95rem;"><i class="fas fa-lock"></i> Target Sasaran (Khusus Admin)</h3>
+            <h3 style="margin:0; color:#92400E; font-size:0.95rem;"><i class="fas fa-lock"></i> Pengaturan Admin (Target Sasaran & Logika Kemasan Vaksin)</h3>
           </div>
           <button class="btn btn-warning" onclick="toggleFormAdminSasaran()" style="padding:4px 8px; font-size:0.78rem;"><i class="fas fa-user-lock"></i> Pengaturan Admin</button>
         </div>
 
-        <form id="formTargetSasaran" style="display:none; margin-top:12px; border-top:1px dashed #FCD34D; padding-top:12px;">
-          <div class="grid">
-            <div class="form-group">
-              <label>Desa <span class="req">*</span></label>
-              <select id="sas_desa" required>
-                <option value="Melata">Melata</option>
-                <option value="Nanuah">Nanuah</option>
-                <option value="Topalan">Topalan</option>
-                <option value="Batu Ampar">Batu Ampar</option>
-                <option value="Lubuk Hiju">Lubuk Hiju</option>
-                <option value="Bukit Makmur">Bukit Makmur</option>
-                <option value="Bukit Raya">Bukit Raya</option>
-                <option value="Modang Mas">Modang Mas</option>
-                <option value="Mukti Manunggal">Mukti Manunggal</option>
-                <option value="Sumber Jaya">Sumber Jaya</option>
-                <option value="Bukit Harum">Bukit Harum</option>
-                <option value="PT. TSA">PT. TSA</option>
-                <option value="PT. SHS">PT. SHS</option>
-              </select>
+        <div id="panelAdminPengaturan" style="display:none; margin-top:12px; border-top:1px dashed #FCD34D; padding-top:12px;">
+          
+          <h4 style="color:#92400E; margin-bottom:8px;"><i class="fas fa-bullseye"></i> 1. Form Target Sasaran Wilayah</h4>
+          <form id="formTargetSasaran">
+            <div class="grid">
+              <div class="form-group">
+                <label>Desa <span class="req">*</span></label>
+                <select id="sas_desa" required>
+                  <option value="Melata">Melata</option>
+                  <option value="Nanuah">Nanuah</option>
+                  <option value="Topalan">Topalan</option>
+                  <option value="Batu Ampar">Batu Ampar</option>
+                  <option value="Lubuk Hiju">Lubuk Hiju</option>
+                  <option value="Bukit Makmur">Bukit Makmur</option>
+                  <option value="Bukit Raya">Bukit Raya</option>
+                  <option value="Modang Mas">Modang Mas</option>
+                  <option value="Mukti Manunggal">Mukti Manunggal</option>
+                  <option value="Sumber Jaya">Sumber Jaya</option>
+                  <option value="Bukit Harum">Bukit Harum</option>
+                  <option value="PT. TSA">PT. TSA</option>
+                  <option value="PT. SHS">PT. SHS</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Tahun <span class="req">*</span></label>
+                <input type="number" id="sas_tahun" value="2026" required>
+              </div>
+              <div class="form-group">
+                <label>Target Bayi <span class="req">*</span></label>
+                <input type="number" id="sas_target_bayi" placeholder="Jumlah sasaran bayi" required>
+              </div>
+              <div class="form-group">
+                <label>Target Baduta <span class="req">*</span></label>
+                <input type="number" id="sas_target_baduta" placeholder="Jumlah sasaran baduta" required>
+              </div>
+              <div class="form-group full-width">
+                <label>Target BIAS <span class="req">*</span></label>
+                <input type="number" id="sas_target_bias" placeholder="Jumlah sasaran anak sekolah BIAS" required>
+              </div>
             </div>
-            <div class="form-group">
-              <label>Tahun <span class="req">*</span></label>
-              <input type="number" id="sas_tahun" value="2026" required>
+            <div class="actions" style="margin-bottom:20px;">
+              <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Simpan Target Sasaran</button>
             </div>
-            <div class="form-group">
-              <label>Target Bayi <span class="req">*</span></label>
-              <input type="number" id="sas_target_bayi" placeholder="Jumlah sasaran bayi" required>
+          </form>
+
+          <hr style="border:0; border-top:1px dashed #FCD34D; margin:16px 0;">
+
+          <h4 style="color:#92400E; margin-bottom:8px;"><i class="fas fa-box"></i> 2. Pengaturan Logika Konsumsi & Kemasan Vaksin (Vial/Uniject/Pcs)</h4>
+          <p style="font-size:0.78rem; color:#78350F; margin-top:0;">Jika terjadi perubahan ketersediaan kemasan merek vaksin dari pusat (misalnya 1 vial DPT berubah jadi 2 dosis atau 5 dosis), ubah nilainya di bawah lalu simpan:</p>
+
+          <form id="formLogikaVaksinAdmin">
+            <div class="grid" id="gridLogikaVaksinContainer">
+              <!-- Render otomatis via JS -->
             </div>
-            <div class="form-group">
-              <label>Target Baduta <span class="req">*</span></label>
-              <input type="number" id="sas_target_baduta" placeholder="Jumlah sasaran baduta" required>
+            <div class="actions">
+              <button type="submit" class="btn btn-warning"><i class="fas fa-sliders"></i> Simpan Aturan Kemasan Vaksin</button>
             </div>
-            <div class="form-group full-width">
-              <label>Target BIAS <span class="req">*</span></label>
-              <input type="number" id="sas_target_bias" placeholder="Jumlah sasaran anak sekolah BIAS" required>
-            </div>
-          </div>
-          <div class="actions">
-            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Simpan Target</button>
-          </div>
-        </form>
+          </form>
+
+        </div>
       </div>
 
       <div class="card">
@@ -1011,7 +1030,7 @@
 
     const ALL_VAKSIN_KEYS = [...VAKSIN_ANAK_KEYS, ...VAKSIN_DEWASA_KEYS];
 
-    const ANTIGEN_GROUPS = [
+    let ANTIGEN_GROUPS = [
       { name: "Hepatitis B (HB-0)", group_key: "HBO", doses_per_vial: 1, unit: "Uniject", kemasan: "1 Dosis/Uniject" },
       { name: "BCG", group_key: "BCG", doses_per_vial: 10, unit: "Vial", kemasan: "10 Dosis/Vial" },
       { name: "DPT-HB-Hib", group_key: "DPT-HB-Hib", doses_per_vial: 4, unit: "Vial", kemasan: "4 Dosis/Vial" },
@@ -1233,6 +1252,76 @@
       return "LAINNYA";
     }
 
+    async function loadLogikaVaksinSettings() {
+      try {
+        const snap = await getDocs(collection(db, COL_TARGET));
+        snap.forEach(d => {
+          if (d.id === 'CONFIG_LOGIKA_VAKSIN' || d.id === 'config_logika_vaksin') {
+            const data = d.data();
+            if (data.antigen_groups) {
+              ANTIGEN_GROUPS = data.antigen_groups;
+            }
+          }
+        });
+      } catch (e) {
+        console.error("Gagal load setting logika kemasan:", e);
+      }
+      renderGridLogikaVaksinAdmin();
+    }
+
+    function renderGridLogikaVaksinAdmin() {
+      const container = document.getElementById('gridLogikaVaksinContainer');
+      if (!container) return;
+
+      let html = '';
+      ANTIGEN_GROUPS.forEach((g, idx) => {
+        html += `
+          <div class="form-group" style="background:#FFF; padding:10px; border-radius:8px; border:1px solid #FCD34D;">
+            <label style="color:#92400E; font-size:0.8rem;">${g.name} (${g.group_key})</label>
+            <div style="display:flex; gap:6px;">
+              <input type="number" id="vax_dose_${idx}" value="${g.doses_per_vial}" min="1" max="100" style="width:70px; text-align:center;" title="Kapasitas Dosis Per Vial">
+              <input type="text" id="vax_unit_${idx}" value="${g.unit}" style="width:80px;" title="Satuan Logistik">
+              <input type="text" id="vax_kemasan_${idx}" value="${g.kemasan}" title="Label Kemasan">
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    async function handleSaveLogikaVaksinAdmin(e) {
+      e.preventDefault();
+      if (activePetugasName !== AUTH_ADMIN_USER) {
+        return alert("🔒 Hanya Admin yang berhak merubah Logika Kemasan Vaksin!");
+      }
+
+      const newGroups = ANTIGEN_GROUPS.map((g, idx) => {
+        const doseVal = parseInt(document.getElementById(`vax_dose_${idx}`).value) || 1;
+        const unitVal = document.getElementById(`vax_unit_${idx}`).value.trim() || "Vial";
+        const kemasanVal = document.getElementById(`vax_kemasan_${idx}`).value.trim() || `${doseVal} Dosis/Vial`;
+
+        return {
+          ...g,
+          doses_per_vial: doseVal,
+          unit: unitVal,
+          kemasan: kemasanVal
+        };
+      });
+
+      try {
+        await setDoc(doc(db, COL_TARGET, 'CONFIG_LOGIKA_VAKSIN'), {
+          antigen_groups: newGroups,
+          updated_by: activePetugasName,
+          updated_at: new Date().toISOString()
+        }, { merge: true });
+
+        ANTIGEN_GROUPS = newGroups;
+        alert("✅ Logika kemasan/dosis vaksin diperbarui & tersimpan!");
+      } catch (err) {
+        alert("Gagal menyimpan aturan kemasan: " + err.message);
+      }
+    }
+
     function initUserAuthCheck() {
       const savedUser = localStorage.getItem('pkm_app_username');
       if (savedUser) {
@@ -1320,6 +1409,7 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       initUserAuthCheck();
+      loadLogikaVaksinSettings();
 
       const today = new Date().toISOString().split('T')[0];
       document.getElementById('reg_tgl_pelayanan').value = today;
@@ -1337,13 +1427,14 @@
       document.getElementById('btnStartImport').addEventListener('click', startImport);
 
       document.getElementById('btnApplyFilter').addEventListener('click', loadReviewDetail);
-      document.getElementById('btnDownloadExcelFilter').addEventListener('click', downloadExcel2Sheets);
+      document.getElementById('btnDownloadExcelFilter').addEventListener('click', downloadExcel3Sheets);
 
       document.getElementById('btnApplyCatchUp').addEventListener('click', loadCatchUpAnalysis);
       document.getElementById('btnDownloadCatchUpExcel').addEventListener('click', downloadCatchUpExcel);
 
       document.getElementById('btnHitungCapaian').addEventListener('click', loadCapanTabContent);
       document.getElementById('formTargetSasaran').addEventListener('submit', handleSaveTargetSasaran);
+      document.getElementById('formLogikaVaksinAdmin').addEventListener('submit', handleSaveLogikaVaksinAdmin);
 
       document.getElementById('search_desa_anak').addEventListener('change', (e) => {
         currentInputDesa = e.target.value;
@@ -1362,7 +1453,7 @@
       setupLiveSearchAndDuplicateDetection();
 
       document.getElementById('btnExportFilteredJSON').addEventListener('click', () => doExportFiltered('json'));
-      document.getElementById('btnExportFilteredExcel').addEventListener('click', downloadExcel2Sheets);
+      document.getElementById('btnExportFilteredExcel').addEventListener('click', downloadExcel3Sheets);
 
       initBiasDropdowns();
       applyPeranUIFilter();
@@ -2061,7 +2152,7 @@
                   
                   <div class="kop-container">
                     <h3>PEMERINTAH KABUPATEN LAMANDAU</h3>
-                    2<h2>DINAS KESEHATAN</h2>
+                    <h2>DINAS KESEHATAN</h2>
                     <h1>PUSKESMAS MELATA</h1>
                     <p>Jln. Tri Setya No. 01 Ds. Melata Kec. Menthobi Raya Kab. Lamandau</p>
                   </div>
@@ -2291,8 +2382,8 @@
       if (activePetugasName !== AUTH_ADMIN_USER) {
         return alert("🔒 Fitur ini hanya dapat diakses oleh Admin!");
       }
-      const form = document.getElementById('formTargetSasaran');
-      form.style.display = form.style.display === 'none' ? 'block' : 'none';
+      const panel = document.getElementById('panelAdminPengaturan');
+      panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
     };
 
     async function handleSaveTargetSasaran(e) {
@@ -3089,7 +3180,7 @@
       } catch (err) { container.innerHTML = `<p style="color:red; text-align:center;">Error: ${err.message}</p>`; }
     }
 
-    async function downloadExcel2Sheets() {
+    async function downloadExcel3Sheets() {
       const thn = document.getElementById('filter_tahun').value || document.getElementById('exp_filter_tahun').value;
       const bln = document.getElementById('filter_bulan').value || document.getElementById('exp_filter_bulan').value;
       const desaSel = document.getElementById('filter_desa').value || document.getElementById('exp_filter_desa').value;
@@ -3144,6 +3235,7 @@
           allDocsInDb.push(doc.data());
         });
 
+        // ==================== SHEET 1: KOHORT MATRIKS ====================
         let filteredDocsForSheet1 = allDocsInDb.filter(d => {
           const matchDesa = (desaSel === 'ALL' || (d.desa && d.desa.toLowerCase() === desaSel.toLowerCase()));
           let hasMatchingVaccine = false;
@@ -3209,26 +3301,113 @@
         totalRow1.push("");
         sheet1Data.push(totalRow1);
 
+        // ==================== SHEET 2: REKAPAN TOTAL PENERIMA VAKSIN (DETAIL PER DOSIS) ====================
         const sheet2Data = [];
-        sheet2Data.push([`REKAPITULASI TOTAL PENERIMA VAKSIN & ESTIMASI PEMAKAIAN LOGISTIK - PUSKESMAS MELATA`]);
+        sheet2Data.push([`REKAPITULASI TOTAL PENERIMA VAKSIN (RINCIAN DOSIS) - PUSKESMAS MELATA`]);
         sheet2Data.push([`Periode Bulan: ${labelTglBulan} | Periode Kumulatif: ${labelTglKumulatif} | Wilayah: ${desaSel === 'ALL' ? 'Semua Desa (Per Rekap Desa)' : desaSel}`]);
         sheet2Data.push([]);
 
-        function buildRekapTableForDocs(docsList, titleRekap) {
+        function buildRekapSheet2Detail(docsList, titleRekap) {
           sheet2Data.push([`=== ${titleRekap.toUpperCase()} ===`]);
           sheet2Data.push([
             "No",
-            "Nama Antigen Vaksin",
-            "Kemasan Dosis / Kemasan",
+            "Kategori Sasaran / Usia",
+            "Jenis Imunisasi / Dosis Antigen",
             labelTglBulan, "", "",
-            labelTglKumulatif, "", "",
-            "=== LOGISTIK VAKSIN ===", "", ""
+            labelTglKumulatif, "", ""
           ]);
           sheet2Data.push([
             "", "", "",
             "(L)", "(P)", "(TOTAL DOSIS)",
+            "(L)", "(P)", "(TOTAL DOSIS)"
+          ]);
+
+          const counts = {};
+          activeVaccineKeys.forEach(v => {
+            counts[v] = { exL: 0, exP: 0, exTotal: 0, kumL: 0, kumP: 0, kumTotal: 0 };
+          });
+
+          docsList.forEach(d => {
+            const jk = d.jk === 'L' ? 'L' : 'P';
+            activeVaccineKeys.forEach(vKey => {
+              const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
+              const val = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
+
+              if (isVaccineGivenExactMonth(val, thn, bln)) {
+                if (jk === 'L') counts[vKey].exL++; else counts[vKey].exP++;
+                counts[vKey].exTotal++;
+              }
+
+              if (isVaccineGivenUpToMonth(val, thn, bln)) {
+                if (jk === 'L') counts[vKey].kumL++; else counts[vKey].kumP++;
+                counts[vKey].kumTotal++;
+              }
+            });
+          });
+
+          let sumExL = 0, sumExP = 0, sumExTot = 0;
+          let sumKumL = 0, sumKumP = 0, sumKumTot = 0;
+          let s2Idx = 1;
+
+          activeVaccineKeys.forEach(vKey => {
+            let cat = "0 - 12 Bulan (Imunisasi Dasar)";
+            const idx = ALL_VAKSIN_KEYS.indexOf(vKey);
+            if (idx >= 19 && idx <= 21) cat = "12 - 24 Bulan / Kejar Anak";
+            else if (idx >= 22 && idx <= 23) cat = "TT Calon Pengantin (Catin)";
+            else if (idx >= 24) cat = "TT Ibu Hamil (Bumil)";
+
+            const c = counts[vKey];
+            sumExL += c.exL; sumExP += c.exP; sumExTot += c.exTotal;
+            sumKumL += c.kumL; sumKumP += c.kumP; sumKumTot += c.kumTotal;
+
+            sheet2Data.push([
+              s2Idx++, cat, vKey,
+              c.exL, c.exP, c.exTotal,
+              c.kumL, c.kumP, c.kumTotal
+            ]);
+          });
+
+          sheet2Data.push([
+            "", "SUBTOTAL / TOTAL DOSIS", titleRekap,
+            sumExL, sumExP, sumExTot,
+            sumKumL, sumKumP, sumKumTot
+          ]);
+          sheet2Data.push([]);
+        }
+
+        if (desaSel === 'ALL') {
+          ALL_DESA_LIST.forEach(dName => {
+            const desaDocs = allDocsInDb.filter(d => d.desa && d.desa.toLowerCase() === dName.toLowerCase());
+            buildRekapSheet2Detail(desaDocs, `Rekap Penerima Dosis - ${dName}`);
+          });
+
+          buildRekapSheet2Detail(allDocsInDb, "Rekap Penerima Dosis Total Seluruh Desa");
+        } else {
+          const desaDocs = allDocsInDb.filter(d => d.desa && d.desa.toLowerCase() === desaSel.toLowerCase());
+          buildRekapSheet2Detail(desaDocs, `Rekap Penerima Dosis - ${desaSel}`);
+        }
+
+        // ==================== SHEET 3: REKAPAN LOGISTIK VAKSIN (RINGKASAN KEMASAN TERPAKAI) ====================
+        const sheet3Data = [];
+        sheet3Data.push([`REKAPITULASI PEMAKAIAN LOGISTIK VAKSIN - PUSKESMAS MELATA`]);
+        sheet3Data.push([`Periode Bulan: ${labelTglBulan} | Periode Kumulatif: ${labelTglKumulatif} | Wilayah: ${desaSel === 'ALL' ? 'Semua Desa (Per Rekap Desa)' : desaSel}`]);
+        sheet3Data.push([]);
+
+        function buildRekapSheet3Logistik(docsList, titleRekap) {
+          sheet3Data.push([`=== ${titleRekap.toUpperCase()} ===`]);
+          sheet3Data.push([
+            "No",
+            "Kelompok Antigen Vaksin",
+            "Kemasan Standar / Dosis",
+            labelTglBulan, "", "",
+            labelTglKumulatif, "", "",
+            "=== ESTIMASI KEMASAN TERPAKAI ===", "", ""
+          ]);
+          sheet3Data.push([
+            "", "", "",
             "(L)", "(P)", "(TOTAL DOSIS)",
-            "Total Dosis Terpakai", "Kebutuhan Logistik", "Estimasi Kemasan Terpakai"
+            "(L)", "(P)", "(TOTAL DOSIS)",
+            "Total Dosis Terpakai", "Kebutuhan Satuan", "Estimasi Kemasan Terpakai (Desa)"
           ]);
 
           const groupCounts = {};
@@ -3263,7 +3442,7 @@
           let sumExL = 0, sumExP = 0, sumExTot = 0;
           let sumKumL = 0, sumKumP = 0, sumKumTot = 0;
           let sumTotalKemasan = 0;
-          let s2Idx = 1;
+          let s3Idx = 1;
 
           ANTIGEN_GROUPS.forEach(g => {
             const c = groupCounts[g.group_key];
@@ -3273,8 +3452,8 @@
             const jumlahKemasanTerpakai = Math.ceil(c.exTotal / g.doses_per_vial);
             sumTotalKemasan += jumlahKemasanTerpakai;
 
-            sheet2Data.push([
-              s2Idx++,
+            sheet3Data.push([
+              s3Idx++,
               g.name,
               g.kemasan,
               c.exL, c.exP, c.exTotal,
@@ -3285,30 +3464,31 @@
             ]);
           });
 
-          sheet2Data.push([
-            "", "SUBTOTAL / TOTAL", "-",
+          sheet3Data.push([
+            "", "SUBTOTAL / TOTAL LOGISTIK", "-",
             sumExL, sumExP, sumExTot,
             sumKumL, sumKumP, sumKumTot,
             sumExTot, "-", `${sumTotalKemasan} Vial/Uniject/Pcs`
           ]);
-          sheet2Data.push([]);
+          sheet3Data.push([]);
         }
 
         if (desaSel === 'ALL') {
           ALL_DESA_LIST.forEach(dName => {
             const desaDocs = allDocsInDb.filter(d => d.desa && d.desa.toLowerCase() === dName.toLowerCase());
-            buildRekapTableForDocs(desaDocs, `Rekap ${dName}`);
+            buildRekapSheet3Logistik(desaDocs, `Logistik Vaksin - ${dName}`);
           });
 
-          buildRekapTableForDocs(allDocsInDb, "Rekap Total Seluruh Desa");
+          buildRekapSheet3Logistik(allDocsInDb, "Logistik Vaksin Total Seluruh Desa");
         } else {
           const desaDocs = allDocsInDb.filter(d => d.desa && d.desa.toLowerCase() === desaSel.toLowerCase());
-          buildRekapTableForDocs(desaDocs, `Rekap ${desaSel}`);
+          buildRekapSheet3Logistik(desaDocs, `Logistik Vaksin - ${desaSel}`);
         }
 
         const wb = XLSX.utils.book_new();
         const ws1 = XLSX.utils.aoa_to_sheet(sheet1Data);
         const ws2 = XLSX.utils.aoa_to_sheet(sheet2Data);
+        const ws3 = XLSX.utils.aoa_to_sheet(sheet3Data);
 
         ws1['!cols'] = headerRow1.map((_, colIdx) => {
           if (colIdx === 0) return { wch: 4 };
@@ -3323,6 +3503,14 @@
 
         ws2['!cols'] = [
           { wch: 4 },
+          { wch: 30 },
+          { wch: 22 },
+          { wch: 8 }, { wch: 8 }, { wch: 14 },
+          { wch: 8 }, { wch: 8 }, { wch: 14 }
+        ];
+
+        ws3['!cols'] = [
+          { wch: 4 },
           { wch: 26 },
           { wch: 20 },
           { wch: 8 }, { wch: 8 }, { wch: 14 },
@@ -3331,7 +3519,8 @@
         ];
 
         XLSX.utils.book_append_sheet(wb, ws1, "Register Kohort Matriks");
-        XLSX.utils.book_append_sheet(wb, ws2, "Rekapan Total & Logistik");
+        XLSX.utils.book_append_sheet(wb, ws2, "Rekapan Total Penerima");
+        XLSX.utils.book_append_sheet(wb, ws3, "Rekapan Logistik Vaksin");
 
         const filename = `Kohort_Matriks_${desaSel}_${bln}_${thn}_${katSel}.xlsx`;
         XLSX.writeFile(wb, filename);
@@ -3341,7 +3530,7 @@
 
     async function doExportFiltered(format) {
       if (format === 'json') exportDatabase();
-      else downloadExcel2Sheets();
+      else downloadExcel3Sheets();
     }
 
     function initBiasDropdowns() {

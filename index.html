@@ -3304,8 +3304,7 @@
         sheet1Data.push(totalRow1);
 
 
-        // ==================== SHEET 2: REKAPITULASI CAPAIAN (SAMA SEPERTI MODEL LAPORAN RESMI) ====================
-        // TANPA KOLOM KATEGORI USIA SASARAN & TANPA PERSENTASE
+        // ==================== SHEET 2: REKAPITULASI CAPAIAN (DENGAN MERGE HEADER, STYLING BORDER, & ZEBRA) ====================
         const sheet2Data = [
           ["LAPORAN BULANAN HASIL IMUNISASI RUTIN BAYI PUSKESMAS"],
           ["Puskesmas:", "Melata"],
@@ -3315,28 +3314,15 @@
           []
         ];
 
-        sheet2Data.push([
-          "NO", "DESA / KELURAHAN",
-          "HB0 (<24 JAM)", "", "",
-          "HB0 (1-7 HARI)", "", "",
-          "BCG", "", "",
-          "OPV 1", "", "",
-          "DPT-HB-Hib 1", "", "",
-          "OPV 2", "", "",
-          "PCV 1", "", "",
-          "Rotavirus 1", "", "",
-          "DPT-HB-Hib 2", "", "",
-          "OPV 3", "", "",
-          "PCV 2", "", "",
-          "Rotavirus 2", "", "",
-          "DPT-HB-Hib 3", "", "",
-          "OPV 4", "", "",
-          "IPV 1", "", "",
-          "Rotavirus 3", "", "",
-          "Campak Rubela 1", "", "",
-          "IPV 2", "", ""
-        ]);
+        // Baris 6: Main Header (Index Row 6)
+        const rowHeaderMain = ["NO", "DESA / KELURAHAN"];
+        const vaccineNames18 = VAKSIN_ANAK_KEYS.slice(0, 18);
+        vaccineNames18.forEach(vKey => {
+          rowHeaderMain.push(vKey, "", "");
+        });
+        sheet2Data.push(rowHeaderMain);
 
+        // Baris 7: Sub Header L/P/JUMLAH (Index Row 7)
         const subHeaderRow = ["", ""];
         for (let i = 0; i < 18; i++) {
           subHeaderRow.push("L", "P", "JUMLAH");
@@ -3345,14 +3331,13 @@
 
         const desasToProcess = desaSel === 'ALL' ? ALL_DESA_LIST : [desaSel];
         let idxDesa = 1;
-
         const grandTotals = Array(18 * 3).fill(0);
 
         desasToProcess.forEach(dName => {
           const desaDocs = allDocsInDb.filter(d => d.desa && d.desa.toLowerCase() === dName.toLowerCase());
           const row = [idxDesa++, dName];
 
-          VAKSIN_ANAK_KEYS.slice(0, 18).forEach((vKey, vIdx) => {
+          vaccineNames18.forEach((vKey, vIdx) => {
             let countL = 0, countP = 0;
 
             desaDocs.forEach(d => {
@@ -3427,11 +3412,85 @@
         });
 
 
-        // ==================== PROSES EXPORT & AUTO FIT LEBAR KOLOM ====================
+        // ==================== PROSES EXPORT, MERGING, STYLING & FREEZE PANES ====================
         const wb = XLSX.utils.book_new();
         const ws1 = XLSX.utils.aoa_to_sheet(sheet1Data);
         const ws2 = XLSX.utils.aoa_to_sheet(sheet2Data);
         const ws3 = XLSX.utils.aoa_to_sheet(sheet3Data);
+
+        // 1. DARI MERGE HEADER PADA SHEET 2 (KUMULATIF)
+        const merges2 = [
+          // Merge vertical No & Nama Desa
+          { s: { r: 6, c: 0 }, e: { r: 7, c: 0 } },
+          { s: { r: 6, c: 1 }, e: { r: 7, c: 1 } }
+        ];
+
+        // Merge horizontal tiap antigen (3 kolom per antigen: L, P, Total)
+        for (let i = 0; i < 18; i++) {
+          const colStart = 2 + (i * 3);
+          merges2.push({
+            s: { r: 6, c: colStart },
+            e: { r: 6, c: colStart + 2 }
+          });
+        }
+        ws2['!merges'] = merges2;
+
+        // 2. FREEZE PANES PADA SHEET 2 (Bekukan Kolom NO & Nama Desa, serta Header)
+        ws2['!freeze'] = { xSplit: 2, ySplit: 8 };
+
+        // 3. AUTO FIT LEBAR KOLOM KHUSUS UNTUK SHEET 2 (Sesuai Kebutuhan Presisi)
+        const colsWidthSheet2 = [
+          { wch: 6 },   // Kolom 0: NO (dikecilkan agar presisi)
+          { wch: 22 }  // Kolom 1: DESA / KELURAHAN
+        ];
+        // Sub-kolom L, P, JUMLAH diberi lebar standar 8
+        for (let i = 0; i < 18 * 3; i++) {
+          colsWidthSheet2.push({ wch: 8 });
+        }
+        ws2['!cols'] = colsWidthSheet2;
+
+        // 4. BORDERS, ALIGNMENT & TWO-TONE ZEBRA STRIPING PADA SHEET 2
+        const thinBorder = {
+          top: { style: "thin", color: { rgb: "D1D5DB" } },
+          bottom: { style: "thin", color: { rgb: "D1D5DB" } },
+          left: { style: "thin", color: { rgb: "D1D5DB" } },
+          right: { style: "thin", color: { rgb: "D1D5DB" } }
+        };
+
+        const range2 = XLSX.utils.decode_range(ws2['!ref']);
+        for (let R = range2.s.r; R <= range2.e.r; ++R) {
+          // Hanya beri styling khusus mulai dari header tabel (baris 6 ke bawah)
+          if (R < 6) continue;
+
+          for (let C = range2.s.c; C <= range2.e.c; ++C) {
+            const cell_address = XLSX.utils.encode_cell({ r: R, c: C });
+            if (!ws2[cell_address]) {
+              ws2[cell_address] = { v: "" };
+            }
+
+            const cell = ws2[cell_address];
+            cell.s = cell.s || {};
+            cell.s.border = thinBorder;
+
+            if (R === 6 || R === 7) {
+              // Styling Header
+              cell.s.fill = { fgColor: { rgb: "003366" } };
+              cell.s.font = { name: "Calibri", sz: 10, bold: true, color: { rgb: "FFFFFF" } };
+              cell.s.alignment = { horizontal: "center", vertical: "center", wrapText: true };
+            } else if (R === range2.e.r) {
+              // Styling Total Footer
+              cell.s.fill = { fgColor: { rgb: "E2E8F0" } };
+              cell.s.font = { name: "Calibri", sz: 10, bold: true };
+              cell.s.alignment = { horizontal: C <= 1 ? "left" : "center", vertical: "center" };
+            } else {
+              // Two-tone Zebra Striping untuk baris data
+              const isEvenRow = (R % 2 === 0);
+              cell.s.fill = { fgColor: { rgb: isEvenRow ? "F1F5F9" : "FFFFFF" } };
+              cell.s.font = { name: "Calibri", sz: 10 };
+              cell.s.alignment = { horizontal: C === 1 ? "left" : "center", vertical: "center" };
+            }
+          }
+        }
 
         function autoFitColumns(dataArray, minWidth = 8, maxWidth = 35) {
           const colWidths = [];
@@ -3445,13 +3504,13 @@
             });
           });
 
-          return colWidths.map(w => ({
-            wch: Math.min(Math.max(w + 3, minWidth), maxWidth)
-          }));
+          return colWidths.map((w, idx) => {
+            if (idx === 0) return { wch: 6 }; // Kolom NO kecil
+            return { wch: Math.min(Math.max(w + 3, minWidth), maxWidth) };
+          });
         }
 
         ws1['!cols'] = autoFitColumns(sheet1Data, 10, 30);
-        ws2['!cols'] = autoFitColumns(sheet2Data, 6, 22);
         ws3['!cols'] = autoFitColumns(sheet3Data, 10, 32);
 
         XLSX.utils.book_append_sheet(wb, ws1, "Kohort Matriks");
@@ -3459,7 +3518,7 @@
         XLSX.utils.book_append_sheet(wb, ws3, "Rekap Logistik Vaksin");
 
         XLSX.writeFile(wb, `Laporan_Imunisasi_Puskesmas_Melata_${monthNameStr}_${thn}.xlsx`);
-        alert("✅ File Excel berhasil diunduh dengan tampilan rapi!");
+        alert("✅ File Excel berhasil diunduh dengan tabel, zebra striping, dan freeze column yang rapi!");
 
       } catch (err) {
         alert("Gagal mengunduh file Excel: " + err.message);

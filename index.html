@@ -118,7 +118,7 @@
     label { font-weight: 700; color: #334155; margin-bottom: 6px; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; }
     .req { color: var(--danger); font-weight: 800; }
 
-    input[type="text"], input[type="password"], input[type="number"], input[type="date"], input[type="month"], select, textarea, input[type="file"], input[type="tel"] {
+    input[type="text"], input[type="password"], input[type="number"], input[type="date"], select, textarea, input[type="file"], input[type="tel"] {
       width: 100%; padding: 10px 12px; border-radius: 8px; border: 1.5px solid var(--border-color);
       background: #F8FAFC; font-size: 0.88rem; font-family: inherit; outline: none; transition: all 0.2s ease;
       color: var(--text-dark); font-weight: 500;
@@ -143,7 +143,6 @@
       padding: 10px 12px; border-bottom: 1px solid var(--border-color); cursor: pointer;
       transition: background 0.15s ease; font-size: 0.82rem;
     }
-    .search-result-item:last-child { border-bottom: none; }
     .search-result-item:hover { background: #FFF5F2; }
     .highlight-text { background-color: #FFE082; font-weight: 800; border-radius: 2px; padding: 0 2px; }
 
@@ -179,7 +178,6 @@
     }
 
     .kohort-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.8rem; white-space: nowrap; }
-
     .kohort-table th, .kohort-table td { border-right: 1px solid #F1F5F9; border-bottom: 1px solid #F1F5F9; padding: 8px 10px; text-align: center; }
     .kohort-table thead tr:first-child th { background: var(--accent); color: #FFF; font-weight: 700; }
     .kohort-table thead tr:nth-child(2) th { background: #002244; color: #E2E8F0; font-size: 0.75rem; font-weight: 600; }
@@ -629,7 +627,7 @@
     <section id="export" class="tab-panel" style="display:none">
       <div class="card">
         <h2><i class="fas fa-file-export" style="color:var(--info)"></i> Ekspor Data Spesifik</h2>
-        <p class="lead">Ekspor data register kohort desa/bulan/tahun tertentu dalam format **Excel (.xlsx) 3 Sheet** (Sheet 1: Kohort Matriks, Sheet 2: Rekap Dosis Penggunaan, Sheet 3: Rekap Logistik Kemasan Vaksin).</p>
+        <p class="lead">Ekspor data register kohort desa/bulan/tahun tertentu dalam format **Excel (.xlsx) 3 Sheet** (Sheet 1: Kohort Matriks, Sheet 2: Laporan Imunisasi Rutin, Sheet 3: Rekap Logistik Vaksin).</p>
 
         <div class="grid">
           <div class="form-group">
@@ -914,7 +912,6 @@
 
           <form id="formLogikaVaksinAdmin">
             <div class="grid" id="gridLogikaVaksinContainer">
-              <!-- Render otomatis via JS -->
             </div>
             <div class="actions">
               <button type="submit" class="btn btn-warning"><i class="fas fa-sliders"></i> Simpan Aturan Kemasan Vaksin</button>
@@ -1046,10 +1043,10 @@
     ];
 
     const BULAN_NAME_MAP = {
-      '01': 'Januari', '02': 'Februari', '03': 'Maret', '04': 'April',
-      '05': 'Mei', '06': 'Juni', '07': 'Juli', '08': 'Agustus',
-      '09': 'September', '10': 'Oktober', '11': 'November', '12': 'Desember',
-      'ALL': 'Semua Bulan'
+      '01': 'JANUARI', '02': 'FEBRUARI', '03': 'MARET', '04': 'APRIL',
+      '05': 'MEI', '06': 'JUNI', '07': 'JULI', '08': 'AGUSTUS',
+      '09': 'SEPTEMBER', '10': 'OKTOBER', '11': 'NOVEMBER', '12': 'DESEMBER',
+      'ALL': 'SEMUA BULAN'
     };
 
     const DAYS_IN_MONTH = {
@@ -1891,12 +1888,29 @@
 
         const isAdmin = (typeof activePetugasName !== 'undefined' && activePetugasName.toLowerCase() === 'admin');
 
+        function formatTanggalIndo(dateStr) {
+          if (!dateStr || dateStr === '-') return null;
+          const cleanDate = dateStr.substring(0, 10);
+          const parts = cleanDate.split('-');
+          if (parts.length !== 3) return dateStr;
+          
+          const bulanIndo = [
+            'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+            'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+          ];
+          const year = parts[0];
+          const monthIndex = parseInt(parts[1], 10) - 1;
+          const day = parseInt(parts[2], 10);
+
+          if (isNaN(day) || isNaN(monthIndex) || !bulanIndo[monthIndex]) return dateStr;
+          return `${day} ${bulanIndo[monthIndex]} ${year}`;
+        }
+
         function getDesaCode(desaName) {
           if (!desaName) return "XX";
           const words = desaName.trim().replace(/^PT\.\s*/i, '').split(/\s+/);
           if (words.length >= 2) {
-            const w1 = words[0], w2 = words[1];
-            return (w1[0] + w2[0]).toUpperCase();
+            return (words[0][0] + words[1][0]).toUpperCase();
           } else {
             const w = words[0];
             return (w[0] + w[w.length - 1]).toUpperCase();
@@ -1908,8 +1922,8 @@
         const noSertifikat = `${kodeDesa}/IDL/${noUrut}/${new Date().getFullYear()}`;
 
         const listVaksinRingkas = [
-          { key: "HBO (<24 Jam)", label: "Hepatitis B (HB-0 <24 Jam)" },
-          { key: "HBO (1-7 Hari)", label: "Hepatitis B (HB-0 1-7 Hari)" },
+          { key: "HBO (<24 Jam)", label: "Hepatitis B (<24 Jam)" },
+          { key: "HBO (1-7 Hari)", label: "Hepatitis B (1-7 Hari)" },
           { key: "BCG", label: "BCG" },
           { key: "OPV1", label: "Polio Oral 1 (OPV 1)" },
           { key: "DPT-HB-Hib1", label: "DPT-HB-Hib 1" },
@@ -1922,25 +1936,30 @@
           { key: "Rotavirus2", label: "Rotavirus 2 (RV 2)" },
           { key: "DPT-HB-Hib3", label: "DPT-HB-Hib 3" },
           { key: "OPV4", label: "Polio Oral 4 (OPV 4)" },
-          { key: "IPV1", label: "Inactivated Polio Vaccine 1 (IPV 1)" },
+          { key: "IPV1", label: "IPV 1 (Polio Suntik)" },
           { key: "Rotavirus3", label: "Rotavirus 3 (RV 3)" },
           { key: "Campak Rubela-1", label: "Campak Rubella 1 (MR 1)" },
-          { key: "IPV2", label: "Inactivated Polio Vaccine 2 (IPV 2)" }
+          { key: "IPV2", label: "IPV 2 (Polio Suntik)" }
         ];
 
         let vGridHtml = '';
         listVaksinRingkas.forEach(item => {
           const fieldKey = `vaksin_${item.key.replace(/[\s\(\)<>-]/g, '_')}`;
-          const tgl = d[fieldKey] || (d.jenis_imunisasi === item.key ? d.tanggal_pelayanan : null);
+          const rawDate = d[fieldKey] || (d.jenis_imunisasi === item.key ? d.tanggal_pelayanan : null);
+          const tglFormatted = formatTanggalIndo(rawDate);
+
           vGridHtml += `
-            <div style="border: 1.5px solid #CBD5E1; padding: 8px 12px; border-radius: 8px; background: #FFFFFF; font-size: 12px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="border: 1.5px solid #CBD5E1; padding: 6px 10px; border-radius: 8px; background: #FFFFFF; font-size: 11px; display: flex; justify-content: space-between; align-items: center;">
               <span style="font-weight: 700; color: #1E293B;">${item.label}</span>
-              <span style="font-weight: 800; color: ${tgl ? '#065F46' : '#94A3B8'}; background: transparent; padding: 3px 8px; border-radius: 6px;">${tgl || 'Sudah Diberikan'}</span>
+              <span style="font-weight: 800; color: ${tglFormatted ? '#065F46' : '#94A3B8'}; font-size: 11px;">
+                ${tglFormatted ? `✓ ${tglFormatted}` : '—'}
+              </span>
             </div>
           `;
         });
 
-        const nowFormatted = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+        const nowFormatted = formatTanggalIndo(new Date().toISOString().split('T')[0]);
+        const tglLahirFormatted = formatTanggalIndo(d.tgl_lahir) || d.tgl_lahir || '-';
 
         const draftBannerHtml = !isAdmin ? `
           <div class="draft-no-print-banner">
@@ -2135,7 +2154,7 @@
               }
 
               .back-title { font-family: 'Cinzel', serif; font-size: 18px; font-weight: 800; color: #003366; text-align: center; margin-bottom: 10px; border-bottom: 2px solid #003366; padding-bottom: 4px; }
-              .v-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 6px; }
+              .v-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin-top: 6px; }
 
               ${printCSS}
             </style>
@@ -2172,7 +2191,7 @@
                       </div>
                       <div class="bio-row">
                         <div class="bio-label">Tanggal Lahir / JK</div>
-                        <div>: ${d.tgl_lahir || '-'} (${d.jk === 'L' ? 'Laki-Laki' : d.jk === 'P' ? 'Perempuan' : '-'})</div>
+                        <div>: ${tglLahirFormatted} (${d.jk === 'L' ? 'Laki-Laki' : d.jk === 'P' ? 'Perempuan' : '-'})</div>
                       </div>
                       <div class="bio-row">
                         <div class="bio-label">Nama Orang Tua / Ibu</div>
@@ -3187,10 +3206,6 @@
       const katSel = document.getElementById('filter_kategori').value || 'ALL';
 
       const monthNameStr = BULAN_NAME_MAP[bln] || bln;
-      const endDayStr = DAYS_IN_MONTH[bln] || '31';
-      
-      const labelTglBulan = bln === 'ALL' ? `01/01/${thn} - 31/12/${thn}` : `01/${bln}/${thn} - ${endDayStr}/${bln}/${thn}`;
-      const labelTglKumulatif = bln === 'ALL' ? `01/01/${thn} - 31/12/${thn}` : `01/01/${thn} - ${endDayStr}/${bln}/${thn}`;
 
       try {
         if (katSel === 'BIAS') {
@@ -3221,14 +3236,13 @@
 
           const wb = XLSX.utils.book_new();
           const ws = XLSX.utils.aoa_to_sheet(biasSheetData);
-          ws['!cols'] = [ {wch: 4}, {wch: 32}, {wch: 15}, {wch: 10}, {wch: 15}, {wch: 20}, {wch: 12}, {wch: 12}, {wch: 14}, {wch: 12}, {wch: 12}, {wch: 14}, {wch: 10}, {wch: 18} ];
+          ws['!cols'] = autoFitColumns(biasSheetData, 8, 30);
           XLSX.utils.book_append_sheet(wb, ws, "Laporan BIAS Sekolah");
           XLSX.writeFile(wb, `Laporan_BIAS_Puskesmas_${desaSel}_${bln}_${thn}.xlsx`);
           return;
         }
 
         const snap = await getDocs(collection(db, COL_KOHORT));
-        let activeVaccineKeys = getActiveVaccineKeysByCategory(katSel);
         let allDocsInDb = [];
 
         snap.forEach(doc => {
@@ -3240,7 +3254,7 @@
           const matchDesa = (desaSel === 'ALL' || (d.desa && d.desa.toLowerCase() === desaSel.toLowerCase()));
           let hasMatchingVaccine = false;
 
-          activeVaccineKeys.forEach(vKey => {
+          VAKSIN_ANAK_KEYS.forEach(vKey => {
             const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
             const vDate = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
             if (isVaccineGivenUpToMonth(vDate, thn, bln)) {
@@ -3251,34 +3265,27 @@
           return matchDesa && (katSel === 'ALL' || hasMatchingVaccine);
         });
 
-        const sheet1Data = [];
-        sheet1Data.push([`LAPORAN REGISTER KOHORT MATRIKS - PUSKESMAS MELATA`]);
-        sheet1Data.push([`Periode Matriks: s/d ${monthNameStr} ${thn} | Wilayah: ${desaSel === 'ALL' ? 'Semua Desa' : desaSel} | Kategori: ${katSel}`]);
-        sheet1Data.push([]);
+        const sheet1Data = [
+          ["LAPORAN REGISTER KOHORT MATRIKS - PUSKESMAS MELATA"],
+          [`Periode Matriks: s/d ${monthNameStr} ${thn} | Wilayah: ${desaSel === 'ALL' ? 'Semua Desa' : desaSel}`],
+          []
+        ];
 
-        const headerRow1 = ["No", "Desa", "Posyandu/Pustu", "Nama Sasaran", "Tanggal Lahir", "L/P", "Orang Tua / Suami", "WhatsApp", "Alamat / RT"];
-        activeVaccineKeys.forEach(v => headerRow1.push(v));
-        headerRow1.push("Penginput Terakhir");
+        const headerRow1 = ["No", "Desa", "Posyandu/Pustu", "Nama Sasaran", "Tanggal Lahir", "L/P", "Orang Tua / Ibu", "WhatsApp", "Alamat / RT"];
+        VAKSIN_ANAK_KEYS.forEach(v => headerRow1.push(v));
         sheet1Data.push(headerRow1);
 
         const vTotalSheet1 = {};
-        activeVaccineKeys.forEach(v => vTotalSheet1[v] = 0);
+        VAKSIN_ANAK_KEYS.forEach(v => vTotalSheet1[v] = 0);
 
         let rowNum = 1;
         filteredDocsForSheet1.forEach(d => {
           const row = [
-            rowNum++,
-            d.desa || '',
-            d.kegiatan || '',
-            d.nama_anak || '',
-            d.tgl_lahir || '',
-            d.jk || '',
-            d.nama_ibu || '',
-            d.wa_anak || '-',
-            d.alamat_rt || ''
+            rowNum++, d.desa || '', d.kegiatan || '', d.nama_anak || '',
+            d.tgl_lahir || '', d.jk || '', d.nama_ibu || '', d.wa_anak || '-', d.alamat_rt || ''
           ];
 
-          activeVaccineKeys.forEach(vKey => {
+          VAKSIN_ANAK_KEYS.forEach(vKey => {
             const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
             const val = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
             
@@ -3289,248 +3296,174 @@
               row.push("-");
             }
           });
-
-          row.push(d.last_updated_by || '-');
           sheet1Data.push(row);
         });
 
         const totalRow1 = ["TOTAL DOSIS (S/D PERIODE)", "", "", "", "", "", "", "", ""];
-        activeVaccineKeys.forEach(vKey => {
-          totalRow1.push(vTotalSheet1[vKey]);
-        });
-        totalRow1.push("");
+        VAKSIN_ANAK_KEYS.forEach(vKey => totalRow1.push(vTotalSheet1[vKey]));
         sheet1Data.push(totalRow1);
 
-        // ==================== SHEET 2: REKAPAN TOTAL PENERIMA VAKSIN (DETAIL PER DOSIS) ====================
-        const sheet2Data = [];
-        sheet2Data.push([`REKAPITULASI TOTAL PENERIMA VAKSIN (RINCIAN DOSIS) - PUSKESMAS MELATA`]);
-        sheet2Data.push([`Periode Bulan: ${labelTglBulan} | Periode Kumulatif: ${labelTglKumulatif} | Wilayah: ${desaSel === 'ALL' ? 'Semua Desa (Per Rekap Desa)' : desaSel}`]);
-        sheet2Data.push([]);
 
-        function buildRekapSheet2Detail(docsList, titleRekap) {
-          sheet2Data.push([`=== ${titleRekap.toUpperCase()} ===`]);
-          sheet2Data.push([
-            "No",
-            "Kategori Sasaran / Usia",
-            "Jenis Imunisasi / Dosis Antigen",
-            labelTglBulan, "", "",
-            labelTglKumulatif, "", ""
-          ]);
-          sheet2Data.push([
-            "", "", "",
-            "(L)", "(P)", "(TOTAL DOSIS)",
-            "(L)", "(P)", "(TOTAL DOSIS)"
-          ]);
+        // ==================== SHEET 2: REKAPITULASI CAPAIAN (SAMA SEPERTI MODEL LAPORAN RESMI) ====================
+        // TANPA KOLOM KATEGORI USIA SASARAN & TANPA PERSENTASE
+        const sheet2Data = [
+          ["LAPORAN BULANAN HASIL IMUNISASI RUTIN BAYI PUSKESMAS"],
+          ["Puskesmas:", "Melata"],
+          ["Kabupaten/Kota:", "Lamandau"],
+          ["Provinsi:", "Kalimantan Tengah"],
+          ["Bulan:", monthNameStr, "TAHUN:", thn],
+          []
+        ];
 
-          const counts = {};
-          activeVaccineKeys.forEach(v => {
-            counts[v] = { exL: 0, exP: 0, exTotal: 0, kumL: 0, kumP: 0, kumTotal: 0 };
-          });
+        sheet2Data.push([
+          "NO", "DESA / KELURAHAN",
+          "HB0 (<24 JAM)", "", "",
+          "HB0 (1-7 HARI)", "", "",
+          "BCG", "", "",
+          "OPV 1", "", "",
+          "DPT-HB-Hib 1", "", "",
+          "OPV 2", "", "",
+          "PCV 1", "", "",
+          "Rotavirus 1", "", "",
+          "DPT-HB-Hib 2", "", "",
+          "OPV 3", "", "",
+          "PCV 2", "", "",
+          "Rotavirus 2", "", "",
+          "DPT-HB-Hib 3", "", "",
+          "OPV 4", "", "",
+          "IPV 1", "", "",
+          "Rotavirus 3", "", "",
+          "Campak Rubela 1", "", "",
+          "IPV 2", "", ""
+        ]);
 
-          docsList.forEach(d => {
-            const jk = d.jk === 'L' ? 'L' : 'P';
-            activeVaccineKeys.forEach(vKey => {
+        const subHeaderRow = ["", ""];
+        for (let i = 0; i < 18; i++) {
+          subHeaderRow.push("L", "P", "JUMLAH");
+        }
+        sheet2Data.push(subHeaderRow);
+
+        const desasToProcess = desaSel === 'ALL' ? ALL_DESA_LIST : [desaSel];
+        let idxDesa = 1;
+
+        const grandTotals = Array(18 * 3).fill(0);
+
+        desasToProcess.forEach(dName => {
+          const desaDocs = allDocsInDb.filter(d => d.desa && d.desa.toLowerCase() === dName.toLowerCase());
+          const row = [idxDesa++, dName];
+
+          VAKSIN_ANAK_KEYS.slice(0, 18).forEach((vKey, vIdx) => {
+            let countL = 0, countP = 0;
+
+            desaDocs.forEach(d => {
               const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
               const val = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
-
+              
               if (isVaccineGivenExactMonth(val, thn, bln)) {
-                if (jk === 'L') counts[vKey].exL++; else counts[vKey].exP++;
-                counts[vKey].exTotal++;
+                if (d.jk === 'L') countL++;
+                else countP++;
               }
+            });
 
-              if (isVaccineGivenUpToMonth(val, thn, bln)) {
-                if (jk === 'L') counts[vKey].kumL++; else counts[vKey].kumP++;
-                counts[vKey].kumTotal++;
+            const total = countL + countP;
+            row.push(countL, countP, total);
+
+            grandTotals[vIdx * 3] += countL;
+            grandTotals[vIdx * 3 + 1] += countP;
+            grandTotals[vIdx * 3 + 2] += total;
+          });
+
+          sheet2Data.push(row);
+        });
+
+        const totalRow2 = ["", "JUMLAH / TOTAL"];
+        grandTotals.forEach(val => totalRow2.push(val));
+        sheet2Data.push(totalRow2);
+
+
+        // ==================== SHEET 3: REKAP LOGISTIK KEMASAN VAKSIN ====================
+        const sheet3Data = [
+          ["REKAPITULASI ESTIMASI PEMAKAIAN LOGISTIK VAKSIN"],
+          [`Periode: ${monthNameStr} ${thn} | Wilayah: ${desaSel === 'ALL' ? 'Semua Desa' : desaSel}`],
+          [],
+          ["NO", "NAMA ANTIGEN / LOGISTIK VAKSIN", "KAPASITAS DOSIS / VIAL", "TOTAL DOSIS TERPAKAI (L)", "TOTAL DOSIS TERPAKAI (P)", "TOTAL DOSIS KESELURUHAN", "ESTIMASI KEMASAN TERPAKAI"]
+        ];
+
+        const logistikMapping = [
+          { name: "Hepatitis B (HB-0)", dose: 1, unit: "Uniject", keys: ["HBO (<24 Jam)", "HBO (1-7 Hari)"] },
+          { name: "BCG", dose: 10, unit: "Vial", keys: ["BCG"] },
+          { name: "Polio Oral (OPV)", dose: 7, unit: "Vial", keys: ["OPV1", "OPV2", "OPV3", "OPV4"] },
+          { name: "DPT-HB-Hib", dose: 4, unit: "Vial", keys: ["DPT-HB-Hib1", "DPT-HB-Hib2", "DPT-HB-Hib3", "DPT-HB-Hib4"] },
+          { name: "PCV", dose: 3, unit: "Vial", keys: ["PCV1", "PCV2", "PCV3"] },
+          { name: "Rotavirus", dose: 4, unit: "Vial", keys: ["Rotavirus1", "Rotavirus2", "Rotavirus3"] },
+          { name: "Polio Suntik (IPV)", dose: 4, unit: "Vial", keys: ["IPV1", "IPV2"] },
+          { name: "Campak Rubela (MR)", dose: 8, unit: "Vial", keys: ["Campak Rubela-1", "Campak Rubela-2"] }
+        ];
+
+        let idxLog = 1;
+        logistikMapping.forEach(item => {
+          let sumL = 0, sumP = 0;
+
+          allDocsInDb.forEach(d => {
+            const matchDesa = (desaSel === 'ALL' || (d.desa && d.desa.toLowerCase() === desaSel.toLowerCase()));
+            if (!matchDesa) return;
+
+            item.keys.forEach(vk => {
+              const fieldKey = `vaksin_${vk.replace(/[\s\(\)<>-]/g, '_')}`;
+              const val = d[fieldKey] || (d.jenis_imunisasi === vk ? d.tanggal_pelayanan : null);
+              if (isVaccineGivenExactMonth(val, thn, bln)) {
+                if (d.jk === 'L') sumL++;
+                else sumP++;
               }
             });
           });
 
-          let sumExL = 0, sumExP = 0, sumExTot = 0;
-          let sumKumL = 0, sumKumP = 0, sumKumTot = 0;
-          let s2Idx = 1;
-
-          activeVaccineKeys.forEach(vKey => {
-            let cat = "0 - 12 Bulan (Imunisasi Dasar)";
-            const idx = ALL_VAKSIN_KEYS.indexOf(vKey);
-            if (idx >= 19 && idx <= 21) cat = "12 - 24 Bulan / Kejar Anak";
-            else if (idx >= 22 && idx <= 23) cat = "TT Calon Pengantin (Catin)";
-            else if (idx >= 24) cat = "TT Ibu Hamil (Bumil)";
-
-            const c = counts[vKey];
-            sumExL += c.exL; sumExP += c.exP; sumExTot += c.exTotal;
-            sumKumL += c.kumL; sumKumP += c.kumP; sumKumTot += c.kumTotal;
-
-            sheet2Data.push([
-              s2Idx++, cat, vKey,
-              c.exL, c.exP, c.exTotal,
-              c.kumL, c.kumP, c.kumTotal
-            ]);
-          });
-
-          sheet2Data.push([
-            "", "SUBTOTAL / TOTAL DOSIS", titleRekap,
-            sumExL, sumExP, sumExTot,
-            sumKumL, sumKumP, sumKumTot
-          ]);
-          sheet2Data.push([]);
-        }
-
-        if (desaSel === 'ALL') {
-          ALL_DESA_LIST.forEach(dName => {
-            const desaDocs = allDocsInDb.filter(d => d.desa && d.desa.toLowerCase() === dName.toLowerCase());
-            buildRekapSheet2Detail(desaDocs, `Rekap Penerima Dosis - ${dName}`);
-          });
-
-          buildRekapSheet2Detail(allDocsInDb, "Rekap Penerima Dosis Total Seluruh Desa");
-        } else {
-          const desaDocs = allDocsInDb.filter(d => d.desa && d.desa.toLowerCase() === desaSel.toLowerCase());
-          buildRekapSheet2Detail(desaDocs, `Rekap Penerima Dosis - ${desaSel}`);
-        }
-
-        // ==================== SHEET 3: REKAPAN LOGISTIK VAKSIN (RINGKASAN KEMASAN TERPAKAI) ====================
-        const sheet3Data = [];
-        sheet3Data.push([`REKAPITULASI PEMAKAIAN LOGISTIK VAKSIN - PUSKESMAS MELATA`]);
-        sheet3Data.push([`Periode Bulan: ${labelTglBulan} | Periode Kumulatif: ${labelTglKumulatif} | Wilayah: ${desaSel === 'ALL' ? 'Semua Desa (Per Rekap Desa)' : desaSel}`]);
-        sheet3Data.push([]);
-
-        function buildRekapSheet3Logistik(docsList, titleRekap) {
-          sheet3Data.push([`=== ${titleRekap.toUpperCase()} ===`]);
-          sheet3Data.push([
-            "No",
-            "Kelompok Antigen Vaksin",
-            "Kemasan Standar / Dosis",
-            labelTglBulan, "", "",
-            labelTglKumulatif, "", "",
-            "=== ESTIMASI KEMASAN TERPAKAI ===", "", ""
-          ]);
-          sheet3Data.push([
-            "", "", "",
-            "(L)", "(P)", "(TOTAL DOSIS)",
-            "(L)", "(P)", "(TOTAL DOSIS)",
-            "Total Dosis Terpakai", "Kebutuhan Satuan", "Estimasi Kemasan Terpakai (Desa)"
-          ]);
-
-          const groupCounts = {};
-          ANTIGEN_GROUPS.forEach(g => {
-            groupCounts[g.group_key] = {
-              exL: 0, exP: 0, exTotal: 0,
-              kumL: 0, kumP: 0, kumTotal: 0
-            };
-          });
-
-          docsList.forEach(d => {
-            const jk = d.jk === 'L' ? 'L' : 'P';
-            ALL_VAKSIN_KEYS.forEach(vKey => {
-              const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
-              const val = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
-              const gKey = getGroupKey(vKey);
-
-              if (groupCounts[gKey]) {
-                if (isVaccineGivenExactMonth(val, thn, bln)) {
-                  if (jk === 'L') groupCounts[gKey].exL++; else groupCounts[gKey].exP++;
-                  groupCounts[gKey].exTotal++;
-                }
-
-                if (isVaccineGivenUpToMonth(val, thn, bln)) {
-                  if (jk === 'L') groupCounts[gKey].kumL++; else groupCounts[gKey].kumP++;
-                  groupCounts[gKey].kumTotal++;
-                }
-              }
-            });
-          });
-
-          let sumExL = 0, sumExP = 0, sumExTot = 0;
-          let sumKumL = 0, sumKumP = 0, sumKumTot = 0;
-          let sumTotalKemasan = 0;
-          let s3Idx = 1;
-
-          ANTIGEN_GROUPS.forEach(g => {
-            const c = groupCounts[g.group_key];
-            sumExL += c.exL; sumExP += c.exP; sumExTot += c.exTotal;
-            sumKumL += c.kumL; sumKumP += c.kumP; sumKumTot += c.kumTotal;
-
-            const jumlahKemasanTerpakai = Math.ceil(c.exTotal / g.doses_per_vial);
-            sumTotalKemasan += jumlahKemasanTerpakai;
-
-            sheet3Data.push([
-              s3Idx++,
-              g.name,
-              g.kemasan,
-              c.exL, c.exP, c.exTotal,
-              c.kumL, c.kumP, c.kumTotal,
-              c.exTotal,
-              g.unit,
-              `${jumlahKemasanTerpakai} ${g.unit}`
-            ]);
-          });
+          const totalDoses = sumL + sumP;
+          const estimasiKemasan = Math.ceil(totalDoses / item.dose);
 
           sheet3Data.push([
-            "", "SUBTOTAL / TOTAL LOGISTIK", "-",
-            sumExL, sumExP, sumExTot,
-            sumKumL, sumKumP, sumKumTot,
-            sumExTot, "-", `${sumTotalKemasan} Vial/Uniject/Pcs`
+            idxLog++, item.name, `${item.dose} Dosis/${item.unit}`, sumL, sumP, totalDoses, `${estimasiKemasan} ${item.unit}`
           ]);
-          sheet3Data.push([]);
-        }
+        });
 
-        if (desaSel === 'ALL') {
-          ALL_DESA_LIST.forEach(dName => {
-            const desaDocs = allDocsInDb.filter(d => d.desa && d.desa.toLowerCase() === dName.toLowerCase());
-            buildRekapSheet3Logistik(desaDocs, `Logistik Vaksin - ${dName}`);
-          });
 
-          buildRekapSheet3Logistik(allDocsInDb, "Logistik Vaksin Total Seluruh Desa");
-        } else {
-          const desaDocs = allDocsInDb.filter(d => d.desa && d.desa.toLowerCase() === desaSel.toLowerCase());
-          buildRekapSheet3Logistik(desaDocs, `Logistik Vaksin - ${desaSel}`);
-        }
-
+        // ==================== PROSES EXPORT & AUTO FIT LEBAR KOLOM ====================
         const wb = XLSX.utils.book_new();
         const ws1 = XLSX.utils.aoa_to_sheet(sheet1Data);
         const ws2 = XLSX.utils.aoa_to_sheet(sheet2Data);
         const ws3 = XLSX.utils.aoa_to_sheet(sheet3Data);
 
-        ws1['!cols'] = headerRow1.map((_, colIdx) => {
-          if (colIdx === 0) return { wch: 4 };
-          let maxLen = 10;
-          sheet1Data.forEach((row, rIdx) => {
-            if (rIdx < 3) return;
-            const val = row[colIdx] ? String(row[colIdx]) : '';
-            if (val.length > maxLen) maxLen = val.length;
+        function autoFitColumns(dataArray, minWidth = 8, maxWidth = 35) {
+          const colWidths = [];
+          dataArray.forEach(row => {
+            row.forEach((cell, colIdx) => {
+              const cellStr = cell !== null && cell !== undefined ? String(cell) : '';
+              const len = cellStr.length;
+              if (!colWidths[colIdx] || len > colWidths[colIdx]) {
+                colWidths[colIdx] = len;
+              }
+            });
           });
-          return { wch: maxLen + 3 };
-        });
 
-        ws2['!cols'] = [
-          { wch: 4 },
-          { wch: 30 },
-          { wch: 22 },
-          { wch: 8 }, { wch: 8 }, { wch: 14 },
-          { wch: 8 }, { wch: 8 }, { wch: 14 }
-        ];
+          return colWidths.map(w => ({
+            wch: Math.min(Math.max(w + 3, minWidth), maxWidth)
+          }));
+        }
 
-        ws3['!cols'] = [
-          { wch: 4 },
-          { wch: 26 },
-          { wch: 20 },
-          { wch: 8 }, { wch: 8 }, { wch: 14 },
-          { wch: 8 }, { wch: 8 }, { wch: 14 },
-          { wch: 20 }, { wch: 18 }, { wch: 26 }
-        ];
+        ws1['!cols'] = autoFitColumns(sheet1Data, 10, 30);
+        ws2['!cols'] = autoFitColumns(sheet2Data, 6, 22);
+        ws3['!cols'] = autoFitColumns(sheet3Data, 10, 32);
 
-        XLSX.utils.book_append_sheet(wb, ws1, "Register Kohort Matriks");
-        XLSX.utils.book_append_sheet(wb, ws2, "Rekapan Total Penerima");
-        XLSX.utils.book_append_sheet(wb, ws3, "Rekapan Logistik Vaksin");
+        XLSX.utils.book_append_sheet(wb, ws1, "Kohort Matriks");
+        XLSX.utils.book_append_sheet(wb, ws2, "Laporan Imunisasi Rutin");
+        XLSX.utils.book_append_sheet(wb, ws3, "Rekap Logistik Vaksin");
 
-        const filename = `Kohort_Matriks_${desaSel}_${bln}_${thn}_${katSel}.xlsx`;
-        XLSX.writeFile(wb, filename);
+        XLSX.writeFile(wb, `Laporan_Imunisasi_Puskesmas_Melata_${monthNameStr}_${thn}.xlsx`);
+        alert("✅ File Excel berhasil diunduh dengan tampilan rapi!");
 
-      } catch (err) { alert("Gagal download Excel: " + err.message); }
-    }
-
-    async function doExportFiltered(format) {
-      if (format === 'json') exportDatabase();
-      else downloadExcel3Sheets();
+      } catch (err) {
+        alert("Gagal mengunduh file Excel: " + err.message);
+      }
     }
 
     function initBiasDropdowns() {

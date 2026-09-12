@@ -249,7 +249,7 @@
 
     /* Modal Progress OCR */
     .ocr-loading-card {
-      background: #FFFFFF; padding: 24px; border-radius: 16px; width: 100%; max-width: 360px;
+      background: #FFFFFF; padding: 24px; border-radius: 16px; width: 100%; max-width: 380px;
       text-align: center; box-shadow: 0 20px 30px rgba(0,0,0,0.25);
     }
     .ocr-progress-bg {
@@ -259,6 +259,62 @@
       width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary), #FF8A65);
       transition: width 0.15s ease; border-radius: 10px;
     }
+
+    /* KAMERA SCANNER OVERLAY & GARIS BANTU */
+    .camera-scanner-modal {
+      position: fixed; inset: 0; background: #000; z-index: 3000;
+      display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+    }
+    .camera-container {
+      position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden;
+    }
+    .camera-video {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    .scanner-overlay {
+      position: absolute; inset: 0; pointer-events: none;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .scanner-mask {
+      position: absolute; inset: 0; background: rgba(0, 0, 0, 0.55);
+    }
+    
+    /* Garis Bantu Single Line (1 Baris Teks) */
+    .scan-guide-single {
+      position: relative; width: 85%; max-width: 480px; height: 48px;
+      border: 2px solid var(--primary); border-radius: 8px; box-shadow: 0 0 0 9999px rgba(0,0,0,0.5);
+      z-index: 10; display: flex; align-items: center; justify-content: center;
+    }
+    .scan-guide-single::before {
+      content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 2px;
+      background: rgba(255, 87, 34, 0.7); transform: translateY(-50%);
+    }
+
+    /* Garis Bantu Multi Line (2-4 Baris Alamat) */
+    .scan-guide-multi {
+      position: relative; width: 88%; max-width: 480px; height: 130px;
+      border: 2px dashed #00E676; border-radius: 10px; box-shadow: 0 0 0 9999px rgba(0,0,0,0.5);
+      z-index: 10; display: flex; flex-direction: column; justify-content: space-around; padding: 6px 0;
+    }
+    .scan-guide-multi .guide-line {
+      width: 100%; height: 1px; background: rgba(0, 230, 118, 0.4);
+    }
+
+    .scanner-hint-text {
+      position: absolute; top: 18%; color: #FFF; font-size: 0.9rem; font-weight: 700;
+      background: rgba(0,0,0,0.7); padding: 8px 16px; border-radius: 20px; z-index: 12; text-align: center;
+    }
+    .camera-controls {
+      position: absolute; bottom: 30px; left: 0; right: 0; z-index: 20;
+      display: flex; justify-content: space-around; align-items: center; padding: 0 30px;
+    }
+    .btn-capture-snap {
+      width: 70px; height: 70px; border-radius: 50%; background: #FFF; border: 4px solid var(--primary);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 15px rgba(255,87,34,0.6); transition: transform 0.15s ease;
+    }
+    .btn-capture-snap:active { transform: scale(0.9); }
+    .btn-capture-snap inner { width: 52px; height: 52px; border-radius: 50%; background: var(--primary); display: block; }
 
     @media (max-width: 768px) {
       header.app-header { padding: 10px 12px 0 12px; }
@@ -283,18 +339,43 @@
 </head>
 <body>
 
-  <!-- MODAL OCR LOADING PROGRESS -->
+  <!-- MODAL OCR LOADING PROGRESS & ERROR/RETRY -->
   <div id="ocrModal" class="modal-overlay" style="display:none;">
     <div class="ocr-loading-card">
-      <div style="font-size:2rem; color:var(--primary); margin-bottom:6px;"><i class="fas fa-camera-retro fa-bounce"></i></div>
-      <h3 style="margin:0; font-size:1.05rem; color:var(--accent);">Memproses OCR Gambar...</h3>
-      <p style="font-size:0.78rem; color:var(--muted); margin-top:4px;" id="ocrStatusText">Membaca teks dari dokumen kamera client...</p>
+      <div id="ocrIconContainer" style="font-size:2rem; color:var(--primary); margin-bottom:6px;"><i class="fas fa-camera-retro fa-bounce"></i></div>
+      <h3 id="ocrModalTitle" style="margin:0; font-size:1.05rem; color:var(--accent);">Memproses OCR Gambar...</h3>
+      <p style="font-size:0.78rem; color:var(--muted); margin-top:4px;" id="ocrStatusText">Membaca teks dari area penanda scan...</p>
       
-      <div class="ocr-progress-bg">
+      <div class="ocr-progress-bg" id="ocrProgressContainer">
         <div id="ocrProgressBar" class="ocr-progress-fill"></div>
       </div>
       <div style="font-size:0.85rem; font-weight:800; color:var(--accent);" id="ocrProgressPercent">0%</div>
+
+      <div id="ocrRetryActionGroup" style="display:none; margin-top:16px; gap:8px; justify-content:center;">
+        <button type="button" class="btn btn-warning" onclick="retryLastOCR()"><i class="fas fa-redo"></i> Coba Lagi OCR</button>
+        <button type="button" class="btn btn-danger" onclick="cancelOCRProcess()"><i class="fas fa-times"></i> Batalkan / Gagal</button>
+      </div>
     </div>
+  </div>
+
+  <!-- MODAL LIVE CAMERA SCANNER -->
+  <div id="cameraScannerModal" class="camera-scanner-modal" style="display:none;">
+    <div class="camera-container">
+      <video id="scannerVideo" class="camera-video" autoplay playsinline></video>
+      <div class="scanner-overlay">
+        <div id="scannerHint" class="scanner-hint-text">Posisikan Teks Tepat di Garis Bantu</div>
+        <div id="scanGuideBox" class="scan-guide-single"></div>
+      </div>
+    </div>
+
+    <div class="camera-controls">
+      <button type="button" class="btn btn-ghost" onclick="closeCameraScanner()" style="color:#FFF; border-color:#FFF; padding:10px 16px;"><i class="fas fa-arrow-left"></i> Batal</button>
+      <button type="button" class="btn-capture-snap" onclick="captureAndProcessOCR()" title="Ambil Foto"><inner></inner></button>
+      <button type="button" class="btn btn-ghost" onclick="toggleCameraFacing()" style="color:#FFF; border-color:#FFF; padding:10px 16px;"><i class="fas fa-sync"></i> Putar</button>
+    </div>
+
+    <!-- Hidden Canvas untuk Cropping Gambar -->
+    <canvas id="cropCanvas" style="display:none;"></canvas>
   </div>
 
   <!-- MODAL LOGIN PETUGAS -->
@@ -401,7 +482,7 @@
             <label><i class="fas fa-search-location" style="color:var(--primary);"></i> Cari Nama Sasaran (Mulai 2 Huruf)</label>
             <div class="input-with-btn">
               <input type="text" id="input_search_sasaran" placeholder="Ketik minimal 2 huruf nama sasaran (misal: 'Ar')..." autocomplete="off">
-              <button type="button" class="btn-ocr-cam" onclick="triggerCameraOCR('input_search_sasaran')" title="Scan Nama via Kamera 📷">
+              <button type="button" class="btn-ocr-cam" onclick="triggerCameraOCR('input_search_sasaran', 'single')" title="Scan Nama via Kamera 📷">
                 <i class="fas fa-camera"></i>
               </button>
             </div>
@@ -486,7 +567,7 @@
               <label>Nama Sasaran <span class="req">*</span></label>
               <div class="input-with-btn">
                 <input type="text" id="reg_nama_anak" placeholder="Nama lengkap sasaran" required autocomplete="off">
-                <button type="button" class="btn-ocr-cam" onclick="triggerCameraOCR('reg_nama_anak')" title="Scan Nama via Kamera 📷">
+                <button type="button" class="btn-ocr-cam" onclick="triggerCameraOCR('reg_nama_anak', 'single')" title="Scan Nama (1 Baris) 📷">
                   <i class="fas fa-camera"></i>
                 </button>
               </div>
@@ -508,7 +589,7 @@
               <label>NIK Sasaran (Opsional)</label>
               <div class="input-with-btn">
                 <input type="text" id="reg_nik_anak" placeholder="NIK Sasaran">
-                <button type="button" class="btn-ocr-cam" onclick="triggerCameraOCR('reg_nik_anak')" title="Scan NIK via Kamera 📷">
+                <button type="button" class="btn-ocr-cam" onclick="triggerCameraOCR('reg_nik_anak', 'single')" title="Scan NIK (1 Baris) 📷">
                   <i class="fas fa-camera"></i>
                 </button>
               </div>
@@ -523,7 +604,7 @@
               <label id="lbl_nama_ibu">Nama Orang Tua / Ibu <span class="req">*</span></label>
               <div class="input-with-btn">
                 <input type="text" id="reg_nama_ibu" placeholder="Nama ibu / nama suami" required>
-                <button type="button" class="btn-ocr-cam" onclick="triggerCameraOCR('reg_nama_ibu')" title="Scan Nama Ortu via Kamera 📷">
+                <button type="button" class="btn-ocr-cam" onclick="triggerCameraOCR('reg_nama_ibu', 'single')" title="Scan Nama Ortu (1 Baris) 📷">
                   <i class="fas fa-camera"></i>
                 </button>
               </div>
@@ -533,7 +614,7 @@
               <label id="lbl_nik_ibu">NIK Orang Tua / Suami</label>
               <div class="input-with-btn">
                 <input type="text" id="reg_nik_ibu" placeholder="NIK Orang Tua / Suami">
-                <button type="button" class="btn-ocr-cam" onclick="triggerCameraOCR('reg_nik_ibu')" title="Scan NIK Ortu via Kamera 📷">
+                <button type="button" class="btn-ocr-cam" onclick="triggerCameraOCR('reg_nik_ibu', 'single')" title="Scan NIK Ortu (1 Baris) 📷">
                   <i class="fas fa-camera"></i>
                 </button>
               </div>
@@ -543,7 +624,7 @@
               <label>Alamat / RT <span class="req">*</span></label>
               <div class="input-with-btn">
                 <input type="text" id="reg_alamat" placeholder="Contoh: RT 02 / Dusun A" required>
-                <button type="button" class="btn-ocr-cam" onclick="triggerCameraOCR('reg_alamat')" title="Scan Alamat via Kamera 📷">
+                <button type="button" class="btn-ocr-cam" onclick="triggerCameraOCR('reg_alamat', 'multi')" title="Scan Alamat (2-4 Baris) 📷">
                   <i class="fas fa-camera"></i>
                 </button>
               </div>
@@ -802,7 +883,6 @@
 
           <div class="form-group">
             <label>Opsi Seleksi Kategori Pelayanan</label>
-            <!-- Hapus opsi 'Pilih Semua Pelayanan Lengkap' agar murni sesuai filter -->
             <select id="filter_kategori">
               <option value="BAYI_0_24">Bayi Usia 0 - 24 Bulan (Sampai MR2)</option>
               <option value="IMUNISASI_BAYI">Imunisasi Dasar Bayi (0 - 12 Bulan)</option>
@@ -907,7 +987,7 @@
       </div>
     </section>
 
-    <!-- TAB 6: ADMIN TERPISAH (PALING KANAN) -->
+    <!-- TAB 6: ADMIN TERPISAH -->
     <section id="admin" class="tab-panel" style="display:none">
       <div class="card" style="background:#FFF5F5; border:1.5px solid #FEB2B2;">
         <h2><i class="fas fa-user-shield" style="color:var(--danger)"></i> Panel Kontrol & Administrasi Sistem</h2>
@@ -915,7 +995,6 @@
       </div>
 
       <div class="grid">
-        <!-- Fitur Ekspor & Backup Data (Dipindahkan ke Tab Admin) -->
         <div class="card">
           <h3><i class="fas fa-file-export" style="color:var(--info)"></i> Ekspor Data Spesifik</h3>
           <p style="font-size:0.8rem; color:var(--muted);">Ekspor kohort dalam format Excel (.xlsx) 3 Sheet atau JSON.</p>
@@ -972,7 +1051,6 @@
           </div>
         </div>
 
-        <!-- Fitur Import Data (Dipindahkan ke Tab Admin) -->
         <div class="card">
           <h3><i class="fas fa-upload" style="color:var(--primary)"></i> Import Database Ke Cloud</h3>
           <p style="font-size:0.8rem; color:var(--muted);">Unggah file JSON/CSV untuk memperbarui basis data server.</p>
@@ -996,7 +1074,6 @@
         </div>
 
         <div id="panelAdminPengaturan" style="display:none; margin-top:12px; border-top:1px dashed #FCD34D; padding-top:12px;">
-          
           <h4 style="color:#92400E; margin-bottom:8px;"><i class="fas fa-bullseye"></i> 1. Form Target Sasaran Wilayah</h4>
           <form id="formTargetSasaran">
             <div class="grid">
@@ -1044,9 +1121,7 @@
 
           <h4 style="color:#92400E; margin-bottom:8px;"><i class="fas fa-box"></i> 2. Pengaturan Logika Konsumsi & Kemasan Vaksin (Vial/Uniject/Pcs)</h4>
           <form id="formLogikaVaksinAdmin">
-            <div class="grid" id="gridLogikaVaksinContainer">
-              <!-- Render otomatis via JS -->
-            </div>
+            <div class="grid" id="gridLogikaVaksinContainer"></div>
             <div class="actions">
               <button type="submit" class="btn btn-warning"><i class="fas fa-sliders"></i> Simpan Aturan Kemasan Vaksin</button>
             </div>
@@ -1134,54 +1209,12 @@
     };
 
     const SERIES_SEQUENCES = [
-      {
-        name: "DPT-HB-Hib",
-        items: [
-          { key: "DPT-HB-Hib1", offsetMonths: 2 },
-          { key: "DPT-HB-Hib2", offsetMonths: 3 },
-          { key: "DPT-HB-Hib3", offsetMonths: 4 },
-          { key: "DPT-HB-Hib4", offsetMonths: 18 }
-        ]
-      },
-      {
-        name: "OPV",
-        items: [
-          { key: "OPV1", offsetMonths: 1 },
-          { key: "OPV2", offsetMonths: 2 },
-          { key: "OPV3", offsetMonths: 3 },
-          { key: "OPV4", offsetMonths: 4 }
-        ]
-      },
-      {
-        name: "PCV",
-        items: [
-          { key: "PCV1", offsetMonths: 2 },
-          { key: "PCV2", offsetMonths: 3 },
-          { key: "PCV3", offsetMonths: 12 }
-        ]
-      },
-      {
-        name: "Rotavirus",
-        items: [
-          { key: "Rotavirus1", offsetMonths: 2 },
-          { key: "Rotavirus2", offsetMonths: 3 },
-          { key: "Rotavirus3", offsetMonths: 4 }
-        ]
-      },
-      {
-        name: "IPV",
-        items: [
-          { key: "IPV1", offsetMonths: 4 },
-          { key: "IPV2", offsetMonths: 9 }
-        ]
-      },
-      {
-        name: "Campak Rubela",
-        items: [
-          { key: "Campak Rubela-1", offsetMonths: 9 },
-          { key: "Campak Rubela-2", offsetMonths: 18 }
-        ]
-      }
+      { name: "DPT-HB-Hib", items: [{ key: "DPT-HB-Hib1", offsetMonths: 2 }, { key: "DPT-HB-Hib2", offsetMonths: 3 }, { key: "DPT-HB-Hib3", offsetMonths: 4 }, { key: "DPT-HB-Hib4", offsetMonths: 18 }] },
+      { name: "OPV", items: [{ key: "OPV1", offsetMonths: 1 }, { key: "OPV2", offsetMonths: 2 }, { key: "OPV3", offsetMonths: 3 }, { key: "OPV4", offsetMonths: 4 }] },
+      { name: "PCV", items: [{ key: "PCV1", offsetMonths: 2 }, { key: "PCV2", offsetMonths: 3 }, { key: "PCV3", offsetMonths: 12 }] },
+      { name: "Rotavirus", items: [{ key: "Rotavirus1", offsetMonths: 2 }, { key: "Rotavirus2", offsetMonths: 3 }, { key: "Rotavirus3", offsetMonths: 4 }] },
+      { name: "IPV", items: [{ key: "IPV1", offsetMonths: 4 }, { key: "IPV2", offsetMonths: 9 }] },
+      { name: "Campak Rubela", items: [{ key: "Campak Rubela-1", offsetMonths: 9 }, { key: "Campak Rubela-2", offsetMonths: 18 }] }
     ];
 
     const DESA_DALAM_WILAYAH = [
@@ -1225,83 +1258,224 @@
     const AUTH_ADMIN_USER = "admin";
     const AUTH_ADMIN_PASS = "adminsri26";
 
-    // FUNGSI CLIENT-SIDE OCR DENGAN PROSES ANIMASI 0-70% DAN REAL-TIME 70-100%
-    window.triggerCameraOCR = function(targetFieldId) {
-      const fileInput = document.createElement('input');
-      fileInput.type = 'file';
-      fileInput.accept = 'image/*';
-      fileInput.capture = 'environment'; // Membuka kamera langsung HP
+    // GLOBAL STATE KAMERA & OCR ENGINE
+    let currentOcrTargetId = "";
+    let currentOcrMode = "single"; // "single" (1 baris) atau "multi" (2-4 baris alamat)
+    let cameraStream = null;
+    let currentFacingMode = "environment";
+    let activeTesseractWorker = null;
+    let lastCapturedImageData = null;
 
-      fileInput.onchange = async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
+    // FUNGSI KAMERA SCANNER LIVE OVERLAY
+    window.triggerCameraOCR = async function(targetFieldId, mode = "single") {
+      currentOcrTargetId = targetFieldId;
+      currentOcrMode = mode;
 
-        const modal = document.getElementById('ocrModal');
-        const fill = document.getElementById('ocrProgressBar');
-        const percent = document.getElementById('ocrProgressPercent');
-        const statusText = document.getElementById('ocrStatusText');
+      const guideBox = document.getElementById('scanGuideBox');
+      const hintText = document.getElementById('scannerHint');
 
-        modal.style.display = 'flex';
-        statusText.textContent = "Menginisialisasi pemprosesan hardware...";
-        
-        let progress = 0;
-        fill.style.width = '0%';
-        percent.textContent = '0%';
+      if (mode === 'multi') {
+        guideBox.className = 'scan-guide-multi';
+        guideBox.innerHTML = '<div class="guide-line"></div><div class="guide-line"></div><div class="guide-line"></div>';
+        hintText.innerText = 'Posisikan Alamat di Area Kotak (2-4 Baris)';
+      } else {
+        guideBox.className = 'scan-guide-single';
+        guideBox.innerHTML = '';
+        hintText.innerText = 'Posisikan Teks Tepat di Garis Merah Horizontal (1 Baris)';
+      }
 
-        // Animasi Cepat 0% -> 70%
-        const fastTimer = setInterval(() => {
-          if (progress < 70) {
-            progress += 5;
-            fill.style.width = progress + '%';
-            percent.textContent = progress + '%';
-          } else {
-            clearInterval(fastTimer);
-          }
-        }, 35);
+      document.getElementById('cameraScannerModal').style.display = 'flex';
+      await startCameraStream();
+    };
 
+    async function startCameraStream() {
+      try {
+        if (cameraStream) {
+          cameraStream.getTracks().forEach(track => track.stop());
+        }
+        const constraints = {
+          video: { facingMode: { exact: currentFacingMode }, width: { ideal: 1920 }, height: { ideal: 1080 } }
+        };
         try {
-          const worker = await Tesseract.createWorker('ind');
-          statusText.textContent = "Menganalisis teks dokumen dari gambar...";
-          
-          const ret = await worker.recognize(file, {
-            logger: m => {
-              if (m.status === 'recognizing text') {
-                const realProg = 70 + Math.round(m.progress * 30);
-                if (realProg > progress) {
-                  progress = realProg;
-                  fill.style.width = progress + '%';
-                  percent.textContent = progress + '%';
-                }
+          cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+        } catch (e) {
+          // Fallback jika exact mode gagal
+          cameraStream = await navigator.mediaDevices.getUserMedia({ video: true });
+        }
+        const video = document.getElementById('scannerVideo');
+        video.srcObject = cameraStream;
+      } catch (err) {
+        alert("Gagal mengaktifkan kamera: " + err.message);
+        closeCameraScanner();
+      }
+    }
+
+    window.toggleCameraFacing = async function() {
+      currentFacingMode = currentFacingMode === "environment" ? "user" : "environment";
+      await startCameraStream();
+    };
+
+    window.closeCameraScanner = function() {
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+        cameraStream = null;
+      }
+      document.getElementById('cameraScannerModal').style.display = 'none';
+    };
+
+    // FUNGSI CAPTURE & CROPPING HANYA PADA AREA SCANNER
+    window.captureAndProcessOCR = async function() {
+      const video = document.getElementById('scannerVideo');
+      const canvas = document.getElementById('cropCanvas');
+      const ctx = canvas.getContext('2d');
+
+      const videoWidth = video.videoWidth;
+      const videoHeight = video.videoHeight;
+
+      if (!videoWidth || !videoHeight) return;
+
+      const guideBox = document.getElementById('scanGuideBox');
+      const guideRect = guideBox.getBoundingClientRect();
+      const videoRect = video.getBoundingClientRect();
+
+      // Hitung koordinat relatif area penanda scan terhadap resolusi asli video
+      const scaleX = videoWidth / videoRect.width;
+      const scaleY = videoHeight / videoRect.height;
+
+      const cropX = (guideRect.left - videoRect.left) * scaleX;
+      const cropY = (guideRect.top - videoRect.top) * scaleY;
+      const cropWidth = guideRect.width * scaleX;
+      const cropHeight = guideRect.height * scaleY;
+
+      canvas.width = cropWidth;
+      canvas.height = cropHeight;
+
+      ctx.drawImage(video, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+
+      lastCapturedImageData = canvas.toDataURL('image/jpeg', 0.95);
+      closeCameraScanner();
+
+      await processImageDataWithOCR(lastCapturedImageData);
+    };
+
+    // PROSES OCR DENGAN TIMEOUT 30 DETIK & OPSI RE-TRY / CANCEL
+    async function processImageDataWithOCR(imageData) {
+      const modal = document.getElementById('ocrModal');
+      const fill = document.getElementById('ocrProgressBar');
+      const percent = document.getElementById('ocrProgressPercent');
+      const statusText = document.getElementById('ocrStatusText');
+      const titleText = document.getElementById('ocrModalTitle');
+      const iconContainer = document.getElementById('ocrIconContainer');
+      const actionGroup = document.getElementById('ocrRetryActionGroup');
+      const progressContainer = document.getElementById('ocrProgressContainer');
+
+      modal.style.display = 'flex';
+      actionGroup.style.display = 'none';
+      progressContainer.style.display = 'block';
+      percent.style.display = 'block';
+      titleText.textContent = "Memproses OCR Gambar...";
+      statusText.textContent = "Menginisialisasi engine OCR...";
+      iconContainer.innerHTML = '<i class="fas fa-camera-retro fa-bounce"></i>';
+
+      let progress = 0;
+      fill.style.width = '0%';
+      percent.textContent = '0%';
+
+      const fastTimer = setInterval(() => {
+        if (progress < 70) {
+          progress += 5;
+          fill.style.width = progress + '%';
+          percent.textContent = progress + '%';
+        } else {
+          clearInterval(fastTimer);
+        }
+      }, 35);
+
+      let isTimeout = false;
+
+      // Promise Timeout 30 detik
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => {
+          isTimeout = true;
+          reject(new Error("OCR_TIMEOUT"));
+        }, 30000);
+      });
+
+      // Process OCR Promise
+      const ocrPromise = (async () => {
+        activeTesseractWorker = await Tesseract.createWorker('ind');
+        statusText.textContent = "Menganalisis teks pada area penanda scan...";
+
+        const ret = await activeTesseractWorker.recognize(imageData, {
+          logger: m => {
+            if (m.status === 'recognizing text' && !isTimeout) {
+              const realProg = 70 + Math.round(m.progress * 30);
+              if (realProg > progress) {
+                progress = realProg;
+                fill.style.width = progress + '%';
+                percent.textContent = progress + '%';
               }
             }
-          });
-
-          await worker.terminate();
-
-          fill.style.width = '100%';
-          percent.textContent = '100%';
-
-          let textResult = ret.data.text.trim();
-          textResult = textResult.replace(/[\r\n]+/g, " ");
-
-          const targetElem = document.getElementById(targetFieldId);
-          if (targetElem) {
-            targetElem.value = textResult;
-            targetElem.dispatchEvent(new Event('input'));
           }
+        });
 
-          setTimeout(() => {
-            modal.style.display = 'none';
-          }, 300);
+        await activeTesseractWorker.terminate();
+        activeTesseractWorker = null;
+        return ret.data.text;
+      })();
 
-        } catch (err) {
-          clearInterval(fastTimer);
-          modal.style.display = 'none';
-          alert("Gagal membaca teks OCR dari kamera: " + err.message);
+      try {
+        const textResult = await Promise.race([ocrPromise, timeoutPromise]);
+        clearInterval(fastTimer);
+
+        fill.style.width = '100%';
+        percent.textContent = '100%';
+
+        let cleanedText = textResult.trim().replace(/[\r\n]+/g, " ");
+
+        const targetElem = document.getElementById(currentOcrTargetId);
+        if (targetElem) {
+          targetElem.value = cleanedText;
+          targetElem.dispatchEvent(new Event('input'));
         }
-      };
 
-      fileInput.click();
+        setTimeout(() => {
+          modal.style.display = 'none';
+        }, 350);
+
+      } catch (err) {
+        clearInterval(fastTimer);
+        if (activeTesseractWorker) {
+          try { await activeTesseractWorker.terminate(); } catch (e) {}
+          activeTesseractWorker = null;
+        }
+
+        titleText.textContent = "Gagal Membaca / Waktu Habis";
+        statusText.textContent = err.message === "OCR_TIMEOUT" 
+          ? "Proses membaca teks melebihi 30 detik (Nyangkut/Timeout)."
+          : "Gagal memproses gambar: " + err.message;
+
+        iconContainer.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:var(--danger);"></i>';
+        progressContainer.style.display = 'none';
+        percent.style.display = 'none';
+        actionGroup.style.display = 'flex';
+      }
+    }
+
+    window.retryLastOCR = function() {
+      if (lastCapturedImageData) {
+        processImageDataWithOCR(lastCapturedImageData);
+      } else {
+        cancelOCRProcess();
+      }
+    };
+
+    window.cancelOCRProcess = function() {
+      if (activeTesseractWorker) {
+        try { activeTesseractWorker.terminate(); } catch (e) {}
+        activeTesseractWorker = null;
+      }
+      document.getElementById('ocrModal').style.display = 'none';
     };
 
     window.resetFormRegisterIndividu = function() {
@@ -1381,7 +1555,7 @@
     }
 
     function getActiveVaccineKeysByCategory(katSel) {
-      if (katSel === 'BAYI_0_24') return VAKSIN_ANAK_KEYS; // Sampai MR2
+      if (katSel === 'BAYI_0_24') return VAKSIN_ANAK_KEYS;
       if (katSel === 'IMUNISASI_BAYI') return VAKSIN_ANAK_KEYS.slice(0, 19);
       if (katSel === 'BADUTA') return VAKSIN_ANAK_KEYS.slice(19, 22);
       if (katSel === 'CATIN') return VAKSIN_DEWASA_KEYS.slice(0, 2);
@@ -3019,7 +3193,7 @@
           allDocsInDb.push(doc.data());
         });
 
-        // ==================== SHEET 1: KOHORT MATRIKS ====================
+        // SHEET 1: KOHORT MATRIKS
         let filteredDocsForSheet1 = allDocsInDb.filter(d => {
           const matchDesa = (desaSel === 'ALL' || (d.desa && d.desa.toLowerCase() === desaSel.toLowerCase()));
           let hasMatchingVaccine = false;
@@ -3085,7 +3259,7 @@
         totalRow1.push("");
         sheet1Data.push(totalRow1);
 
-        // ==================== SHEET 2: REKAPAN TOTAL PENERIMA VAKSIN (DETAIL HINGGA MR2SESUAI EXCEL) ====================
+        // SHEET 2: REKAPAN TOTAL PENERIMA VAKSIN
         const sheet2Data = [];
         sheet2Data.push([`REKAPITULASI TOTAL PENERIMA VAKSIN (SAMPAI DENGAN MR2 & BOOSTER)`]);
         sheet2Data.push([`Periode Bulan: ${labelTglBulan} | Periode Kumulatif: ${labelTglKumulatif} | Wilayah: ${desaSel === 'ALL' ? 'Semua Desa (Per Rekap Desa)' : desaSel}`]);
@@ -3171,7 +3345,7 @@
           buildRekapSheet2Detail(desaDocs, `Rekap Penerima Dosis - ${desaSel}`);
         }
 
-        // ==================== SHEET 3: REKAPAN LOGISTIK VAKSIN ====================
+        // SHEET 3: REKAPAN LOGISTIK VAKSIN
         const sheet3Data = [];
         sheet3Data.push([`REKAPITULASI PEMAKAIAN LOGISTIK VAKSIN - PUSKESMAS MELATA`]);
         sheet3Data.push([`Periode Bulan: ${labelTglBulan} | Periode Kumulatif: ${labelTglKumulatif} | Wilayah: ${desaSel === 'ALL' ? 'Semua Desa (Per Rekap Desa)' : desaSel}`]);

@@ -9,6 +9,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <!-- OCR Engine Library -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
   <style>
     :root {
@@ -72,7 +74,7 @@
       display: flex; gap: 4px; width: 100%; max-width: 1200px;
       margin: 12px auto 0 auto; overflow-x: auto; white-space: nowrap;
       -webkit-overflow-scrolling: touch; padding-bottom: 2px;
-      scrollbar-width: none;
+      scrollbar-width: none; align-items: center;
     }
     .app-nav-tabs::-webkit-scrollbar { display: none; }
     .app-nav-tabs .tab {
@@ -87,6 +89,18 @@
       background: var(--card); color: var(--accent); font-weight: 700; 
       border-bottom: 3px solid var(--primary); 
       box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+    }
+    
+    .tab-admin-highlight {
+      margin-left: auto;
+      background: rgba(239, 68, 68, 0.15) !important;
+      color: #FCA5A5 !important;
+      border: 1px dashed rgba(239, 68, 68, 0.4) !important;
+    }
+    .tab-admin-highlight.active {
+      background: #FFFFFF !important;
+      color: var(--danger) !important;
+      border-bottom: 3px solid var(--danger) !important;
     }
 
     .wrap { width: 100%; max-width: 1200px; margin: 16px auto; padding: 0 16px; }
@@ -118,10 +132,22 @@
     label { font-weight: 700; color: #334155; margin-bottom: 6px; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; }
     .req { color: var(--danger); font-weight: 800; }
 
+    .input-with-btn {
+      display: flex; gap: 6px; align-items: center;
+    }
+    .input-with-btn input { flex: 1; }
+    .btn-ocr-cam {
+      background: #F1F5F9; border: 1.5px solid var(--border-color); color: var(--accent);
+      border-radius: 8px; padding: 0 12px; height: 42px; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center;
+      transition: all 0.2s ease; flex-shrink: 0;
+    }
+    .btn-ocr-cam:hover { background: #E2E8F0; color: var(--primary); border-color: var(--primary); }
+
     input[type="text"], input[type="password"], input[type="number"], input[type="date"], input[type="month"], select, textarea, input[type="file"], input[type="tel"] {
       width: 100%; padding: 10px 12px; border-radius: 8px; border: 1.5px solid var(--border-color);
       background: #F8FAFC; font-size: 0.88rem; font-family: inherit; outline: none; transition: all 0.2s ease;
-      color: var(--text-dark); font-weight: 500;
+      color: var(--text-dark); font-weight: 500; height: 42px;
     }
     select {
       background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23003366' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
@@ -221,6 +247,19 @@
       animation: fadeIn 0.25s ease-out;
     }
 
+    /* Modal Progress OCR */
+    .ocr-loading-card {
+      background: #FFFFFF; padding: 24px; border-radius: 16px; width: 100%; max-width: 360px;
+      text-align: center; box-shadow: 0 20px 30px rgba(0,0,0,0.25);
+    }
+    .ocr-progress-bg {
+      width: 100%; background: #E2E8F0; border-radius: 10px; height: 18px; overflow: hidden; margin: 14px 0 8px 0;
+    }
+    .ocr-progress-fill {
+      width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary), #FF8A65);
+      transition: width 0.15s ease; border-radius: 10px;
+    }
+
     @media (max-width: 768px) {
       header.app-header { padding: 10px 12px 0 12px; }
       .brand-title-small { display: none; }
@@ -243,6 +282,20 @@
   </style>
 </head>
 <body>
+
+  <!-- MODAL OCR LOADING PROGRESS -->
+  <div id="ocrModal" class="modal-overlay" style="display:none;">
+    <div class="ocr-loading-card">
+      <div style="font-size:2rem; color:var(--primary); margin-bottom:6px;"><i class="fas fa-camera-retro fa-bounce"></i></div>
+      <h3 style="margin:0; font-size:1.05rem; color:var(--accent);">Memproses OCR Gambar...</h3>
+      <p style="font-size:0.78rem; color:var(--muted); margin-top:4px;" id="ocrStatusText">Membaca teks dari dokumen kamera client...</p>
+      
+      <div class="ocr-progress-bg">
+        <div id="ocrProgressBar" class="ocr-progress-fill"></div>
+      </div>
+      <div style="font-size:0.85rem; font-weight:800; color:var(--accent);" id="ocrProgressPercent">0%</div>
+    </div>
+  </div>
 
   <!-- MODAL LOGIN PETUGAS -->
   <div id="loginModal" class="modal-overlay">
@@ -321,11 +374,11 @@
     <div class="app-nav-tabs"> 
       <button class="tab active" data-tab="imunisasi" onclick="switchTab(event)"><i class="fas fa-user-plus"></i> INPUT KOHORT</button>
       <button class="tab" data-tab="bias" onclick="switchTab(event)"><i class="fas fa-school"></i> BIAS</button>
-      <button class="tab" data-tab="export" onclick="switchTab(event)"><i class="fas fa-file-export"></i> EKSPOR</button>
-      <button class="tab" data-tab="import" onclick="switchTab(event)"><i class="fas fa-upload"></i> IMPORT</button>
       <button class="tab" data-tab="catchup" onclick="switchTab(event)"><i class="fas fa-exclamation-circle" style="color:#ffc107;"></i> CATCH UP</button>
       <button class="tab" data-tab="kumulatif" onclick="switchTab(event)"><i class="fas fa-chart-line"></i> KUMULATIF</button>
-      <button class="tab" data-tab="capaian" onclick="switchTab(event)"><i class="fas fa-award" style="color:#10B981;"></i> CAPAIAN & ADMIN</button>
+      <button class="tab" data-tab="capaian" onclick="switchTab(event)"><i class="fas fa-award" style="color:#10B981;"></i> CAPAIAN</button>
+      <!-- Tab Admin Terpisah paling kanan -->
+      <button class="tab tab-admin-highlight" data-tab="admin" onclick="switchTab(event)"><i class="fas fa-user-gear"></i> ADMIN & KONTROL</button>
     </div>
   </header>
 
@@ -346,7 +399,12 @@
         <div class="grid">
           <div class="form-group full-width" style="margin-bottom: 6px;">
             <label><i class="fas fa-search-location" style="color:var(--primary);"></i> Cari Nama Sasaran (Mulai 2 Huruf)</label>
-            <input type="text" id="input_search_sasaran" placeholder="Ketik minimal 2 huruf nama sasaran (misal: 'Ar')..." autocomplete="off">
+            <div class="input-with-btn">
+              <input type="text" id="input_search_sasaran" placeholder="Ketik minimal 2 huruf nama sasaran (misal: 'Ar')..." autocomplete="off">
+              <button type="button" class="btn-ocr-cam" onclick="triggerCameraOCR('input_search_sasaran')" title="Scan Nama via Kamera 📷">
+                <i class="fas fa-camera"></i>
+              </button>
+            </div>
             <div id="liveSearchResults" class="search-results-dropdown"></div>
             <small style="font-size:0.72rem; color:var(--muted); margin-top:3px;"><i class="fas fa-info-circle"></i> Mengetik &ge; 2 huruf akan memfilter daftar saran secara real-time dan mencocokkan TTL & nama ibu.</small>
           </div>
@@ -426,7 +484,12 @@
 
             <div class="form-group">
               <label>Nama Sasaran <span class="req">*</span></label>
-              <input type="text" id="reg_nama_anak" placeholder="Nama lengkap sasaran" required autocomplete="off">
+              <div class="input-with-btn">
+                <input type="text" id="reg_nama_anak" placeholder="Nama lengkap sasaran" required autocomplete="off">
+                <button type="button" class="btn-ocr-cam" onclick="triggerCameraOCR('reg_nama_anak')" title="Scan Nama via Kamera 📷">
+                  <i class="fas fa-camera"></i>
+                </button>
+              </div>
             </div>
 
             <div class="form-group">
@@ -443,7 +506,12 @@
 
             <div class="form-group">
               <label>NIK Sasaran (Opsional)</label>
-              <input type="text" id="reg_nik_anak" placeholder="NIK Sasaran">
+              <div class="input-with-btn">
+                <input type="text" id="reg_nik_anak" placeholder="NIK Sasaran">
+                <button type="button" class="btn-ocr-cam" onclick="triggerCameraOCR('reg_nik_anak')" title="Scan NIK via Kamera 📷">
+                  <i class="fas fa-camera"></i>
+                </button>
+              </div>
             </div>
 
             <div class="form-group">
@@ -453,17 +521,32 @@
 
             <div class="form-group" id="group_nama_ortu">
               <label id="lbl_nama_ibu">Nama Orang Tua / Ibu <span class="req">*</span></label>
-              <input type="text" id="reg_nama_ibu" placeholder="Nama ibu / nama suami" required>
+              <div class="input-with-btn">
+                <input type="text" id="reg_nama_ibu" placeholder="Nama ibu / nama suami" required>
+                <button type="button" class="btn-ocr-cam" onclick="triggerCameraOCR('reg_nama_ibu')" title="Scan Nama Ortu via Kamera 📷">
+                  <i class="fas fa-camera"></i>
+                </button>
+              </div>
             </div>
 
             <div class="form-group">
               <label id="lbl_nik_ibu">NIK Orang Tua / Suami</label>
-              <input type="text" id="reg_nik_ibu" placeholder="NIK Orang Tua / Suami">
+              <div class="input-with-btn">
+                <input type="text" id="reg_nik_ibu" placeholder="NIK Orang Tua / Suami">
+                <button type="button" class="btn-ocr-cam" onclick="triggerCameraOCR('reg_nik_ibu')" title="Scan NIK Ortu via Kamera 📷">
+                  <i class="fas fa-camera"></i>
+                </button>
+              </div>
             </div>
 
             <div class="form-group full-width">
               <label>Alamat / RT <span class="req">*</span></label>
-              <input type="text" id="reg_alamat" placeholder="Contoh: RT 02 / Dusun A" required>
+              <div class="input-with-btn">
+                <input type="text" id="reg_alamat" placeholder="Contoh: RT 02 / Dusun A" required>
+                <button type="button" class="btn-ocr-cam" onclick="triggerCameraOCR('reg_alamat')" title="Scan Alamat via Kamera 📷">
+                  <i class="fas fa-camera"></i>
+                </button>
+              </div>
             </div>
 
             <div class="form-group full-width">
@@ -625,95 +708,7 @@
       </div>
     </section>
 
-    <!-- TAB 3: EXPORT -->
-    <section id="export" class="tab-panel" style="display:none">
-      <div class="card">
-        <h2><i class="fas fa-file-export" style="color:var(--info)"></i> Ekspor Data Spesifik</h2>
-        <p class="lead">Ekspor data register kohort desa/bulan/tahun tertentu dalam format **Excel (.xlsx) 3 Sheet** (Sheet 1: Kohort Matriks, Sheet 2: Rekap Dosis Penggunaan, Sheet 3: Rekap Logistik Kemasan Vaksin).</p>
-
-        <div class="grid">
-          <div class="form-group">
-            <label>Pilih Desa</label>
-            <select id="exp_filter_desa">
-              <option value="ALL">-- Semua Desa --</option>
-              <option value="Melata">Melata</option>
-              <option value="Nanuah">Nanuah</option>
-              <option value="Topalan">Topalan</option>
-              <option value="Batu Ampar">Batu Ampar</option>
-              <option value="Lubuk Hiju">Lubuk Hiju</option>
-              <option value="Bukit Makmur">Bukit Makmur</option>
-              <option value="Bukit Raya">Bukit Raya</option>
-              <option value="Modang Mas">Modang Mas</option>
-              <option value="Mukti Manunggal">Mukti Manunggal</option>
-              <option value="Sumber Jaya">Sumber Jaya</option>
-              <option value="Bukit Harum">Bukit Harum</option>
-              <option value="PT. TSA">PT. TSA</option>
-              <option value="PT. SHS">PT. SHS</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label>Nama Posyandu (Opsional)</label>
-            <input type="text" id="exp_filter_kegiatan" placeholder="Ketik nama posyandu">
-          </div>
-
-          <div class="form-group">
-            <label>Tahun Spesifik</label>
-            <select id="exp_filter_tahun">
-              <option value="ALL">-- Semua Tahun --</option>
-              <option value="2026">2026</option>
-              <option value="2025">2025</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label>Bulan Spesifik</label>
-            <select id="exp_filter_bulan">
-              <option value="ALL">-- Semua Bulan --</option>
-              <option value="01">Januari (01)</option>
-              <option value="02">Februari (02)</option>
-              <option value="03">Maret (03)</option>
-              <option value="04">April (04)</option>
-              <option value="05">Mei (05)</option>
-              <option value="06">Juni (06)</option>
-              <option value="07">Juli (07)</option>
-              <option value="08">Agustus (08)</option>
-              <option value="09">September (09)</option>
-              <option value="10">Oktober (10)</option>
-              <option value="11">November (11)</option>
-              <option value="12">Desember (12)</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="actions">
-          <button class="btn btn-primary" id="btnExportFilteredJSON"><i class="fas fa-download"></i> Ekspor JSON</button>
-          <button class="btn btn-success" id="btnExportFilteredExcel"><i class="fas fa-file-excel"></i> Ekspor Excel 3 Sheet (.xlsx)</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <h3><i class="fas fa-database"></i> Backup Full Database</h3>
-        <button class="btn btn-ghost" id="btnExportDb"><i class="fas fa-cloud-download-alt"></i> Backup JSON (.json)</button>
-      </div>
-    </section>
-
-    <!-- TAB 4: IMPORT -->
-    <section id="import" class="tab-panel" style="display:none">
-        <div class="card">
-          <h2><i class="fas fa-upload" style="color:var(--primary)"></i> Import Database ke Cloud</h2>
-          <div class="form-group">
-            <label>Pilih File (JSON atau CSV)</label>
-            <input type="file" id="importFile" accept=".json,.csv" multiple>
-          </div>
-          <div id="importStatus" class="small" style="margin-top:10px;"></div>
-          <div class="actions" style="justify-content:flex-start">
-            <button class="btn btn-primary" id="btnStartImport"><i class="fas fa-cloud-upload-alt"></i> Mulai Import & Sync</button>
-          </div>
-        </div>
-    </section>
-
-    <!-- TAB 5: CATCH UP -->
+    <!-- TAB 3: CATCH UP -->
     <section id="catchup" class="tab-panel" style="display:none">
       <div class="card">
         <h3><i class="fas fa-filter"></i> Filter Catch Up Wilayah</h3>
@@ -774,7 +769,7 @@
       </div>
     </section>
     
-    <!-- TAB 6: KUMULATIF -->
+    <!-- TAB 4: KUMULATIF -->
     <section id="kumulatif" class="tab-panel" style="display:none">
       <div class="card">
         <h3><i class="fas fa-filter"></i> Filter Laporan Kumulatif</h3>
@@ -806,11 +801,12 @@
           </div>
 
           <div class="form-group">
-            <label>Kategori Jenis Pelayanan</label>
+            <label>Opsi Seleksi Kategori Pelayanan</label>
+            <!-- Hapus opsi 'Pilih Semua Pelayanan Lengkap' agar murni sesuai filter -->
             <select id="filter_kategori">
-              <option value="ALL">-- Semua Pelayanan (Lengkap) --</option>
-              <option value="IMUNISASI_BAYI">Imunisasi Bayi (0 - 12 Bulan)</option>
-              <option value="BADUTA">Imunisasi Lanjutan Baduta</option>
+              <option value="BAYI_0_24">Bayi Usia 0 - 24 Bulan (Sampai MR2)</option>
+              <option value="IMUNISASI_BAYI">Imunisasi Dasar Bayi (0 - 12 Bulan)</option>
+              <option value="BADUTA">Imunisasi Lanjutan Baduta (MR2 & DPT4)</option>
               <option value="BIAS">BIAS (Anak Sekolah)</option>
               <option value="CATIN">Td Catin</option>
               <option value="BUMIL">Td Ibu Hamil</option>
@@ -840,26 +836,163 @@
 
         <div class="actions">
           <button class="btn btn-primary" id="btnApplyFilter"><i class="fas fa-search"></i> Hitung Laporan</button>
-          <button class="btn btn-success" id="btnDownloadExcelFilter"><i class="fas fa-file-excel"></i> Download Excel 3 Sheet</button>
+          <button class="btn btn-success" id="btnDownloadExcelFilter"><i class="fas fa-file-excel"></i> Download Excel (Sesuai Filter)</button>
         </div>
       </div>
 
       <div class="card">
-        <h3><i class="fas fa-list-alt"></i> Hasil Rekapitulasi Matriks</h3>
+        <h3><i class="fas fa-list-alt"></i> Hasil Rekapitulasi Matriks Kumulatif</h3>
         <div id="reviewContainer" class="table-container">
           <p class="muted" style="text-align:center; padding:15px;">Klik Hitung Laporan untuk memuat data.</p>
         </div>
       </div>
     </section>
 
-    <!-- TAB 7: CAPAIAN & MODE ADMIN -->
+    <!-- TAB 5: CAPAIAN -->
     <section id="capaian" class="tab-panel" style="display:none">
+      <div class="card">
+        <h3><i class="fas fa-filter"></i> Filter Capaian</h3>
+        <div class="grid">
+          <div class="form-group">
+            <label>Tahun</label>
+            <select id="cap_filter_tahun">
+              <option value="2026">2026</option>
+              <option value="2025">2025</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Bulan Spesifik</label>
+            <select id="cap_filter_bulan">
+              <option value="ALL">-- Semua Bulan (Tahunan) --</option>
+              <option value="01">Januari (01)</option>
+              <option value="02">Februari (02)</option>
+              <option value="03">Maret (03)</option>
+              <option value="04">April (04)</option>
+              <option value="05">Mei (05)</option>
+              <option value="06">Juni (06)</option>
+              <option value="07">Juli (07)</option>
+              <option value="08">Agustus (08)</option>
+              <option value="09">September (09)</option>
+              <option value="10">Oktober (10)</option>
+              <option value="11">November (11)</option>
+              <option value="12">Desember (12)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary" id="btnHitungCapaian"><i class="fas fa-chart-pie"></i> Hitung Capaian & IDL</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3><i class="fas fa-baby"></i> 1. Capaian Bayi & Baduta Per Antigen (Sampai MR2)</h3>
+        <div id="containerCapaianBayiBaduta" class="table-container">
+          <p class="muted" style="text-align:center; padding:15px;">Klik Hitung Capaian & IDL di atas.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3><i class="fas fa-certificate" style="color:var(--success)"></i> 2. Imunisasi Dasar Lengkap (IDL) Per Desa</h3>
+        <div id="containerTabelIDL" class="table-container">
+          <p class="muted" style="text-align:center; padding:15px;">Klik Hitung Capaian & IDL di atas.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3><i class="fas fa-school" style="color:var(--info)"></i> 3. Capaian BIAS</h3>
+        <div id="containerCapaianBIAS" class="table-container">
+          <p class="muted" style="text-align:center; padding:15px;">Klik Hitung Capaian & IDL di atas.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 6: ADMIN TERPISAH (PALING KANAN) -->
+    <section id="admin" class="tab-panel" style="display:none">
+      <div class="card" style="background:#FFF5F5; border:1.5px solid #FEB2B2;">
+        <h2><i class="fas fa-user-shield" style="color:var(--danger)"></i> Panel Kontrol & Administrasi Sistem</h2>
+        <p class="lead">Pusat kendali pengguna, manajemen data ekspor-impor, target sasaran, dan konfigurasi kemasan logistik.</p>
+      </div>
+
+      <div class="grid">
+        <!-- Fitur Ekspor & Backup Data (Dipindahkan ke Tab Admin) -->
+        <div class="card">
+          <h3><i class="fas fa-file-export" style="color:var(--info)"></i> Ekspor Data Spesifik</h3>
+          <p style="font-size:0.8rem; color:var(--muted);">Ekspor kohort dalam format Excel (.xlsx) 3 Sheet atau JSON.</p>
+
+          <div class="form-group">
+            <label>Pilih Desa</label>
+            <select id="exp_filter_desa">
+              <option value="ALL">-- Semua Desa --</option>
+              <option value="Melata">Melata</option>
+              <option value="Nanuah">Nanuah</option>
+              <option value="Topalan">Topalan</option>
+              <option value="Batu Ampar">Batu Ampar</option>
+              <option value="Lubuk Hiju">Lubuk Hiju</option>
+              <option value="Bukit Makmur">Bukit Makmur</option>
+              <option value="Bukit Raya">Bukit Raya</option>
+              <option value="Modang Mas">Modang Mas</option>
+              <option value="Mukti Manunggal">Mukti Manunggal</option>
+              <option value="Sumber Jaya">Sumber Jaya</option>
+              <option value="Bukit Harum">Bukit Harum</option>
+              <option value="PT. TSA">PT. TSA</option>
+              <option value="PT. SHS">PT. SHS</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Tahun & Bulan</label>
+            <div class="form-row">
+              <select id="exp_filter_tahun">
+                <option value="2026">2026</option>
+                <option value="2025">2025</option>
+              </select>
+              <select id="exp_filter_bulan">
+                <option value="ALL">-- Semua Bulan --</option>
+                <option value="01">Januari (01)</option>
+                <option value="02">Februari (02)</option>
+                <option value="03">Maret (03)</option>
+                <option value="04">April (04)</option>
+                <option value="05">Mei (05)</option>
+                <option value="06">Juni (06)</option>
+                <option value="07">Juli (07)</option>
+                <option value="08">Agustus (08)</option>
+                <option value="09">September (09)</option>
+                <option value="10">Oktober (10)</option>
+                <option value="11">November (11)</option>
+                <option value="12">Desember (12)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="actions" style="justify-content:flex-start;">
+            <button class="btn btn-primary" id="btnExportFilteredJSON"><i class="fas fa-download"></i> JSON</button>
+            <button class="btn btn-success" id="btnExportFilteredExcel"><i class="fas fa-file-excel"></i> Excel 3 Sheet</button>
+            <button class="btn btn-ghost" id="btnExportDb"><i class="fas fa-database"></i> Backup Full DB</button>
+          </div>
+        </div>
+
+        <!-- Fitur Import Data (Dipindahkan ke Tab Admin) -->
+        <div class="card">
+          <h3><i class="fas fa-upload" style="color:var(--primary)"></i> Import Database Ke Cloud</h3>
+          <p style="font-size:0.8rem; color:var(--muted);">Unggah file JSON/CSV untuk memperbarui basis data server.</p>
+          <div class="form-group">
+            <label>Pilih File (.json / .csv)</label>
+            <input type="file" id="importFile" accept=".json,.csv" multiple>
+          </div>
+          <div id="importStatus" class="small" style="margin-top:6px;"></div>
+          <div class="actions" style="justify-content:flex-start">
+            <button class="btn btn-primary" id="btnStartImport"><i class="fas fa-cloud-upload-alt"></i> Mulai Import & Sync</button>
+          </div>
+        </div>
+      </div>
+
       <div class="card" style="background:#FFFBEB; border:1.5px solid #FCD34D;">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
           <div>
-            <h3 style="margin:0; color:#92400E; font-size:0.95rem;"><i class="fas fa-lock"></i> Pengaturan Admin (Target Sasaran & Logika Kemasan Vaksin)</h3>
+            <h3 style="margin:0; color:#92400E; font-size:0.95rem;"><i class="fas fa-sliders"></i> Pengaturan Target Sasaran & Logika Kemasan Vaksin</h3>
           </div>
-          <button class="btn btn-warning" onclick="toggleFormAdminSasaran()" style="padding:4px 8px; font-size:0.78rem;"><i class="fas fa-user-lock"></i> Pengaturan Admin</button>
+          <button class="btn btn-warning" onclick="toggleFormAdminSasaran()" style="padding:4px 8px; font-size:0.78rem;"><i class="fas fa-user-lock"></i> Buka Pengaturan</button>
         </div>
 
         <div id="panelAdminPengaturan" style="display:none; margin-top:12px; border-top:1px dashed #FCD34D; padding-top:12px;">
@@ -910,8 +1043,6 @@
           <hr style="border:0; border-top:1px dashed #FCD34D; margin:16px 0;">
 
           <h4 style="color:#92400E; margin-bottom:8px;"><i class="fas fa-box"></i> 2. Pengaturan Logika Konsumsi & Kemasan Vaksin (Vial/Uniject/Pcs)</h4>
-          <p style="font-size:0.78rem; color:#78350F; margin-top:0;">Jika terjadi perubahan ketersediaan kemasan merek vaksin dari pusat (misalnya 1 vial DPT berubah jadi 2 dosis atau 5 dosis), ubah nilainya di bawah lalu simpan:</p>
-
           <form id="formLogikaVaksinAdmin">
             <div class="grid" id="gridLogikaVaksinContainer">
               <!-- Render otomatis via JS -->
@@ -921,62 +1052,6 @@
             </div>
           </form>
 
-        </div>
-      </div>
-
-      <div class="card">
-        <h3><i class="fas fa-filter"></i> Filter Capaian</h3>
-        <div class="grid">
-          <div class="form-group">
-            <label>Tahun</label>
-            <select id="cap_filter_tahun">
-              <option value="2026">2026</option>
-              <option value="2025">2025</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Bulan Spesifik</label>
-            <select id="cap_filter_bulan">
-              <option value="ALL">-- Semua Bulan (Tahunan) --</option>
-              <option value="01">Januari (01)</option>
-              <option value="02">Februari (02)</option>
-              <option value="03">Maret (03)</option>
-              <option value="04">April (04)</option>
-              <option value="05">Mei (05)</option>
-              <option value="06">Juni (06)</option>
-              <option value="07">Juli (07)</option>
-              <option value="08">Agustus (08)</option>
-              <option value="09">September (09)</option>
-              <option value="10">Oktober (10)</option>
-              <option value="11">November (11)</option>
-              <option value="12">Desember (12)</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="actions">
-          <button class="btn btn-primary" id="btnHitungCapaian"><i class="fas fa-chart-pie"></i> Hitung Capaian & IDL</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <h3><i class="fas fa-baby"></i> 1. Capaian Bayi & Baduta Per Antigen</h3>
-        <div id="containerCapaianBayiBaduta" class="table-container">
-          <p class="muted" style="text-align:center; padding:15px;">Klik Hitung Capaian & IDL di atas.</p>
-        </div>
-      </div>
-
-      <div class="card">
-        <h3><i class="fas fa-certificate" style="color:var(--success)"></i> 2. Imunisasi Dasar Lengkap (IDL) Per Desa</h3>
-        <div id="containerTabelIDL" class="table-container">
-          <p class="muted" style="text-align:center; padding:15px;">Klik Hitung Capaian & IDL di atas.</p>
-        </div>
-      </div>
-
-      <div class="card">
-        <h3><i class="fas fa-school" style="color:var(--info)"></i> 3. Capaian BIAS</h3>
-        <div id="containerCapaianBIAS" class="table-container">
-          <p class="muted" style="text-align:center; padding:15px;">Klik Hitung Capaian & IDL di atas.</p>
         </div>
       </div>
     </section>
@@ -1150,7 +1225,84 @@
     const AUTH_ADMIN_USER = "admin";
     const AUTH_ADMIN_PASS = "adminsri26";
 
-    const BASE64_LOGO_WATERMARK = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300'><circle cx='150' cy='150' r='130' fill='none' stroke='%23003366' stroke-width='8'/><path d='M 150 40 L 150 260 M 40 150 L 260 150' stroke='%23ff5722' stroke-width='24'/><circle cx='150' cy='150' r='45' fill='%23003366'/></svg>";
+    // FUNGSI CLIENT-SIDE OCR DENGAN PROSES ANIMASI 0-70% DAN REAL-TIME 70-100%
+    window.triggerCameraOCR = function(targetFieldId) {
+      const fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.accept = 'image/*';
+      fileInput.capture = 'environment'; // Membuka kamera langsung HP
+
+      fileInput.onchange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const modal = document.getElementById('ocrModal');
+        const fill = document.getElementById('ocrProgressBar');
+        const percent = document.getElementById('ocrProgressPercent');
+        const statusText = document.getElementById('ocrStatusText');
+
+        modal.style.display = 'flex';
+        statusText.textContent = "Menginisialisasi pemprosesan hardware...";
+        
+        let progress = 0;
+        fill.style.width = '0%';
+        percent.textContent = '0%';
+
+        // Animasi Cepat 0% -> 70%
+        const fastTimer = setInterval(() => {
+          if (progress < 70) {
+            progress += 5;
+            fill.style.width = progress + '%';
+            percent.textContent = progress + '%';
+          } else {
+            clearInterval(fastTimer);
+          }
+        }, 35);
+
+        try {
+          const worker = await Tesseract.createWorker('ind');
+          statusText.textContent = "Menganalisis teks dokumen dari gambar...";
+          
+          const ret = await worker.recognize(file, {
+            logger: m => {
+              if (m.status === 'recognizing text') {
+                const realProg = 70 + Math.round(m.progress * 30);
+                if (realProg > progress) {
+                  progress = realProg;
+                  fill.style.width = progress + '%';
+                  percent.textContent = progress + '%';
+                }
+              }
+            }
+          });
+
+          await worker.terminate();
+
+          fill.style.width = '100%';
+          percent.textContent = '100%';
+
+          let textResult = ret.data.text.trim();
+          textResult = textResult.replace(/[\r\n]+/g, " ");
+
+          const targetElem = document.getElementById(targetFieldId);
+          if (targetElem) {
+            targetElem.value = textResult;
+            targetElem.dispatchEvent(new Event('input'));
+          }
+
+          setTimeout(() => {
+            modal.style.display = 'none';
+          }, 300);
+
+        } catch (err) {
+          clearInterval(fastTimer);
+          modal.style.display = 'none';
+          alert("Gagal membaca teks OCR dari kamera: " + err.message);
+        }
+      };
+
+      fileInput.click();
+    };
 
     window.resetFormRegisterIndividu = function() {
       const form = document.getElementById('formRegisterIndividu');
@@ -1229,6 +1381,7 @@
     }
 
     function getActiveVaccineKeysByCategory(katSel) {
+      if (katSel === 'BAYI_0_24') return VAKSIN_ANAK_KEYS; // Sampai MR2
       if (katSel === 'IMUNISASI_BAYI') return VAKSIN_ANAK_KEYS.slice(0, 19);
       if (katSel === 'BADUTA') return VAKSIN_ANAK_KEYS.slice(19, 22);
       if (katSel === 'CATIN') return VAKSIN_DEWASA_KEYS.slice(0, 2);
@@ -1884,373 +2037,6 @@
       loadRecentTransactions();
     }
 
-    window.cetakSertifikatIndividu = function(dataAnakJson) {
-      try {
-        const d = JSON.parse(decodeURIComponent(dataAnakJson));
-        const win = window.open('', '_blank');
-
-        const isAdmin = (typeof activePetugasName !== 'undefined' && activePetugasName.toLowerCase() === 'admin');
-
-        function getDesaCode(desaName) {
-          if (!desaName) return "XX";
-          const words = desaName.trim().replace(/^PT\.\s*/i, '').split(/\s+/);
-          if (words.length >= 2) {
-            const w1 = words[0], w2 = words[1];
-            return (w1[0] + w2[0]).toUpperCase();
-          } else {
-            const w = words[0];
-            return (w[0] + w[w.length - 1]).toUpperCase();
-          }
-        }
-
-        const kodeDesa = getDesaCode(d.desa);
-        const noUrut = d.id ? String(d.id).replace(/[^0-9]/g, '').slice(-3) || "001" : "001";
-        const noSertifikat = `${kodeDesa}/IDL/${noUrut}/${new Date().getFullYear()}`;
-
-        const listVaksinRingkas = [
-          { key: "HBO (<24 Jam)", label: "Hepatitis B (HB-0 <24 Jam)" },
-          { key: "HBO (1-7 Hari)", label: "Hepatitis B (HB-0 1-7 Hari)" },
-          { key: "BCG", label: "BCG" },
-          { key: "OPV1", label: "Polio Oral 1 (OPV 1)" },
-          { key: "DPT-HB-Hib1", label: "DPT-HB-Hib 1" },
-          { key: "OPV2", label: "Polio Oral 2 (OPV 2)" },
-          { key: "PCV1", label: "PCV 1" },
-          { key: "Rotavirus1", label: "Rotavirus 1 (RV 1)" },
-          { key: "DPT-HB-Hib2", label: "DPT-HB-Hib 2" },
-          { key: "OPV3", label: "Polio Oral 3 (OPV 3)" },
-          { key: "PCV2", label: "PCV 2" },
-          { key: "Rotavirus2", label: "Rotavirus 2 (RV 2)" },
-          { key: "DPT-HB-Hib3", label: "DPT-HB-Hib 3" },
-          { key: "OPV4", label: "Polio Oral 4 (OPV 4)" },
-          { key: "IPV1", label: "Inactivated Polio Vaccine 1 (IPV 1)" },
-          { key: "Rotavirus3", label: "Rotavirus 3 (RV 3)" },
-          { key: "Campak Rubela-1", label: "Campak Rubella 1 (MR 1)" },
-          { key: "IPV2", label: "Inactivated Polio Vaccine 2 (IPV 2)" }
-        ];
-
-        let vGridHtml = '';
-        listVaksinRingkas.forEach(item => {
-          const fieldKey = `vaksin_${item.key.replace(/[\s\(\)<>-]/g, '_')}`;
-          const tgl = d[fieldKey] || (d.jenis_imunisasi === item.key ? d.tanggal_pelayanan : null);
-          vGridHtml += `
-            <div style="border: 1.5px solid #CBD5E1; padding: 8px 12px; border-radius: 8px; background: #FFFFFF; font-size: 12px; display: flex; justify-content: space-between; align-items: center;">
-              <span style="font-weight: 700; color: #1E293B;">${item.label}</span>
-              <span style="font-weight: 800; color: ${tgl ? '#065F46' : '#94A3B8'}; background: transparent; padding: 3px 8px; border-radius: 6px;">${tgl || 'Sudah Diberikan'}</span>
-            </div>
-          `;
-        });
-
-        const nowFormatted = new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-
-        const draftBannerHtml = !isAdmin ? `
-          <div class="draft-no-print-banner">
-            ⚠️ MODE PREVIEW VIEW-ONLY (KHUSUS DRAFT - TIDAK UNTUK DICETAK / DISIMPAN)
-          </div>
-        ` : '';
-
-        const draftWatermarkHtml = !isAdmin ? `<div class="draft-watermark-big">DRAFT</div>` : '';
-
-        const printCSS = !isAdmin ? `
-          @media print {
-            body { display: none !important; }
-          }
-        ` : `
-          @media print {
-            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-          }
-        `;
-
-        const printScript = isAdmin ? `
-          window.onload = function() {
-            window.print();
-          }
-        ` : `
-          window.addEventListener('keydown', function(e) {
-            if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 's')) {
-              e.preventDefault();
-              alert('🔒 AKSES DITOLAK: Mode View-Only. Cetak sertifikat resmi hanya dapat dilakukan oleh Admin.');
-            }
-          });
-        `;
-
-        const template = `
-          <!DOCTYPE html>
-          <html lang="id">
-          <head>
-            <meta charset="utf-8">
-            <title>Sertifikat IDL - ${d.nama_anak}</title>
-            <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-            <style>
-              @page { size: A4 landscape; margin: 0; }
-              *, *::before, *::after { box-sizing: border-box; }
-              body { font-family: 'Plus Jakarta Sans', sans-serif; color: #0F172A; margin: 0; padding: 0; background: #FFFFFF; user-select: none; }
-              
-              .draft-no-print-banner {
-                background: #DC2626; color: #FFF; text-align: center; font-weight: 800;
-                padding: 8px; font-size: 13px; letter-spacing: 1px; position: sticky; top: 0; z-index: 9999;
-              }
-
-              .page {
-                width: 297mm;
-                height: 210mm;
-                padding: 10mm;
-                page-break-after: always;
-                box-sizing: border-box;
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-                position: relative;
-                overflow: hidden;
-                background: #FFFFFF;
-              }
-
-              .cert-outer {
-                border: 4px double #003366;
-                padding: 5px;
-                height: 100%;
-                box-sizing: border-box;
-                position: relative;
-                z-index: 2;
-                background: transparent;
-              }
-
-              .cert-inner {
-                border: 2px solid #FF5722;
-                height: 100%;
-                padding: 18px 28px;
-                background: #FFFFFF;
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-                position: relative;
-                z-index: 2;
-              }
-
-              .watermark-bg {
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                width: 300px;
-                height: auto;
-                opacity: 0.1;
-                pointer-events: none;
-                z-index: 1;
-              }
-
-              .draft-watermark-big {
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%) rotate(-30deg);
-                font-size: 110px;
-                font-weight: 900;
-                color: rgba(239, 68, 68, 0.22);
-                letter-spacing: 12px;
-                text-transform: uppercase;
-                pointer-events: none;
-                z-index: 10;
-                white-space: nowrap;
-                border: 10px dashed rgba(239, 68, 68, 0.22);
-                padding: 8px 30px;
-                border-radius: 16px;
-              }
-
-              .kop-container {
-                text-align: center;
-                border-bottom: 3px double #003366;
-                padding-bottom: 6px;
-                margin-bottom: 8px;
-              }
-              .kop-container h3 { margin: 0; font-size: 14px; font-weight: 800; color: #003366; letter-spacing: 1px; }
-              .kop-container h2 { margin: 2px 0; font-size: 16px; font-weight: 800; color: #003366; letter-spacing: 1.5px; }
-              .kop-container h1 { margin: 2px 0; font-size: 20px; font-weight: 800; color: #003366; letter-spacing: 2px; }
-              .kop-container p { margin: 0; font-size: 10.5px; color: #334155; font-weight: 600; }
-
-              .content-body { text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
-              .cert-title { font-family: 'Cinzel', serif; font-size: 32px; font-weight: 800; color: #003366; letter-spacing: 5px; margin-bottom: 2px; }
-              .cert-no { font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 14px; }
-
-              .bio-container {
-                width: 80%;
-                margin: 0 auto 12px auto;
-                text-align: left;
-                font-size: 13.5px;
-                line-height: 1.6;
-                background: #FFFFFF;
-                padding: 12px 20px;
-                border-radius: 8px;
-                border: 1px solid #CBD5E1;
-              }
-              .bio-row { display: flex; }
-              .bio-label { width: 200px; font-weight: 700; color: #1E293B; }
-              .bio-val { font-weight: 700; color: #003366; }
-
-              .statement-box {
-                font-size: 13.5px;
-                line-height: 1.4;
-                color: #1E293B;
-                margin-bottom: 6px;
-              }
-              .motto {
-                font-size: 15px;
-                font-weight: 800;
-                color: #FF5722;
-                margin-top: 2px;
-                text-transform: uppercase;
-                letter-spacing: 2px;
-              }
-
-              .ttd-row {
-                display: flex;
-                justify-content: space-between;
-                align-items: flex-end;
-                margin-top: 6px;
-              }
-              .ttd-box { 
-                width: 38%; 
-                text-align: center; 
-                font-size: 11.5px; 
-              }
-              .ttd-title { 
-                font-weight: 700; 
-                color: #003366; 
-                margin-bottom: 2px; 
-              }
-              .ttd-space {
-                height: 70px;
-              }
-              .ttd-name { 
-                font-weight: 800; 
-                font-size: 12.5px; 
-                text-decoration: underline; 
-                color: #003366; 
-                margin-top: 2px;
-              }
-              .ttd-nip { 
-                font-size: 10.5px; 
-                color: #334155; 
-                font-weight: 600; 
-                margin-top: 1px; 
-              }
-
-              .back-title { font-family: 'Cinzel', serif; font-size: 18px; font-weight: 800; color: #003366; text-align: center; margin-bottom: 10px; border-bottom: 2px solid #003366; padding-bottom: 4px; }
-              .v-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 6px; }
-
-              ${printCSS}
-            </style>
-          </head>
-          <body oncontextmenu="return false;">
-            ${draftBannerHtml}
-            
-            <div class="page">
-              <img class="watermark-bg" src="${BASE64_LOGO_WATERMARK}" alt="Watermark Puskesmas Melata">
-              ${draftWatermarkHtml}
-
-              <div class="cert-outer">
-                <div class="cert-inner">
-                  
-                  <div class="kop-container">
-                    <h3>PEMERINTAH KABUPATEN LAMANDAU</h3>
-                    <h2>DINAS KESEHATAN</h2>
-                    <h1>PUSKESMAS MELATA</h1>
-                    <p>Jln. Tri Setya No. 01 Ds. Melata Kec. Menthobi Raya Kab. Lamandau</p>
-                  </div>
-
-                  <div class="content-body">
-                    <div class="cert-title">SERTIFIKAT</div>
-                    <div class="cert-no">Nomor: ${noSertifikat}</div>
-
-                    <div class="statement-box">
-                      Diberikan kepada anak:
-                    </div>
-
-                    <div class="bio-container">
-                      <div class="bio-row">
-                        <div class="bio-label">Nama Lengkap Anak</div>
-                        <div>: <span class="bio-val" style="font-size:15px; text-transform:uppercase;">${d.nama_anak}</span></div>
-                      </div>
-                      <div class="bio-row">
-                        <div class="bio-label">Tanggal Lahir / JK</div>
-                        <div>: ${d.tgl_lahir || '-'} (${d.jk === 'L' ? 'Laki-Laki' : d.jk === 'P' ? 'Perempuan' : '-'})</div>
-                      </div>
-                      <div class="bio-row">
-                        <div class="bio-label">Nama Orang Tua / Ibu</div>
-                        <div>: ${d.nama_ibu || '-'}</div>
-                      </div>
-                      <div class="bio-row">
-                        <div class="bio-label">Desa / Alamat</div>
-                        <div>: Desa ${d.desa || '-'}, ${d.alamat_rt || '-'}</div>
-                      </div>
-                    </div>
-
-                    <div class="statement-box">
-                      Menyatakan bahwa anak tersebut di atas telah mendapatkan <b>Imunisasi Dasar Lengkap</b>.
-                      <div class="motto">"Anak Sehat Generasi Kuat"</div>
-                    </div>
-                  </div>
-
-                  <div class="ttd-row">
-                    <div class="ttd-box">
-                      <div class="ttd-title">Koordinator Imunisasi,</div>
-                      <div class="ttd-space"></div>
-                      <div class="ttd-name">Tri Prio Heryanto</div>
-                    </div>
-
-                    <div class="ttd-box">
-                      <div style="font-size: 10.5px; margin-bottom: 2px;">Melata, ${nowFormatted}</div>
-                      <div class="ttd-title">Mengetahui,<br>Kepala Puskesmas Melata</div>
-                      <div class="ttd-space"></div>
-                      <div class="ttd-name">dr. Anang Argo Yuwono</div>
-                      <div class="ttd-nip">Pembina Tingkat I</div>
-                      <div class="ttd-nip">NIP. 19830521 201403 003</div>
-                    </div>
-                  </div>
-
-                </div>
-              </div>
-            </div>
-
-            <div class="page">
-              <img class="watermark-bg" src="${BASE64_LOGO_WATERMARK}" alt="Watermark Puskesmas Melata">
-              ${draftWatermarkHtml}
-
-              <div class="cert-outer">
-                <div class="cert-inner">
-                  
-                  <div>
-                    <div class="back-title">CATATAN RIWAYAT IMUNISASI DASAR LENGKAP</div>
-                    <div style="font-size:12px; color:#334155; margin-bottom:8px; text-align:center;">
-                      Lampiran Halaman Belakang Sertifikat An. <b>${d.nama_anak}</b> (Desa ${d.desa || '-'})
-                    </div>
-
-                    <div class="v-grid">
-                      ${vGridHtml}
-                    </div>
-                  </div>
-
-                  <div style="text-align:center; font-size:10.5px; color:#64748B; border-top:1px solid #CBD5E1; padding-top:6px;">
-                    Dokumen Rekam Imunisasi Resmi — Puskesmas Melata, Kabupaten Lamandau
-                  </div>
-
-                </div>
-              </div>
-            </div>
-
-            <script>
-              ${printScript}
-            <\/script>
-          </body>
-          </html>
-        `;
-
-        win.document.write(template);
-        win.document.close();
-      } catch (err) {
-        alert("Gagal memuat sertifikat: " + err.message);
-      }
-    };
-
     async function loadRecentTransactions() {
       const tbodyAnak = document.querySelector('#tblRecentAnak tbody');
       const tbodyDewasa = document.querySelector('#tblRecentDewasa tbody');
@@ -2318,7 +2104,6 @@
               <td>${petugasKet}</td>
               <td style="display:flex; gap:4px; justify-content:center;">
                 <button class="btn btn-warning" onclick="editDataSasaran('${jsonString}')" style="padding:3px 6px; font-size:0.72rem;"><i class="fas fa-edit"></i> Edit</button>
-                <button class="btn btn-info" onclick="cetakSertifikatIndividu('${jsonString}')" style="padding:3px 6px; font-size:0.72rem;"><i class="fas fa-certificate"></i> Cetak</button>
                 <button class="btn btn-danger" onclick="hapusTrans('${d.id}')" style="padding:3px 6px; font-size:0.72rem;"><i class="fas fa-trash"></i></button>
               </td>
             `;
@@ -2346,7 +2131,6 @@
               <td>${petugasKet}</td>
               <td style="display:flex; gap:4px; justify-content:center;">
                 <button class="btn btn-warning" onclick="editDataSasaran('${jsonString}')" style="padding:3px 6px; font-size:0.72rem;"><i class="fas fa-edit"></i> Edit</button>
-                <button class="btn btn-info" onclick="cetakSertifikatIndividu('${jsonString}')" style="padding:3px 6px; font-size:0.72rem;"><i class="fas fa-certificate"></i> Cetak</button>
                 <button class="btn btn-danger" onclick="hapusTrans('${d.id}')" style="padding:3px 6px; font-size:0.72rem;"><i class="fas fa-trash"></i></button>
               </td>
             `;
@@ -2472,7 +2256,7 @@
         `;
         VAKSIN_ANAK_KEYS.forEach(vKey => {
           const idx = VAKSIN_ANAK_KEYS.indexOf(vKey);
-          const kat = idx <= 18 ? "Imunisasi Bayi" : "Booster Baduta";
+          const kat = idx <= 18 ? "Imunisasi Bayi" : "Booster Baduta (MR2 & DPT4)";
           const ex = exactCounts[vKey];
           const kum = kumulatifCounts[vKey];
           htmlBayi += `
@@ -3096,7 +2880,7 @@
             }
           });
 
-          if (matchDesa && (katSel === 'ALL' || hasMatchingVaccineInKat)) {
+          if (matchDesa && hasMatchingVaccineInKat) {
             filteredDocs.push(d);
           }
         });
@@ -3146,7 +2930,7 @@
           <div style="margin-bottom:10px; background:#F0F7FF; padding:10px 12px; border-radius:8px; font-size:0.82rem;">
             <strong>Periode:</strong> ${bln === 'ALL' ? 'Semua Bulan' : 'Bulan ' + BULAN_NAME_MAP[bln]} ${thn} | 
             <strong>Desa:</strong> ${desaSel === 'ALL' ? 'Semua Desa' : desaSel} | 
-            <strong>Kategori:</strong> ${katSel}
+            <strong>Kategori Filter:</strong> ${katSel}
           </div>
           <table class="kohort-table">
             <thead>
@@ -3157,7 +2941,7 @@
                 <th rowspan="2">Orang Tua/Suami</th>
                 <th rowspan="2">WhatsApp</th>
                 <th rowspan="2">Desa</th>
-                <th colspan="${activeVaccineKeys.length}">Imunisasi Terfilter (${katSel})</th>
+                <th colspan="${activeVaccineKeys.length}">Imunisasi Terfilter</th>
               </tr>
               <tr>
                 ${headerVColsHtml}
@@ -3184,7 +2968,7 @@
       const thn = document.getElementById('filter_tahun').value || document.getElementById('exp_filter_tahun').value;
       const bln = document.getElementById('filter_bulan').value || document.getElementById('exp_filter_bulan').value;
       const desaSel = document.getElementById('filter_desa').value || document.getElementById('exp_filter_desa').value;
-      const katSel = document.getElementById('filter_kategori').value || 'ALL';
+      const katSel = document.getElementById('filter_kategori').value || 'BAYI_0_24';
 
       const monthNameStr = BULAN_NAME_MAP[bln] || bln;
       const endDayStr = DAYS_IN_MONTH[bln] || '31';
@@ -3248,12 +3032,12 @@
             }
           });
 
-          return matchDesa && (katSel === 'ALL' || hasMatchingVaccine);
+          return matchDesa && hasMatchingVaccine;
         });
 
         const sheet1Data = [];
         sheet1Data.push([`LAPORAN REGISTER KOHORT MATRIKS - PUSKESMAS MELATA`]);
-        sheet1Data.push([`Periode Matriks: s/d ${monthNameStr} ${thn} | Wilayah: ${desaSel === 'ALL' ? 'Semua Desa' : desaSel} | Kategori: ${katSel}`]);
+        sheet1Data.push([`Periode Matriks: s/d ${monthNameStr} ${thn} | Wilayah: ${desaSel === 'ALL' ? 'Semua Desa' : desaSel} | Kategori Filter: ${katSel}`]);
         sheet1Data.push([]);
 
         const headerRow1 = ["No", "Desa", "Posyandu/Pustu", "Nama Sasaran", "Tanggal Lahir", "L/P", "Orang Tua / Suami", "WhatsApp", "Alamat / RT"];
@@ -3301,9 +3085,9 @@
         totalRow1.push("");
         sheet1Data.push(totalRow1);
 
-        // ==================== SHEET 2: REKAPAN TOTAL PENERIMA VAKSIN (DETAIL PER DOSIS) ====================
+        // ==================== SHEET 2: REKAPAN TOTAL PENERIMA VAKSIN (DETAIL HINGGA MR2SESUAI EXCEL) ====================
         const sheet2Data = [];
-        sheet2Data.push([`REKAPITULASI TOTAL PENERIMA VAKSIN (RINCIAN DOSIS) - PUSKESMAS MELATA`]);
+        sheet2Data.push([`REKAPITULASI TOTAL PENERIMA VAKSIN (SAMPAI DENGAN MR2 & BOOSTER)`]);
         sheet2Data.push([`Periode Bulan: ${labelTglBulan} | Periode Kumulatif: ${labelTglKumulatif} | Wilayah: ${desaSel === 'ALL' ? 'Semua Desa (Per Rekap Desa)' : desaSel}`]);
         sheet2Data.push([]);
 
@@ -3351,10 +3135,10 @@
 
           activeVaccineKeys.forEach(vKey => {
             let cat = "0 - 12 Bulan (Imunisasi Dasar)";
-            const idx = ALL_VAKSIN_KEYS.indexOf(vKey);
-            if (idx >= 19 && idx <= 21) cat = "12 - 24 Bulan / Kejar Anak";
-            else if (idx >= 22 && idx <= 23) cat = "TT Calon Pengantin (Catin)";
-            else if (idx >= 24) cat = "TT Ibu Hamil (Bumil)";
+            const idx = VAKSIN_ANAK_KEYS.indexOf(vKey);
+            if (idx >= 19) cat = "12 - 24 Bulan (Booster Baduta / Kejar)";
+            else if (vKey.includes("Catin")) cat = "TT Calon Pengantin (Catin)";
+            else if (vKey.includes("Bumil")) cat = "TT Ibu Hamil (Bumil)";
 
             const c = counts[vKey];
             sumExL += c.exL; sumExP += c.exP; sumExTot += c.exTotal;
@@ -3387,7 +3171,7 @@
           buildRekapSheet2Detail(desaDocs, `Rekap Penerima Dosis - ${desaSel}`);
         }
 
-        // ==================== SHEET 3: REKAPAN LOGISTIK VAKSIN (RINGKASAN KEMASAN TERPAKAI) ====================
+        // ==================== SHEET 3: REKAPAN LOGISTIK VAKSIN ====================
         const sheet3Data = [];
         sheet3Data.push([`REKAPITULASI PEMAKAIAN LOGISTIK VAKSIN - PUSKESMAS MELATA`]);
         sheet3Data.push([`Periode Bulan: ${labelTglBulan} | Periode Kumulatif: ${labelTglKumulatif} | Wilayah: ${desaSel === 'ALL' ? 'Semua Desa (Per Rekap Desa)' : desaSel}`]);
@@ -3503,8 +3287,8 @@
 
         ws2['!cols'] = [
           { wch: 4 },
-          { wch: 30 },
-          { wch: 22 },
+          { wch: 32 },
+          { wch: 24 },
           { wch: 8 }, { wch: 8 }, { wch: 14 },
           { wch: 8 }, { wch: 8 }, { wch: 14 }
         ];

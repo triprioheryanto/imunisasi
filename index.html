@@ -275,9 +275,6 @@
       position: absolute; inset: 0; pointer-events: none;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
     }
-    .scanner-mask {
-      position: absolute; inset: 0; background: rgba(0, 0, 0, 0.55);
-    }
     
     /* Garis Bantu Single Line (1 Baris Teks) */
     .scan-guide-single {
@@ -1260,7 +1257,7 @@
 
     // GLOBAL STATE KAMERA & OCR ENGINE
     let currentOcrTargetId = "";
-    let currentOcrMode = "single"; // "single" (1 baris) atau "multi" (2-4 baris alamat)
+    let currentOcrMode = "single"; 
     let cameraStream = null;
     let currentFacingMode = "environment";
     let activeTesseractWorker = null;
@@ -1293,13 +1290,12 @@
         if (cameraStream) {
           cameraStream.getTracks().forEach(track => track.stop());
         }
-        const constraints = {
+        let constraints = {
           video: { facingMode: { exact: currentFacingMode }, width: { ideal: 1920 }, height: { ideal: 1080 } }
         };
         try {
           cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
         } catch (e) {
-          // Fallback jika exact mode gagal
           cameraStream = await navigator.mediaDevices.getUserMedia({ video: true });
         }
         const video = document.getElementById('scannerVideo');
@@ -1338,7 +1334,6 @@
       const guideRect = guideBox.getBoundingClientRect();
       const videoRect = video.getBoundingClientRect();
 
-      // Hitung koordinat relatif area penanda scan terhadap resolusi asli video
       const scaleX = videoWidth / videoRect.width;
       const scaleY = videoHeight / videoRect.height;
 
@@ -1393,7 +1388,6 @@
 
       let isTimeout = false;
 
-      // Promise Timeout 30 detik
       const timeoutPromise = new Promise((_, reject) => {
         setTimeout(() => {
           isTimeout = true;
@@ -1401,10 +1395,15 @@
         }, 30000);
       });
 
-      // Process OCR Promise
       const ocrPromise = (async () => {
         activeTesseractWorker = await Tesseract.createWorker('ind');
         statusText.textContent = "Menganalisis teks pada area penanda scan...";
+
+        if (currentOcrTargetId.includes("nik")) {
+          await activeTesseractWorker.setParameters({
+            tessedit_char_whitelist: '0123456789'
+          });
+        }
 
         const ret = await activeTesseractWorker.recognize(imageData, {
           logger: m => {
@@ -1432,11 +1431,15 @@
         percent.textContent = '100%';
 
         let cleanedText = textResult.trim().replace(/[\r\n]+/g, " ");
+        if (currentOcrTargetId.includes("nik")) {
+          cleanedText = cleanedText.replace(/[^0-9]/g, "");
+        }
 
         const targetElem = document.getElementById(currentOcrTargetId);
         if (targetElem) {
           targetElem.value = cleanedText;
           targetElem.dispatchEvent(new Event('input'));
+          targetElem.dispatchEvent(new Event('keyup'));
         }
 
         setTimeout(() => {

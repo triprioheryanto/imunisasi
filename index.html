@@ -455,7 +455,6 @@
       <button class="tab" data-tab="catchup" onclick="switchTab(event)"><i class="fas fa-exclamation-circle" style="color:#ffc107;"></i> CATCH UP</button>
       <button class="tab" data-tab="kumulatif" onclick="switchTab(event)"><i class="fas fa-chart-line"></i> KUMULATIF</button>
       <button class="tab" data-tab="capaian" onclick="switchTab(event)"><i class="fas fa-award" style="color:#10B981;"></i> CAPAIAN</button>
-      <!-- Tab Admin Terpisah paling kanan -->
       <button class="tab tab-admin-highlight" data-tab="admin" onclick="switchTab(event)"><i class="fas fa-user-gear"></i> ADMIN & KONTROL</button>
     </div>
   </header>
@@ -1353,7 +1352,7 @@
       await processImageDataWithOCR(lastCapturedImageData);
     };
 
-    // PROSES OCR DENGAN TIMEOUT 30 DETIK & OPSI RE-TRY / CANCEL
+    // PROSES OCR DENGAN CDN STABIL & TIMEOUT HANDLING
     async function processImageDataWithOCR(imageData) {
       const modal = document.getElementById('ocrModal');
       const fill = document.getElementById('ocrProgressBar');
@@ -1369,7 +1368,7 @@
       progressContainer.style.display = 'block';
       percent.style.display = 'block';
       titleText.textContent = "Memproses OCR Gambar...";
-      statusText.textContent = "Menginisialisasi engine OCR...";
+      statusText.textContent = "Mengunduh engine & bahasa OCR...";
       iconContainer.innerHTML = '<i class="fas fa-camera-retro fa-bounce"></i>';
 
       let progress = 0;
@@ -1377,38 +1376,31 @@
       percent.textContent = '0%';
 
       const fastTimer = setInterval(() => {
-        if (progress < 70) {
+        if (progress < 60) {
           progress += 5;
           fill.style.width = progress + '%';
           percent.textContent = progress + '%';
         } else {
           clearInterval(fastTimer);
         }
-      }, 35);
+      }, 50);
 
       let isTimeout = false;
-
       const timeoutPromise = new Promise((_, reject) => {
         setTimeout(() => {
           isTimeout = true;
           reject(new Error("OCR_TIMEOUT"));
-        }, 30000);
+        }, 25000);
       });
 
       const ocrPromise = (async () => {
-        activeTesseractWorker = await Tesseract.createWorker('ind');
-        statusText.textContent = "Menganalisis teks pada area penanda scan...";
-
-        if (currentOcrTargetId.includes("nik")) {
-          await activeTesseractWorker.setParameters({
-            tessedit_char_whitelist: '0123456789'
-          });
-        }
-
-        const ret = await activeTesseractWorker.recognize(imageData, {
+        activeTesseractWorker = await Tesseract.createWorker('ind', 1, {
+          workerPath: 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/worker.min.js',
+          langPath: 'https://tessdata.projectnaptha.com/4.0.0',
+          corePath: 'https://cdn.jsdelivr.net/npm/tesseract.js-core@5/tesseract-core.wasm.js',
           logger: m => {
             if (m.status === 'recognizing text' && !isTimeout) {
-              const realProg = 70 + Math.round(m.progress * 30);
+              const realProg = 60 + Math.round(m.progress * 40);
               if (realProg > progress) {
                 progress = realProg;
                 fill.style.width = progress + '%';
@@ -1418,6 +1410,20 @@
           }
         });
 
+        statusText.textContent = "Membaca karakter teks...";
+
+        if (currentOcrTargetId.includes("nik")) {
+          await activeTesseractWorker.setParameters({
+            tessedit_char_whitelist: '0123456789',
+            tessedit_pageseg_mode: Tesseract.PSM.SINGLE_LINE
+          });
+        } else if (currentOcrMode === "single") {
+          await activeTesseractWorker.setParameters({
+            tessedit_pageseg_mode: Tesseract.PSM.SINGLE_LINE
+          });
+        }
+
+        const ret = await activeTesseractWorker.recognize(imageData);
         await activeTesseractWorker.terminate();
         activeTesseractWorker = null;
         return ret.data.text;
@@ -1444,7 +1450,7 @@
 
         setTimeout(() => {
           modal.style.display = 'none';
-        }, 350);
+        }, 300);
 
       } catch (err) {
         clearInterval(fastTimer);
@@ -1453,10 +1459,10 @@
           activeTesseractWorker = null;
         }
 
-        titleText.textContent = "Gagal Membaca / Waktu Habis";
+        titleText.textContent = "Gagal Membaca Gambar";
         statusText.textContent = err.message === "OCR_TIMEOUT" 
-          ? "Proses membaca teks melebihi 30 detik (Nyangkut/Timeout)."
-          : "Gagal memproses gambar: " + err.message;
+          ? "Koneksi internet lambat saat mengunduh data bahasa OCR (Timeout)."
+          : "Terjadi kesalahan: " + err.message;
 
         iconContainer.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:var(--danger);"></i>';
         progressContainer.style.display = 'none';

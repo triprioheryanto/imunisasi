@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Sistem Register Imunisasi & BIAS — Puskesmas Melata</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cinzel:wght@700;800&display=swap" rel="stylesheet">
+  <!-- Google Fonts: Plus Jakarta Sans & Cinzel for Luxury Certificate Typography -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -18,6 +19,9 @@
       --primary-hover: #E64A19;
       --accent: #003366; 
       --accent-light: #004080;
+      --gold: #D4AF37;
+      --gold-dark: #B8860B;
+      --gold-light: #F3E5AB;
       --bg: #F4F7FA; 
       --card: #FFFFFF;
       --text-dark: #1E293B;
@@ -311,82 +315,285 @@
     .btn-capture-snap:active { transform: scale(0.9); }
     .btn-capture-snap inner { width: 52px; height: 52px; border-radius: 50%; background: var(--primary); display: block; }
 
-    /* STYLE KHUSUS SERTIFIKAT IMUNISASI PRESISI SAMA PERSIS CONTOH ACUAN */
-    .certificate-page {
-      background: #FFFFFF; border: 2px solid #000; padding: 25px 35px;
-      max-width: 780px; margin: 0 auto 20px auto; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-      position: relative; font-family: 'Plus Jakarta Sans', Arial, sans-serif; color: #000;
+    /* ==========================================================================
+       STYLE SERTIFIKAT MEWAH KONSISTEN PRESISI UKURAN A4 (210mm x 297mm)
+       ========================================================================== */
+    .cert-preview-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+      margin: 20px auto;
     }
+
+    .certificate-page-a4 {
+      width: 210mm;
+      height: 297mm;
+      min-width: 210mm;
+      min-height: 297mm;
+      max-width: 210mm;
+      max-height: 297mm;
+      background: #FFFFFF;
+      position: relative;
+      box-sizing: border-box;
+      padding: 10mm 12mm;
+      margin: 0 auto;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.18);
+      font-family: 'Plus Jakarta Sans', Arial, sans-serif;
+      color: #0F172A;
+      overflow: hidden;
+      background-image: radial-gradient(#F8FAFC 10%, transparent 11%);
+      background-size: 20px 20px;
+      page-break-after: always;
+      page-break-inside: avoid;
+    }
+
+    /* BINGKAI ORNAMEN ELEGAN GANDA CLASSIC */
+    .cert-frame-outer {
+      border: 3.5px solid #003366;
+      height: 100%;
+      width: 100%;
+      padding: 5px;
+      position: relative;
+      box-sizing: border-box;
+    }
+
+    .cert-frame-inner {
+      border: 1.5px solid #B8860B;
+      outline: 1px solid #003366;
+      outline-offset: -6px;
+      height: 100%;
+      width: 100%;
+      padding: 16px 20px;
+      position: relative;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    /* AKSEN CORNER EMBLEM EMAS & NAVY */
+    .cert-corner {
+      position: absolute;
+      width: 28px;
+      height: 28px;
+      border-color: #B8860B;
+      border-style: solid;
+      z-index: 5;
+    }
+    .cert-corner-tl { top: 4px; left: 4px; border-width: 3.5px 0 0 3.5px; }
+    .cert-corner-tr { top: 4px; right: 4px; border-width: 3.5px 3.5px 0 0; }
+    .cert-corner-bl { bottom: 4px; left: 4px; border-width: 0 0 3.5px 3.5px; }
+    .cert-corner-br { bottom: 4px; right: 4px; border-width: 0 3.5px 3.5px 0; }
+
+    /* WATERMARK EMBLEM KESEHATAN TERPENGARUH DI TENGAH */
+    .cert-watermark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 220px;
+      color: rgba(0, 51, 102, 0.03);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* KOP SERTIFIKAT RESMI PUSKESMAS */
     .cert-header-acuan {
-      text-align: center; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 16px;
+      text-align: center;
+      border-bottom: 2.5px double #B8860B;
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+      position: relative;
+      z-index: 2;
     }
     .cert-header-acuan h3 {
-      margin: 0; font-size: 1.15rem; font-weight: 800; color: #000; letter-spacing: 0.5px;
+      margin: 0;
+      font-family: 'Cinzel', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #002244;
+      letter-spacing: 1px;
     }
     .cert-header-acuan h2 {
-      margin: 2px 0; font-size: 1.35rem; font-weight: 800; color: #000; justify-content: center;
+      margin: 3px 0;
+      font-family: 'Cinzel', serif;
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #003366;
+      justify-content: center;
+      letter-spacing: 0.5px;
     }
     .cert-header-acuan p {
-      margin: 2px 0 0 0; font-size: 0.8rem; font-weight: 500; color: #1E293B;
+      margin: 2px 0 0 0;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #475569;
     }
+
     .cert-title-box {
-      text-align: center; margin: 14px 0 16px 0;
+      text-align: center;
+      margin: 10px 0 14px 0;
+      position: relative;
+      z-index: 2;
     }
     .cert-main-title {
-      font-size: 1.45rem; font-weight: 800; text-decoration: underline; letter-spacing: 2px; color: #000;
+      font-family: 'Cinzel', serif;
+      font-size: 1.85rem;
+      font-weight: 800;
+      letter-spacing: 4px;
+      color: #003366;
+      text-shadow: 1px 1px 2px rgba(212, 175, 55, 0.3);
+      margin-bottom: 2px;
     }
     .cert-no-text {
-      font-size: 0.88rem; font-weight: 600; margin-top: 3px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #334155;
+      letter-spacing: 0.5px;
     }
+
     .cert-body-content {
-      font-size: 0.88rem; line-height: 1.6;
+      font-size: 0.92rem;
+      line-height: 1.6;
+      position: relative;
+      z-index: 2;
     }
-    .cert-field-row {
-      display: flex; margin-bottom: 6px; font-size: 0.88rem;
+
+    .cert-field-table {
+      width: 100%;
+      margin: 12px 0;
+      border-collapse: collapse;
+    }
+    .cert-field-table td {
+      padding: 6px 4px;
+      vertical-align: middle;
+      font-size: 0.92rem;
     }
     .cert-field-label {
-      width: 170px; font-weight: 600; flex-shrink: 0;
+      width: 175px;
+      font-weight: 700;
+      color: #1E293B;
     }
     .cert-field-val {
-      font-weight: 700; flex: 1;
+      font-weight: 800;
+      color: #002244;
+      font-size: 0.95rem;
     }
-    
-    /* BOX FOTO 4x6 GARIS PUTUS-PUTUS */
+
+    /* BOX FOTO 4x6 GARIS PUTUS-PUTUS AESTHETIC */
     .cert-photo-box-4x6 {
-      width: 90px; height: 120px; border: 2px dashed #64748B;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      text-align: center; color: #64748B; font-weight: 700; font-size: 0.75rem;
-      background: #F8FAFC; border-radius: 4px; line-height: 1.3;
+      width: 105px;
+      height: 140px;
+      border: 2px dashed #B8860B;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #B8860B;
+      font-weight: 800;
+      font-size: 0.78rem;
+      background: #FFFDF5;
+      border-radius: 6px;
+      line-height: 1.4;
+      box-shadow: inset 0 0 10px rgba(212, 175, 55, 0.1);
+      flex-shrink: 0;
+      margin-left: 12px;
     }
 
     .cert-slogan {
-      text-align: center; font-weight: 800; font-style: italic; font-size: 1rem;
-      margin: 22px 0 25px 0; letter-spacing: 1.5px; color: #000;
+      text-align: center;
+      font-family: 'Cinzel', serif;
+      font-weight: 800;
+      font-style: italic;
+      font-size: 1.1rem;
+      margin: 18px 0;
+      letter-spacing: 2px;
+      color: #003366;
+      background: linear-gradient(90deg, transparent, #FFF8E7, transparent);
+      padding: 6px 0;
+      border-top: 1px dashed #DAA520;
+      border-bottom: 1px dashed #DAA520;
+      position: relative;
+      z-index: 2;
     }
 
     .cert-sig-area {
-      display: flex; justify-content: space-between; align-items: flex-start; margin-top: 15px; font-size: 0.85rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-top: 10px;
+      font-size: 0.88rem;
+      position: relative;
+      z-index: 2;
     }
     .cert-sig-col {
-      width: 45%; text-align: center; min-height: 130px; display: flex; flex-direction: column; justify-content: space-between;
+      width: 46%;
+      text-align: center;
+      min-height: 135px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
 
+    /* TABEL HALAMAN BELAKANG SERTIFIKAT */
     .cert-back-table {
-      width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.8rem;
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      font-size: 0.82rem;
+      position: relative;
+      z-index: 2;
     }
     .cert-back-table th, .cert-back-table td {
-      border: 1px solid #000; padding: 6px 8px; text-align: left;
+      border: 1px solid #002244;
+      padding: 7px 9px;
+      text-align: left;
     }
     .cert-back-table th {
-      background: #F1F5F9; font-weight: 800; text-align: center;
+      background: #003366;
+      color: #FFFFFF;
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      text-align: center;
+      letter-spacing: 0.5px;
     }
 
+    /* MEDIA PRINT PRESISI KHUSUS A4 BOLAK-BALIK */
     @media print {
-      body * { visibility: hidden; }
-      #certificatePrintArea, #certificatePrintArea * { visibility: visible; }
-      #certificatePrintArea { position: absolute; left: 0; top: 0; width: 100%; }
-      .certificate-page { page-break-after: always; border: 1px solid #000 !important; box-shadow: none !important; }
-      .no-print { display: none !important; }
+      @page {
+        size: A4 portrait;
+        margin: 0;
+      }
+      body * {
+        visibility: hidden;
+      }
+      #certificatePrintArea, #certificatePrintArea * {
+        visibility: visible;
+      }
+      #certificatePrintArea {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 210mm;
+        margin: 0;
+        padding: 0;
+      }
+      .certificate-page-a4 {
+        box-shadow: none !important;
+        margin: 0 !important;
+        width: 210mm !important;
+        height: 297mm !important;
+        page-break-after: always !important;
+        page-break-inside: avoid !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .no-print {
+        display: none !important;
+      }
     }
 
     @media (max-width: 768px) {
@@ -407,6 +614,11 @@
       .kohort-table .sticky-col-1 { min-width: 100px; }
       .kohort-table .sticky-col-2 { min-width: 85px; left: 100px; }
       .app-nav-tabs .tab { padding: 8px 10px; font-size: 0.78rem; }
+      .certificate-page-a4 {
+        transform: scale(0.42);
+        transform-origin: top center;
+        margin-bottom: -160mm;
+      }
     }
   </style>
 </head>
@@ -1064,10 +1276,10 @@
         <p class="lead">Pusat kendali pengguna, manajemen cetak sertifikat IDL, ekspor-impor, target sasaran, dan konfigurasi logistik.</p>
       </div>
 
-      <!-- KARTU CETAK SERTIFIKAT IMUNISASI -->
+      <!-- KARTU CETAK SERTIFIKAT IMUNISASI MEWAH A4 -->
       <div class="card" style="background: linear-gradient(135deg, #FFFDF5 0%, #FEFCE8 100%); border:1.5px solid #FDE047;">
-        <h2><i class="fas fa-certificate" style="color:var(--warning)"></i> View / Cetak Sertifikat Imunisasi (IDL Presisi)</h2>
-        <p class="lead" style="font-size:0.82rem; margin-bottom:10px;">Pilih sasaran terdaftar untuk mencetak Sertifikat Imunisasi Resmi Puskesmas Melata (Format persis seperti acuan, dikosongkan TTD & Cap, dilengkapi area foto 4x6 garis putus-putus)[cite: 3].</p>
+        <h2><i class="fas fa-award" style="color:var(--warning)"></i> View / Cetak Sertifikat Imunisasi (A4 Presisi Elegan)</h2>
+        <p class="lead" style="font-size:0.82rem; margin-bottom:10px;">Pilih sasaran terdaftar untuk mencetak Sertifikat Imunisasi Elegan Ukuran Presisi Kertas A4 (Lembar Bolak-Balik, tanpa TTD & Cap, bingkai emas ganda, dan area foto 4x6)[cite: 3].</p>
         
         <div class="grid">
           <div class="form-group">
@@ -1098,101 +1310,143 @@
         </div>
 
         <div class="actions" style="justify-content:flex-start;">
-          <button class="btn btn-warning" onclick="generateAndShowCertificate()"><i class="fas fa-file-invoice"></i> Tampilkan Sertifikat Presisi</button>
+          <button class="btn btn-warning" onclick="generateAndShowCertificate()"><i class="fas fa-file-invoice"></i> Tampilkan Sertifikat A4 Elegan</button>
         </div>
       </div>
 
-      <!-- AREA PRINTER / PREVIEW SERTIFIKAT PERSIS CONTOH ACUAN -->
-      <div id="certificatePrintArea" style="display:none; margin-bottom:20px;">
-        
-        <!-- HALAMAN DEPAN SERTIFIKAT -->
-        <div class="certificate-page">
-          <div class="cert-header-acuan">
-            <h3>PEMERINTAH KABUPATEN LAMANDAU</h3>
-            <h2>DINAS KESEHATAN</h2>
-            <h2>PUSKESMAS MELATA</h2>
-            <p>Jln. Tri Setya No. 01 Ds. Melata Kec. Menthobi Raya Kab. Lamandau</p>
-          </div>
+      <!-- AREA PRINTER / PREVIEW SERTIFIKAT A4 ELEGAN BOLAK BALIK -->
+      <div id="certificatePrintArea" style="display:none; margin-bottom:30px;">
+        <div class="cert-preview-wrapper">
+          
+          <!-- HALAMAN DEPAN SERTIFIKAT (A4 PRESISI) -->
+          <div class="certificate-page-a4">
+            <div class="cert-frame-outer">
+              <div class="cert-corner cert-corner-tl"></div>
+              <div class="cert-corner cert-corner-tr"></div>
+              <div class="cert-corner cert-corner-bl"></div>
+              <div class="cert-corner cert-corner-br"></div>
 
-          <div class="cert-title-box">
-            <div class="cert-main-title">SERTIFIKAT</div>
-            <div class="cert-no-text">Nomor: <span id="cert_no_reg">MM/IDL/415/2026</span></div>
-          </div>
+              <div class="cert-frame-inner">
+                <!-- WATERMARK BACKGROUND -->
+                <div class="cert-watermark"><i class="fas fa-shield-halved"></i></div>
 
-          <div class="cert-body-content">
-            <p style="margin-bottom:12px;">Diberikan kepada anak:</p>
-            
-            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-              <div style="flex:1;">
-                <div class="cert-field-row">
-                  <div class="cert-field-label">Nama Lengkap Anak</div>
-                  <div>: <span class="cert-field-val" id="cert_nama_anak">MUTIA A.</span></div>
-                </div>
-                <div class="cert-field-row">
-                  <div class="cert-field-label">Tanggal Lahir / JK</div>
-                  <div>: <span class="cert-field-val" id="cert_ttl_jk">2024-04-15 (Perempuan)</span></div>
-                </div>
-                <div class="cert-field-row">
-                  <div class="cert-field-label">Nama Orang Tua / Ibu</div>
-                  <div>: <span class="cert-field-val" id="cert_nama_ibu">Puji Rahayu</span></div>
-                </div>
-                <div class="cert-field-row">
-                  <div class="cert-field-label">Desa / Alamat</div>
-                  <div>: <span class="cert-field-val" id="cert_desa_alamat">Desa Modang Mas, Modang Mas</span></div>
-                </div>
-              </div>
+                <div>
+                  <div class="cert-header-acuan">
+                    <h3>PEMERINTAH KABUPATEN LAMANDAU</h3>
+                    <h2>DINAS KESEHATAN</h2>
+                    <h2>PUSKESMAS MELATA</h2>
+                    <p>Jln. Tri Setya No. 01 Ds. Melata Kec. Menthobi Raya Kab. Lamandau</p>
+                  </div>
 
-              <!-- AREA FOTO ANAK/BAYI 4x6 BINGKAI PUTUS-PUTUS -->
-              <div class="cert-photo-box-4x6">
-                FOTO<br>ANAK/BAYI<br>4x6
+                  <div class="cert-title-box">
+                    <div class="cert-main-title">SERTIFIKAT</div>
+                    <div class="cert-no-text">Nomor: <span id="cert_no_reg">MM/IDL/415/2026</span></div>
+                  </div>
+
+                  <div class="cert-body-content">
+                    <p style="margin-bottom:10px; font-weight:600; color:#334155;">Diberikan kepada anak:</p>
+                    
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                      <table class="cert-field-table">
+                        <tr>
+                          <td class="cert-field-label">Nama Lengkap Anak</td>
+                          <td>: <span class="cert-field-val" id="cert_nama_anak">MUTIA A.</span></td>
+                        </tr>
+                        <tr>
+                          <td class="cert-field-label">Tanggal Lahir / JK</td>
+                          <td>: <span class="cert-field-val" id="cert_ttl_jk">2024-04-15 (Perempuan)</span></td>
+                        </tr>
+                        <tr>
+                          <td class="cert-field-label">Nama Orang Tua / Ibu</td>
+                          <td>: <span class="cert-field-val" id="cert_nama_ibu">Puji Rahayu</span></td>
+                        </tr>
+                        <tr>
+                          <td class="cert-field-label">Desa / Alamat</td>
+                          <td>: <span class="cert-field-val" id="cert_desa_alamat">Desa Modang Mas, Modang Mas</span></td>
+                        </tr>
+                      </table>
+
+                      <!-- AREA FOTO ANAK/BAYI 4x6 BINGKAI EMAS PUTUS-PUTUS -->
+                      <div class="cert-photo-box-4x6">
+                        <i class="fas fa-camera" style="font-size:1.2rem; margin-bottom:4px; opacity:0.8;"></i>
+                        FOTO<br>ANAK/BAYI<br>4 x 6
+                      </div>
+                    </div>
+
+                    <p style="margin-top:16px; font-size:0.95rem; line-height:1.6; color:#1E293B; text-align:justify;">
+                      Menyatakan bahwa anak tersebut di atas telah menyelesaikan seluruh rangkaian pelayanan imunisasi dan dinyatakan telah mendapatkan <strong>Imunisasi Dasar Lengkap (IDL)</strong> sesuai standar kesehatan nasional.
+                    </p>
+                  </div>
+
+                  <div class="cert-slogan">"ANAK SEHAT GENERASI KUAT"</div>
+                </div>
+
+                <div class="cert-sig-area">
+                  <div class="cert-sig-col">
+                    <div>Koordinator Imunisasi,</div>
+                    <!-- TTD & CAP DIKOSONGKAN -->
+                    <div style="font-weight:800; font-size:0.95rem; color:#002244; text-decoration:underline;">Tri Prio Heryanto</div>
+                  </div>
+                  <div class="cert-sig-col">
+                    <div>Melata, <span id="cert_tgl_cetak">21 Agustus 2026</span><br>Mengetahui,<br>Kepala Puskesmas Melata</div>
+                    <!-- TTD & CAP DIKOSONGKAN -->
+                    <div>
+                      <strong style="text-decoration:underline; font-size:0.95rem; color:#002244;">dr. Anang Argo Yuwono</strong><br>
+                      Pembina Tingkat I<br>
+                      NIP. 19830521 201403 1 003
+                    </div>
+                  </div>
+                </div>
+
               </div>
             </div>
-
-            <p style="margin-top:16px;">Menyatakan bahwa anak tersebut di atas telah mendapatkan Imunisasi Dasar Lengkap.</p>
           </div>
 
-          <div class="cert-slogan">"ANAK SEHAT GENERASI KUAT"</div>
+          <!-- HALAMAN BELAKANG SERTIFIKAT (A4 PRESISI) -->
+          <div class="certificate-page-a4">
+            <div class="cert-frame-outer">
+              <div class="cert-corner cert-corner-tl"></div>
+              <div class="cert-corner cert-corner-tr"></div>
+              <div class="cert-corner cert-corner-bl"></div>
+              <div class="cert-corner cert-corner-br"></div>
 
-          <div class="cert-sig-area">
-            <div class="cert-sig-col">
-              <div>Koordinator Imunisasi,</div>
-              <!-- TTD & CAP DIKOSONGKAN -->
-              <div style="font-weight:800; text-decoration:underline;">Tri Prio Heryanto</div>
-            </div>
-            <div class="cert-sig-col">
-              <div>Melata, <span id="cert_tgl_cetak">21 Agustus 2026</span><br>Mengetahui,<br>Kepala Puskesmas Melata</div>
-              <!-- TTD & CAP DIKOSONGKAN -->
-              <div>
-                <strong style="text-decoration:underline;">dr. Anang Argo Yuwono</strong><br>
-                Pembina Tingkat I<br>
-                NIP. 19830521 201403 1 003
+              <div class="cert-frame-inner">
+                <div class="cert-watermark"><i class="fas fa-clipboard-check"></i></div>
+
+                <div>
+                  <div style="text-align:center; font-family:'Cinzel', serif; font-weight:800; font-size:1.2rem; color:#003366; margin-bottom:4px; text-transform:uppercase; letter-spacing:1px; border-bottom:2px solid #D4AF37; padding-bottom:6px;">
+                    CATATAN RIWAYAT IMUNISASI DASAR LENGKAP
+                  </div>
+                  <div style="text-align:center; font-size:0.88rem; font-weight:700; color:#475569; margin-bottom:16px; margin-top:6px;">
+                    Lampiran Halaman Belakang Sertifikat An. <span id="cert_back_nama_anak" style="color:#002244; text-transform:uppercase;">MUTIA A.</span> (<span id="cert_back_desa" style="color:#002244;">Desa Modang Mas</span>)
+                  </div>
+
+                  <table class="cert-back-table">
+                    <thead>
+                      <tr>
+                        <th style="width:32%;">NAMA ANTIGEN</th>
+                        <th style="width:18%;">TGL DIBERIKAN</th>
+                        <th style="width:32%;">NAMA ANTIGEN</th>
+                        <th style="width:18%;">TGL DIBERIKAN</th>
+                      </tr>
+                    </thead>
+                    <tbody id="cert_back_table_body">
+                      <!-- Render 2 Kolom via JS -->
+                    </tbody>
+                  </table>
+                </div>
+
+                <div style="text-align:center; font-size:0.78rem; font-weight:700; color:#64748B; border-top:1.5px dashed #DAA520; padding-top:10px;">
+                  Dokumen Rekam Imunisasi Resmi — Puskesmas Melata, Kabupaten Lamandau
+                </div>
               </div>
             </div>
           </div>
+
         </div>
 
-        <!-- HALAMAN BELAKANG SERTIFIKAT -->
-        <div class="certificate-page">
-          <div style="text-align:center; font-weight:800; font-size:1.05rem; margin-bottom:4px; text-transform:uppercase;">
-            CATATAN RIWAYAT IMUNISASI DASAR LENGKAP
-          </div>
-          <div style="text-align:center; font-size:0.85rem; font-weight:600; color:#334155; margin-bottom:14px;">
-            Lampiran Halaman Belakang Sertifikat An. <span id="cert_back_nama_anak">MUTIA A.</span> (<span id="cert_back_desa">Desa Modang Mas</span>)
-          </div>
-
-          <table class="cert-back-table">
-            <tbody id="cert_back_table_body">
-              <!-- Render 2 Kolom via JS -->
-            </tbody>
-          </table>
-
-          <div style="text-align:center; font-size:0.75rem; font-weight:700; color:#64748B; margin-top:25px; border-top:1px dashed #CBD5E1; padding-top:8px;">
-            Dokumen Rekam Imunisasi Resmi — Puskesmas Melata, Kabupaten Lamandau
-          </div>
-        </div>
-
-        <div class="actions no-print" style="justify-content:center; margin-top:12px;">
-          <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-print"></i> Cetak / Download PDF Sertifikat</button>
+        <div class="actions no-print" style="justify-content:center; margin-top:16px;">
+          <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-print"></i> Cetak / Download PDF Sertifikat A4</button>
           <button class="btn btn-ghost" onclick="document.getElementById('certificatePrintArea').style.display='none'"><i class="fas fa-times"></i> Sembunyikan Preview</button>
         </div>
       </div>
@@ -1405,12 +1659,6 @@
       'ALL': 'Semua Bulan'
     };
 
-    const DAYS_IN_MONTH = {
-      '01': '31', '02': '28', '03': '31', '04': '30', '05': '31', '06': '30',
-      '07': '31', '08': '31', '09': '30', '10': '31', '11': '30', '12': '31',
-      'ALL': '31'
-    };
-
     const SERIES_SEQUENCES = [
       { name: "DPT-HB-Hib", items: [{ key: "DPT-HB-Hib1", offsetMonths: 2 }, { key: "DPT-HB-Hib2", offsetMonths: 3 }, { key: "DPT-HB-Hib3", offsetMonths: 4 }, { key: "DPT-HB-Hib4", offsetMonths: 18 }] },
       { name: "OPV", items: [{ key: "OPV1", offsetMonths: 1 }, { key: "OPV2", offsetMonths: 2 }, { key: "OPV3", offsetMonths: 3 }, { key: "OPV4", offsetMonths: 4 }] },
@@ -1461,7 +1709,6 @@
     const AUTH_ADMIN_USER = "admin";
     const AUTH_ADMIN_PASS = "adminsri26";
 
-    // GLOBAL STATE KAMERA & OCR ENGINE
     let currentOcrTargetId = "";
     let currentOcrMode = "single"; 
     let cameraStream = null;
@@ -1469,7 +1716,7 @@
     let activeTesseractWorker = null;
     let lastCapturedImageData = null;
 
-    // FUNGSI SERTIFIKAT IMUNISASI PRESISI SAMA PERSIS ACUAN
+    // FUNGSI GENERATE SERTIFIKAT A4 PRESISI ELEGAN
     window.generateAndShowCertificate = function() {
       const selectElem = document.getElementById('cert_select_sasaran');
       if (!selectElem.value) return alert("Pilih sasaran terlebih dahulu!");
@@ -1487,7 +1734,7 @@
       document.getElementById('cert_back_nama_anak').textContent = data.nama_anak || '-';
       document.getElementById('cert_back_desa').textContent = `Desa ${data.desa || '-'}`;
 
-      // HALAMAN BELAKANG: 18 ANTIGEN IDL DENGAN LAYOUT 2 KOLOM RAPI SAMA PERSIS CONTOH ACUAN
+      // 18 ANTIGEN IDL DENGAN LAYOUT 2 KOLOM ELEGANT
       const IDL_MAPPING_ACUAN = [
         { labelLeft: "Hepatitis B (HB-0 <24 Jam)", keyLeft: "HBO (<24 Jam)", labelRight: "Hepatitis B (HB-0 1-7 Hari)", keyRight: "HBO (1-7 Hari)" },
         { labelLeft: "BCG", keyLeft: "BCG", labelRight: "Polio Oral 1 (OPV 1)", keyRight: "OPV1" },
@@ -1515,10 +1762,10 @@
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td style="width:32%; font-weight:700;">${rowPair.labelLeft}</td>
-          <td style="width:18%; text-align:center; font-weight:800; color:#000;">${textLeft}</td>
-          <td style="width:32%; font-weight:700;">${rowPair.labelRight}</td>
-          <td style="width:18%; text-align:center; font-weight:800; color:#000;">${textRight}</td>
+          <td style="font-weight:700; color:#1E293B;">${rowPair.labelLeft}</td>
+          <td style="text-align:center; font-weight:800; color:#002244;">${textLeft}</td>
+          <td style="font-weight:700; color:#1E293B;">${rowPair.labelRight}</td>
+          <td style="text-align:center; font-weight:800; color:#002244;">${textRight}</td>
         `;
         tbodyBack.appendChild(tr);
       });
@@ -1527,7 +1774,6 @@
       document.getElementById('certificatePrintArea').scrollIntoView({ behavior: 'smooth' });
     };
 
-    // FUNGSI KAMERA SCANNER LIVE OVERLAY
     window.triggerCameraOCR = async function(targetFieldId, mode = "single") {
       currentOcrTargetId = targetFieldId;
       currentOcrMode = mode;
@@ -2389,7 +2635,7 @@
       }
 
       if (jk === 'L' && (selectedVaccines.includes('TT2 Catin') || selectedVaccines.some(v => v.includes('Bumil')))) {
-        return alert("⚠️️ Laki-Laki (Pria) hanya dapat menerima TT1 Catin!");
+        return alert("⚠ Laki-Laki (Pria) hanya dapat menerima TT1 Catin!");
       }
 
       const tglPelayananInput = document.getElementById('reg_tgl_pelayanan').value;
@@ -3444,7 +3690,6 @@
       } catch (err) { container.innerHTML = `<p style="color:red; text-align:center;">Error: ${err.message}</p>`; }
     }
 
-    // FUNGSI EKSPOR EXCEL 3 SHEET BERWARNA DENGAN FREEZE COLUMN (DESA & NAMA ANAK)
     async function downloadExcel3Sheets() {
       const thn = document.getElementById('filter_tahun').value || document.getElementById('exp_filter_tahun').value;
       const bln = document.getElementById('filter_bulan').value || document.getElementById('exp_filter_bulan').value;
@@ -3457,7 +3702,7 @@
         let allDocsInDb = [];
         snap.forEach(doc => allDocsInDb.push(doc.data()));
 
-        // ================= SHEET 1: KOHORT MATRIKS =================
+        // SHEET 1: KOHORT MATRIKS
         const sheet1Data = [];
         sheet1Data.push([`LAPORAN REGISTER KOHORT MATRIKS - PUSKESMAS MELATA`]);
         sheet1Data.push([`Periode Matriks: s/d ${monthNameStr} ${thn} | Wilayah: ${desaSel === 'ALL' ? 'Semua Desa' : desaSel}`]);
@@ -3487,7 +3732,7 @@
           sheet1Data.push(row);
         });
 
-        // ================= SHEET 2: REKAPAN TOTAL PENERIMA (HEADER 2 BARIS) =================
+        // SHEET 2: REKAPAN TOTAL PENERIMA
         const sheet2Data = [];
         sheet2Data.push([`REKAPITULASI TOTAL PENERIMA VAKSIN PER ANTIGEN - PUSKESMAS MELATA`]);
         sheet2Data.push([`Wilayah: Semua Desa (13 Desa) | Periode: ${monthNameStr} ${thn}`]);
@@ -3531,7 +3776,6 @@
             row_data.push(lCount, pCount, lCount + pCount);
           });
 
-          // IDL count
           desaDocs.forEach(d => {
             const getV = (vk) => d[`vaksin_${vk.replace(/[\s\(\)<>-]/g, '_')}`];
             if (getV("HBO (<24 Jam)") && getV("BCG") && getV("DPT-HB-Hib3") && getV("OPV4") && getV("IPV1") && getV("Campak Rubela-1")) {
@@ -3544,7 +3788,7 @@
           sheet2Data.push(row_data);
         });
 
-        // ================= SHEET 3: REKAPAN LOGISTIK MATRIKS PER DESA =================
+        // SHEET 3: REKAPAN LOGISTIK DENGAN HEADER "PEMAKAIAN" DAN "KUMULATIF" ANGKA MURNI
         const sheet3Data = [];
         sheet3Data.push([`REKAPITULASI PEMAKAIAN LOGISTIK VAKSIN PER DESA - PUSKESMAS MELATA`]);
         sheet3Data.push([`Periode: ${monthNameStr} ${thn} | Matriks 13 Desa`]);
@@ -3566,11 +3810,11 @@
         const s3_h2 = ["", "", ""];
 
         ROUTINE_GROUPS.forEach(g => {
-          s3_h1.push(`${g.name} (${g.unit})`, "", "");
-          s3_h2.push("Dosis", "Kemasan", "Kumulatif");
+          s3_h1.push(`${g.name} (${g.unit})`, "");
+          s3_h2.push("Pemakaian", "Kumulatif");
         });
 
-        s3_h1.push("Total Dosis Rutin", "Total Kemasan Terpakai");
+        s3_h1.push("Total Dosis Rutin", "Total Pemakaian Kemasan");
         s3_h2.push("", "");
 
         sheet3Data.push(s3_h1);
@@ -3600,10 +3844,11 @@
             totDosisDesa += dosisBln;
             totVialDesa += vialBln;
 
-            row.push(dosisBln, `${vialBln} ${g.unit}`, `${vialKum} ${g.unit}`);
+            // Memasukkan angka murni pemakaian agar bisa dijumlahkan
+            row.push(vialBln, vialKum);
           });
 
-          row.push(totDosisDesa, `${totVialDesa} Vial/Uniject`);
+          row.push(totDosisDesa, totVialDesa);
           sheet3Data.push(row);
         });
 
@@ -3612,12 +3857,23 @@
         const ws2 = XLSX.utils.aoa_to_sheet(sheet2Data);
         const ws3 = XLSX.utils.aoa_to_sheet(sheet3Data);
 
-        // FREEZE COLUMN PERTAMA (KOLOM DESA DAN NAMA ANAK BARIS HEADER)
+        // PENYESUAIAN LEBAR KOLOM SESUAI ISI PADA SHEET 1
+        ws1['!cols'] = sheet1Data[3].map((_, colIdx) => {
+          let maxLen = 8;
+          sheet1Data.forEach((row, rowIdx) => {
+            if (rowIdx >= 3) {
+              const val = row[colIdx] !== undefined && row[colIdx] !== null ? String(row[colIdx]) : '';
+              if (val.length > maxLen) maxLen = val.length;
+            }
+          });
+          return { wch: Math.min(maxLen + 3, 35) };
+        });
+
+        // FREEZE COLUMN (DESA DAN NAMA ANAK)
         ws1['!views'] = [{ state: 'frozen', xSplit: 3, ySplit: 4 }];
         ws2['!views'] = [{ state: 'frozen', xSplit: 2, ySplit: 5 }];
         ws3['!views'] = [{ state: 'frozen', xSplit: 2, ySplit: 5 }];
 
-        // MERGE CELLS UNTUK HEADER BERTIAT
         ws2['!merges'] = [
           { s: { r: 3, c: 0 }, e: { r: 4, c: 0 } },
           { s: { r: 3, c: 1 }, e: { r: 4, c: 1 } },
@@ -3639,15 +3895,15 @@
 
         let colIndexS3 = 3;
         ROUTINE_GROUPS.forEach(() => {
-          ws3['!merges'].push({ s: { r: 3, c: colIndexS3 }, e: { r: 3, c: colIndexS3 + 2 } });
-          colIndexS3 += 3;
+          ws3['!merges'].push({ s: { r: 3, c: colIndexS3 }, e: { r: 3, c: colIndexS3 + 1 } });
+          colIndexS3 += 2;
         });
 
         XLSX.utils.book_append_sheet(wb, ws1, "Register Kohort Matriks");
         XLSX.utils.book_append_sheet(wb, ws2, "Rekapan Total Penerima");
         XLSX.utils.book_append_sheet(wb, ws3, "Rekapan Logistik Vaksin");
 
-        XLSX.writeFile(wb, `Laporan_Imunisasi_Melata_Berwarna_Freeze_${bln}_${thn}.xlsx`);
+        XLSX.writeFile(wb, `Laporan_Imunisasi_Melata_A4_Berwarna_${bln}_${thn}.xlsx`);
 
       } catch (err) { alert("Gagal download Excel: " + err.message); }
     }

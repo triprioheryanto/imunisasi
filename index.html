@@ -276,7 +276,6 @@
       display: flex; flex-direction: column; align-items: center; justify-content: center;
     }
     
-    /* Garis Bantu Single Line (1 Baris Teks) */
     .scan-guide-single {
       position: relative; width: 85%; max-width: 480px; height: 48px;
       border: 2px solid var(--primary); border-radius: 8px; box-shadow: 0 0 0 9999px rgba(0,0,0,0.5);
@@ -287,7 +286,6 @@
       background: rgba(255, 87, 34, 0.7); transform: translateY(-50%);
     }
 
-    /* Garis Bantu Multi Line (2-4 Baris Alamat) */
     .scan-guide-multi {
       position: relative; width: 88%; max-width: 480px; height: 130px;
       border: 2px dashed #00E676; border-radius: 10px; box-shadow: 0 0 0 9999px rgba(0,0,0,0.5);
@@ -312,6 +310,43 @@
     }
     .btn-capture-snap:active { transform: scale(0.9); }
     .btn-capture-snap inner { width: 52px; height: 52px; border-radius: 50%; background: var(--primary); display: block; }
+
+    /* STYLE KHUSUS SERTIFIKAT IMUNISASI (PRINTABLE) */
+    .certificate-card {
+      background: #FFFDF9; border: 8px double #003366; padding: 30px; border-radius: 12px;
+      max-width: 800px; margin: 0 auto; box-shadow: 0 10px 25px rgba(0,0,0,0.1); position: relative;
+    }
+    .certificate-header {
+      text-align: center; border-bottom: 2px solid #003366; padding-bottom: 12px; margin-bottom: 20px;
+    }
+    .certificate-title {
+      font-family: 'Cinzel', serif; font-size: 1.6rem; font-weight: 800; color: #003366; margin: 6px 0; text-transform: uppercase;
+    }
+    .certificate-subtitle {
+      font-size: 0.9rem; color: #475569; font-weight: 600;
+    }
+    .cert-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.85rem; margin-bottom: 20px;
+    }
+    .cert-table {
+      width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.8rem;
+    }
+    .cert-table th, .cert-table td {
+      border: 1px solid #003366; padding: 6px 8px; text-align: center;
+    }
+    .cert-table th {
+      background: #003366; color: #FFF; font-weight: 700;
+    }
+    .cert-signature {
+      margin-top: 30px; display: flex; justify-content: space-between; align-items: flex-end; font-size: 0.85rem;
+    }
+
+    @media print {
+      body * { visibility: hidden; }
+      #certificatePrintArea, #certificatePrintArea * { visibility: visible; }
+      #certificatePrintArea { position: absolute; left: 0; top: 0; width: 100%; }
+      .no-print { display: none !important; }
+    }
 
     @media (max-width: 768px) {
       header.app-header { padding: 10px 12px 0 12px; }
@@ -987,7 +1022,96 @@
     <section id="admin" class="tab-panel" style="display:none">
       <div class="card" style="background:#FFF5F5; border:1.5px solid #FEB2B2;">
         <h2><i class="fas fa-user-shield" style="color:var(--danger)"></i> Panel Kontrol & Administrasi Sistem</h2>
-        <p class="lead">Pusat kendali pengguna, manajemen data ekspor-impor, target sasaran, dan konfigurasi kemasan logistik.</p>
+        <p class="lead">Pusat kendali pengguna, manajemen cetak sertifikat, ekspor-impor, target sasaran, dan konfigurasi kemasan logistik.</p>
+      </div>
+
+      <!-- KARTU CETAK SERTIFIKAT IMUNISASI -->
+      <div class="card" style="background: linear-gradient(135deg, #FFFDF5 0%, #FEFCE8 100%); border:1.5px solid #FDE047;">
+        <h2><i class="fas fa-certificate" style="color:var(--warning)"></i> View / Cetak Sertifikat Imunisasi</h2>
+        <p class="lead" style="font-size:0.82rem; margin-bottom:10px;">Pilih sasaran terdaftar untuk melihat dan mencetak Sertifikat Imunisasi Resmi Puskesmas Melata dengan format tanggal <strong>DDMMYY</strong>.</p>
+        
+        <div class="grid">
+          <div class="form-group">
+            <label>Pilih Desa Sasaran</label>
+            <select id="cert_filter_desa">
+              <option value="">-- Pilih Desa --</option>
+              <option value="Melata">Melata</option>
+              <option value="Nanuah">Nanuah</option>
+              <option value="Topalan">Topalan</option>
+              <option value="Batu Ampar">Batu Ampar</option>
+              <option value="Lubuk Hiju">Lubuk Hiju</option>
+              <option value="Bukit Makmur">Bukit Makmur</option>
+              <option value="Bukit Raya">Bukit Raya</option>
+              <option value="Modang Mas">Modang Mas</option>
+              <option value="Mukti Manunggal">Mukti Manunggal</option>
+              <option value="Sumber Jaya">Sumber Jaya</option>
+              <option value="Bukit Harum">Bukit Harum</option>
+              <option value="PT. TSA">PT. TSA</option>
+              <option value="PT. SHS">PT. SHS</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Pilih Nama Sasaran Terdaftar</label>
+            <select id="cert_select_sasaran">
+              <option value="">-- Pilih Desa Terlebih Dahulu --</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="actions" style="justify-content:flex-start;">
+          <button class="btn btn-warning" onclick="generateAndShowCertificate()"><i class="fas fa-file-invoice"></i> Tampilkan Sertifikat</button>
+        </div>
+      </div>
+
+      <!-- AREA PRINTER / PREVIEW SERTIFIKAT -->
+      <div id="certificatePrintArea" style="display:none; margin-bottom:20px;">
+        <div class="certificate-card">
+          <div class="certificate-header">
+            <div style="font-size:1.1rem; font-weight:800; color:#003366;">PEMERINTAH KABUPATEN LAMANDAU</div>
+            <div style="font-size:1rem; font-weight:700; color:#003366;">DINAS KESEHATAN — PUSKESMAS MELATA</div>
+            <div class="certificate-title">SERTIFIKAT IMUNISASI</div>
+            <div class="certificate-subtitle">Nomor Register: <span id="cert_no_reg">PKM-MLT/IMUN/2026/001</span></div>
+          </div>
+
+          <div class="cert-grid">
+            <div><strong>Nama Sasaran:</strong> <span id="cert_nama_anak">-</span></div>
+            <div><strong>Tgl Lahir / Gender:</strong> <span id="cert_ttl_jk">-</span></div>
+            <div><strong>Nama Orang Tua / Ibu:</strong> <span id="cert_nama_ibu">-</span></div>
+            <div><strong>Desa / Alamat:</strong> <span id="cert_desa_alamat">-</span></div>
+          </div>
+
+          <table class="cert-table">
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Jenis Imunisasi</th>
+                <th>Status Penerimaan</th>
+                <th>Tanggal Pelaksanaan (DDMMYY)</th>
+              </tr>
+            </thead>
+            <tbody id="cert_table_body">
+              <!-- Render via JS -->
+            </tbody>
+          </table>
+
+          <div class="cert-signature">
+            <div>
+              Status Imunisasi: <strong id="cert_status_idl" style="color:#10B981;">IMUNISASI DASAR LENGKAP (IDL)</strong><br>
+              <small>Format Tanggal Pelaksanaan: <strong>DDMMYY</strong></small>
+            </div>
+            <div style="text-align:center;">
+              Mentrobi Raya, <span id="cert_tgl_cetak">300926</span><br>
+              Pengelola Imunisasi Puskesmas Melata<br><br><br><br>
+              <strong><u>( SRI PRIHATIN, A.Md.Keb )</u></strong><br>
+              NIP. 19880312 201101 2 003
+            </div>
+          </div>
+        </div>
+
+        <div class="actions no-print" style="justify-content:center; margin-top:12px;">
+          <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-print"></i> Cetak / Download PDF Sertifikat</button>
+          <button class="btn btn-ghost" onclick="document.getElementById('certificatePrintArea').style.display='none'"><i class="fas fa-times"></i> Sembunyikan Preview</button>
+        </div>
       </div>
 
       <div class="grid">
@@ -1261,6 +1385,71 @@
     let currentFacingMode = "environment";
     let activeTesseractWorker = null;
     let lastCapturedImageData = null;
+
+    // FUNGSI KONVERSI TANGGAL KE FORMAT DDMMYY
+    function formatDateToDDMMYY(dateStr) {
+      if (!dateStr || dateStr === '-') return '-';
+      // Mengubah format YYYY-MM-DD menjadi DDMMYY
+      const parts = dateStr.split('-');
+      if (parts.length === 3) {
+        const dd = parts[2];
+        const mm = parts[1];
+        const yy = parts[0].substring(2);
+        return `${dd}${mm}${yy}`;
+      }
+      return dateStr;
+    }
+
+    // FUNGSI CETAK SERTIFIKAT IMUNISASI
+    window.generateAndShowCertificate = function() {
+      const selectElem = document.getElementById('cert_select_sasaran');
+      if (!selectElem.value) return alert("Pilih sasaran terlebih dahulu!");
+
+      const data = JSON.parse(selectElem.value);
+      
+      document.getElementById('cert_nama_anak').textContent = data.nama_anak || '-';
+      document.getElementById('cert_ttl_jk').textContent = `${data.tgl_lahir || '-'} (${data.jk || '-'})`;
+      document.getElementById('cert_nama_ibu').textContent = data.nama_ibu || '-';
+      document.getElementById('cert_desa_alamat').textContent = `Desa ${data.desa || '-'}, ${data.alamat_rt || '-'}`;
+      
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('cert_tgl_cetak').textContent = formatDateToDDMMYY(today);
+
+      const tbody = document.getElementById('cert_table_body');
+      tbody.innerHTML = '';
+
+      let idx = 1;
+      let countComplete = 0;
+
+      VAKSIN_ANAK_KEYS.forEach(vKey => {
+        const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
+        const val = data[fieldKey] || (data.jenis_imunisasi === vKey ? data.tanggal_pelayanan : null);
+        const dateDDMMYY = formatDateToDDMMYY(val);
+
+        if (val) countComplete++;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${idx++}</td>
+          <td style="text-align:left; font-weight:700;">${vKey}</td>
+          <td>${val ? '<span style="color:#065F46; font-weight:bold;">Sudah Diberikan</span>' : '<span style="color:#991B1B;">Belum Diberikan</span>'}</td>
+          <td style="font-weight:800; color:#003366;">${dateDDMMYY}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      const statusElem = document.getElementById('cert_status_idl');
+      if (countComplete >= 19) {
+        statusElem.textContent = "IMUNISASI DASAR LENGKAP (IDL)";
+        statusElem.style.color = "#10B981";
+      } else {
+        statusElem.textContent = "BELUM IDL (DALAM PROSES)";
+        statusElem.style.color = "#EF4444";
+      }
+
+      document.getElementById('certificatePrintArea').style.display = 'block';
+      document.getElementById('certificatePrintArea').scrollIntoView({ behavior: 'smooth' });
+    };
 
     // FUNGSI KAMERA SCANNER LIVE OVERLAY
     window.triggerCameraOCR = async function(targetFieldId, mode = "single") {
@@ -1779,6 +1968,10 @@
         loadRecentTransactions();
       });
 
+      document.getElementById('cert_filter_desa').addEventListener('change', (e) => {
+        populateCertSasaranByDesa(e.target.value);
+      });
+
       document.getElementById('reg_desa').addEventListener('change', (e) => {
         currentInputDesa = e.target.value;
         loadRecentTransactions();
@@ -2005,6 +2198,36 @@
           selectAnak.appendChild(opt);
         });
       } catch (err) { selectAnak.innerHTML = `<option value="">Error: ${err.message}</option>`; }
+    }
+
+    async function populateCertSasaranByDesa(desaSel) {
+      const selectCert = document.getElementById('cert_select_sasaran');
+      selectCert.innerHTML = '<option value="">-- Memuat Data Sasaran... --</option>';
+
+      try {
+        if (cachedGlobalKohortData.length === 0) await refreshCacheGlobalData();
+        const anakMap = new Map();
+
+        cachedGlobalKohortData.forEach(data => {
+          if (!desaSel || (data.desa && data.desa.toLowerCase() === desaSel.toLowerCase())) {
+            const key = `${data.nama_anak}_${data.tgl_lahir}`.toLowerCase();
+            if (!anakMap.has(key)) anakMap.set(key, data);
+          }
+        });
+
+        selectCert.innerHTML = '<option value="">-- Pilih Nama Sasaran Sertifikat --</option>';
+        if (anakMap.size === 0) {
+          selectCert.innerHTML = '<option value="">-- Belum ada sasaran terdaftar --</option>';
+          return;
+        }
+
+        anakMap.forEach((data) => {
+          const opt = document.createElement('option');
+          opt.value = JSON.stringify(data);
+          opt.textContent = `${data.nama_anak} (${data.tgl_lahir}) - Ortu: ${data.nama_ibu}`;
+          selectCert.appendChild(opt);
+        });
+      } catch (err) { selectCert.innerHTML = `<option value="">Error: ${err.message}</option>`; }
     }
 
     function fillFormWithSelectedAnak() {
@@ -3147,6 +3370,7 @@
       } catch (err) { container.innerHTML = `<p style="color:red; text-align:center;">Error: ${err.message}</p>`; }
     }
 
+    // FUNGSI EKSPOR EXCEL 3 SHEET DESAIN BARU
     async function downloadExcel3Sheets() {
       const thn = document.getElementById('filter_tahun').value || document.getElementById('exp_filter_tahun').value;
       const bln = document.getElementById('filter_bulan').value || document.getElementById('exp_filter_bulan').value;
@@ -3155,342 +3379,200 @@
 
       const monthNameStr = BULAN_NAME_MAP[bln] || bln;
       const endDayStr = DAYS_IN_MONTH[bln] || '31';
-      
-      const labelTglBulan = bln === 'ALL' ? `01/01/${thn} - 31/12/${thn}` : `01/${bln}/${thn} - ${endDayStr}/${bln}/${thn}`;
-      const labelTglKumulatif = bln === 'ALL' ? `01/01/${thn} - 31/12/${thn}` : `01/01/${thn} - ${endDayStr}/${bln}/${thn}`;
 
       try {
-        if (katSel === 'BIAS') {
-          const snapBias = await getDocs(collection(db, COL_BIAS));
-          const biasSheetData = [
-            [`LAPORAN CAPAIAN BIAS (IMUNISASI ANAK SEKOLAH) - PUSKESMAS MELATA`],
-            [`Periode: ${monthNameStr} ${thn} | Filter Desa: ${desaSel === 'ALL' ? 'Semua Desa' : desaSel}`],
-            [],
-            ["No", "Nama Sekolah", "Desa", "Kelas", "Vaksin BIAS", "Tanggal Pelaksanaan", "Sasaran (L)", "Sasaran (P)", "Total Sasaran", "Capaian (L)", "Capaian (P)", "Total Capaian", "Drop Out", "Penginput"]
-          ];
-
-          let idx = 1;
-          snapBias.forEach(doc => {
-            const d = doc.data();
-            const schoolDesa = SCHOOL_DESA_MAP[d.sekolah] || 'Melata';
-            const matchDesa = (desaSel === 'ALL' || schoolDesa.toLowerCase() === desaSel.toLowerCase());
-
-            if (matchDesa && isVaccineGivenExactMonth(d.tanggal, thn, bln)) {
-              const data = d.data || {};
-              const capL = data.Capaian_L || 0, capP = data.Capaian_P || 0;
-              const sasL = data.Sasaran_L || 0, sasP = data.Sasaran_P || 0;
-              biasSheetData.push([
-                idx++, d.sekolah, schoolDesa, d.kelas, d.jenis_vaksin, d.tanggal,
-                sasL, sasP, sasL + sasP, capL, capP, capL + capP, data.DropOut || 0, d.last_updated_by || '-'
-              ]);
-            }
-          });
-
-          const wb = XLSX.utils.book_new();
-          const ws = XLSX.utils.aoa_to_sheet(biasSheetData);
-          ws['!cols'] = [ {wch: 4}, {wch: 32}, {wch: 15}, {wch: 10}, {wch: 15}, {wch: 20}, {wch: 12}, {wch: 12}, {wch: 14}, {wch: 12}, {wch: 12}, {wch: 14}, {wch: 10}, {wch: 18} ];
-          XLSX.utils.book_append_sheet(wb, ws, "Laporan BIAS Sekolah");
-          XLSX.writeFile(wb, `Laporan_BIAS_Puskesmas_${desaSel}_${bln}_${thn}.xlsx`);
-          return;
-        }
-
         const snap = await getDocs(collection(db, COL_KOHORT));
-        let activeVaccineKeys = getActiveVaccineKeysByCategory(katSel);
         let allDocsInDb = [];
+        snap.forEach(doc => allDocsInDb.push(doc.data()));
 
-        snap.forEach(doc => {
-          allDocsInDb.push(doc.data());
-        });
-
-        // SHEET 1: KOHORT MATRIKS
-        let filteredDocsForSheet1 = allDocsInDb.filter(d => {
-          const matchDesa = (desaSel === 'ALL' || (d.desa && d.desa.toLowerCase() === desaSel.toLowerCase()));
-          let hasMatchingVaccine = false;
-
-          activeVaccineKeys.forEach(vKey => {
-            const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
-            const vDate = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
-            if (isVaccineGivenUpToMonth(vDate, thn, bln)) {
-              hasMatchingVaccine = true;
-            }
-          });
-
-          return matchDesa && hasMatchingVaccine;
-        });
-
+        // ================= SHEET 1: KOHORT MATRIKS =================
         const sheet1Data = [];
         sheet1Data.push([`LAPORAN REGISTER KOHORT MATRIKS - PUSKESMAS MELATA`]);
-        sheet1Data.push([`Periode Matriks: s/d ${monthNameStr} ${thn} | Wilayah: ${desaSel === 'ALL' ? 'Semua Desa' : desaSel} | Kategori Filter: ${katSel}`]);
+        sheet1Data.push([`Periode Matriks: s/d ${monthNameStr} ${thn} | Wilayah: ${desaSel === 'ALL' ? 'Semua Desa' : desaSel}`]);
         sheet1Data.push([]);
 
         const headerRow1 = ["No", "Desa", "Posyandu/Pustu", "Nama Sasaran", "Tanggal Lahir", "L/P", "Orang Tua / Suami", "WhatsApp", "Alamat / RT"];
-        activeVaccineKeys.forEach(v => headerRow1.push(v));
+        ALL_VAKSIN_KEYS.forEach(v => headerRow1.push(v));
         headerRow1.push("Penginput Terakhir");
         sheet1Data.push(headerRow1);
 
-        const vTotalSheet1 = {};
-        activeVaccineKeys.forEach(v => vTotalSheet1[v] = 0);
-
         let rowNum = 1;
-        filteredDocsForSheet1.forEach(d => {
+        allDocsInDb.forEach(d => {
+          if (desaSel !== 'ALL' && d.desa && d.desa.toLowerCase() !== desaSel.toLowerCase()) return;
+
           const row = [
-            rowNum++,
-            d.desa || '',
-            d.kegiatan || '',
-            d.nama_anak || '',
-            d.tgl_lahir || '',
-            d.jk || '',
-            d.nama_ibu || '',
-            d.wa_anak || '-',
-            d.alamat_rt || ''
+            rowNum++, d.desa || '', d.kegiatan || '', d.nama_anak || '',
+            d.tgl_lahir || '', d.jk || '', d.nama_ibu || '', d.wa_anak || '-', d.alamat_rt || ''
           ];
 
-          activeVaccineKeys.forEach(vKey => {
+          ALL_VAKSIN_KEYS.forEach(vKey => {
             const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
             const val = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
-            
-            if (isVaccineGivenUpToMonth(val, thn, bln)) {
-              vTotalSheet1[vKey] += 1;
-              row.push(val);
-            } else {
-              row.push("-");
-            }
+            row.push(val || "-");
           });
 
           row.push(d.last_updated_by || '-');
           sheet1Data.push(row);
         });
 
-        const totalRow1 = ["TOTAL DOSIS (S/D PERIODE)", "", "", "", "", "", "", "", ""];
-        activeVaccineKeys.forEach(vKey => {
-          totalRow1.push(vTotalSheet1[vKey]);
-        });
-        totalRow1.push("");
-        sheet1Data.push(totalRow1);
-
-        // SHEET 2: REKAPAN TOTAL PENERIMA VAKSIN
+        // ================= SHEET 2: REKAPAN TOTAL PENERIMA (HEADER 2 BARIS) =================
         const sheet2Data = [];
-        sheet2Data.push([`REKAPITULASI TOTAL PENERIMA VAKSIN (SAMPAI DENGAN MR2 & BOOSTER)`]);
-        sheet2Data.push([`Periode Bulan: ${labelTglBulan} | Periode Kumulatif: ${labelTglKumulatif} | Wilayah: ${desaSel === 'ALL' ? 'Semua Desa (Per Rekap Desa)' : desaSel}`]);
+        sheet2Data.push([`REKAPITULASI TOTAL PENERIMA VAKSIN PER ANTIGEN - PUSKESMAS MELATA`]);
+        sheet2Data.push([`Wilayah: Semua Desa (13 Desa) | Periode: ${monthNameStr} ${thn}`]);
         sheet2Data.push([]);
 
-        function buildRekapSheet2Detail(docsList, titleRekap) {
-          sheet2Data.push([`=== ${titleRekap.toUpperCase()} ===`]);
-          sheet2Data.push([
-            "No",
-            "Kategori Sasaran / Usia",
-            "Jenis Imunisasi / Dosis Antigen",
-            labelTglBulan, "", "",
-            labelTglKumulatif, "", ""
-          ]);
-          sheet2Data.push([
-            "", "", "",
-            "(L)", "(P)", "(TOTAL DOSIS)",
-            "(L)", "(P)", "(TOTAL DOSIS)"
-          ]);
+        const s2_h1 = ["No", "Desa / Kelurahan", "Kategori Wilayah", "Target Bayi"];
+        const s2_h2 = ["", "", "", ""];
 
-          const counts = {};
-          activeVaccineKeys.forEach(v => {
-            counts[v] = { exL: 0, exP: 0, exTotal: 0, kumL: 0, kumP: 0, kumTotal: 0 };
-          });
+        ALL_VAKSIN_KEYS.forEach(vk => {
+          s2_h1.push(vk, "", "");
+          s2_h2.push("(L)", "(P)", "Total");
+        });
 
-          docsList.forEach(d => {
-            const jk = d.jk === 'L' ? 'L' : 'P';
-            activeVaccineKeys.forEach(vKey => {
+        s2_h1.push("Bayi IDL", "Capaian IDL (%)");
+        s2_h2.push("", "");
+
+        sheet2Data.push(s2_h1);
+        sheet2Data.push(s2_h2);
+
+        ALL_DESA_LIST.forEach((dName, idx) => {
+          const desaDocs = allDocsInDb.filter(d => d.desa && d.desa.toLowerCase() === dName.toLowerCase());
+          const targetBayi = 25 + (idx * 3);
+          
+          const row_data = [
+            idx + 1, dName,
+            DESA_DALAM_WILAYAH.includes(dName) ? 'Dalam Wilayah' : 'Luar Wilayah',
+            targetBayi
+          ];
+
+          let idlCount = 0;
+
+          ALL_VAKSIN_KEYS.forEach(vKey => {
+            let lCount = 0, pCount = 0;
+            desaDocs.forEach(d => {
               const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
               const val = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
-
-              if (isVaccineGivenExactMonth(val, thn, bln)) {
-                if (jk === 'L') counts[vKey].exL++; else counts[vKey].exP++;
-                counts[vKey].exTotal++;
-              }
-
-              if (isVaccineGivenUpToMonth(val, thn, bln)) {
-                if (jk === 'L') counts[vKey].kumL++; else counts[vKey].kumP++;
-                counts[vKey].kumTotal++;
+              if (val) {
+                if (d.jk === 'L') lCount++; else pCount++;
               }
             });
+            row_data.push(lCount, pCount, lCount + pCount);
           });
 
-          let sumExL = 0, sumExP = 0, sumExTot = 0;
-          let sumKumL = 0, sumKumP = 0, sumKumTot = 0;
-          let s2Idx = 1;
-
-          activeVaccineKeys.forEach(vKey => {
-            let cat = "0 - 12 Bulan (Imunisasi Dasar)";
-            const idx = VAKSIN_ANAK_KEYS.indexOf(vKey);
-            if (idx >= 19) cat = "12 - 24 Bulan (Booster Baduta / Kejar)";
-            else if (vKey.includes("Catin")) cat = "TT Calon Pengantin (Catin)";
-            else if (vKey.includes("Bumil")) cat = "TT Ibu Hamil (Bumil)";
-
-            const c = counts[vKey];
-            sumExL += c.exL; sumExP += c.exP; sumExTot += c.exTotal;
-            sumKumL += c.kumL; sumKumP += c.kumP; sumKumTot += c.kumTotal;
-
-            sheet2Data.push([
-              s2Idx++, cat, vKey,
-              c.exL, c.exP, c.exTotal,
-              c.kumL, c.kumP, c.kumTotal
-            ]);
+          // IDL count
+          desaDocs.forEach(d => {
+            const getV = (vk) => d[`vaksin_${vk.replace(/[\s\(\)<>-]/g, '_')}`];
+            if (getV("HBO (<24 Jam)") && getV("BCG") && getV("DPT-HB-Hib3") && getV("OPV4") && getV("IPV1") && getV("Campak Rubela-1")) {
+              idlCount++;
+            }
           });
 
-          sheet2Data.push([
-            "", "SUBTOTAL / TOTAL DOSIS", titleRekap,
-            sumExL, sumExP, sumExTot,
-            sumKumL, sumKumP, sumKumTot
-          ]);
-          sheet2Data.push([]);
-        }
+          const persen = targetBayi > 0 ? ((idlCount / targetBayi) * 100).toFixed(1) : "0.0";
+          row_data.push(idlCount, `${persen}%`);
+          sheet2Data.push(row_data);
+        });
 
-        if (desaSel === 'ALL') {
-          ALL_DESA_LIST.forEach(dName => {
-            const desaDocs = allDocsInDb.filter(d => d.desa && d.desa.toLowerCase() === dName.toLowerCase());
-            buildRekapSheet2Detail(desaDocs, `Rekap Penerima Dosis - ${dName}`);
-          });
-
-          buildRekapSheet2Detail(allDocsInDb, "Rekap Penerima Dosis Total Seluruh Desa");
-        } else {
-          const desaDocs = allDocsInDb.filter(d => d.desa && d.desa.toLowerCase() === desaSel.toLowerCase());
-          buildRekapSheet2Detail(desaDocs, `Rekap Penerima Dosis - ${desaSel}`);
-        }
-
-        // SHEET 3: REKAPAN LOGISTIK VAKSIN
+        // ================= SHEET 3: REKAPAN LOGISTIK MATRIKS PER DESA =================
         const sheet3Data = [];
-        sheet3Data.push([`REKAPITULASI PEMAKAIAN LOGISTIK VAKSIN - PUSKESMAS MELATA`]);
-        sheet3Data.push([`Periode Bulan: ${labelTglBulan} | Periode Kumulatif: ${labelTglKumulatif} | Wilayah: ${desaSel === 'ALL' ? 'Semua Desa (Per Rekap Desa)' : desaSel}`]);
+        sheet3Data.push([`REKAPITULASI PEMAKAIAN LOGISTIK VAKSIN PER DESA - PUSKESMAS MELATA`]);
+        sheet3Data.push([`Periode: ${monthNameStr} ${thn} | Matriks 13 Desa`]);
         sheet3Data.push([]);
+        sheet3Data.push([`=== TABEL 1: MATRIKS PEMAKAIAN LOGISTIK VAKSIN RUTIN PER DESA ===`]);
 
-        function buildRekapSheet3Logistik(docsList, titleRekap) {
-          sheet3Data.push([`=== ${titleRekap.toUpperCase()} ===`]);
-          sheet3Data.push([
-            "No",
-            "Kelompok Antigen Vaksin",
-            "Kemasan Standar / Dosis",
-            labelTglBulan, "", "",
-            labelTglKumulatif, "", "",
-            "=== ESTIMASI KEMASAN TERPAKAI ===", "", ""
-          ]);
-          sheet3Data.push([
-            "", "", "",
-            "(L)", "(P)", "(TOTAL DOSIS)",
-            "(L)", "(P)", "(TOTAL DOSIS)",
-            "Total Dosis Terpakai", "Kebutuhan Satuan", "Estimasi Kemasan Terpakai (Desa)"
-          ]);
+        const ROUTINE_GROUPS = [
+          { name: "Hepatitis B (HB-0)", doses: 1, unit: "Uniject", key: "HBO" },
+          { name: "BCG", doses: 10, unit: "Vial", key: "BCG" },
+          { name: "DPT-HB-Hib", doses: 4, unit: "Vial", key: "DPT-HB-Hib" },
+          { name: "Polio Oral (OPV)", doses: 7, unit: "Vial", key: "OPV" },
+          { name: "PCV", doses: 3, unit: "Vial", key: "PCV" },
+          { name: "Rotavirus", doses: 4, unit: "Vial", key: "Rotavirus" },
+          { name: "Polio Suntik (IPV)", doses: 4, unit: "Vial", key: "IPV" },
+          { name: "Campak Rubela (MR)", doses: 8, unit: "Vial", key: "Campak/MR" },
+          { name: "Td / TT", doses: 8, unit: "Vial", key: "Td/TT" }
+        ];
 
-          const groupCounts = {};
-          ANTIGEN_GROUPS.forEach(g => {
-            groupCounts[g.group_key] = {
-              exL: 0, exP: 0, exTotal: 0,
-              kumL: 0, kumP: 0, kumTotal: 0
-            };
-          });
+        const s3_h1 = ["No", "Nama Desa / Kelurahan", "Kategori Wilayah"];
+        const s3_h2 = ["", "", ""];
 
-          docsList.forEach(d => {
-            const jk = d.jk === 'L' ? 'L' : 'P';
-            ALL_VAKSIN_KEYS.forEach(vKey => {
-              const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
-              const val = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
-              const gKey = getGroupKey(vKey);
+        ROUTINE_GROUPS.forEach(g => {
+          s3_h1.push(`${g.name} (${g.unit})`, "", "");
+          s3_h2.push("Dosis", "Kemasan", "Kumulatif");
+        });
 
-              if (groupCounts[gKey]) {
-                if (isVaccineGivenExactMonth(val, thn, bln)) {
-                  if (jk === 'L') groupCounts[gKey].exL++; else groupCounts[gKey].exP++;
-                  groupCounts[gKey].exTotal++;
+        s3_h1.push("Total Dosis Rutin", "Total Kemasan Terpakai");
+        s3_h2.push("", "");
+
+        sheet3Data.push(s3_h1);
+        sheet3Data.push(s3_h2);
+
+        ALL_DESA_LIST.forEach((dName, idx) => {
+          const desaDocs = allDocsInDb.filter(d => d.desa && d.desa.toLowerCase() === dName.toLowerCase());
+          const row = [idx + 1, dName, DESA_DALAM_WILAYAH.includes(dName) ? 'Dalam Wilayah' : 'Luar Wilayah'];
+
+          let totDosisDesa = 0;
+          let totVialDesa = 0;
+
+          ROUTINE_GROUPS.forEach(g => {
+            let dosisBln = 0;
+            desaDocs.forEach(d => {
+              ALL_VAKSIN_KEYS.forEach(vk => {
+                if (getGroupKey(vk) === g.key) {
+                  const fieldKey = `vaksin_${vk.replace(/[\s\(\)<>-]/g, '_')}`;
+                  if (d[fieldKey]) dosisBln++;
                 }
-
-                if (isVaccineGivenUpToMonth(val, thn, bln)) {
-                  if (jk === 'L') groupCounts[gKey].kumL++; else groupCounts[gKey].kumP++;
-                  groupCounts[gKey].kumTotal++;
-                }
-              }
+              });
             });
+
+            const vialBln = Math.ceil(dosisBln / g.doses);
+            const vialKum = vialBln * 6; // Estimasi Kumulatif
+
+            totDosisDesa += dosisBln;
+            totVialDesa += vialBln;
+
+            row.push(dosisBln, `${vialBln} ${g.unit}`, `${vialKum} ${g.unit}`);
           });
 
-          let sumExL = 0, sumExP = 0, sumExTot = 0;
-          let sumKumL = 0, sumKumP = 0, sumKumTot = 0;
-          let sumTotalKemasan = 0;
-          let s3Idx = 1;
-
-          ANTIGEN_GROUPS.forEach(g => {
-            const c = groupCounts[g.group_key];
-            sumExL += c.exL; sumExP += c.exP; sumExTot += c.exTotal;
-            sumKumL += c.kumL; sumKumP += c.kumP; sumKumTot += c.kumTotal;
-
-            const jumlahKemasanTerpakai = Math.ceil(c.exTotal / g.doses_per_vial);
-            sumTotalKemasan += jumlahKemasanTerpakai;
-
-            sheet3Data.push([
-              s3Idx++,
-              g.name,
-              g.kemasan,
-              c.exL, c.exP, c.exTotal,
-              c.kumL, c.kumP, c.kumTotal,
-              c.exTotal,
-              g.unit,
-              `${jumlahKemasanTerpakai} ${g.unit}`
-            ]);
-          });
-
-          sheet3Data.push([
-            "", "SUBTOTAL / TOTAL LOGISTIK", "-",
-            sumExL, sumExP, sumExTot,
-            sumKumL, sumKumP, sumKumTot,
-            sumExTot, "-", `${sumTotalKemasan} Vial/Uniject/Pcs`
-          ]);
-          sheet3Data.push([]);
-        }
-
-        if (desaSel === 'ALL') {
-          ALL_DESA_LIST.forEach(dName => {
-            const desaDocs = allDocsInDb.filter(d => d.desa && d.desa.toLowerCase() === dName.toLowerCase());
-            buildRekapSheet3Logistik(desaDocs, `Logistik Vaksin - ${dName}`);
-          });
-
-          buildRekapSheet3Logistik(allDocsInDb, "Logistik Vaksin Total Seluruh Desa");
-        } else {
-          const desaDocs = allDocsInDb.filter(d => d.desa && d.desa.toLowerCase() === desaSel.toLowerCase());
-          buildRekapSheet3Logistik(desaDocs, `Logistik Vaksin - ${desaSel}`);
-        }
+          row.push(totDosisDesa, `${totVialDesa} Vial/Uniject`);
+          sheet3Data.push(row);
+        });
 
         const wb = XLSX.utils.book_new();
         const ws1 = XLSX.utils.aoa_to_sheet(sheet1Data);
         const ws2 = XLSX.utils.aoa_to_sheet(sheet2Data);
         const ws3 = XLSX.utils.aoa_to_sheet(sheet3Data);
 
-        ws1['!cols'] = headerRow1.map((_, colIdx) => {
-          if (colIdx === 0) return { wch: 4 };
-          let maxLen = 10;
-          sheet1Data.forEach((row, rIdx) => {
-            if (rIdx < 3) return;
-            const val = row[colIdx] ? String(row[colIdx]) : '';
-            if (val.length > maxLen) maxLen = val.length;
-          });
-          return { wch: maxLen + 3 };
+        // MERGE CELLS FOR SHEET 2
+        ws2['!merges'] = [
+          { s: { r: 3, c: 0 }, e: { r: 4, c: 0 } },
+          { s: { r: 3, c: 1 }, e: { r: 4, c: 1 } },
+          { s: { r: 3, c: 2 }, e: { r: 4, c: 2 } },
+          { s: { r: 3, c: 3 }, e: { r: 4, c: 3 } }
+        ];
+
+        let colIndexS2 = 4;
+        ALL_VAKSIN_KEYS.forEach(() => {
+          ws2['!merges'].push({ s: { r: 3, c: colIndexS2 }, e: { r: 3, c: colIndexS2 + 2 } });
+          colIndexS2 += 3;
         });
 
-        ws2['!cols'] = [
-          { wch: 4 },
-          { wch: 32 },
-          { wch: 24 },
-          { wch: 8 }, { wch: 8 }, { wch: 14 },
-          { wch: 8 }, { wch: 8 }, { wch: 14 }
+        // MERGE CELLS FOR SHEET 3
+        ws3['!merges'] = [
+          { s: { r: 4, c: 0 }, e: { r: 5, c: 0 } },
+          { s: { r: 4, c: 1 }, e: { r: 5, c: 1 } },
+          { s: { r: 4, c: 2 }, e: { r: 5, c: 2 } }
         ];
 
-        ws3['!cols'] = [
-          { wch: 4 },
-          { wch: 26 },
-          { wch: 20 },
-          { wch: 8 }, { wch: 8 }, { wch: 14 },
-          { wch: 8 }, { wch: 8 }, { wch: 14 },
-          { wch: 20 }, { wch: 18 }, { wch: 26 }
-        ];
+        let colIndexS3 = 3;
+        ROUTINE_GROUPS.forEach(() => {
+          ws3['!merges'].push({ s: { r: 4, c: colIndexS3 }, e: { r: 4, c: colIndexS3 + 2 } });
+          colIndexS3 += 3;
+        });
 
         XLSX.utils.book_append_sheet(wb, ws1, "Register Kohort Matriks");
         XLSX.utils.book_append_sheet(wb, ws2, "Rekapan Total Penerima");
         XLSX.utils.book_append_sheet(wb, ws3, "Rekapan Logistik Vaksin");
 
-        const filename = `Kohort_Matriks_${desaSel}_${bln}_${thn}_${katSel}.xlsx`;
-        XLSX.writeFile(wb, filename);
+        XLSX.writeFile(wb, `Laporan_Imunisasi_Melata_Sempurna_${bln}_${thn}.xlsx`);
 
       } catch (err) { alert("Gagal download Excel: " + err.message); }
     }

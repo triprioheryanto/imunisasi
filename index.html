@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Sistem Register Imunisasi & BIAS — Puskesmas Melata</title>
 
-  <!-- Google Fonts: Plus Jakarta Sans & Cinzel for Luxury Certificate Typography -->
+  <!-- Google Fonts: Plus Jakarta Sans & Cinzel for Certificate Typography -->
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
@@ -259,9 +259,8 @@
     .scan-guide-multi {
       position: relative; width: 88%; max-width: 480px; height: 130px;
       border: 2px dashed #00E676; border-radius: 10px; box-shadow: 0 0 0 9999px rgba(0,0,0,0.5);
-      z-index: 10; display: flex; flex-direction: column; justify-content: space-around; padding: 6px 0;
+      z-index: 10; display: flex; flex-direction: column; justify-around: space-around; padding: 6px 0;
     }
-    .scan-guide-multi .guide-line { width: 100%; height: 1px; background: rgba(0, 230, 118, 0.4); }
 
     .scanner-hint-text { position: absolute; top: 18%; color: #FFF; font-size: 0.9rem; font-weight: 700; background: rgba(0,0,0,0.7); padding: 8px 16px; border-radius: 20px; z-index: 12; text-align: center; }
     .camera-controls { position: absolute; bottom: 30px; left: 0; right: 0; z-index: 20; display: flex; justify-content: space-around; align-items: center; padding: 0 30px; }
@@ -302,7 +301,6 @@
       page-break-inside: avoid;
     }
 
-    /* BINGKAI ORNAMEN ELEGAN LANDSCAPE GANDA */
     .cert-frame-outer {
       border: 3.5px solid #003366;
       height: 100%;
@@ -327,7 +325,6 @@
       background: rgba(255, 255, 255, 0.96);
     }
 
-    /* AKSEN CORNER EMBLEM EMAS & NAVY */
     .cert-corner {
       position: absolute;
       width: 28px;
@@ -341,7 +338,6 @@
     .cert-corner-bl { bottom: 4px; left: 4px; border-width: 0 0 3.5px 3.5px; }
     .cert-corner-br { bottom: 4px; right: 4px; border-width: 0 3.5px 3.5px 0; }
 
-    /* WATERMARK LOGO PUSKESMAS MELATA DI TENGAH SERTIFIKAT */
     .cert-watermark-logo {
       position: absolute;
       top: 50%;
@@ -349,13 +345,12 @@
       transform: translate(-50%, -50%);
       width: 340px;
       height: auto;
-      opacity: 0.09; /* Transparan halus sebagai watermark */
+      opacity: 0.09;
       pointer-events: none;
       z-index: 1;
       filter: grayscale(10%) contrast(110%);
     }
 
-    /* KOP SERTIFIKAT LANDSCAPE DENGAN LOGO PUSKESMAS MELATA */
     .cert-header-landscape {
       display: flex;
       align-items: center;
@@ -448,7 +443,6 @@
       font-size: 0.95rem;
     }
 
-    /* BOX FOTO 4x6 LANDSCAPE ELEGANT */
     .cert-photo-box-4x6 {
       width: 95px;
       height: 125px;
@@ -503,7 +497,6 @@
       justify-content: space-between;
     }
 
-    /* TABEL HALAMAN BELAKANG SERTIFIKAT LANDSCAPE */
     .cert-back-table {
       width: 100%;
       border-collapse: collapse;
@@ -526,7 +519,7 @@
       letter-spacing: 0.5px;
     }
 
-    /* MEDIA PRINT PRESISI A4 LANDSCAPE */
+    /* MEDIA PRINT A4 LANDSCAPE */
     @media print {
       @page {
         size: A4 landscape;
@@ -589,7 +582,7 @@
 </head>
 <body>
 
-  <!-- MODAL OCR LOADING PROGRESS & ERROR/RETRY -->
+  <!-- MODAL OCR LOADING PROGRESS -->
   <div id="ocrModal" class="modal-overlay" style="display:none;">
     <div class="ocr-loading-card">
       <div id="ocrIconContainer" style="font-size:2rem; color:var(--primary); margin-bottom:6px;"><i class="fas fa-camera-retro fa-bounce"></i></div>
@@ -602,8 +595,8 @@
       <div style="font-size:0.85rem; font-weight:800; color:var(--accent);" id="ocrProgressPercent">0%</div>
 
       <div id="ocrRetryActionGroup" style="display:none; margin-top:16px; gap:8px; justify-content:center;">
-        <button type="button" class="btn btn-warning" onclick="retryLastOCR()"><i class="fas fa-redo"></i> Coba Lagi OCR</button>
-        <button type="button" class="btn btn-danger" onclick="cancelOCRProcess()"><i class="fas fa-times"></i> Batalkan / Gagal</button>
+        <button type="button" class="btn btn-warning" id="btnRetryOcr"><i class="fas fa-redo"></i> Coba Lagi OCR</button>
+        <button type="button" class="btn btn-danger" id="btnCancelOcr"><i class="fas fa-times"></i> Batalkan / Gagal</button>
       </div>
     </div>
   </div>
@@ -619,9 +612,9 @@
     </div>
 
     <div class="camera-controls">
-      <button type="button" class="btn btn-ghost" onclick="closeCameraScanner()" style="color:#FFF; border-color:#FFF; padding:10px 16px;"><i class="fas fa-arrow-left"></i> Batal</button>
-      <button type="button" class="btn-capture-snap" onclick="captureAndProcessOCR()" title="Ambil Foto"><inner></inner></button>
-      <button type="button" class="btn btn-ghost" onclick="toggleCameraFacing()" style="color:#FFF; border-color:#FFF; padding:10px 16px;"><i class="fas fa-sync"></i> Putar</button>
+      <button type="button" class="btn btn-ghost" id="btnCloseCamera" style="color:#FFF; border-color:#FFF; padding:10px 16px;"><i class="fas fa-arrow-left"></i> Batal</button>
+      <button type="button" class="btn-capture-snap" id="btnCaptureSnap" title="Ambil Foto"><inner></inner></button>
+      <button type="button" class="btn btn-ghost" id="btnToggleCameraFacing" style="color:#FFF; border-color:#FFF; padding:10px 16px;"><i class="fas fa-sync"></i> Putar</button>
     </div>
 
     <canvas id="cropCanvas" style="display:none;"></canvas>
@@ -642,7 +635,6 @@
         <div class="form-group">
           <label>Nama Petugas / Username <span class="req">*</span></label>
           <input type="text" id="login_username" placeholder="Masukkan nama/username petugas" required>
-          <small id="login_device_hint" style="font-size:0.72rem; color:var(--info); margin-top:4px;"></small>
         </div>
 
         <div class="form-group">
@@ -664,7 +656,7 @@
         <h3 style="margin:0; color:var(--primary); font-size:1.1rem; display:flex; align-items:center; gap:8px;">
           <i class="fas fa-copy"></i> Ditemukan Data Kemiripan Nama!
         </h3>
-        <button class="btn btn-ghost" onclick="closeCompareModal()" style="padding:4px 8px; font-size:0.8rem;"><i class="fas fa-times"></i> Tutup</button>
+        <button class="btn btn-ghost" id="btnCloseCompareModal" style="padding:4px 8px; font-size:0.8rem;"><i class="fas fa-times"></i> Tutup</button>
       </div>
       
       <p style="font-size:0.82rem; color:var(--muted); margin-top:0; margin-bottom:10px;">
@@ -675,7 +667,7 @@
       </div>
 
       <div style="margin-top:14px; text-align:right;">
-        <button class="btn btn-ghost" onclick="closeCompareModal()"><i class="fas fa-plus-circle"></i> Tetap Buat Baru</button>
+        <button class="btn btn-ghost" id="btnForceCreateNew"><i class="fas fa-plus-circle"></i> Tetap Buat Baru</button>
       </div>
     </div>
   </div>
@@ -693,21 +685,21 @@
       </div>
       <div class="header-actions">
         <div class="badge-user" id="currentUserDisplay"><i class="fas fa-user-circle"></i> <span>Petugas</span></div>
-        <button class="btn btn-ghost" onclick="logoutPetugas()" style="color:#fff; border-color:rgba(255,255,255,0.3); padding:5px 8px; font-size:0.75rem;" title="Ganti Petugas">
+        <button class="btn btn-ghost" id="btnLogoutPetugas" style="color:#fff; border-color:rgba(255,255,255,0.3); padding:5px 8px; font-size:0.75rem;" title="Ganti Petugas">
           <i class="fas fa-sign-out-alt"></i>
         </button>
-        <button class="btn btn-ghost" onclick="document.getElementById('helpModal').style.display='flex'" style="color:#fff; border-color:rgba(255,255,255,0.3); padding:5px 8px; font-size:0.75rem;">
+        <button class="btn btn-ghost" id="btnOpenHelp" style="color:#fff; border-color:rgba(255,255,255,0.3); padding:5px 8px; font-size:0.75rem;">
           <i class="fas fa-circle-info"></i>
         </button>
       </div>
     </div>
     <div class="app-nav-tabs"> 
-      <button class="tab active" data-tab="imunisasi" onclick="switchTab(event)"><i class="fas fa-user-plus"></i> INPUT KOHORT</button>
-      <button class="tab" data-tab="bias" onclick="switchTab(event)"><i class="fas fa-school"></i> BIAS</button>
-      <button class="tab" data-tab="catchup" onclick="switchTab(event)"><i class="fas fa-exclamation-circle" style="color:#ffc107;"></i> CATCH UP</button>
-      <button class="tab" data-tab="kumulatif" onclick="switchTab(event)"><i class="fas fa-chart-line"></i> KUMULATIF</button>
-      <button class="tab" data-tab="capaian" onclick="switchTab(event)"><i class="fas fa-award" style="color:#10B981;"></i> CAPAIAN</button>
-      <button class="tab tab-admin-highlight" data-tab="admin" onclick="switchTab(event)"><i class="fas fa-user-gear"></i> ADMIN & KONTROL</button>
+      <button class="tab active" data-tab="imunisasi"><i class="fas fa-user-plus"></i> INPUT KOHORT</button>
+      <button class="tab" data-tab="bias"><i class="fas fa-school"></i> BIAS</button>
+      <button class="tab" data-tab="catchup"><i class="fas fa-exclamation-circle" style="color:#ffc107;"></i> CATCH UP</button>
+      <button class="tab" data-tab="kumulatif"><i class="fas fa-chart-line"></i> KUMULATIF</button>
+      <button class="tab" data-tab="capaian"><i class="fas fa-award" style="color:#10B981;"></i> CAPAIAN</button>
+      <button class="tab tab-admin-highlight" data-tab="admin"><i class="fas fa-user-gear"></i> ADMIN & KONTROL</button>
     </div>
   </header>
 
@@ -730,7 +722,7 @@
             <label><i class="fas fa-search-location" style="color:var(--primary);"></i> Cari Nama Sasaran (Mulai 2 Huruf)</label>
             <div class="input-with-btn">
               <input type="text" id="input_search_sasaran" placeholder="Ketik minimal 2 huruf nama sasaran..." autocomplete="off">
-              <button type="button" class="btn-ocr-cam" onclick="triggerCameraOCR('input_search_sasaran', 'single')" title="Scan Nama via Kamera 📷">
+              <button type="button" class="btn-ocr-cam btn-trigger-ocr" data-target="input_search_sasaran" data-mode="single" title="Scan Nama via Kamera 📷">
                 <i class="fas fa-camera"></i>
               </button>
             </div>
@@ -814,7 +806,7 @@
               <label>Nama Sasaran <span class="req">*</span></label>
               <div class="input-with-btn">
                 <input type="text" id="reg_nama_anak" placeholder="Nama lengkap sasaran" required autocomplete="off">
-                <button type="button" class="btn-ocr-cam" onclick="triggerCameraOCR('reg_nama_anak', 'single')" title="Scan Nama 📷">
+                <button type="button" class="btn-ocr-cam btn-trigger-ocr" data-target="reg_nama_anak" data-mode="single" title="Scan Nama 📷">
                   <i class="fas fa-camera"></i>
                 </button>
               </div>
@@ -836,7 +828,7 @@
               <label>NIK Sasaran (Opsional)</label>
               <div class="input-with-btn">
                 <input type="text" id="reg_nik_anak" placeholder="NIK Sasaran">
-                <button type="button" class="btn-ocr-cam" onclick="triggerCameraOCR('reg_nik_anak', 'single')" title="Scan NIK 📷">
+                <button type="button" class="btn-ocr-cam btn-trigger-ocr" data-target="reg_nik_anak" data-mode="single" title="Scan NIK 📷">
                   <i class="fas fa-camera"></i>
                 </button>
               </div>
@@ -851,7 +843,7 @@
               <label id="lbl_nama_ibu">Nama Orang Tua / Ibu <span class="req">*</span></label>
               <div class="input-with-btn">
                 <input type="text" id="reg_nama_ibu" placeholder="Nama ibu / nama suami" required>
-                <button type="button" class="btn-ocr-cam" onclick="triggerCameraOCR('reg_nama_ibu', 'single')" title="Scan Nama Ortu 📷">
+                <button type="button" class="btn-ocr-cam btn-trigger-ocr" data-target="reg_nama_ibu" data-mode="single" title="Scan Nama Ortu 📷">
                   <i class="fas fa-camera"></i>
                 </button>
               </div>
@@ -861,7 +853,7 @@
               <label id="lbl_nik_ibu">NIK Orang Tua / Suami</label>
               <div class="input-with-btn">
                 <input type="text" id="reg_nik_ibu" placeholder="NIK Orang Tua / Suami">
-                <button type="button" class="btn-ocr-cam" onclick="triggerCameraOCR('reg_nik_ibu', 'single')" title="Scan NIK Ortu 📷">
+                <button type="button" class="btn-ocr-cam btn-trigger-ocr" data-target="reg_nik_ibu" data-mode="single" title="Scan NIK Ortu 📷">
                   <i class="fas fa-camera"></i>
                 </button>
               </div>
@@ -871,7 +863,7 @@
               <label>Alamat / RT <span class="req">*</span></label>
               <div class="input-with-btn">
                 <input type="text" id="reg_alamat" placeholder="Contoh: RT 02 / Dusun A" required>
-                <button type="button" class="btn-ocr-cam" onclick="triggerCameraOCR('reg_alamat', 'multi')" title="Scan Alamat 📷">
+                <button type="button" class="btn-ocr-cam btn-trigger-ocr" data-target="reg_alamat" data-mode="multi" title="Scan Alamat 📷">
                   <i class="fas fa-camera"></i>
                 </button>
               </div>
@@ -938,7 +930,7 @@
           </div>
 
           <div class="actions">
-            <button type="button" class="btn btn-warning" onclick="resetFormRegisterIndividu()"><i class="fas fa-eraser"></i> Bersihkan Form</button>
+            <button type="button" class="btn btn-warning" id="btnResetFormIndividu"><i class="fas fa-eraser"></i> Bersihkan Form</button>
             <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Simpan Ke Kohort</button>
           </div>
         </form>
@@ -949,7 +941,7 @@
           <div>
             <h3 style="margin:0;"><i class="fas fa-list-check" style="color:var(--success);"></i> Preview Data (<span id="preview_desa_title">Semua Desa</span>)</h3>
           </div>
-          <button class="btn btn-ghost" onclick="loadRecentTransactions()" style="padding:4px 8px; font-size:0.78rem;"><i class="fas fa-sync-alt"></i> Refresh</button>
+          <button class="btn btn-ghost" id="btnRefreshPreview" style="padding:4px 8px; font-size:0.78rem;"><i class="fas fa-sync-alt"></i> Refresh</button>
         </div>
 
         <h4 style="color:var(--accent); margin-top:14px; font-size:0.92rem;"><i class="fas fa-baby"></i> Matriks Imunisasi Bayi & Anak</h4>
@@ -975,7 +967,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr><td colspan="31" style="text-align:center;"><i class="fas fa-info-circle"></i> Pilih desa untuk melihat preview data.</td></tr>
+              <tr><td colspan="31" style="text-align:center;"><i class="fas fa-info-circle"></i> Memuat preview data...</td></tr>
             </tbody>
           </table>
         </div>
@@ -1003,7 +995,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr><td colspan="16" style="text-align:center;"><i class="fas fa-info-circle"></i> Pilih desa untuk melihat preview data.</td></tr>
+              <tr><td colspan="16" style="text-align:center;"><i class="fas fa-info-circle"></i> Memuat preview data...</td></tr>
             </tbody>
           </table>
         </div>
@@ -1244,7 +1236,7 @@
       <!-- KARTU CETAK SERTIFIKAT IMUNISASI MEWAH A4 LANDSCAPE -->
       <div class="card" style="background: linear-gradient(135deg, #FFFDF5 0%, #FEFCE8 100%); border:1.5px solid #FDE047;">
         <h2><i class="fas fa-award" style="color:var(--warning)"></i> View / Cetak Sertifikat Imunisasi (A4 Horizontal / Landscape)</h2>
-        <p class="lead" style="font-size:0.82rem; margin-bottom:10px;">Pilih sasaran terdaftar untuk mencetak Sertifikat Imunisasi Elegan Orientasi Horizontal A4 dengan Watermark Logo Puskesmas Melata[cite: 4].</p>
+        <p class="lead" style="font-size:0.82rem; margin-bottom:10px;">Pilih sasaran terdaftar untuk mencetak Sertifikat Imunisasi Elegan Orientasi Horizontal A4 dengan Watermark Logo Puskesmas Melata.</p>
         
         <div class="grid">
           <div class="form-group">
@@ -1275,7 +1267,7 @@
         </div>
 
         <div class="actions" style="justify-content:flex-start;">
-          <button class="btn btn-warning" onclick="generateAndShowCertificate()"><i class="fas fa-file-invoice"></i> Tampilkan Sertifikat A4 Landscape</button>
+          <button class="btn btn-warning" id="btnShowCert"><i class="fas fa-file-invoice"></i> Tampilkan Sertifikat A4 Landscape</button>
         </div>
       </div>
 
@@ -1292,7 +1284,6 @@
               <div class="cert-corner cert-corner-br"></div>
 
               <div class="cert-frame-inner">
-                <!-- WATERMARK LOGO PUSKESMAS MELATA DI TENGAH -->
                 <img src="MELATA LOGO.jpg" alt="Watermark Logo Puskesmas Melata" class="cert-watermark-logo" />
 
                 <div>
@@ -1317,23 +1308,22 @@
                       <table class="cert-field-table">
                         <tr>
                           <td class="cert-field-label">Nama Lengkap Anak</td>
-                          <td>: <span class="cert-field-val" id="cert_nama_anak">MUTIA A.</span></td>
+                          <td>: <span class="cert-field-val" id="cert_nama_anak">-</span></td>
                         </tr>
                         <tr>
                           <td class="cert-field-label">Tanggal Lahir / Gender</td>
-                          <td>: <span class="cert-field-val" id="cert_ttl_jk">15 April 2024 (Perempuan)</span></td>
+                          <td>: <span class="cert-field-val" id="cert_ttl_jk">-</span></td>
                         </tr>
                         <tr>
                           <td class="cert-field-label">Nama Orang Tua / Ibu</td>
-                          <td>: <span class="cert-field-val" id="cert_nama_ibu">Puji Rahayu</span></td>
+                          <td>: <span class="cert-field-val" id="cert_nama_ibu">-</span></td>
                         </tr>
                         <tr>
                           <td class="cert-field-label">Desa / Alamat</td>
-                          <td>: <span class="cert-field-val" id="cert_desa_alamat">Desa Modang Mas, RT 02</span></td>
+                          <td>: <span class="cert-field-val" id="cert_desa_alamat">-</span></td>
                         </tr>
                       </table>
 
-                      <!-- AREA FOTO ANAK/BAYI 4x6 BINGKAI EMAS PUTUS-PUTUS -->
                       <div class="cert-photo-box-4x6">
                         <i class="fas fa-camera" style="font-size:1.1rem; margin-bottom:2px; opacity:0.8;"></i>
                         FOTO<br>ANAK/BAYI<br>4 x 6
@@ -1351,12 +1341,10 @@
                 <div class="cert-sig-area">
                   <div class="cert-sig-col">
                     <div>Koordinator Imunisasi,</div>
-                    <!-- TTD & CAP DIKOSONGKAN -->
                     <div style="font-weight:800; font-size:0.95rem; color:#002244; text-decoration:underline;">Tri Prio Heryanto</div>
                   </div>
                   <div class="cert-sig-col">
                     <div>Melata, <span id="cert_tgl_cetak">01 Oktober 2026</span><br>Mengetahui,<br>Kepala Puskesmas Melata</div>
-                    <!-- TTD & CAP DIKOSONGKAN -->
                     <div>
                       <strong style="text-decoration:underline; font-size:0.95rem; color:#002244;">dr. Anang Argo Yuwono</strong><br>
                       Pembina Tingkat I<br>
@@ -1378,7 +1366,6 @@
               <div class="cert-corner cert-corner-br"></div>
 
               <div class="cert-frame-inner">
-                <!-- WATERMARK LOGO PUSKESMAS MELATA DI TENGAH -->
                 <img src="MELATA LOGO.jpg" alt="Watermark Logo Puskesmas Melata" class="cert-watermark-logo" />
 
                 <div>
@@ -1386,7 +1373,7 @@
                     CATATAN RIWAYAT IMUNISASI DASAR LENGKAP
                   </div>
                   <div style="text-align:center; font-size:0.85rem; font-weight:700; color:#475569; margin-bottom:10px; margin-top:4px;">
-                    Lampiran Halaman Belakang Sertifikat An. <span id="cert_back_nama_anak" style="color:#002244; text-transform:uppercase;">MUTIA A.</span> (<span id="cert_back_desa" style="color:#002244;">Desa Modang Mas</span>)
+                    Lampiran Halaman Belakang Sertifikat An. <span id="cert_back_nama_anak" style="color:#002244; text-transform:uppercase;">-</span> (<span id="cert_back_desa" style="color:#002244;">-</span>)
                   </div>
 
                   <table class="cert-back-table">
@@ -1399,7 +1386,6 @@
                       </tr>
                     </thead>
                     <tbody id="cert_back_table_body">
-                      <!-- Render 2 Kolom via JS -->
                     </tbody>
                   </table>
                 </div>
@@ -1415,7 +1401,7 @@
 
         <div class="actions no-print" style="justify-content:center; margin-top:16px;">
           <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-print"></i> Cetak / Download PDF Sertifikat A4 Landscape</button>
-          <button class="btn btn-ghost" onclick="document.getElementById('certificatePrintArea').style.display='none'"><i class="fas fa-times"></i> Sembunyikan Preview</button>
+          <button class="btn btn-ghost" id="btnHideCert"><i class="fas fa-times"></i> Sembunyikan Preview</button>
         </div>
       </div>
 
@@ -1495,7 +1481,7 @@
           <div>
             <h3 style="margin:0; color:#92400E; font-size:0.95rem;"><i class="fas fa-sliders"></i> Pengaturan Target Sasaran & Logika Kemasan Vaksin</h3>
           </div>
-          <button class="btn btn-warning" onclick="toggleFormAdminSasaran()" style="padding:4px 8px; font-size:0.78rem;"><i class="fas fa-user-lock"></i> Buka Pengaturan</button>
+          <button class="btn btn-warning" id="btnToggleAdminPengaturan" style="padding:4px 8px; font-size:0.78rem;"><i class="fas fa-user-lock"></i> Buka Pengaturan</button>
         </div>
 
         <div id="panelAdminPengaturan" style="display:none; margin-top:12px; border-top:1px dashed #FCD34D; padding-top:12px;">
@@ -1566,7 +1552,7 @@
     <div style="background:#fff;padding:20px;border-radius:14px;max-width:400px;margin:16px; width:90%;">
       <div style="display:flex;justify-content:space-between;align-items:center">
         <h3 style="margin:0; color:var(--accent);"><i class="fas fa-circle-info"></i> Bantuan</h3>
-        <button class="btn btn-ghost" onclick="document.getElementById('helpModal').style.display='none'">Tutup</button>
+        <button class="btn btn-ghost" id="btnCloseHelp">Tutup</button>
       </div>
       <hr style="margin: 10px 0; border:0; border-top:1px solid var(--border-color);">
       <p class="lead">Sistem dilengkapi jejak audit otomatis per petugas untuk pencatatan riwayat transaksi serta fitur penyeleksian anti-duplikasi sasaran.</p>
@@ -1620,181 +1606,236 @@
       { name: "HPV", group_key: "HPV", doses_per_vial: 1, unit: "Pcs", kemasan: "1 Dosis/Pcs" }
     ];
 
-    const BULAN_NAME_MAP = {
-      '01': 'Januari', '02': 'Februari', '03': 'Maret', '04': 'April',
-      '05': 'Mei', '06': 'Juni', '07': 'Juli', '08': 'Agustus',
-      '09': 'September', '10': 'Oktober', '11': 'November', '12': 'Desember',
-      'ALL': 'Semua Bulan'
-    };
-
-    const SERIES_SEQUENCES = [
-      { name: "DPT-HB-Hib", items: [{ key: "DPT-HB-Hib1", offsetMonths: 2 }, { key: "DPT-HB-Hib2", offsetMonths: 3 }, { key: "DPT-HB-Hib3", offsetMonths: 4 }, { key: "DPT-HB-Hib4", offsetMonths: 18 }] },
-      { name: "OPV", items: [{ key: "OPV1", offsetMonths: 1 }, { key: "OPV2", offsetMonths: 2 }, { key: "OPV3", offsetMonths: 3 }, { key: "OPV4", offsetMonths: 4 }] },
-      { name: "PCV", items: [{ key: "PCV1", offsetMonths: 2 }, { key: "PCV2", offsetMonths: 3 }, { key: "PCV3", offsetMonths: 12 }] },
-      { name: "Rotavirus", items: [{ key: "Rotavirus1", offsetMonths: 2 }, { key: "Rotavirus2", offsetMonths: 3 }, { key: "Rotavirus3", offsetMonths: 4 }] },
-      { name: "IPV", items: [{ key: "IPV1", offsetMonths: 4 }, { key: "IPV2", offsetMonths: 9 }] },
-      { name: "Campak Rubela", items: [{ key: "Campak Rubela-1", offsetMonths: 9 }, { key: "Campak Rubela-2", offsetMonths: 18 }] }
+    const LIST_DESA = [
+      "Melata", "Nanuah", "Topalan", "Batu Ampar", "Lubuk Hiju",
+      "Bukit Makmur", "Bukit Raya", "Modang Mas", "Mukti Manunggal",
+      "Sumber Jaya", "Bukit Harum", "PT. TSA", "PT. SHS"
     ];
 
-    const DESA_DALAM_WILAYAH = [
-      "Melata", "Nanuah", "Topalan", "Batu Ampar", "Lubuk Hiju", "Bukit Makmur", 
-      "Bukit Raya", "Modang Mas", "Mukti Manunggal", "Sumber Jaya", "Bukit Harum"
-    ];
-    const DESA_LUAR_WILAYAH = ["PT. TSA", "PT. SHS"];
-    const ALL_DESA_LIST = [...DESA_DALAM_WILAYAH, ...DESA_LUAR_WILAYAH];
+    let globalKohortData = [];
+    let globalBiasData = [];
+    let activePetugas = localStorage.getItem("imun_petugas_name") || "Petugas";
 
-    const SCHOOL_DATA = {
-        'SD NEGERI MELATA': 'SD', 'SD NEGERI NANUAH': 'SD', 'SD NEGERI TOPALAN': 'SD', 
-        'SD NEGERI BATU AMPAR': 'SD', 'SD NEGERI LUBUK HIJU': 'SD', 'SD NEGERI BUKIT MAKMUR': 'SD',
-        'SD NEGERI BUKIT RAYA': 'SD', 'SD NEGERI MODANG MAS': 'SD', 'SD NEGERI MUKTI MANUNGGAL': 'SD',
-        'SD NEGERI SUMBER JAYA': 'SD', 'SD NEGERI BUKIT HARUM': 'SD', 'SD SWASTA TANJUNG SAWIT ABADI': 'SD',
-        'MIS RAUDHATUL ULUM': 'SD', 'SMP NEGERI 1 MENTHOBI RAYA': 'SMP', 'SMP NEGERI 2 MENTHOBI RAYA': 'SMP', 
-        'SMP NEGERI 3 MENTHOBI RAYA': 'SMP', 'SMP NEGERI 4 MENTHOBI RAYA': 'SMP', 
-        'SMP NEGERI 5 MENTHOBI RAYA': 'SMP', 'SMP NEGERI SATU ATAP 6 MENTHOBI RAYA': 'SMP',
-        'SMP ISLAM AT-TANWIR': 'SMP', 'MTS RAUDHATUL ULUM': 'SMP', 'SMA NEGERI 1 MENTHOBI RAYA': 'SMA',
-        'SMK NEGERI 1 MENTHOBI RAYA': 'SMA' 
+    /* UTILITY FUNCTIONS */
+    function formatDateIndo(dateStr) {
+      if(!dateStr) return "-";
+      const parts = dateStr.split("-");
+      if(parts.length !== 3) return dateStr;
+      const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agus", "Sep", "Okt", "Nov", "Des"];
+      return `${parseInt(parts[2])} ${months[parseInt(parts[1])-1]} ${parts[0]}`;
+    }
+
+    function calculateAgeMonths(birthDateStr, targetDateStr = null) {
+      if(!birthDateStr) return 0;
+      const birth = new Date(birthDateStr);
+      const target = targetDateStr ? new Date(targetDateStr) : new Date();
+      let months = (target.getFullYear() - birth.getFullYear()) * 12 + (target.getMonth() - birth.getMonth());
+      if(target.getDate() < birth.getDate()) months--;
+      return months < 0 ? 0 : months;
+    }
+
+    /* TAB NAVIGATION */
+    window.switchTab = function(tabName) {
+      document.querySelectorAll('.app-nav-tabs .tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
+      
+      const targetTabBtn = document.querySelector(`.app-nav-tabs .tab[data-tab="${tabName}"]`);
+      if(targetTabBtn) targetTabBtn.classList.add('active');
+
+      const targetPanel = document.getElementById(tabName);
+      if(targetPanel) targetPanel.style.display = 'block';
+
+      if(tabName === 'imunisasi') renderPreviewTables();
+      if(tabName === 'catchup') executeCatchUpAnalysis();
+      if(tabName === 'admin') renderLogikaVaksinAdminGrid();
     };
 
-    const SCHOOL_DESA_MAP = {
-      'SD NEGERI MELATA': 'Melata', 'SD NEGERI NANUAH': 'Nanuah', 'SD NEGERI TOPALAN': 'Topalan',
-      'SD NEGERI BATU AMPAR': 'Batu Ampar', 'SD NEGERI LUBUK HIJU': 'Lubuk Hiju', 'SD NEGERI BUKIT MAKMUR': 'Bukit Makmur',
-      'SD NEGERI BUKIT RAYA': 'Bukit Raya', 'SD NEGERI MODANG MAS': 'Modang Mas', 'SD NEGERI MUKTI MANUNGGAL': 'Mukti Manunggal',
-      'SD NEGERI SUMBER JAYA': 'Sumber Jaya', 'SD NEGERI BUKIT HARUM': 'Bukit Harum', 'SD SWASTA TANJUNG SAWIT ABADI': 'PT. TSA',
-      'MIS RAUDHATUL ULUM': 'Melata', 'SMP NEGERI 1 MENTHOBI RAYA': 'Melata', 'SMP NEGERI 2 MENTHOBI RAYA': 'Batu Ampar',
-      'SMP NEGERI 3 MENTHOBI RAYA': 'Bukit Raya', 'SMP NEGERI 4 MENTHOBI RAYA': 'Mukti Manunggal',
-      'SMP NEGERI 5 MENTHOBI RAYA': 'Sumber Jaya', 'SMP NEGERI SATU ATAP 6 MENTHOBI RAYA': 'Lubuk Hiju',
-      'SMP ISLAM AT-TANWIR': 'Melata', 'MTS RAUDHATUL ULUM': 'Melata', 'SMA NEGERI 1 MENTHOBI RAYA': 'Melata',
-      'SMK NEGERI 1 MENTHOBI RAYA': 'Bukit Raya'
-    };
+    /* AUTENTIKASI PETUGAS */
+    function checkAuth() {
+      if(!activePetugas || activePetugas === "Petugas") {
+        document.getElementById('loginModal').style.display = 'flex';
+      } else {
+        document.getElementById('loginModal').style.display = 'none';
+        document.getElementById('currentUserDisplay').querySelector('span').innerText = activePetugas;
+      }
+    }
 
-    const CLASS_MAP = { 'SD': [1, 2, 3, 4, 5, 6], 'SMP': [7, 8, 9], 'SMA': [10, 11, 12] };
-    let classInputCounter = 0;
-    let currentInputDesa = "";
-    let activePetugasName = "";
-    let cachedGlobalKohortData = [];
+    /* LOAD DATA FROM FIRESTORE */
+    async function fetchAllData() {
+      try {
+        const snapshot = await getDocs(collection(db, COL_KOHORT));
+        globalKohortData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-    const AUTH_PASSWORD_PETUGAS = "sri26";
-    const AUTH_ADMIN_USER = "admin";
-    const AUTH_ADMIN_PASS = "adminsri26";
+        const biasSnap = await getDocs(collection(db, COL_BIAS));
+        globalBiasData = biasSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-    let currentOcrTargetId = "";
-    let currentOcrMode = "single"; 
-    let cameraStream = null;
-    let currentFacingMode = "environment";
-    let activeTesseractWorker = null;
-    let lastCapturedImageData = null;
+        populateRegisteredSelectOptions();
+        renderPreviewTables();
+      } catch (e) {
+        console.error("Gagal memuat data dari Firestore:", e);
+      }
+    }
 
-    // FUNGSI GENERATE SERTIFIKAT A4 LANDSCAPE ELEGAN
-    window.generateAndShowCertificate = function() {
-      const selectElem = document.getElementById('cert_select_sasaran');
-      if (!selectElem.value) return alert("Pilih sasaran terlebih dahulu!");
-
-      const data = JSON.parse(selectElem.value);
+    function populateRegisteredSelectOptions() {
+      const selectAnak = document.getElementById('select_anak_registered');
+      const selectCert = document.getElementById('cert_select_sasaran');
       
-      const genderStr = data.jk === 'P' ? 'Perempuan' : 'Laki-Laki';
-      
-      document.getElementById('cert_no_reg').textContent = `MM/IDL/${Math.floor(100 + Math.random() * 900)}/2026`;
-      document.getElementById('cert_nama_anak').textContent = (data.nama_anak || '-').toUpperCase();
-      document.getElementById('cert_ttl_jk').textContent = `${data.tgl_lahir || '-'} (${genderStr})`;
-      document.getElementById('cert_nama_ibu').textContent = data.nama_ibu || '-';
-      document.getElementById('cert_desa_alamat').textContent = `Desa ${data.desa || '-'}, ${data.alamat_rt || '-'}`;
-      
-      document.getElementById('cert_back_nama_anak').textContent = data.nama_anak || '-';
-      document.getElementById('cert_back_desa').textContent = `Desa ${data.desa || '-'}`;
+      selectAnak.innerHTML = '<option value="">-- Select / Cari Nama Terdaftar --</option>';
+      selectCert.innerHTML = '<option value="">-- Pilih Sasaran Terdaftar --</option>';
 
-      // 18 ANTIGEN IDL DENGAN LAYOUT 2 KOLOM LANDSCAPE
-      const IDL_MAPPING_ACUAN = [
-        { labelLeft: "Hepatitis B (HB-0 <24 Jam)", keyLeft: "HBO (<24 Jam)", labelRight: "Hepatitis B (HB-0 1-7 Hari)", keyRight: "HBO (1-7 Hari)" },
-        { labelLeft: "BCG", keyLeft: "BCG", labelRight: "Polio Oral 1 (OPV 1)", keyRight: "OPV1" },
-        { labelLeft: "DPT-HB-Hib 1", keyLeft: "DPT-HB-Hib1", labelRight: "Polio Oral 2 (OPV 2)", keyRight: "OPV2" },
-        { labelLeft: "PCV 1", keyLeft: "PCV1", labelRight: "Rotavirus 1 (RV 1)", keyRight: "Rotavirus1" },
-        { labelLeft: "DPT-HB-Hib 2", keyLeft: "DPT-HB-Hib2", labelRight: "Polio Oral 3 (OPV 3)", keyRight: "OPV3" },
-        { labelLeft: "PCV 2", keyLeft: "PCV2", labelRight: "Rotavirus 2 (RV 2)", keyRight: "Rotavirus2" },
-        { labelLeft: "DPT-HB-Hib 3", keyLeft: "DPT-HB-Hib3", labelRight: "Polio Oral 4 (OPV 4)", keyRight: "OPV4" },
-        { labelLeft: "Inactivated Polio Vaccine 1 (IPV 1)", keyLeft: "IPV1", labelRight: "Rotavirus 3 (RV 3)", keyRight: "Rotavirus3" },
-        { labelLeft: "Campak Rubella 1 (MR 1)", keyLeft: "Campak Rubela-1", labelRight: "Inactivated Polio Vaccine 2 (IPV 2)", keyRight: "IPV2" }
-      ];
+      globalKohortData.forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item.id;
+        opt.innerText = `${item.nama_anak || item.nama} (${item.desa || '-'}) - Ortu: ${item.nama_ibu || '-'}`;
+        selectAnak.appendChild(opt);
+        
+        const optCert = opt.cloneNode(true);
+        selectCert.appendChild(optCert);
+      });
+    }
 
-      const tbodyBack = document.getElementById('cert_back_table_body');
-      tbodyBack.innerHTML = '';
+    /* PREVIEW MATRIKS TABLE RENDERING */
+    function renderPreviewTables() {
+      const filterDesa = document.getElementById('search_desa_anak').value;
+      document.getElementById('preview_desa_title').innerText = filterDesa || "Semua Desa";
 
-      IDL_MAPPING_ACUAN.forEach(rowPair => {
-        const fieldLeft = `vaksin_${rowPair.keyLeft.replace(/[\s\(\)<>-]/g, '_')}`;
-        const fieldRight = `vaksin_${rowPair.keyRight.replace(/[\s\(\)<>-]/g, '_')}`;
+      let filtered = globalKohortData;
+      if(filterDesa) {
+        filtered = globalKohortData.filter(d => (d.desa || "").toLowerCase() === filterDesa.toLowerCase());
+      }
 
-        const valLeft = data[fieldLeft] || (data.jenis_imunisasi === rowPair.keyLeft ? data.tanggal_pelayanan : null);
-        const valRight = data[fieldRight] || (data.jenis_imunisasi === rowPair.keyRight ? data.tanggal_pelayanan : null);
+      // 1. Table Anak
+      const tbodyAnak = document.getElementById('tblRecentAnak').querySelector('tbody');
+      tbodyAnak.innerHTML = "";
 
-        const textLeft = valLeft ? valLeft : 'Sudah Diberikan';
-        const textRight = valRight ? valRight : 'Sudah Diberikan';
+      const anakList = filtered.filter(d => (d.peran || "Bayi/Baduta") === "Bayi/Baduta");
+      if(anakList.length === 0) {
+        tbodyAnak.innerHTML = `<tr><td colspan="31" style="text-align:center;">Tidak ada data sasaran bayi/anak.</td></tr>`;
+      } else {
+        anakList.forEach(item => {
+          let tr = document.createElement('tr');
+          let vaxCells = VAKSIN_ANAK_KEYS.map(k => {
+            const v = item.imunisasi ? item.imunisasi[k] : null;
+            return v ? `<td><span class="v-given">${formatDateIndo(v.tgl)}</span></td>` : `<td>-</td>`;
+          }).join('');
 
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td style="font-weight:700; color:#1E293B;">${rowPair.labelLeft}</td>
-          <td style="text-align:center; font-weight:800; color:#002244;">${textLeft}</td>
-          <td style="font-weight:700; color:#1E293B;">${rowPair.labelRight}</td>
-          <td style="text-align:center; font-weight:800; color:#002244;">${textRight}</td>
-        `;
-        tbodyBack.appendChild(tr);
+          tr.innerHTML = `
+            <td class="sticky-col-1">${item.nama_anak || item.nama || '-'}</td>
+            <td class="sticky-col-2">${formatDateIndo(item.tgl_lahir)}</td>
+            <td>${item.jk || '-'}</td>
+            <td>${item.nama_ibu || '-'}</td>
+            <td>${item.wa_anak || '-'}</td>
+            <td>${item.desa || '-'}</td>
+            <td>${item.alamat || '-'}</td>
+            ${vaxCells}
+            <td>${item.petugas || '-'}</td>
+            <td><button class="btn btn-ghost" style="padding:2px 6px; font-size:0.7rem;" onclick="loadDataToForm('${item.id}')"><i class="fas fa-edit"></i> Edit</button></td>
+          `;
+          tbodyAnak.appendChild(tr);
+        });
+      }
+
+      // 2. Table Dewasa
+      const tbodyDewasa = document.getElementById('tblRecentDewasa').querySelector('tbody');
+      tbodyDewasa.innerHTML = "";
+
+      const dewasaList = filtered.filter(d => (d.peran || "") === "Catin" || (d.peran || "") === "Bumil");
+      if(dewasaList.length === 0) {
+        tbodyDewasa.innerHTML = `<tr><td colspan="16" style="text-align:center;">Tidak ada data Td Catin/Bumil.</td></tr>`;
+      } else {
+        dewasaList.forEach(item => {
+          let tr = document.createElement('tr');
+          let vaxCells = VAKSIN_DEWASA_KEYS.map(k => {
+            const v = item.imunisasi ? item.imunisasi[k] : null;
+            return v ? `<td><span class="v-given">${formatDateIndo(v.tgl)}</span></td>` : `<td>-</td>`;
+          }).join('');
+
+          tr.innerHTML = `
+            <td class="sticky-col-1">${item.nama_anak || item.nama || '-'}</td>
+            <td class="sticky-col-2">${formatDateIndo(item.tgl_lahir)}</td>
+            <td>${item.jk || '-'}</td>
+            <td>${item.nama_ibu || '-'}</td>
+            <td>${item.wa_anak || '-'}</td>
+            <td>${item.desa || '-'}</td>
+            <td>${item.alamat || '-'}</td>
+            ${vaxCells}
+            <td>${item.petugas || '-'}</td>
+            <td><button class="btn btn-ghost" style="padding:2px 6px; font-size:0.7rem;" onclick="loadDataToForm('${item.id}')"><i class="fas fa-edit"></i> Edit</button></td>
+          `;
+          tbodyDewasa.appendChild(tr);
+        });
+      }
+    }
+
+    /* LOAD DATA TO FORM FOR EDIT */
+    window.loadDataToForm = function(id) {
+      const item = globalKohortData.find(d => d.id === id);
+      if(!item) return;
+
+      document.getElementById('reg_desa').value = item.desa || '';
+      document.getElementById('reg_kegiatan').value = item.kegiatan || '';
+      document.getElementById('reg_tgl_pelayanan').value = item.tgl_pelayanan || new Date().toISOString().split('T')[0];
+      document.getElementById('reg_peran').value = item.peran || 'Bayi/Baduta';
+      document.getElementById('reg_nama_anak').value = item.nama_anak || item.nama || '';
+      document.getElementById('reg_tgl_lahir').value = item.tgl_lahir || '';
+      document.getElementById('reg_jk').value = item.jk || '';
+      document.getElementById('reg_nik_anak').value = item.nik_anak || '';
+      document.getElementById('reg_wa_anak').value = item.wa_anak || '';
+      document.getElementById('reg_nama_ibu').value = item.nama_ibu || '';
+      document.getElementById('reg_nik_ibu').value = item.nik_ibu || '';
+      document.getElementById('reg_alamat').value = item.alamat || '';
+
+      document.querySelectorAll('input[name="chk_vaksin"]').forEach(cb => {
+        cb.checked = !!(item.imunisasi && item.imunisasi[cb.value]);
       });
 
-      document.getElementById('certificatePrintArea').style.display = 'block';
-      document.getElementById('certificatePrintArea').scrollIntoView({ behavior: 'smooth' });
+      document.getElementById('cardFormUtama').scrollIntoView({ behavior: 'smooth' });
     };
 
-    window.triggerCameraOCR = async function(targetFieldId, mode = "single") {
-      currentOcrTargetId = targetFieldId;
+    /* OCR CAMERA & RECOGNITION ENGINE */
+    let currentOcrTargetId = null;
+    let currentOcrMode = 'single';
+    let mediaStream = null;
+    let facingMode = 'environment';
+
+    window.triggerCameraOCR = function(targetInputId, mode = 'single') {
+      currentOcrTargetId = targetInputId;
       currentOcrMode = mode;
-
+      
       const guideBox = document.getElementById('scanGuideBox');
-      const hintText = document.getElementById('scannerHint');
-
-      if (mode === 'multi') {
+      if(mode === 'multi') {
         guideBox.className = 'scan-guide-multi';
-        guideBox.innerHTML = '<div class="guide-line"></div><div class="guide-line"></div><div class="guide-line"></div>';
-        hintText.innerText = 'Posisikan Alamat di Area Kotak (2-4 Baris)';
+        guideBox.innerHTML = '<div class="guide-line"></div><div class="guide-line"></div>';
+        document.getElementById('scannerHint').innerText = "Posisikan Beberapa Baris Teks / Alamat";
       } else {
         guideBox.className = 'scan-guide-single';
         guideBox.innerHTML = '';
-        hintText.innerText = 'Posisikan Teks Tepat di Garis Merah Horizontal (1 Baris)';
+        document.getElementById('scannerHint').innerText = "Posisikan Teks Tepat di Garis Bantu";
       }
 
-      document.getElementById('cameraScannerModal').style.display = 'flex';
-      await startCameraStream();
+      startCameraStream();
     };
 
     async function startCameraStream() {
       try {
-        if (cameraStream) {
-          cameraStream.getTracks().forEach(track => track.stop());
-        }
-        let constraints = {
-          video: { facingMode: { exact: currentFacingMode }, width: { ideal: 1920 }, height: { ideal: 1080 } }
-        };
-        try {
-          cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
-        } catch (e) {
-          cameraStream = await navigator.mediaDevices.getUserMedia({ video: true });
-        }
-        const video = document.getElementById('scannerVideo');
-        video.srcObject = cameraStream;
-      } catch (err) {
+        if(mediaStream) mediaStream.getTracks().forEach(track => track.stop());
+        const constraints = { video: { facingMode: facingMode, width: { ideal: 1280 }, height: { ideal: 720 } } };
+        mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
+        document.getElementById('scannerVideo').srcObject = mediaStream;
+        document.getElementById('cameraScannerModal').style.display = 'flex';
+      } catch(err) {
         alert("Gagal mengaktifkan kamera: " + err.message);
-        closeCameraScanner();
       }
     }
 
-    window.toggleCameraFacing = async function() {
-      currentFacingMode = currentFacingMode === "environment" ? "user" : "environment";
-      await startCameraStream();
+    window.closeCameraScanner = function() {
+      if(mediaStream) mediaStream.getTracks().forEach(track => track.stop());
+      document.getElementById('cameraScannerModal').style.display = 'none';
     };
 
-    window.closeCameraScanner = function() {
-      if (cameraStream) {
-        cameraStream.getTracks().forEach(track => track.stop());
-        cameraStream = null;
-      }
-      document.getElementById('cameraScannerModal').style.display = 'none';
+    window.toggleCameraFacing = function() {
+      facingMode = facingMode === 'environment' ? 'user' : 'environment';
+      startCameraStream();
     };
 
     window.captureAndProcessOCR = async function() {
@@ -1802,2244 +1843,321 @@
       const canvas = document.getElementById('cropCanvas');
       const ctx = canvas.getContext('2d');
 
-      const videoWidth = video.videoWidth;
-      const videoHeight = video.videoHeight;
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-      if (!videoWidth || !videoHeight) return;
-
-      const guideBox = document.getElementById('scanGuideBox');
-      const guideRect = guideBox.getBoundingClientRect();
-      const videoRect = video.getBoundingClientRect();
-
-      const scaleX = videoWidth / videoRect.width;
-      const scaleY = videoHeight / videoRect.height;
-
-      const cropX = (guideRect.left - videoRect.left) * scaleX;
-      const cropY = (guideRect.top - videoRect.top) * scaleY;
-      const cropWidth = guideRect.width * scaleX;
-      const cropHeight = guideRect.height * scaleY;
-
-      canvas.width = cropWidth;
-      canvas.height = cropHeight;
-
-      ctx.drawImage(video, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
-
-      lastCapturedImageData = canvas.toDataURL('image/jpeg', 0.95);
       closeCameraScanner();
-
-      await processImageDataWithOCR(lastCapturedImageData);
-    };
-
-    async function processImageDataWithOCR(imageData) {
-      const modal = document.getElementById('ocrModal');
-      const fill = document.getElementById('ocrProgressBar');
-      const percent = document.getElementById('ocrProgressPercent');
+      
+      const ocrModal = document.getElementById('ocrModal');
+      const progressBar = document.getElementById('ocrProgressBar');
+      const progressPercent = document.getElementById('ocrProgressPercent');
       const statusText = document.getElementById('ocrStatusText');
-      const titleText = document.getElementById('ocrModalTitle');
-      const iconContainer = document.getElementById('ocrIconContainer');
-      const actionGroup = document.getElementById('ocrRetryActionGroup');
-      const progressContainer = document.getElementById('ocrProgressContainer');
-
-      modal.style.display = 'flex';
-      actionGroup.style.display = 'none';
-      progressContainer.style.display = 'block';
-      percent.style.display = 'block';
-      titleText.textContent = "Memproses OCR Gambar...";
-      statusText.textContent = "Mengunduh engine & bahasa OCR...";
-      iconContainer.innerHTML = '<i class="fas fa-camera-retro fa-bounce"></i>';
-
-      let progress = 0;
-      fill.style.width = '0%';
-      percent.textContent = '0%';
-
-      const fastTimer = setInterval(() => {
-        if (progress < 60) {
-          progress += 5;
-          fill.style.width = progress + '%';
-          percent.textContent = progress + '%';
-        } else {
-          clearInterval(fastTimer);
-        }
-      }, 50);
-
-      let isTimeout = false;
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => {
-          isTimeout = true;
-          reject(new Error("OCR_TIMEOUT"));
-        }, 25000);
-      });
-
-      const ocrPromise = (async () => {
-        activeTesseractWorker = await Tesseract.createWorker('ind', 1, {
-          workerPath: 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/worker.min.js',
-          langPath: 'https://tessdata.projectnaptha.com/4.0.0',
-          corePath: 'https://cdn.jsdelivr.net/npm/tesseract.js-core@5/tesseract-core.wasm.js',
-          logger: m => {
-            if (m.status === 'recognizing text' && !isTimeout) {
-              const realProg = 60 + Math.round(m.progress * 40);
-              if (realProg > progress) {
-                progress = realProg;
-                fill.style.width = progress + '%';
-                percent.textContent = progress + '%';
-              }
-            }
-          }
-        });
-
-        statusText.textContent = "Membaca karakter teks...";
-
-        if (currentOcrTargetId.includes("nik")) {
-          await activeTesseractWorker.setParameters({
-            tessedit_char_whitelist: '0123456789',
-            tessedit_pageseg_mode: Tesseract.PSM.SINGLE_LINE
-          });
-        } else if (currentOcrMode === "single") {
-          await activeTesseractWorker.setParameters({
-            tessedit_pageseg_mode: Tesseract.PSM.SINGLE_LINE
-          });
-        }
-
-        const ret = await activeTesseractWorker.recognize(imageData);
-        await activeTesseractWorker.terminate();
-        activeTesseractWorker = null;
-        return ret.data.text;
-      })();
+      
+      ocrModal.style.display = 'flex';
+      document.getElementById('ocrRetryActionGroup').style.display = 'none';
 
       try {
-        const textResult = await Promise.race([ocrPromise, timeoutPromise]);
-        clearInterval(fastTimer);
+        const worker = await Tesseract.createWorker('ind');
+        
+        worker.setParameters({
+          tessstatus: '1'
+        });
 
-        fill.style.width = '100%';
-        percent.textContent = '100%';
+        const ret = await worker.recognize(canvas.toDataURL('image/jpeg'));
+        const text = ret.data.text.trim();
+        await worker.terminate();
 
-        let cleanedText = textResult.trim().replace(/[\r\n]+/g, " ");
-        if (currentOcrTargetId.includes("nik")) {
-          cleanedText = cleanedText.replace(/[^0-9]/g, "");
+        if(currentOcrTargetId && text) {
+          const targetInput = document.getElementById(currentOcrTargetId);
+          if(targetInput) targetInput.value = text.replace(/\n/g, ' ');
         }
 
-        const targetElem = document.getElementById(currentOcrTargetId);
-        if (targetElem) {
-          targetElem.value = cleanedText;
-          targetElem.dispatchEvent(new Event('input'));
-          targetElem.dispatchEvent(new Event('keyup'));
-        }
-
-        setTimeout(() => {
-          modal.style.display = 'none';
-        }, 300);
-
+        ocrModal.style.display = 'none';
       } catch (err) {
-        clearInterval(fastTimer);
-        if (activeTesseractWorker) {
-          try { await activeTesseractWorker.terminate(); } catch (e) {}
-          activeTesseractWorker = null;
-        }
-
-        titleText.textContent = "Gagal Membaca Gambar";
-        statusText.textContent = err.message === "OCR_TIMEOUT" 
-          ? "Koneksi internet lambat saat mengunduh data bahasa OCR (Timeout)."
-          : "Terjadi kesalahan: " + err.message;
-
-        iconContainer.innerHTML = '<i class="fas fa-exclamation-triangle" style="color:var(--danger);"></i>';
-        progressContainer.style.display = 'none';
-        percent.style.display = 'none';
-        actionGroup.style.display = 'flex';
+        statusText.innerText = "Gagal memproses OCR: " + err.message;
+        document.getElementById('ocrRetryActionGroup').style.display = 'flex';
       }
-    }
+    };
 
-    window.retryLastOCR = function() {
-      if (lastCapturedImageData) {
-        processImageDataWithOCR(lastCapturedImageData);
+    /* CATCH UP ANALYSIS LOGIC */
+    function executeCatchUpAnalysis() {
+      const selectedDesa = document.getElementById('catchup_filter_desa').value;
+      let dataset = globalKohortData;
+
+      if(selectedDesa !== "ALL") {
+        dataset = dataset.filter(d => (d.desa || "").toLowerCase() === selectedDesa.toLowerCase());
+      }
+
+      // Panel 1: Catch Up Bayi (<12 Bulan)
+      const panelBayi = document.getElementById('panel_bayi_container');
+      const bayiCatchUp = dataset.filter(d => {
+        if((d.peran || "Bayi/Baduta") !== "Bayi/Baduta") return false;
+        const age = calculateAgeMonths(d.tgl_lahir);
+        if(age > 12) return false;
+        const vax = d.imunisasi || {};
+        return !(vax['BCG'] && vax['OPV4'] && vax['DPT-HB-Hib3'] && vax['Campak Rubela-1']);
+      });
+
+      if(bayiCatchUp.length === 0) {
+        panelBayi.innerHTML = `<p style="padding:15px; text-align:center; color:var(--success); font-weight:700;"><i class="fas fa-check-circle"></i> Seluruh bayi < 12 bulan telah mendapatkan Imunisasi Dasar Lengkap!</p>`;
       } else {
-        cancelOCRProcess();
-      }
-    };
+        let html = `<table class="kohort-table"><thead><tr><th>Nama</th><th>Tgl Lahir</th><th>Usia (Bln)</th><th>Desa</th><th>Antigen Belum Diberikan</th></tr></thead><tbody>`;
+        bayiCatchUp.forEach(b => {
+          const v = b.imunisasi || {};
+          let missing = [];
+          if(!v['BCG']) missing.push("BCG");
+          if(!v['OPV1']) missing.push("OPV1");
+          if(!v['DPT-HB-Hib1']) missing.push("DPT1");
+          if(!v['DPT-HB-Hib3']) missing.push("DPT3");
+          if(!v['OPV4']) missing.push("OPV4");
+          if(!v['Campak Rubela-1']) missing.push("MR1");
 
-    window.cancelOCRProcess = function() {
-      if (activeTesseractWorker) {
-        try { activeTesseractWorker.terminate(); } catch (e) {}
-        activeTesseractWorker = null;
-      }
-      document.getElementById('ocrModal').style.display = 'none';
-    };
-
-    window.resetFormRegisterIndividu = function() {
-      const form = document.getElementById('formRegisterIndividu');
-      if (form) form.reset();
-      
-      document.getElementById('reg_jk').value = "";
-      
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById('reg_tgl_pelayanan').value = today;
-
-      document.querySelectorAll('input[name="chk_vaksin"]').forEach(cb => {
-        cb.checked = false;
-        cb.disabled = false;
-      });
-
-      applyPeranUIFilter();
-    };
-
-    function isVaccineGivenExactMonth(vaccineDateStr, targetYear, targetMonth) {
-      if (!vaccineDateStr || vaccineDateStr === '-') return false;
-      const vDate = vaccineDateStr.substring(0, 10);
-      const vYear = vDate.substring(0, 4);
-      const vMonth = vDate.substring(5, 7);
-
-      if (targetYear !== 'ALL' && vYear !== targetYear) return false;
-      if (targetMonth === 'ALL') return true;
-      return vMonth === targetMonth;
-    }
-
-    function isVaccineGivenUpToMonth(vaccineDateStr, targetYear, targetMonth) {
-      if (!vaccineDateStr || vaccineDateStr === '-') return false;
-      const vDate = vaccineDateStr.substring(0, 10);
-      const vYear = vDate.substring(0, 4);
-      const vMonth = vDate.substring(5, 7);
-
-      if (targetYear !== 'ALL' && vYear !== targetYear) return false;
-      if (targetMonth === 'ALL') return true;
-      return vMonth <= targetMonth;
-    }
-
-    function getKelompokUsia(tglLahir, tglPelayanan) {
-      if (!tglLahir || !tglPelayanan) return "0-12 Bulan";
-      const birth = new Date(tglLahir);
-      const service = new Date(tglPelayanan);
-      let diffMonths = (service.getFullYear() - birth.getFullYear()) * 12 + (service.getMonth() - birth.getMonth());
-      if (diffMonths <= 12) return "0-12 Bulan";
-      if (diffMonths <= 24) return "12-24 Bulan";
-      return "Anak > 2 Tahun / Dewasa";
-    }
-
-    function getAgeInMonths(tglLahir) {
-      if (!tglLahir) return 0;
-      const birth = new Date(tglLahir);
-      const now = new Date();
-      return (now.getFullYear() - birth.getFullYear()) * 12 + (now.getMonth() - birth.getMonth());
-    }
-
-    function calculateIdealVaccineDate(tglLahirStr, offsetMonths, offsetDays = 0) {
-      if (!tglLahirStr) return new Date().toISOString().split('T')[0];
-      const d = new Date(tglLahirStr);
-      if (offsetMonths) d.setMonth(d.getMonth() + offsetMonths);
-      if (offsetDays) d.setDate(d.getDate() + offsetDays);
-      return d.toISOString().split('T')[0];
-    }
-
-    function hasMinInterval4Weeks(prevDateStr, targetDate = new Date()) {
-      if (!prevDateStr) return true;
-      const prev = new Date(prevDateStr);
-      const diffDays = Math.floor((targetDate - prev) / (1000 * 60 * 60 * 24));
-      return diffDays >= 28;
-    }
-
-    function checkCb(val) {
-      const cb = document.querySelector(`input[name="chk_vaksin"][value="${val}"]`);
-      if (cb && !cb.checked) cb.checked = true;
-    }
-
-    function getActiveVaccineKeysByCategory(katSel) {
-      if (katSel === 'BAYI_0_24') return VAKSIN_ANAK_KEYS;
-      if (katSel === 'IMUNISASI_BAYI') return VAKSIN_ANAK_KEYS.slice(0, 19);
-      if (katSel === 'BADUTA') return VAKSIN_ANAK_KEYS.slice(19, 22);
-      if (katSel === 'CATIN') return VAKSIN_DEWASA_KEYS.slice(0, 2);
-      if (katSel === 'BUMIL') return VAKSIN_DEWASA_KEYS.slice(2, 7);
-      return ALL_VAKSIN_KEYS;
-    }
-
-    function getGroupKey(vKey) {
-      if (vKey.includes("HBO") || vKey.includes("HB-0") || vKey.includes("HB0")) return "HBO";
-      if (vKey.includes("DPT-HB-Hib")) return "DPT-HB-Hib";
-      if (vKey.includes("PCV")) return "PCV";
-      if (vKey.includes("OPV")) return "OPV";
-      if (vKey.includes("IPV")) return "IPV";
-      if (vKey.includes("Campak") || vKey.includes("MR")) return "Campak/MR";
-      if (vKey.includes("BCG")) return "BCG";
-      if (vKey.includes("Rotavirus")) return "Rotavirus";
-      if (vKey.includes("DT") || vKey.includes("Dt")) return "DT";
-      if (vKey.includes("Td") || vKey.includes("TT")) return "Td/TT";
-      if (vKey.includes("HPV")) return "HPV";
-      if (vKey.includes("JE")) return "JE";
-      return "LAINNYA";
-    }
-
-    async function loadLogikaVaksinSettings() {
-      try {
-        const snap = await getDocs(collection(db, COL_TARGET));
-        snap.forEach(d => {
-          if (d.id === 'CONFIG_LOGIKA_VAKSIN' || d.id === 'config_logika_vaksin') {
-            const data = d.data();
-            if (data.antigen_groups) {
-              ANTIGEN_GROUPS = data.antigen_groups;
-            }
-          }
+          html += `<tr>
+            <td><strong>${b.nama_anak || b.nama}</strong></td>
+            <td>${formatDateIndo(b.tgl_lahir)}</td>
+            <td>${calculateAgeMonths(b.tgl_lahir)} Bln</td>
+            <td>${b.desa || '-'}</td>
+            <td><span class="badge-urgent">${missing.join(', ')}</span></td>
+          </tr>`;
         });
-      } catch (e) {
-        console.error("Gagal load setting logika kemasan:", e);
+        html += `</tbody></table>`;
+        panelBayi.innerHTML = html;
       }
-      renderGridLogikaVaksinAdmin();
     }
 
-    function renderGridLogikaVaksinAdmin() {
-      const container = document.getElementById('gridLogikaVaksinContainer');
-      if (!container) return;
+    /* SERTIFIKAT GENERATOR (A4 LANDSCAPE) */
+    window.generateAndShowCertificate = function() {
+      const selectedId = document.getElementById('cert_select_sasaran').value;
+      if(!selectedId) {
+        alert("Silakan pilih sasaran terdaftar terlebih dahulu.");
+        return;
+      }
 
-      let html = '';
-      ANTIGEN_GROUPS.forEach((g, idx) => {
-        html += `
-          <div class="form-group" style="background:#FFF; padding:10px; border-radius:8px; border:1px solid #FCD34D;">
-            <label style="color:#92400E; font-size:0.8rem;">${g.name} (${g.group_key})</label>
-            <div style="display:flex; gap:6px;">
-              <input type="number" id="vax_dose_${idx}" value="${g.doses_per_vial}" min="1" max="100" style="width:70px; text-align:center;" title="Kapasitas Dosis Per Vial">
-              <input type="text" id="vax_unit_${idx}" value="${g.unit}" style="width:80px;" title="Satuan Logistik">
-              <input type="text" id="vax_kemasan_${idx}" value="${g.kemasan}" title="Label Kemasan">
-            </div>
-          </div>
+      const item = globalKohortData.find(d => d.id === selectedId);
+      if(!item) return;
+
+      document.getElementById('cert_no_reg').innerText = `MM/IDL/${Math.floor(100 + Math.random() * 900)}/2026`;
+      document.getElementById('cert_nama_anak').innerText = (item.nama_anak || item.nama || '-').toUpperCase();
+      document.getElementById('cert_ttl_jk').innerText = `${formatDateIndo(item.tgl_lahir)} (${item.jk === 'L' ? 'Laki-Laki' : 'Perempuan'})`;
+      document.getElementById('cert_nama_ibu').innerText = item.nama_ibu || '-';
+      document.getElementById('cert_desa_alamat').innerText = `Desa ${item.desa || '-'}, ${item.alamat || '-'}`;
+      document.getElementById('cert_tgl_cetak').innerText = formatDateIndo(new Date().toISOString().split('T')[0]);
+
+      document.getElementById('cert_back_nama_anak').innerText = item.nama_anak || item.nama || '-';
+      document.getElementById('cert_back_desa').innerText = `Desa ${item.desa || '-'}`;
+
+      // Table Back
+      const tbodyBack = document.getElementById('cert_back_table_body');
+      tbodyBack.innerHTML = "";
+
+      const vaxList = VAKSIN_ANAK_KEYS;
+      const half = Math.ceil(vaxList.length / 2);
+
+      for(let i = 0; i < half; i++) {
+        const k1 = vaxList[i];
+        const k2 = vaxList[i + half];
+
+        const d1 = item.imunisasi && item.imunisasi[k1] ? formatDateIndo(item.imunisasi[k1].tgl) : "-";
+        const d2 = k2 && item.imunisasi && item.imunisasi[k2] ? formatDateIndo(item.imunisasi[k2].tgl) : "-";
+
+        let tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${k1}</strong></td>
+          <td style="text-align:center;">${d1}</td>
+          <td><strong>${k2 || ''}</strong></td>
+          <td style="text-align:center;">${d2}</td>
         `;
+        tbodyBack.appendChild(tr);
+      }
+
+      document.getElementById('certificatePrintArea').style.display = 'block';
+      document.getElementById('certificatePrintArea').scrollIntoView({ behavior: 'smooth' });
+    };
+
+    /* LOGIKA KEMASAN VAKSIN GRID RENDERING */
+    function renderLogikaVaksinAdminGrid() {
+      const container = document.getElementById('gridLogikaVaksinContainer');
+      container.innerHTML = "";
+
+      ANTIGEN_GROUPS.forEach((group, idx) => {
+        let div = document.createElement('div');
+        div.className = "form-group";
+        div.innerHTML = `
+          <label>${group.name} (${group.unit})</label>
+          <input type="number" value="${group.doses_per_vial}" data-idx="${idx}" class="input-doses-per-vial">
+          <small style="color:var(--muted); margin-top:2px;">Format kemasan saat ini: ${group.kemasan}</small>
+        `;
+        container.appendChild(div);
       });
-      container.innerHTML = html;
     }
 
-    async function handleSaveLogikaVaksinAdmin(e) {
-      e.preventDefault();
-      if (activePetugasName !== AUTH_ADMIN_USER) {
-        return alert("🔒 Hanya Admin yang berhak merubah Logika Kemasan Vaksin!");
-      }
+    /* INITIALIZATION & EVENT LISTENERS */
+    document.addEventListener("DOMContentLoaded", () => {
+      checkAuth();
+      fetchAllData();
 
-      const newGroups = ANTIGEN_GROUPS.map((g, idx) => {
-        const doseVal = parseInt(document.getElementById(`vax_dose_${idx}`).value) || 1;
-        const unitVal = document.getElementById(`vax_unit_${idx}`).value.trim() || "Vial";
-        const kemasanVal = document.getElementById(`vax_kemasan_${idx}`).value.trim() || `${doseVal} Dosis/Vial`;
-
-        return {
-          ...g,
-          doses_per_vial: doseVal,
-          unit: unitVal,
-          kemasan: kemasanVal
-        };
-      });
-
-      try {
-        await setDoc(doc(db, COL_TARGET, 'CONFIG_LOGIKA_VAKSIN'), {
-          antigen_groups: newGroups,
-          updated_by: activePetugasName,
-          updated_at: new Date().toISOString()
-        }, { merge: true });
-
-        ANTIGEN_GROUPS = newGroups;
-        alert("✅ Logika kemasan/dosis vaksin diperbarui & tersimpan!");
-      } catch (err) {
-        alert("Gagal menyimpan aturan kemasan: " + err.message);
-      }
-    }
-
-    function initUserAuthCheck() {
-      const savedUser = localStorage.getItem('pkm_app_username');
-      if (savedUser) {
-        document.getElementById('login_username').value = savedUser;
-        document.getElementById('login_device_hint').innerHTML = `<i class="fas fa-mobile-alt"></i> Username: <strong>${savedUser}</strong>`;
-      }
-
+      // Form Login Petugas Submit
       document.getElementById('formLoginPetugas').addEventListener('submit', (e) => {
         e.preventDefault();
-        const usernameInput = document.getElementById('login_username').value.trim();
-        const passwordInput = document.getElementById('login_password').value;
-        const errDiv = document.getElementById('loginError');
+        const u = document.getElementById('login_username').value;
+        const p = document.getElementById('login_password').value;
 
-        if (passwordInput === AUTH_PASSWORD_PETUGAS || (usernameInput === AUTH_ADMIN_USER && passwordInput === AUTH_ADMIN_PASS)) {
-          activePetugasName = usernameInput;
-          localStorage.setItem('pkm_app_username', usernameInput);
-          document.querySelector('#currentUserDisplay span').textContent = activePetugasName;
-          document.getElementById('loginModal').style.display = 'none';
-          errDiv.style.display = 'none';
+        if(u && p) {
+          activePetugas = u;
+          localStorage.setItem("imun_petugas_name", u);
+          checkAuth();
         } else {
-          errDiv.textContent = "❌ Password salah! Masukkan password yang benar.";
-          errDiv.style.display = 'block';
+          document.getElementById('loginError').innerText = "Username dan password wajib diisi!";
+          document.getElementById('loginError').style.display = 'block';
         }
       });
-    }
 
-    function applyPeranUIFilter() {
-      const peran = document.getElementById('reg_peran').value;
-      const lblOrtu = document.getElementById('lbl_nama_ibu');
-      const lblNikOrtu = document.getElementById('lbl_nik_ibu');
-      
-      const secBayi = document.getElementById('sec_vax_bayi');
-      const secBaduta = document.getElementById('sec_vax_baduta');
-      const secCatin = document.getElementById('sec_vax_catin');
-      const secBumil = document.getElementById('sec_vax_bumil');
-
-      document.querySelectorAll('input[name="chk_vaksin"]').forEach(cb => cb.checked = false);
-
-      if (peran === 'Catin') {
-        lblOrtu.innerHTML = 'Nama Suami / Calon Suami <span class="req">*</span>';
-        lblNikOrtu.innerText = 'NIK Suami / Calon Suami';
-        
-        secBayi.style.display = 'none';
-        secBaduta.style.display = 'none';
-        secCatin.style.display = 'block';
-        secBumil.style.display = 'none';
-      } else if (peran === 'Bumil') {
-        lblOrtu.innerHTML = 'Nama Suami <span class="req">*</span>';
-        lblNikOrtu.innerText = 'NIK Suami';
-        
-        secBayi.style.display = 'none';
-        secBaduta.style.display = 'none';
-        secCatin.style.display = 'none';
-        secBumil.style.display = 'block';
-      } else {
-        lblOrtu.innerHTML = 'Nama Orang Tua / Ibu <span class="req">*</span>';
-        lblNikOrtu.innerText = 'NIK Orang Tua / Ibu';
-        
-        secBayi.style.display = 'block';
-        secBaduta.style.display = 'block';
-        secCatin.style.display = 'none';
-        secBumil.style.display = 'none';
-      }
-    }
-
-    window.logoutPetugas = function() {
-      if (confirm("Keluar dari sesi petugas saat ini?")) {
-        activePetugasName = "";
-        document.getElementById('login_password').value = "";
-        document.getElementById('loginModal').style.display = 'flex';
-      }
-    };
-
-    window.switchTab = function(e){
-      const target = e.currentTarget.getAttribute('data-tab');
-      document.querySelectorAll('.app-nav-tabs .tab').forEach(t=>t.classList.remove('active'));
-      e.currentTarget.classList.add('active');
-      document.querySelectorAll('.tab-panel').forEach(p => p.style.display='none');
-      document.getElementById(target).style.display = 'block';
-      if (target === 'imunisasi') loadRecentTransactions();
-      if (target === 'catchup') loadCatchUpAnalysis();
-      if (target === 'capaian') loadCapanTabContent();
-      window.scrollTo({top:0,behavior:'smooth'});
-    };
-
-    document.addEventListener('DOMContentLoaded', () => {
-      initUserAuthCheck();
-      loadLogikaVaksinSettings();
-
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById('reg_tgl_pelayanan').value = today;
-
-      setupVaccineAutoFillListeners();
-
-      document.getElementById('reg_jk').addEventListener('change', handleJkRules);
-      document.getElementById('reg_peran').addEventListener('change', applyPeranUIFilter);
-
-      document.getElementById('formRegisterIndividu').addEventListener('submit', handleSaveKohortMatrix);
-      document.getElementById('biasForm').addEventListener('submit', handleSaveBias);
-      document.getElementById('sekolah').addEventListener('change', onChangeSekolah);
-      document.getElementById('addBiasClassButton').addEventListener('click', addNewClassInput);
-      document.getElementById('btnExportDb').addEventListener('click', exportDatabase);
-      document.getElementById('btnStartImport').addEventListener('click', startImport);
-
-      document.getElementById('btnApplyFilter').addEventListener('click', loadReviewDetail);
-      document.getElementById('btnDownloadExcelFilter').addEventListener('click', downloadExcel3Sheets);
-
-      document.getElementById('btnApplyCatchUp').addEventListener('click', loadCatchUpAnalysis);
-      document.getElementById('btnDownloadCatchUpExcel').addEventListener('click', downloadCatchUpExcel);
-
-      document.getElementById('btnHitungCapaian').addEventListener('click', loadCapanTabContent);
-      document.getElementById('formTargetSasaran').addEventListener('submit', handleSaveTargetSasaran);
-      document.getElementById('formLogikaVaksinAdmin').addEventListener('submit', handleSaveLogikaVaksinAdmin);
-
-      document.getElementById('search_desa_anak').addEventListener('change', (e) => {
-        currentInputDesa = e.target.value;
-        resetFormRegisterIndividu();
-        populateAnakByDesa();
-        loadRecentTransactions();
-      });
-
-      document.getElementById('cert_filter_desa').addEventListener('change', (e) => {
-        populateCertSasaranByDesa(e.target.value);
-      });
-
-      document.getElementById('reg_desa').addEventListener('change', (e) => {
-        currentInputDesa = e.target.value;
-        loadRecentTransactions();
-      });
-
-      document.getElementById('select_anak_registered').addEventListener('change', fillFormWithSelectedAnak);
-
-      setupLiveSearchAndDuplicateDetection();
-
-      document.getElementById('btnExportFilteredJSON').addEventListener('click', () => doExportFiltered('json'));
-      document.getElementById('btnExportFilteredExcel').addEventListener('click', downloadExcel3Sheets);
-
-      initBiasDropdowns();
-      applyPeranUIFilter();
-      loadRecentTransactions();
-
-      window.addEventListener('online', syncOfflineQueueToCloud);
-    });
-
-    async function refreshCacheGlobalData() {
-      try {
-        if (navigator.onLine) {
-          const snap = await getDocs(collection(db, COL_KOHORT));
-          cachedGlobalKohortData = [];
-          snap.forEach(d => cachedGlobalKohortData.push({ id: d.id, ...d.data() }));
-        }
-      } catch (e) { console.error("Error Caching Data:", e); }
-    }
-
-    function setupLiveSearchAndDuplicateDetection() {
-      refreshCacheGlobalData();
-
-      const searchInput = document.getElementById('input_search_sasaran');
-      const resultsDiv = document.getElementById('liveSearchResults');
-      const regNamaInput = document.getElementById('reg_nama_anak');
-
-      searchInput.addEventListener('input', (e) => {
-        const query = e.target.value.trim().toLowerCase();
-        const desaSel = document.getElementById('search_desa_anak').value;
-
-        if (query.length < 2) {
-          resultsDiv.style.display = 'none';
-          resultsDiv.innerHTML = '';
-
-          if (query.length === 0 && !document.getElementById('select_anak_registered').value) {
-            resetFormRegisterIndividu();
-          }
-          return;
-        }
-
-        const matches = cachedGlobalKohortData.filter(item => {
-          const nameMatch = item.nama_anak && item.nama_anak.toLowerCase().includes(query);
-          const desaMatch = !desaSel || (item.desa && item.desa.toLowerCase() === desaSel.toLowerCase());
-          return nameMatch && desaMatch;
-        }).sort((a, b) => {
-          const aName = a.nama_anak.toLowerCase();
-          const bName = b.nama_anak.toLowerCase();
-          const aStartsWith = aName.startsWith(query);
-          const bStartsWith = bName.startsWith(query);
-
-          if (aStartsWith && !bStartsWith) return -1;
-          if (!aStartsWith && bStartsWith) return 1;
-          return aName.localeCompare(bName);
+      // Tab Buttons Listener
+      document.querySelectorAll('.app-nav-tabs .tab').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const tab = e.currentTarget.getAttribute('data-tab');
+          if(tab) window.switchTab(tab);
         });
-
-        if (matches.length === 0) {
-          resultsDiv.innerHTML = `<div class="search-result-item" style="color:var(--muted); text-align:center;">Tidak ditemukan sasaran mengandung "${query}"</div>`;
-        } else {
-          resultsDiv.innerHTML = matches.map(item => {
-            const regex = new RegExp(`(${query})`, 'gi');
-            const highlightedName = item.nama_anak.replace(regex, '<span class="highlight-text">$1</span>');
-
-            return `
-              <div class="search-result-item" onclick="selectFromLiveSearch('${encodeURIComponent(JSON.stringify(item))}')">
-                <div style="font-weight:800; color:var(--accent);">${highlightedName} <span style="font-weight:normal; font-size:0.75rem; color:var(--muted);">(${item.desa || '-'})</span></div>
-                <div style="font-size:0.75rem; color:#475569;">
-                  <i class="fas fa-calendar-alt"></i> Lahir: <strong>${item.tgl_lahir || '-'}</strong> | 
-                  <i class="fas fa-female"></i> Ortu/Ibu: <strong>${item.nama_ibu || '-'}</strong>
-                </div>
-              </div>
-            `;
-          }).join('');
-        }
-        resultsDiv.style.display = 'block';
       });
 
+      // Help Modal Toggle
+      document.getElementById('btnOpenHelp').addEventListener('click', () => {
+        document.getElementById('helpModal').style.display = 'flex';
+      });
+      document.getElementById('btnCloseHelp').addEventListener('click', () => {
+        document.getElementById('helpModal').style.display = 'none';
+      });
+
+      // OCR Dynamic Buttons Event Delegation
       document.addEventListener('click', (e) => {
-        if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) {
-          resultsDiv.style.display = 'none';
+        const ocrBtn = e.target.closest('.btn-trigger-ocr');
+        if(ocrBtn) {
+          const target = ocrBtn.getAttribute('data-target');
+          const mode = ocrBtn.getAttribute('data-mode') || 'single';
+          if(target) window.triggerCameraOCR(target, mode);
         }
       });
 
-      let typingTimer;
-      regNamaInput.addEventListener('keyup', () => {
-        clearTimeout(typingTimer);
-        typingTimer = setTimeout(checkDuplicateOnFormInput, 500);
+      // OCR Retry and Cancel Actions
+      document.getElementById('btnRetryOcr').addEventListener('click', () => {
+        if(currentOcrTargetId) window.triggerCameraOCR(currentOcrTargetId, currentOcrMode);
       });
-    }
-
-    window.selectFromLiveSearch = function(encodedJson) {
-      const data = JSON.parse(decodeURIComponent(encodedJson));
-      document.getElementById('input_search_sasaran').value = data.nama_anak;
-      document.getElementById('liveSearchResults').style.display = 'none';
-      editDataSasaran(encodedJson);
-    };
-
-    function checkDuplicateOnFormInput() {
-      const nameVal = document.getElementById('reg_nama_anak').value.trim();
-      if (nameVal.length < 2) return;
-
-      const query = nameVal.toLowerCase();
-      const duplicates = cachedGlobalKohortData.filter(item => {
-        return item.nama_anak && item.nama_anak.toLowerCase().includes(query);
+      document.getElementById('btnCancelOcr').addEventListener('click', () => {
+        document.getElementById('ocrModal').style.display = 'none';
       });
 
-      if (duplicates.length > 0) {
-        showCompareModal(duplicates, nameVal);
-      }
-    }
-
-    function showCompareModal(duplicatesList, typedName) {
-      const container = document.getElementById('duplicateListContainer');
-      let html = `<p style="font-size:0.8rem; font-weight:700; color:var(--accent); margin-bottom:8px;">Mencocokkan pengetikan: "<u>${typedName}</u>" (${duplicatesList.length} mirip)</p>`;
-
-      duplicatesList.forEach(item => {
-        const itemJson = encodeURIComponent(JSON.stringify(item));
-        html += `
-          <div style="background:#FFF; border:1px solid var(--border-color); padding:10px 12px; border-radius:8px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-            <div>
-              <div style="font-weight:800; color:var(--accent); font-size:0.9rem;">${item.nama_anak} <span class="v-given">${item.desa}</span></div>
-              <div style="font-size:0.78rem; color:#334155; margin-top:2px;">
-                <i class="fas fa-calendar"></i> TTL: <strong>${item.tgl_lahir || '-'}</strong> | 
-                <i class="fas fa-user-friends"></i> Ortu/Ibu: <strong>${item.nama_ibu || '-'}</strong> | 
-                Alamat: ${item.alamat_rt || '-'}
-              </div>
-            </div>
-            <button type="button" class="btn btn-warning" onclick="selectDuplicateMatch('${itemJson}')" style="padding:4px 8px; font-size:0.75rem;">
-              <i class="fas fa-check-circle"></i> Gunakan Data Ini
-            </button>
-          </div>
-        `;
+      // Camera Modal Buttons
+      document.getElementById('btnCloseCamera').addEventListener('click', () => {
+        window.closeCameraScanner();
+      });
+      document.getElementById('btnCaptureSnap').addEventListener('click', () => {
+        window.captureAndProcessOCR();
+      });
+      document.getElementById('btnToggleCameraFacing').addEventListener('click', () => {
+        window.toggleCameraFacing();
       });
 
-      container.innerHTML = html;
-      document.getElementById('duplicateCompareModal').style.display = 'flex';
-    }
-
-    window.closeCompareModal = function() {
-      document.getElementById('duplicateCompareModal').style.display = 'none';
-    };
-
-    window.selectDuplicateMatch = function(encodedJson) {
-      closeCompareModal();
-      editDataSasaran(encodedJson);
-    };
-
-    function setupVaccineAutoFillListeners() {
-      const checkboxes = document.querySelectorAll('input[name="chk_vaksin"]');
-      checkboxes.forEach(cb => {
-        cb.addEventListener('change', (e) => {
-          if (e.target.checked) {
-            const selectedVal = e.target.value;
-            if (selectedVal.includes("TT")) return;
-
-            if (selectedVal === "BCG") checkCb("HBO (1-7 Hari)");
-
-            if (["DPT-HB-Hib3", "IPV1", "IPV2"].includes(selectedVal)) {
-              checkCb("HBO (1-7 Hari)");
-              checkCb("BCG");
-            }
-
-            SERIES_SEQUENCES.forEach(series => {
-              const idx = series.items.findIndex(item => item.key === selectedVal);
-              if (idx > 0) {
-                for (let i = 0; i < idx; i++) checkCb(series.items[i].key);
-              }
-            });
-          }
-        });
+      // Register Form Actions
+      document.getElementById('btnResetFormIndividu').addEventListener('click', () => {
+        document.getElementById('formRegisterIndividu').reset();
       });
-    }
 
-    function handleJkRules() {
-      const jk = document.getElementById('reg_jk').value;
-      const cbTT2Catin = document.getElementById('cb_tt2_catin');
-      const bumilCBs = document.querySelectorAll('.cb-bumil');
+      document.getElementById('formRegisterIndividu').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const nama = document.getElementById('reg_nama_anak').value;
+        const tgl_lahir = document.getElementById('reg_tgl_lahir').value;
+        const desa = document.getElementById('reg_desa').value;
 
-      if (jk === 'L') {
-        cbTT2Catin.checked = false;
-        cbTT2Catin.disabled = true;
-        bumilCBs.forEach(cb => { cb.checked = false; cb.disabled = true; });
-      } else {
-        cbTT2Catin.disabled = false;
-        bumilCBs.forEach(cb => { cb.disabled = false; });
-      }
-    }
+        // Collect Checked Vaccines
+        let selectedVax = {};
+        const tgl_pelayanan = document.getElementById('reg_tgl_pelayanan').value || new Date().toISOString().split('T')[0];
 
-    async function populateAnakByDesa() {
-      const desaSel = document.getElementById('search_desa_anak').value;
-      const selectAnak = document.getElementById('select_anak_registered');
-      selectAnak.innerHTML = '<option value="">-- Memuat Data Sasaran... --</option>';
-
-      try {
-        if (cachedGlobalKohortData.length === 0) await refreshCacheGlobalData();
-        const anakMap = new Map();
-
-        cachedGlobalKohortData.forEach(data => {
-          if (!desaSel || (data.desa && data.desa.toLowerCase() === desaSel.toLowerCase())) {
-            const key = `${data.nama_anak}_${data.tgl_lahir}`.toLowerCase();
-            if (!anakMap.has(key)) anakMap.set(key, data);
-          }
+        document.querySelectorAll('input[name="chk_vaksin"]:checked').forEach(cb => {
+          selectedVax[cb.value] = { tgl: tgl_pelayanan, petugas: activePetugas };
         });
 
-        selectAnak.innerHTML = '<option value="">-- Pilih Nama Sasaran Untuk Update --</option>';
-        if (anakMap.size === 0) {
-          selectAnak.innerHTML = '<option value="">-- Belum ada sasaran terdaftar --</option>';
-          return;
+        const record = {
+          desa: desa,
+          kegiatan: document.getElementById('reg_kegiatan').value,
+          tgl_pelayanan: tgl_pelayanan,
+          peran: document.getElementById('reg_peran').value,
+          nama_anak: nama,
+          tgl_lahir: tgl_lahir,
+          jk: document.getElementById('reg_jk').value,
+          nik_anak: document.getElementById('reg_nik_anak').value,
+          wa_anak: document.getElementById('reg_wa_anak').value,
+          nama_ibu: document.getElementById('reg_nama_ibu').value,
+          nik_ibu: document.getElementById('reg_nik_ibu').value,
+          alamat: document.getElementById('reg_alamat').value,
+          imunisasi: selectedVax,
+          petugas: activePetugas,
+          updatedAt: new Date().toISOString()
+        };
+
+        try {
+          await addDoc(collection(db, COL_KOHORT), record);
+          alert("Data berhasil disimpan ke Kohort!");
+          document.getElementById('formRegisterIndividu').reset();
+          fetchAllData();
+        } catch(err) {
+          alert("Gagal menyimpan data: " + err.message);
         }
+      });
 
-        anakMap.forEach((data) => {
+      // Certificates Buttons
+      document.getElementById('cert_filter_desa').addEventListener('change', (e) => {
+        const desa = e.target.value;
+        const selectCert = document.getElementById('cert_select_sasaran');
+        selectCert.innerHTML = '<option value="">-- Pilih Sasaran Terdaftar --</option>';
+
+        const filtered = desa ? globalKohortData.filter(d => d.desa === desa) : globalKohortData;
+        filtered.forEach(item => {
           const opt = document.createElement('option');
-          opt.value = JSON.stringify(data);
-          opt.textContent = `${data.nama_anak} (${data.tgl_lahir}) - Desa: ${data.desa || '-'}, Ortu: ${data.nama_ibu}`;
-          selectAnak.appendChild(opt);
-        });
-      } catch (err) { selectAnak.innerHTML = `<option value="">Error: ${err.message}</option>`; }
-    }
-
-    async function populateCertSasaranByDesa(desaSel) {
-      const selectCert = document.getElementById('cert_select_sasaran');
-      selectCert.innerHTML = '<option value="">-- Memuat Data Sasaran... --</option>';
-
-      try {
-        if (cachedGlobalKohortData.length === 0) await refreshCacheGlobalData();
-        const anakMap = new Map();
-
-        cachedGlobalKohortData.forEach(data => {
-          if (!desaSel || (data.desa && data.desa.toLowerCase() === desaSel.toLowerCase())) {
-            const key = `${data.nama_anak}_${data.tgl_lahir}`.toLowerCase();
-            if (!anakMap.has(key)) anakMap.set(key, data);
-          }
-        });
-
-        selectCert.innerHTML = '<option value="">-- Pilih Nama Sasaran Sertifikat --</option>';
-        if (anakMap.size === 0) {
-          selectCert.innerHTML = '<option value="">-- Belum ada sasaran terdaftar --</option>';
-          return;
-        }
-
-        anakMap.forEach((data) => {
-          const opt = document.createElement('option');
-          opt.value = JSON.stringify(data);
-          opt.textContent = `${data.nama_anak} (${data.tgl_lahir}) - Ortu: ${data.nama_ibu}`;
+          opt.value = item.id;
+          opt.innerText = `${item.nama_anak || item.nama} - Ortu: ${item.nama_ibu || '-'}`;
           selectCert.appendChild(opt);
         });
-      } catch (err) { selectCert.innerHTML = `<option value="">Error: ${err.message}</option>`; }
-    }
-
-    function fillFormWithSelectedAnak() {
-      const val = document.getElementById('select_anak_registered').value;
-      if (!val) {
-        resetFormRegisterIndividu();
-        return;
-      }
-      try {
-        const data = JSON.parse(val);
-        document.getElementById('reg_desa').value = data.desa || "";
-        currentInputDesa = data.desa || "";
-        document.getElementById('reg_kegiatan').value = data.kegiatan || "";
-        document.getElementById('reg_nama_anak').value = data.nama_anak || "";
-        document.getElementById('reg_tgl_lahir').value = data.tgl_lahir || "";
-        document.getElementById('reg_jk').value = data.jk || "";
-        document.getElementById('reg_peran').value = data.peran || "Bayi/Baduta";
-        document.getElementById('reg_nik_anak').value = data.nik_anak !== "-" ? data.nik_anak : "";
-        document.getElementById('reg_wa_anak').value = data.wa_anak || "";
-        document.getElementById('reg_nama_ibu').value = data.nama_ibu || "";
-        document.getElementById('reg_nik_ibu').value = data.nik_ibu !== "-" ? data.nik_ibu : "";
-        document.getElementById('reg_alamat').value = data.alamat_rt || "";
-        
-        applyPeranUIFilter();
-        handleJkRules();
-
-        document.querySelectorAll('input[name="chk_vaksin"]').forEach(cb => {
-          const fieldKey = `vaksin_${cb.value.replace(/[\s\(\)<>-]/g, '_')}`;
-          if (data[fieldKey]) cb.checked = true;
-          else cb.checked = false;
-        });
-
-        loadRecentTransactions();
-      } catch (e) { console.error(e); }
-    }
-
-    window.editDataSasaran = function(dataAnakJson) {
-      try {
-        const data = JSON.parse(decodeURIComponent(dataAnakJson));
-        
-        document.getElementById('reg_desa').value = data.desa || "";
-        currentInputDesa = data.desa || "";
-        document.getElementById('reg_kegiatan').value = data.kegiatan || "";
-        document.getElementById('reg_nama_anak').value = data.nama_anak || "";
-        document.getElementById('reg_tgl_lahir').value = data.tgl_lahir || "";
-        document.getElementById('reg_jk').value = data.jk || "";
-        document.getElementById('reg_peran').value = data.peran || "Bayi/Baduta";
-        document.getElementById('reg_nik_anak').value = data.nik_anak !== "-" ? data.nik_anak : "";
-        document.getElementById('reg_wa_anak').value = data.wa_anak || "";
-        document.getElementById('reg_nama_ibu').value = data.nama_ibu || "";
-        document.getElementById('reg_nik_ibu').value = data.nik_ibu !== "-" ? data.nik_ibu : "";
-        document.getElementById('reg_alamat').value = data.alamat_rt || "";
-
-        applyPeranUIFilter();
-        handleJkRules();
-
-        document.querySelectorAll('input[name="chk_vaksin"]').forEach(cb => {
-          const fieldKey = `vaksin_${cb.value.replace(/[\s\(\)<>-]/g, '_')}`;
-          if (data[fieldKey]) cb.checked = true;
-          else cb.checked = false;
-        });
-
-        const cardForm = document.getElementById('cardFormUtama');
-        cardForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      } catch (e) { console.error("Error Edit:", e); }
-    };
-
-    async function handleSaveKohortMatrix(e) {
-      e.preventDefault();
-
-      if (!activePetugasName) {
-        document.getElementById('loginModal').style.display = 'flex';
-        return alert("Silakan login terlebih dahulu!");
-      }
-
-      const jk = document.getElementById('reg_jk').value;
-      if (!jk) {
-        return alert("⚠️ Peringatan: Jenis Kelamin (JK) wajib dipilih (Laki-Laki / Perempuan)!");
-      }
-
-      const selectedVaccines = Array.from(document.querySelectorAll('input[name="chk_vaksin"]:checked')).map(cb => cb.value);
-      
-      if (selectedVaccines.length === 0) {
-        return alert("⚠️ Mohon centang minimal 1 jenis imunisasi!");
-      }
-
-      if (jk === 'L' && (selectedVaccines.includes('TT2 Catin') || selectedVaccines.some(v => v.includes('Bumil')))) {
-        return alert("⚠ Laki-Laki (Pria) hanya dapat menerima TT1 Catin!");
-      }
-
-      const tglPelayananInput = document.getElementById('reg_tgl_pelayanan').value;
-      const tglLahir = document.getElementById('reg_tgl_lahir').value;
-      const namaAnak = document.getElementById('reg_nama_anak').value.trim();
-      const desa = document.getElementById('reg_desa').value;
-      currentInputDesa = desa;
-
-      const uniqueChildId = `${desa}_${namaAnak}_${tglLahir}`.replace(/[\s\/]/g, '_').toLowerCase();
-      const vaccineDataUpdate = {};
-
-      selectedVaccines.forEach(v => {
-        let isLowerSeriesDose = false;
-        let idealOffsetMonths = 0;
-        let idealOffsetDays = 0;
-
-        if (v.includes("TT")) {
-          vaccineDataUpdate[`vaksin_${v.replace(/[\s\(\)<>-]/g, '_')}`] = tglPelayananInput;
-          return;
-        }
-
-        if (v === "HBO (1-7 Hari)" && (selectedVaccines.includes("BCG") || selectedVaccines.includes("DPT-HB-Hib3") || selectedVaccines.includes("IPV1"))) {
-          if (!selectedVaccines.includes("HBO (<24 Jam)")) {
-            isLowerSeriesDose = true;
-            idealOffsetDays = 1;
-          }
-        } else if (v === "BCG" && (selectedVaccines.includes("DPT-HB-Hib3") || selectedVaccines.includes("IPV1") || selectedVaccines.includes("IPV2"))) {
-          isLowerSeriesDose = true;
-          idealOffsetMonths = 1;
-        } else {
-          SERIES_SEQUENCES.forEach(series => {
-            const idx = series.items.findIndex(item => item.key === v);
-            if (idx !== -1) {
-              let maxCheckedIdx = -1;
-              series.items.forEach((item, i) => {
-                if (selectedVaccines.includes(item.key)) maxCheckedIdx = i;
-              });
-
-              if (idx < maxCheckedIdx) {
-                isLowerSeriesDose = true;
-                idealOffsetMonths = series.items[idx].offsetMonths;
-              }
-            }
-          });
-        }
-
-        const fieldKey = `vaksin_${v.replace(/[\s\(\)<>-]/g, '_')}`;
-
-        if (isLowerSeriesDose) {
-          vaccineDataUpdate[fieldKey] = calculateIdealVaccineDate(tglLahir, idealOffsetMonths, idealOffsetDays);
-        } else {
-          vaccineDataUpdate[fieldKey] = tglPelayananInput;
-        }
       });
 
-      const nowTimestamp = new Date().toLocaleString('id-ID');
-
-      const payload = {
-        id: uniqueChildId,
-        desa: desa,
-        kegiatan: document.getElementById('reg_kegiatan').value,
-        tanggal_pelayanan: tglPelayananInput,
-        bulan_tahun: tglPelayananInput.substring(0, 7),
-        tahun: tglPelayananInput.substring(0, 4),
-        nama_anak: namaAnak,
-        tgl_lahir: tglLahir,
-        jk: jk,
-        peran: document.getElementById('reg_peran').value,
-        nik_anak: document.getElementById('reg_nik_anak').value || "-",
-        wa_anak: document.getElementById('reg_wa_anak').value || "-",
-        nama_ibu: document.getElementById('reg_nama_ibu').value,
-        nik_ibu: document.getElementById('reg_nik_ibu').value || "-",
-        alamat_rt: document.getElementById('reg_alamat').value,
-        kelompok_usia: getKelompokUsia(tglLahir, tglPelayananInput),
-        updated_at: new Date().toISOString(),
-        last_updated_by: activePetugasName,
-        audit_log: arrayUnion({
-          waktu: nowTimestamp,
-          petugas: activePetugasName,
-          aksi: "Input/Update Dosis: " + selectedVaccines.join(', ')
-        }),
-        ...vaccineDataUpdate
-      };
-
-      try {
-        if (navigator.onLine) {
-          await setDoc(doc(db, COL_KOHORT, uniqueChildId), payload, { merge: true });
-          alert(`✅ Kohort ${namaAnak} tersimpan ke Cloud oleh ${activePetugasName}!`);
-        } else {
-          saveToOfflineQueue(payload);
-          alert(`🌐 Offline. Data ${namaAnak} tersimpan di memori lokal!`);
-        }
-        
-        resetFormRegisterIndividu();
-        refreshCacheGlobalData();
-        loadRecentTransactions();
-      } catch (err) { 
-        saveToOfflineQueue(payload);
-        alert(`🌐 Gagal koneksi Cloud. Data tersimpan di memori lokal: ${err.message}`);
-      }
-    }
-
-    function saveToOfflineQueue(data) {
-      let queue = JSON.parse(localStorage.getItem('pkm_offline_queue') || '[]');
-      queue.push(data);
-      localStorage.setItem('pkm_offline_queue', JSON.stringify(queue));
-    }
-
-    async function syncOfflineQueueToCloud() {
-      let queue = JSON.parse(localStorage.getItem('pkm_offline_queue') || '[]');
-      if (queue.length === 0) return;
-
-      for (let payload of queue) {
-        try {
-          const docId = payload.id;
-          delete payload.id;
-          await setDoc(doc(db, COL_KOHORT, docId), payload, { merge: true });
-        } catch (e) {
-          console.error("Gagal sync item:", e);
-        }
-      }
-      localStorage.removeItem('pkm_offline_queue');
-      alert("✅ Online kembali! Data offline berhasil diunggah ke Cloud.");
-      refreshCacheGlobalData();
-      loadRecentTransactions();
-    }
-
-    async function loadRecentTransactions() {
-      const tbodyAnak = document.querySelector('#tblRecentAnak tbody');
-      const tbodyDewasa = document.querySelector('#tblRecentDewasa tbody');
-      const titleSpan = document.getElementById('preview_desa_title');
-
-      if (!currentInputDesa) {
-        titleSpan.textContent = "Belum Ada Desa Dipilih";
-        tbodyAnak.innerHTML = '<tr><td colspan="31" style="text-align:center; color:var(--muted);"><i class="fas fa-arrow-up"></i> Pilih desa untuk melihat preview.</td></tr>';
-        tbodyDewasa.innerHTML = '<tr><td colspan="16" style="text-align:center; color:var(--muted);"><i class="fas fa-arrow-up"></i> Pilih desa untuk melihat preview.</td></tr>';
-        return;
-      }
-
-      titleSpan.textContent = `Desa ${currentInputDesa}`;
-      tbodyAnak.innerHTML = '<tr><td colspan="31" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Memuat...</td></tr>';
-      tbodyDewasa.innerHTML = '<tr><td colspan="16" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Memuat...</td></tr>';
-
-      try {
-        let docs = [];
-        if (navigator.onLine) {
-          const snap = await getDocs(collection(db, COL_KOHORT));
-          snap.forEach(d => {
-            const data = d.data();
-            if (data.desa && data.desa.toLowerCase() === currentInputDesa.toLowerCase()) {
-              docs.push({id: d.id, ...data});
-            }
-          });
-        }
-
-        let offlineQueue = JSON.parse(localStorage.getItem('pkm_offline_queue') || '[]');
-        offlineQueue.forEach(item => {
-          if (item.desa && item.desa.toLowerCase() === currentInputDesa.toLowerCase()) {
-            docs.unshift({ id: item.id || 'offline', ...item, last_updated_by: `${item.last_updated_by} (Offline)` });
-          }
-        });
-
-        tbodyAnak.innerHTML = '';
-        tbodyDewasa.innerHTML = '';
-
-        let countAnak = 0, countDewasa = 0;
-
-        docs.forEach(d => {
-          const petugasKet = d.last_updated_by ? `<strong style="color:var(--accent);">${d.last_updated_by}</strong>` : '-';
-          const jsonString = encodeURIComponent(JSON.stringify(d));
-
-          if (d.peran === 'Catin' || d.peran === 'Bumil') {
-            countDewasa++;
-            const tr = document.createElement('tr');
-            let vCols = '';
-
-            VAKSIN_DEWASA_KEYS.forEach(vKey => {
-              const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
-              const val = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
-              vCols += val ? `<td><span class="v-given">${val}</span></td>` : `<td style="color:#CBD5E1;">-</td>`;
-            });
-
-            tr.innerHTML = `
-              <td class="sticky-col-1">${d.nama_anak}</td>
-              <td class="sticky-col-2">${d.tgl_lahir || '-'}</td>
-              <td>${d.jk || '-'}</td>
-              <td>${d.nama_ibu || '-'}</td>
-              <td>${d.wa_anak || '-'}</td>
-              <td>${d.desa || '-'}</td>
-              <td>${d.alamat_rt || '-'}</td>
-              ${vCols}
-              <td>${petugasKet}</td>
-              <td style="display:flex; gap:4px; justify-content:center;">
-                <button class="btn btn-warning" onclick="editDataSasaran('${jsonString}')" style="padding:3px 6px; font-size:0.72rem;"><i class="fas fa-edit"></i> Edit</button>
-                <button class="btn btn-danger" onclick="hapusTrans('${d.id}')" style="padding:3px 6px; font-size:0.72rem;"><i class="fas fa-trash"></i></button>
-              </td>
-            `;
-            tbodyDewasa.appendChild(tr);
-          } else {
-            countAnak++;
-            const tr = document.createElement('tr');
-            let vCols = '';
-
-            VAKSIN_ANAK_KEYS.forEach(vKey => {
-              const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
-              const val = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
-              vCols += val ? `<td><span class="v-given">${val}</span></td>` : `<td style="color:#CBD5E1;">-</td>`;
-            });
-
-            tr.innerHTML = `
-              <td class="sticky-col-1">${d.nama_anak}</td>
-              <td class="sticky-col-2">${d.tgl_lahir || '-'}</td>
-              <td>${d.jk || '-'}</td>
-              <td>${d.nama_ibu || '-'}</td>
-              <td>${d.wa_anak || '-'}</td>
-              <td>${d.desa || '-'}</td>
-              <td>${d.alamat_rt || '-'}</td>
-              ${vCols}
-              <td>${petugasKet}</td>
-              <td style="display:flex; gap:4px; justify-content:center;">
-                <button class="btn btn-warning" onclick="editDataSasaran('${jsonString}')" style="padding:3px 6px; font-size:0.72rem;"><i class="fas fa-edit"></i> Edit</button>
-                <button class="btn btn-danger" onclick="hapusTrans('${d.id}')" style="padding:3px 6px; font-size:0.72rem;"><i class="fas fa-trash"></i></button>
-              </td>
-            `;
-            tbodyAnak.appendChild(tr);
-          }
-        });
-
-        if (countAnak === 0) tbodyAnak.innerHTML = `<tr><td colspan="31" style="text-align:center;">Belum ada sasaran bayi/anak terdaftar di Desa ${currentInputDesa}.</td></tr>`;
-        if (countDewasa === 0) tbodyDewasa.innerHTML = `<tr><td colspan="16" style="text-align:center;">Belum ada sasaran Catin/Ibu Hamil terdaftar di Desa ${currentInputDesa}.</td></tr>`;
-
-      } catch (err) { 
-        tbodyAnak.innerHTML = `<tr><td colspan="31" style="color:red;">Error: ${err.message}</td></tr>`;
-        tbodyDewasa.innerHTML = `<tr><td colspan="16" style="color:red;">Error: ${err.message}</td></tr>`;
-      }
-    }
-
-    window.hapusTrans = async function(docId) {
-      if (!activePetugasName) {
-        document.getElementById('loginModal').style.display = 'flex';
-        return alert("Silakan login terlebih dahulu!");
-      }
-
-      if (confirm(`Yakin ingin menghapus data ini dari Kohort?`)) {
-        if (navigator.onLine && docId !== 'offline') {
-          await deleteDoc(doc(db, COL_KOHORT, docId));
-        }
-        refreshCacheGlobalData();
-        loadRecentTransactions();
-      }
-    };
-
-    window.toggleFormAdminSasaran = function() {
-      if (activePetugasName !== AUTH_ADMIN_USER) {
-        return alert("🔒 Fitur ini hanya dapat diakses oleh Admin!");
-      }
-      const panel = document.getElementById('panelAdminPengaturan');
-      panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-    };
-
-    async function handleSaveTargetSasaran(e) {
-      e.preventDefault();
-      if (activePetugasName !== AUTH_ADMIN_USER) {
-        return alert("🔒 Hanya Admin yang berhak merubah Target Sasaran!");
-      }
-
-      const desa = document.getElementById('sas_desa').value;
-      const tahun = document.getElementById('sas_tahun').value;
-      const targetBayi = parseInt(document.getElementById('sas_target_bayi').value) || 0;
-      const targetBaduta = parseInt(document.getElementById('sas_target_baduta').value) || 0;
-      const targetBias = parseInt(document.getElementById('sas_target_bias').value) || 0;
-
-      const docId = `${tahun}_${desa}`.toLowerCase();
-      try {
-        await setDoc(doc(db, COL_TARGET, docId), {
-          tahun, desa, target_bayi: targetBayi, target_baduta: targetBaduta, target_bias: targetBias,
-          updated_by: activePetugasName, updated_at: new Date().toISOString()
-        }, { merge: true });
-
-        alert(`✅ Target sasaran tahun ${tahun} untuk ${desa} diperbarui!`);
-        loadCapanTabContent();
-      } catch (err) { alert("Error menyimpan target sasaran: " + err.message); }
-    }
-
-    async function loadCapanTabContent() {
-      const thn = document.getElementById('cap_filter_tahun').value;
-      const bln = document.getElementById('cap_filter_bulan').value;
-
-      const cBayi = document.getElementById('containerCapaianBayiBaduta');
-      const cIDL = document.getElementById('containerTabelIDL');
-      const cBIAS = document.getElementById('containerCapaianBIAS');
-
-      [cBayi, cIDL, cBIAS].forEach(c => c.innerHTML = '<p class="muted" style="text-align:center; padding:15px;"><i class="fas fa-spinner fa-spin"></i> Menghitung data capaian...</p>');
-
-      try {
-        const snapTarget = await getDocs(collection(db, COL_TARGET));
-        const targetMap = new Map();
-        snapTarget.forEach(d => {
-          const t = d.data();
-          if (t.tahun === thn) targetMap.set(t.desa.toLowerCase(), t);
-        });
-
-        const snapKohort = await getDocs(collection(db, COL_KOHORT));
-        const kohortDocs = [];
-        snapKohort.forEach(d => kohortDocs.push(d.data()));
-
-        const exactCounts = {};
-        const kumulatifCounts = {};
-        VAKSIN_ANAK_KEYS.forEach(v => { exactCounts[v] = { L: 0, P: 0, Total: 0 }; kumulatifCounts[v] = { L: 0, P: 0, Total: 0 }; });
-
-        kohortDocs.forEach(d => {
-          const jk = d.jk === 'L' ? 'L' : 'P';
-          VAKSIN_ANAK_KEYS.forEach(vKey => {
-            const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
-            const vDate = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
-            if (isVaccineGivenExactMonth(vDate, thn, bln)) {
-              exactCounts[vKey][jk]++;
-              exactCounts[vKey].Total++;
-            }
-            if (isVaccineGivenUpToMonth(vDate, thn, bln)) {
-              kumulatifCounts[vKey][jk]++;
-              kumulatifCounts[vKey].Total++;
-            }
-          });
-        });
-
-        const monthLabel = bln === 'ALL' ? 'Semua Bulan' : `Bulan ${BULAN_NAME_MAP[bln] || bln}`;
-
-        let htmlBayi = `
-          <table class="kohort-table">
-            <thead>
-              <tr>
-                <th rowspan="2">Kategori</th>
-                <th rowspan="2">Nama Antigen</th>
-                <th colspan="3">Dosis ${bln === 'ALL' ? '' : BULAN_NAME_MAP[bln] || bln}</th>
-                <th colspan="3">Kumulatif s/d ${bln === 'ALL' ? 'Semua' : BULAN_NAME_MAP[bln] || bln}</th>
-              </tr>
-              <tr>
-                <th>L</th><th>P</th><th>Total</th>
-                <th>L</th><th>P</th><th>Total</th>
-              </tr>
-            </thead>
-            <tbody>
-        `;
-        VAKSIN_ANAK_KEYS.forEach(vKey => {
-          const idx = VAKSIN_ANAK_KEYS.indexOf(vKey);
-          const kat = idx <= 18 ? "Imunisasi Bayi" : "Booster Baduta (MR2 & DPT4)";
-          const ex = exactCounts[vKey];
-          const kum = kumulatifCounts[vKey];
-          htmlBayi += `
-            <tr>
-              <td style="text-align:left;">${kat}</td>
-              <td style="font-weight:700; text-align:left;">${vKey}</td>
-              <td>${ex.L}</td><td>${ex.P}</td><td style="font-weight:800; color:var(--primary);">${ex.Total}</td>
-              <td>${kum.L}</td><td>${kum.P}</td><td style="font-weight:800; color:var(--accent);">${kum.Total}</td>
-            </tr>
-          `;
-        });
-        htmlBayi += `</tbody></table>`;
-        cBayi.innerHTML = htmlBayi;
-
-        const idlDesaMap = {};
-        ALL_DESA_LIST.forEach(d => idlDesaMap[d.toLowerCase()] = { desa: d, countIDL_L: 0, countIDL_P: 0 });
-
-        kohortDocs.forEach(d => {
-          const getVal = (vk) => {
-            const fieldKey = `vaksin_${vk.replace(/[\s\(\)<>-]/g, '_')}`;
-            const vDate = d[fieldKey] || (d.jenis_imunisasi === vk ? d.tanggal_pelayanan : null);
-            return isVaccineGivenUpToMonth(vDate, thn, bln) ? vDate : null;
-          };
-
-          const hasHb0 = getVal("HBO (<24 Jam)") || getVal("HBO (1-7 Hari)");
-          const hasBcg = getVal("BCG");
-          const hasDpt3 = getVal("DPT-HB-Hib3");
-          const hasOpv4 = getVal("OPV4");
-          const hasIpv1 = getVal("IPV1");
-          const hasMr1 = getVal("Campak Rubela-1");
-
-          if (hasHb0 && hasBcg && hasDpt3 && hasOpv4 && hasIpv1 && hasMr1) {
-            const desaKey = (d.desa || '').toLowerCase();
-            const jk = d.jk === 'L' ? 'L' : 'P';
-            if (idlDesaMap[desaKey]) {
-              if (jk === 'L') idlDesaMap[desaKey].countIDL_L++;
-              else idlDesaMap[desaKey].countIDL_P++;
-            }
-          }
-        });
-
-        let totalDalamIDL_L = 0, totalDalamIDL_P = 0, totalDalamTarget = 0;
-        let totalLuarIDL_L = 0, totalLuarIDL_P = 0, totalLuarTarget = 0;
-
-        let htmlIDL = `
-          <table class="kohort-table">
-            <thead>
-              <tr>
-                <th rowspan="2">Kategori</th>
-                <th rowspan="2">Desa</th>
-                <th rowspan="2">Target</th>
-                <th colspan="3">Bayi IDL (s/d ${monthLabel})</th>
-                <th rowspan="2">Capaian (%)</th>
-              </tr>
-              <tr>
-                <th>L</th><th>P</th><th>Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr style="background:#E0F2FE; font-weight:700;"><td colspan="7" style="text-align:left; color:var(--accent);">A. DALAM WILAYAH (11 DESA)</td></tr>
-        `;
-
-        DESA_DALAM_WILAYAH.forEach(dName => {
-          const item = idlDesaMap[dName.toLowerCase()];
-          const targetObj = targetMap.get(dName.toLowerCase());
-          const targetBayi = targetObj ? targetObj.target_bayi : 0;
-          const countIDL_L = item ? item.countIDL_L : 0;
-          const countIDL_P = item ? item.countIDL_P : 0;
-          const countIDL_Total = countIDL_L + countIDL_P;
-          const persen = targetBayi > 0 ? ((countIDL_Total / targetBayi) * 100).toFixed(1) : "0.0";
-
-          totalDalamIDL_L += countIDL_L;
-          totalDalamIDL_P += countIDL_P;
-          totalDalamTarget += targetBayi;
-
-          htmlIDL += `
-            <tr>
-              <td>Dalam Wilayah</td>
-              <td style="text-align:left; font-weight:700;">Desa ${dName}</td>
-              <td>${targetBayi}</td>
-              <td>${countIDL_L}</td>
-              <td>${countIDL_P}</td>
-              <td style="font-weight:800; color:var(--success);">${countIDL_Total}</td>
-              <td style="font-weight:800; color:var(--accent);">${persen}%</td>
-            </tr>
-          `;
-        });
-
-        const sumDalamIDL = totalDalamIDL_L + totalDalamIDL_P;
-        const persenDalam = totalDalamTarget > 0 ? ((sumDalamIDL / totalDalamTarget) * 100).toFixed(1) : "0.0";
-        htmlIDL += `
-          <tr style="background:#F1F5F9; font-weight:bold;">
-            <td colspan="2" style="text-align:left; color:var(--accent);">SUBTOTAL DALAM WILAYAH:</td>
-            <td>${totalDalamTarget}</td>
-            <td>${totalDalamIDL_L}</td>
-            <td>${totalDalamIDL_P}</td>
-            <td style="color:var(--success); font-size:0.9rem;">${sumDalamIDL}</td>
-            <td style="color:var(--primary); font-size:0.9rem;">${persenDalam}%</td>
-          </tr>
-          <tr style="background:#FEF3C7; font-weight:700;"><td colspan="7" style="text-align:left; color:#92400E;">B. LUAR WILAYAH (PERUSAHAAN)</td></tr>
-        `;
-
-        DESA_LUAR_WILAYAH.forEach(dName => {
-          const item = idlDesaMap[dName.toLowerCase()];
-          const targetObj = targetMap.get(dName.toLowerCase());
-          const targetBayi = targetObj ? targetObj.target_bayi : 0;
-          const countIDL_L = item ? item.countIDL_L : 0;
-          const countIDL_P = item ? item.countIDL_P : 0;
-          const countIDL_Total = countIDL_L + countIDL_P;
-          const persen = targetBayi > 0 ? ((countIDL_Total / targetBayi) * 100).toFixed(1) : "0.0";
-
-          totalLuarIDL_L += countIDL_L;
-          totalLuarIDL_P += countIDL_P;
-          totalLuarTarget += targetBayi;
-
-          htmlIDL += `
-            <tr>
-              <td>Luar Wilayah</td>
-              <td style="text-align:left; font-weight:700;">${dName}</td>
-              <td>${targetBayi}</td>
-              <td>${countIDL_L}</td>
-              <td>${countIDL_P}</td>
-              <td style="font-weight:800; color:var(--success);">${countIDL_Total}</td>
-              <td style="font-weight:800; color:var(--accent);">${persen}%</td>
-            </tr>
-          `;
-        });
-
-        const sumLuarIDL = totalLuarIDL_L + totalLuarIDL_P;
-        const persenLuar = totalLuarTarget > 0 ? ((sumLuarIDL / totalLuarTarget) * 100).toFixed(1) : "0.0";
-        const grandTotalIDL = sumDalamIDL + sumLuarIDL;
-        const grandTotalTarget = totalDalamTarget + totalLuarTarget;
-        const grandPersen = grandTotalTarget > 0 ? ((grandTotalIDL / grandTotalTarget) * 100).toFixed(1) : "0.0";
-
-        htmlIDL += `
-          <tr style="background:#F1F5F9; font-weight:bold;">
-            <td colspan="2" style="text-align:left; color:#92400E;">SUBTOTAL LUAR WILAYAH:</td>
-            <td>${totalLuarTarget}</td>
-            <td>${totalLuarIDL_L}</td>
-            <td>${totalLuarIDL_P}</td>
-            <td style="color:var(--success); font-size:0.9rem;">${sumLuarIDL}</td>
-            <td style="color:var(--primary); font-size:0.9rem;">${persenLuar}%</td>
-          </tr>
-            </tbody>
-            <tfoot>
-              <tr style="background:#E2E8F0; font-weight:bold;">
-                <td colspan="2" style="text-align:left; color:var(--accent);">TOTAL KESELURUHAN:</td>
-                <td>${grandTotalTarget}</td>
-                <td>${totalDalamIDL_L + totalLuarIDL_L}</td>
-                <td>${totalDalamIDL_P + totalLuarIDL_P}</td>
-                <td style="font-weight:800; color:var(--success); font-size:0.95rem;">${grandTotalIDL}</td>
-                <td style="font-weight:800; color:var(--primary); font-size:0.95rem;">${grandPersen}%</td>
-              </tr>
-            </tfoot>
-          </table>
-        `;
-        cIDL.innerHTML = htmlIDL;
-
-        const snapBias = await getDocs(collection(db, COL_BIAS));
-        const biasExact = { MR: {L:0, P:0}, DT: {L:0, P:0}, Td: {L:0, P:0}, HPV: {L:0, P:0} };
-        const biasKumulatif = { MR: {L:0, P:0}, DT: {L:0, P:0}, Td: {L:0, P:0}, HPV: {L:0, P:0} };
-
-        snapBias.forEach(doc => {
-          const b = doc.data();
-          const capL = b.data?.Capaian_L || 0, capP = b.data?.Capaian_P || 0;
-
-          if (isVaccineGivenExactMonth(b.tanggal, thn, bln)) {
-            if (biasExact[b.jenis_vaksin]) {
-              biasExact[b.jenis_vaksin].L += capL;
-              biasExact[b.jenis_vaksin].P += capP;
-            }
-          }
-          if (isVaccineGivenUpToMonth(b.tanggal, thn, bln)) {
-            if (biasKumulatif[b.jenis_vaksin]) {
-              biasKumulatif[b.jenis_vaksin].L += capL;
-              biasKumulatif[b.jenis_vaksin].P += capP;
-            }
-          }
-        });
-
-        let htmlBIAS = `
-          <table class="kohort-table">
-            <thead>
-              <tr>
-                <th rowspan="2">Jenis Vaksin BIAS</th>
-                <th colspan="3">Siswa Diberikan (${monthLabel})</th>
-                <th colspan="3">Kumulatif Siswa (s/d ${monthLabel})</th>
-              </tr>
-              <tr>
-                <th>L</th><th>P</th><th>Total</th>
-                <th>L</th><th>P</th><th>Total</th>
-              </tr>
-            </thead>
-            <tbody>
-        `;
-        ['MR', 'DT', 'Td', 'HPV'].forEach(vk => {
-          const ex = biasExact[vk], kum = biasKumulatif[vk];
-          htmlBIAS += `
-            <tr>
-              <td style="font-weight:700; text-align:left;">BIAS ${vk}</td>
-              <td>${ex.L}</td><td>${ex.P}</td><td style="font-weight:800; color:var(--primary);">${ex.L + ex.P}</td>
-              <td>${kum.L}</td><td>${kum.P}</td><td style="font-weight:800; color:var(--accent);">${kum.L + kum.P}</td>
-            </tr>
-          `;
-        });
-        htmlBIAS += `</tbody></table>`;
-        cBIAS.innerHTML = htmlBIAS;
-
-      } catch (err) { alert("Error Capaian: " + err.message); }
-    }
-
-    function getDropoutColorBadge(delayMonths) {
-      if (delayMonths <= 1) {
-        return {
-          style: "background-color: #FEF08A; color: #854D0E; border: 1px solid #FDE047; font-weight: 700; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem;",
-          label: "Telat 1 Bln (Peringatan Awal)"
-        };
-      } else if (delayMonths === 2) {
-        return {
-          style: "background-color: #FACC15; color: #713F12; border: 1px solid #EAB308; font-weight: 800; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem;",
-          label: "Telat 2 Bln (Risiko DO)"
-        };
-      } else if (delayMonths === 3) {
-        return {
-          style: "background-color: #FB923C; color: #FFFFFF; font-weight: 800; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem;",
-          label: "Telat 3 Bln (Tinggi)"
-        };
-      } else {
-        return {
-          style: "background-color: #EF4444; color: #FFFFFF; font-weight: 800; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem;",
-          label: `Telat ${delayMonths} Bln (Drop Out Heavy)`
-        };
-      }
-    }
-
-    async function loadCatchUpAnalysis() {
-      const desaSel = document.getElementById('catchup_filter_desa').value;
-      const today = new Date();
-
-      const p1 = document.getElementById('panel_bayi_container');
-      const p2 = document.getElementById('panel_berkesinambungan_container');
-      const p3 = document.getElementById('panel_baduta_container');
-      const p4 = document.getElementById('panel_dewasa_container');
-
-      [p1, p2, p3, p4].forEach(p => p.innerHTML = '<p class="muted" style="text-align:center; padding:12px;"><i class="fas fa-spinner fa-spin"></i> Menganalisis data catch up...</p>');
-
-      try {
-        const snap = await getDocs(collection(db, COL_KOHORT));
-        let listBayi = [], listBerkesinambungan = [], listBaduta = [], listDewasa = [];
-
-        snap.forEach(doc => {
-          const d = doc.data();
-          const matchDesa = (desaSel === 'ALL' || (d.desa && d.desa.toLowerCase() === desaSel.toLowerCase()));
-          if (!matchDesa) return;
-
-          const ageMonths = getAgeInMonths(d.tgl_lahir);
-          const getVal = (vk) => d[`vaksin_${vk.replace(/[\s\(\)<>-]/g, '_')}`] || (d.jenis_imunisasi === vk ? d.tanggal_pelayanan : null);
-
-          const hasHb0 = getVal("HBO (<24 Jam)") || getVal("HBO (1-7 Hari)");
-          const pcv1Date = getVal("PCV1");
-          const rv1Date = getVal("Rotavirus1");
-          const rv2Date = getVal("Rotavirus2");
-
-          if (ageMonths < 12) {
-            let missingBayi = [];
-            if (!hasHb0 && ageMonths >= 1) missingBayi.push("HBO");
-            if (!getVal("BCG") && ageMonths >= 1) missingBayi.push("BCG");
-            if (!getVal("OPV1") && ageMonths >= 1) missingBayi.push("OPV1");
-            if (!getVal("DPT-HB-Hib1") && ageMonths >= 2) missingBayi.push("DPT1");
-            if (!getVal("OPV2") && ageMonths >= 2) missingBayi.push("OPV2");
-            if (!getVal("DPT-HB-Hib2") && ageMonths >= 3) missingBayi.push("DPT2");
-            if (!getVal("OPV3") && ageMonths >= 3) missingBayi.push("OPV3");
-            if (!getVal("DPT-HB-Hib3") && ageMonths >= 4) missingBayi.push("DPT3");
-            if (!getVal("OPV4") && ageMonths >= 4) missingBayi.push("OPV4");
-            if (!getVal("IPV1") && ageMonths >= 4) missingBayi.push("IPV1");
-            if (!getVal("Campak Rubela-1") && ageMonths >= 9) missingBayi.push("MR1");
-            if (!getVal("IPV2") && ageMonths >= 9) missingBayi.push("IPV2");
-
-            if (!getVal("PCV1") && ageMonths >= 2) {
-              missingBayi.push("PCV1");
-            } else if (pcv1Date && !getVal("PCV2") && ageMonths >= 3 && hasMinInterval4Weeks(pcv1Date, today)) {
-              missingBayi.push("PCV2");
-            }
-
-            if (ageMonths < 7) {
-              if (!rv1Date && ageMonths >= 2) {
-                missingBayi.push("Rotavirus1");
-              } else if (rv1Date && !rv2Date && ageMonths >= 3 && hasMinInterval4Weeks(rv1Date, today)) {
-                missingBayi.push("Rotavirus2");
-              } else if (rv2Date && !getVal("Rotavirus3") && ageMonths >= 4 && hasMinInterval4Weeks(rv2Date, today)) {
-                missingBayi.push("Rotavirus3");
-              }
-            }
-
-            if (missingBayi.length > 0) {
-              listBayi.push({ ...d, ageMonths, missing: missingBayi });
-            }
-          }
-
-          SERIES_SEQUENCES.forEach(group => {
-            for (let i = 0; i < group.items.length - 1; i++) {
-              const currentVal = getVal(group.items[i].key);
-              const nextVal = getVal(group.items[i+1].key);
-
-              if (currentVal && !nextVal) {
-                if (group.name === "PCV" && ageMonths >= 12) continue;
-                if (group.name === "Rotavirus" && ageMonths >= 7) continue;
-
-                const currentDate = new Date(currentVal);
-                
-                let idealDueDate = new Date(currentDate);
-                if (group.items[i+1].key === "DPT-HB-Hib4" || group.items[i+1].key === "Campak Rubela-2") {
-                  idealDueDate.setFullYear(idealDueDate.getFullYear() + 1);
-                } else {
-                  idealDueDate.setDate(idealDueDate.getDate() + 28);
-                }
-
-                if (today >= idealDueDate) {
-                  const overdueDays = Math.floor((today - idealDueDate) / (1000 * 60 * 60 * 24));
-                  const delayMonths = Math.max(1, Math.floor(overdueDays / 30));
-
-                  listBerkesinambungan.push({
-                    ...d,
-                    ageMonths,
-                    antigen: group.items[i+1].key,
-                    lastDose: group.items[i].key,
-                    lastDate: currentVal,
-                    idealDate: idealDueDate.toISOString().split('T')[0],
-                    delayMonths: delayMonths
-                  });
-                }
-              }
-            }
-          });
-
-          if (ageMonths >= 18 && ageMonths <= 36 && d.peran !== 'Catin' && d.peran !== 'Bumil') {
-            const dpt3Val = getVal("DPT-HB-Hib3"), dpt4Val = getVal("DPT-HB-Hib4");
-            const mr1Val = getVal("Campak Rubela-1"), mr2Val = getVal("Campak Rubela-2");
-
-            let needsBooster = [];
-            let urgentFlag = false;
-
-            if (dpt3Val && !dpt4Val) {
-              const dpt3Date = new Date(dpt3Val);
-              const daysSinceDpt3 = Math.floor((today - dpt3Date) / (1000 * 60 * 60 * 24));
-              if (daysSinceDpt3 >= 365) {
-                const m = Math.floor(daysSinceDpt3 / 30.4375);
-                needsBooster.push(`DPT4 (${m} Bln Pasca DPT3)`);
-                if (ageMonths > 24) urgentFlag = true;
-              }
-            }
-
-            if (mr1Val && !mr2Val) {
-              const mr1Date = new Date(mr1Val);
-              const daysSinceMr1 = Math.floor((today - mr1Date) / (1000 * 60 * 60 * 24));
-              if (daysSinceMr1 >= 365) {
-                const m = Math.floor(daysSinceMr1 / 30.4375);
-                needsBooster.push(`MR2 (${m} Bln Pasca MR1)`);
-                if (ageMonths > 24) urgentFlag = true;
-              }
-            }
-
-            if (needsBooster.length > 0) {
-              listBaduta.push({
-                ...d,
-                ageMonths,
-                needs: needsBooster.join(" & "),
-                urgent: urgentFlag ? "Mendesak (>2 Thn)" : "Jatuh Tempo Booster (>1 Thn)"
-              });
-            }
-          }
-
-          if (d.peran === 'Catin' || d.peran === 'Bumil') {
-            const ttCatin1 = getVal("TT1 Catin"), ttCatin2 = getVal("TT2 Catin");
-            const ttBumil1 = getVal("TT1 Bumil"), ttBumil5 = getVal("TT5 Bumil");
-
-            let catinAlert = (ttCatin1 && !ttCatin2 && d.jk !== 'L') ? "Menunggak TT2 Catin" : "";
-            let bumilAlert = (ttBumil1 && !ttBumil5) ? "Belum TT5 Lengkap" : "";
-
-            if (catinAlert || bumilAlert) {
-              listDewasa.push({
-                ...d,
-                kategori: catinAlert ? "Catin" : "Ibu Hamil",
-                statusTd: catinAlert || bumilAlert
-              });
-            }
-          }
-        });
-
-        p1.innerHTML = listBayi.length === 0 ? '<p class="muted" style="text-align:center;">Semua bayi < 1 tahun terimunisasi sesuai usianya.</p>' : `
-          <table class="kohort-table">
-            <thead><tr><th>Nama Sasaran</th><th>Usia</th><th>Desa</th><th>Alamat</th><th>Orang Tua</th><th>Vaksin Belum Diberikan</th></tr></thead>
-            <tbody>${listBayi.map(b => `<tr><td style="font-weight:700;">${b.nama_anak}</td><td>${b.ageMonths} Bln</td><td>${b.desa}</td><td>${b.alamat_rt}</td><td>${b.nama_ibu}</td><td style="color:var(--danger); font-weight:700;">${b.missing.join(', ')}</td></tr>`).join('')}</tbody>
-          </table>
-        `;
-
-        p2.innerHTML = listBerkesinambungan.length === 0 ? '<p class="muted" style="text-align:center; padding:15px;">Tidak ada sasaran berisiko drop out.</p>' : `
-          <table class="kohort-table">
-            <thead>
-              <tr>
-                <th>Nama Sasaran</th>
-                <th>Usia</th>
-                <th>Desa</th>
-                <th>Dosis Terakhir</th>
-                <th>Tgl Terima</th>
-                <th>Tgl Ideal Dosis Lanjutan</th>
-                <th>Target Dosis</th>
-                <th>Status Keterlambatan</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${listBerkesinambungan.map(b => {
-                const badgeInfo = getDropoutColorBadge(b.delayMonths);
-                return `
-                  <tr>
-                    <td style="font-weight:700; text-align:left;">${b.nama_anak}</td>
-                    <td>${b.ageMonths} Bln</td>
-                    <td>${b.desa}</td>
-                    <td><span class="v-given">${b.lastDose}</span></td>
-                    <td>${b.lastDate}</td>
-                    <td><strong style="color:var(--accent);">${b.idealDate}</strong></td>
-                    <td style="color:var(--primary); font-weight:800;">${b.antigen}</td>
-                    <td><span style="${badgeInfo.style}">${badgeInfo.label}</span></td>
-                  </tr>
-                `;
-              }).join('')}
-            </tbody>
-          </table>
-        `;
-
-        p3.innerHTML = listBaduta.length === 0 ? '<p class="muted" style="text-align:center;">Seluruh anak telah menerima DPT4 & MR2 tepat waktu.</p>' : `
-          <table class="kohort-table">
-            <thead><tr><th>Nama Sasaran</th><th>Usia</th><th>Desa</th><th>Orang Tua</th><th>Target Booster</th><th>Status</th></tr></thead>
-            <tbody>${listBaduta.map(b => `<tr><td style="font-weight:700;">${b.nama_anak}</td><td>${b.ageMonths} Bln</td><td>${b.desa}</td><td>${b.nama_ibu}</td><td style="font-weight:700; color:var(--accent);">${b.needs}</td><td><span class="${b.urgent.includes('Mendesak') ? 'badge-urgent' : 'badge-warning-custom'}">${b.urgent}</span></td></tr>`).join('')}</tbody>
-          </table>
-        `;
-
-        p4.innerHTML = listDewasa.length === 0 ? '<p class="muted" style="text-align:center;">Semua Catin & Ibu Hamil berstatus Td Lengkap.</p>' : `
-          <table class="kohort-table">
-            <thead><tr><th>Nama Sasaran</th><th>Kategori</th><th>Desa</th><th>Alamat</th><th>Pasangan</th><th>Status Td</th></tr></thead>
-            <tbody>${listDewasa.map(b => `<tr><td style="font-weight:700;">${b.nama_anak}</td><td>${b.kategori}</td><td>${b.desa}</td><td>${b.alamat_rt}</td><td>${b.nama_ibu}</td><td style="color:var(--danger); font-weight:700;">${b.statusTd}</td></tr>`).join('')}</tbody>
-          </table>
-        `;
-
-      } catch (err) { alert("Error Catch Up: " + err.message); }
-    }
-
-    async function downloadCatchUpExcel() {
-      const desaSel = document.getElementById('catchup_filter_desa').value;
-      const today = new Date();
-      try {
-        const snap = await getDocs(collection(db, COL_KOHORT));
-        const excelData = [
-          ["No", "Kategori Panel", "Desa", "Nama Sasaran", "Usia (Bulan)", "Orang Tua / Suami", "WhatsApp", "Alamat / RT", "Status Catch Up", "Keterangan Dosis"]
-        ];
-
-        let idx = 1;
-
-        snap.forEach(doc => {
-          const d = doc.data();
-          const matchDesa = (desaSel === 'ALL' || (d.desa && d.desa.toLowerCase() === desaSel.toLowerCase()));
-          if (!matchDesa) return;
-
-          const ageMonths = getAgeInMonths(d.tgl_lahir);
-          const getVal = (vk) => d[`vaksin_${vk.replace(/[\s\(\)<>-]/g, '_')}`] || (d.jenis_imunisasi === vk ? d.tanggal_pelayanan : null);
-
-          if (ageMonths < 12) {
-            const hasHb0 = getVal("HBO (<24 Jam)") || getVal("HBO (1-7 Hari)");
-            let missingBayi = [];
-            if (!hasHb0 && ageMonths >= 1) missingBayi.push("HBO");
-            if (!getVal("BCG") && ageMonths >= 1) missingBayi.push("BCG");
-            if (!getVal("DPT-HB-Hib1") && ageMonths >= 2) missingBayi.push("DPT1");
-            if (!getVal("Campak Rubela-1") && ageMonths >= 9) missingBayi.push("MR1");
-
-            if (!getVal("PCV1") && ageMonths >= 2) missingBayi.push("PCV1");
-            if (ageMonths < 7 && !getVal("Rotavirus1") && ageMonths >= 2) missingBayi.push("RV1");
-
-            if (missingBayi.length > 0) {
-              excelData.push([idx++, "Bayi < 1 Tahun", d.desa, d.nama_anak, ageMonths, d.nama_ibu, d.wa_anak || '-', d.alamat_rt, "Menunggak Imunisasi", missingBayi.join(', ')]);
-            }
-          }
-
-          if (ageMonths >= 18 && ageMonths <= 36 && d.peran !== 'Catin' && d.peran !== 'Bumil') {
-            const dpt3Val = getVal("DPT-HB-Hib3"), dpt4Val = getVal("DPT-HB-Hib4");
-            const mr1Val = getVal("Campak Rubela-1"), mr2Val = getVal("Campak Rubela-2");
-            
-            let needsBooster = [];
-            if (dpt3Val && !dpt4Val) {
-              const m = Math.floor((today - new Date(dpt3Val)) / (1000 * 60 * 60 * 24 * 30.4375));
-              if (m >= 12) needsBooster.push(`DPT4 (${m} bln pasca DPT3)`);
-            }
-            if (mr1Val && !mr2Val) {
-              const m = Math.floor((today - new Date(mr1Val)) / (1000 * 60 * 60 * 24 * 30.4375));
-              if (m >= 12) needsBooster.push(`MR2 (${m} bln pasca MR1)`);
-            }
-
-            if (needsBooster.length > 0) {
-              excelData.push([idx++, "Anak 18 Bln - 3 Thn", d.desa, d.nama_anak, ageMonths, d.nama_ibu, d.wa_anak || '-', d.alamat_rt, ageMonths > 24 ? "Mendesak (>2 Thn)" : "Booster Pasca 1 Thn", needsBooster.join(' & ')]);
-            }
-          }
-        });
-
-        const wb = XLSX.utils.book_new();
-        const ws = XLSX.utils.aoa_to_sheet(excelData);
-
-        ws['!cols'] = excelData[0].map((_, colIdx) => {
-          let maxLen = 10;
-          excelData.forEach(row => {
-            const val = row[colIdx] ? String(row[colIdx]) : '';
-            if (val.length > maxLen) maxLen = val.length;
-          });
-          return { wch: maxLen + 3 };
-        });
-
-        XLSX.utils.book_append_sheet(wb, ws, "Laporan Catch Up");
-        XLSX.writeFile(wb, `Laporan_CatchUp_Puskesmas_${desaSel}_${new Date().toISOString().slice(0,10)}.xlsx`);
-
-      } catch (err) { alert("Gagal Download Catch Up: " + err.message); }
-    }
-
-    async function loadReviewDetail() {
-      const thn = document.getElementById('filter_tahun').value;
-      const bln = document.getElementById('filter_bulan').value;
-      const desaSel = document.getElementById('filter_desa').value;
-      const katSel = document.getElementById('filter_kategori').value;
-      const container = document.getElementById('reviewContainer');
-
-      container.innerHTML = '<p class="muted" style="text-align:center; padding:15px;"><i class="fas fa-spinner fa-spin"></i> Memuat...</p>';
-
-      try {
-        if (katSel === 'BIAS') {
-          const snapBias = await getDocs(collection(db, COL_BIAS));
-          let biasRows = [];
-          
-          snapBias.forEach(doc => {
-            const d = doc.data();
-            const schoolDesa = SCHOOL_DESA_MAP[d.sekolah] || 'Melata';
-            const matchDesa = (desaSel === 'ALL' || schoolDesa.toLowerCase() === desaSel.toLowerCase());
-
-            if (matchDesa && isVaccineGivenExactMonth(d.tanggal, thn, bln)) {
-              biasRows.push({ ...d, desa: schoolDesa });
-            }
-          });
-
-          if (biasRows.length === 0) {
-            container.innerHTML = `<p style="text-align:center; padding:15px;">Tidak ada data BIAS pada periode ini.</p>`;
-            return;
-          }
-
-          let biasHtml = `
-            <div style="margin-bottom:10px; background:#F0F7FF; padding:10px 12px; border-radius:8px; font-size:0.82rem;">
-              <strong>BIAS:</strong> ${bln === 'ALL' ? 'Semua Bulan' : 'Bulan ' + BULAN_NAME_MAP[bln]} ${thn} | 
-              <strong>Desa:</strong> ${desaSel === 'ALL' ? 'Semua Desa' : desaSel}
-            </div>
-            <table class="kohort-table">
-              <thead>
-                <tr>
-                  <th>Sekolah</th><th>Desa</th><th>Kls</th><th>Vaksin</th><th>Tgl</th>
-                  <th>Sas L</th><th>Sas P</th><th>Cap L</th><th>Cap P</th><th>Total</th><th>DO</th><th>Petugas</th>
-                </tr>
-              </thead>
-              <tbody>
-          `;
-
-          let sumSasL = 0, sumSasP = 0, sumCapL = 0, sumCapP = 0, sumDO = 0;
-          biasRows.forEach(b => {
-            const data = b.data || {};
-            const capL = data.Capaian_L || 0, capP = data.Capaian_P || 0;
-            const sasL = data.Sasaran_L || 0, sasP = data.Sasaran_P || 0;
-            const doVal = data.DropOut || 0;
-
-            sumSasL += sasL; sumSasP += sasP; sumCapL += capL; sumCapP += capP; sumDO += doVal;
-
-            biasHtml += `
-              <tr>
-                <td style="text-align:left; font-weight:700;">${b.sekolah}</td>
-                <td>Desa ${b.desa}</td>
-                <td>Kls ${b.kelas}</td>
-                <td><span class="v-given">${b.jenis_vaksin}</span></td>
-                <td>${b.tanggal}</td>
-                <td>${sasL}</td><td>${sasP}</td><td>${capL}</td><td>${capP}</td>
-                <td style="font-weight:800; color:var(--primary);">${capL + capP}</td>
-                <td>${doVal}</td>
-                <td>${b.last_updated_by || '-'}</td>
-              </tr>
-            `;
-          });
-
-          biasHtml += `
-              </tbody>
-              <tfoot>
-                <tr style="background:#E2E8F0; font-weight:bold;">
-                  <td colspan="5" style="text-align:left; color:var(--accent);">TOTAL BIAS:</td>
-                  <td>${sumSasL}</td><td>${sumSasP}</td><td>${sumCapL}</td><td>${sumCapP}</td>
-                  <td style="color:var(--primary);">${sumCapL + sumCapP}</td>
-                  <td>${sumDO}</td>
-                  <td>-</td>
-                </tr>
-              </tfoot>
-            </table>
-          `;
-
-          container.innerHTML = biasHtml;
-          return;
-        }
-
-        const snap = await getDocs(collection(db, COL_KOHORT));
-        let activeVaccineKeys = getActiveVaccineKeysByCategory(katSel);
-        let filteredDocs = [];
-
-        snap.forEach(doc => {
-          const d = doc.data();
-          const matchDesa = (desaSel === 'ALL' || (d.desa && d.desa.toLowerCase() === desaSel.toLowerCase()));
-
-          let hasMatchingVaccineInKat = false;
-          activeVaccineKeys.forEach(vKey => {
-            const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
-            const vDate = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
-            if (isVaccineGivenExactMonth(vDate, thn, bln)) {
-              hasMatchingVaccineInKat = true;
-            }
-          });
-
-          if (matchDesa && hasMatchingVaccineInKat) {
-            filteredDocs.push(d);
-          }
-        });
-
-        const vTotals = {};
-        activeVaccineKeys.forEach(v => vTotals[v] = 0);
-
-        let rowsHtml = '';
-        filteredDocs.forEach(d => {
-          let vCols = '';
-
-          activeVaccineKeys.forEach(vKey => {
-            const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
-            const val = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
-            if (isVaccineGivenExactMonth(val, thn, bln)) {
-              vTotals[vKey] += 1;
-              vCols += `<td><span class="v-given">✓ (${val})</span></td>`;
-            } else {
-              vCols += `<td style="color:#CBD5E1;">-</td>`;
-            }
-          });
-
-          rowsHtml += `
-            <tr>
-              <td class="sticky-col-1">${d.nama_anak}</td>
-              <td class="sticky-col-2">${d.tgl_lahir || '-'}</td>
-              <td>${d.jk || '-'}</td>
-              <td>${d.nama_ibu || '-'}</td>
-              <td>${d.wa_anak || '-'}</td>
-              <td>${d.desa || '-'}</td>
-              ${vCols}
-            </tr>
-          `;
-        });
-
-        let totalColsHtml = '';
-        activeVaccineKeys.forEach(vKey => {
-          totalColsHtml += `<td style="text-align:center; font-weight:800; color:var(--primary);">${vTotals[vKey]}</td>`;
-        });
-
-        let headerVColsHtml = '';
-        activeVaccineKeys.forEach(vKey => {
-          headerVColsHtml += `<th>${vKey}</th>`;
-        });
-
-        let html = `
-          <div style="margin-bottom:10px; background:#F0F7FF; padding:10px 12px; border-radius:8px; font-size:0.82rem;">
-            <strong>Periode:</strong> ${bln === 'ALL' ? 'Semua Bulan' : 'Bulan ' + BULAN_NAME_MAP[bln]} ${thn} | 
-            <strong>Desa:</strong> ${desaSel === 'ALL' ? 'Semua Desa' : desaSel} | 
-            <strong>Kategori Filter:</strong> ${katSel}
-          </div>
-          <table class="kohort-table">
-            <thead>
-              <tr>
-                <th class="sticky-col-1" rowspan="2">Nama Sasaran</th>
-                <th class="sticky-col-2" rowspan="2">Tgl Lahir</th>
-                <th rowspan="2">L/P</th>
-                <th rowspan="2">Orang Tua/Suami</th>
-                <th rowspan="2">WhatsApp</th>
-                <th rowspan="2">Desa</th>
-                <th colspan="${activeVaccineKeys.length}">Imunisasi Terfilter</th>
-              </tr>
-              <tr>
-                ${headerVColsHtml}
-              </tr>
-            </thead>
-            <tbody>
-              ${rowsHtml || '<tr><td colspan="36" style="text-align:center;">Tidak ada data pada filter ini.</td></tr>'}
-            </tbody>
-            <tfoot>
-              <tr style="background:#E2E8F0; font-weight:bold;">
-                <td class="sticky-col-1" colspan="2" style="text-align:left; color:var(--accent);">TOTAL DOSIS:</td>
-                <td>-</td><td>-</td><td>-</td><td>-</td>
-                ${totalColsHtml}
-              </tr>
-            </tfoot>
-          </table>
-        `;
-
-        container.innerHTML = html;
-      } catch (err) { container.innerHTML = `<p style="color:red; text-align:center;">Error: ${err.message}</p>`; }
-    }
-
-    async function downloadExcel3Sheets() {
-      const thn = document.getElementById('filter_tahun').value || document.getElementById('exp_filter_tahun').value;
-      const bln = document.getElementById('filter_bulan').value || document.getElementById('exp_filter_bulan').value;
-      const desaSel = document.getElementById('filter_desa').value || document.getElementById('exp_filter_desa').value;
-
-      const monthNameStr = BULAN_NAME_MAP[bln] || bln;
-
-      try {
-        const snap = await getDocs(collection(db, COL_KOHORT));
-        let allDocsInDb = [];
-        snap.forEach(doc => allDocsInDb.push(doc.data()));
-
-        // SHEET 1: KOHORT MATRIKS
-        const sheet1Data = [];
-        sheet1Data.push([`LAPORAN REGISTER KOHORT MATRIKS - PUSKESMAS MELATA`]);
-        sheet1Data.push([`Periode Matriks: s/d ${monthNameStr} ${thn} | Wilayah: ${desaSel === 'ALL' ? 'Semua Desa' : desaSel}`]);
-        sheet1Data.push([]);
-
-        const headerRow1 = ["No", "Desa", "Nama Sasaran", "Posyandu/Pustu", "Tanggal Lahir", "L/P", "Orang Tua / Suami", "WhatsApp", "Alamat / RT"];
-        ALL_VAKSIN_KEYS.forEach(v => headerRow1.push(v));
-        headerRow1.push("Penginput Terakhir");
-        sheet1Data.push(headerRow1);
-
-        let rowNum = 1;
-        allDocsInDb.forEach(d => {
-          if (desaSel !== 'ALL' && d.desa && d.desa.toLowerCase() !== desaSel.toLowerCase()) return;
-
-          const row = [
-            rowNum++, d.desa || '', d.nama_anak || '', d.kegiatan || '',
-            d.tgl_lahir || '', d.jk || '', d.nama_ibu || '', d.wa_anak || '-', d.alamat_rt || ''
-          ];
-
-          ALL_VAKSIN_KEYS.forEach(vKey => {
-            const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
-            const val = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
-            row.push(val || "-");
-          });
-
-          row.push(d.last_updated_by || '-');
-          sheet1Data.push(row);
-        });
-
-        // SHEET 2: REKAPAN TOTAL PENERIMA
-        const sheet2Data = [];
-        sheet2Data.push([`REKAPITULASI TOTAL PENERIMA VAKSIN PER ANTIGEN - PUSKESMAS MELATA`]);
-        sheet2Data.push([`Wilayah: Semua Desa (13 Desa) | Periode: ${monthNameStr} ${thn}`]);
-        sheet2Data.push([]);
-
-        const s2_h1 = ["No", "Desa / Kelurahan", "Kategori Wilayah", "Target Bayi"];
-        const s2_h2 = ["", "", "", ""];
-
-        ALL_VAKSIN_KEYS.forEach(vk => {
-          s2_h1.push(vk, "", "");
-          s2_h2.push("(L)", "(P)", "Total");
-        });
-
-        s2_h1.push("Bayi IDL", "Capaian IDL (%)");
-        s2_h2.push("", "");
-
-        sheet2Data.push(s2_h1);
-        sheet2Data.push(s2_h2);
-
-        ALL_DESA_LIST.forEach((dName, idx) => {
-          const desaDocs = allDocsInDb.filter(d => d.desa && d.desa.toLowerCase() === dName.toLowerCase());
-          const targetBayi = 25 + (idx * 3);
-          
-          const row_data = [
-            idx + 1, dName,
-            DESA_DALAM_WILAYAH.includes(dName) ? 'Dalam Wilayah' : 'Luar Wilayah',
-            targetBayi
-          ];
-
-          let idlCount = 0;
-
-          ALL_VAKSIN_KEYS.forEach(vKey => {
-            let lCount = 0, pCount = 0;
-            desaDocs.forEach(d => {
-              const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
-              const val = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
-              if (val) {
-                if (d.jk === 'L') lCount++; else pCount++;
-              }
-            });
-            row_data.push(lCount, pCount, lCount + pCount);
-          });
-
-          desaDocs.forEach(d => {
-            const getV = (vk) => d[`vaksin_${vk.replace(/[\s\(\)<>-]/g, '_')}`];
-            if (getV("HBO (<24 Jam)") && getV("BCG") && getV("DPT-HB-Hib3") && getV("OPV4") && getV("IPV1") && getV("Campak Rubela-1")) {
-              idlCount++;
-            }
-          });
-
-          const persen = targetBayi > 0 ? ((idlCount / targetBayi) * 100).toFixed(1) : "0.0";
-          row_data.push(idlCount, `${persen}%`);
-          sheet2Data.push(row_data);
-        });
-
-        // SHEET 3: REKAPAN LOGISTIK DENGAN HEADER "PEMAKAIAN" DAN "KUMULATIF"
-        const sheet3Data = [];
-        sheet3Data.push([`REKAPITULASI PEMAKAIAN LOGISTIK VAKSIN PER DESA - PUSKESMAS MELATA`]);
-        sheet3Data.push([`Periode: ${monthNameStr} ${thn} | Matriks 13 Desa`]);
-        sheet3Data.push([]);
-
-        const ROUTINE_GROUPS = [
-          { name: "Hepatitis B (HB-0)", doses: 1, unit: "Uniject", key: "HBO" },
-          { name: "BCG", doses: 10, unit: "Vial", key: "BCG" },
-          { name: "DPT-HB-Hib", doses: 4, unit: "Vial", key: "DPT-HB-Hib" },
-          { name: "Polio Oral (OPV)", doses: 7, unit: "Vial", key: "OPV" },
-          { name: "PCV", doses: 3, unit: "Vial", key: "PCV" },
-          { name: "Rotavirus", doses: 4, unit: "Vial", key: "Rotavirus" },
-          { name: "Polio Suntik (IPV)", doses: 4, unit: "Vial", key: "IPV" },
-          { name: "Campak Rubela (MR)", doses: 8, unit: "Vial", key: "Campak/MR" },
-          { name: "Td / TT", doses: 8, unit: "Vial", key: "Td/TT" }
-        ];
-
-        const s3_h1 = ["No", "Nama Desa / Kelurahan", "Kategori Wilayah"];
-        const s3_h2 = ["", "", ""];
-
-        ROUTINE_GROUPS.forEach(g => {
-          s3_h1.push(`${g.name} (${g.unit})`, "");
-          s3_h2.push("Pemakaian", "Kumulatif");
-        });
-
-        s3_h1.push("Total Dosis Rutin", "Total Pemakaian Kemasan");
-        s3_h2.push("", "");
-
-        sheet3Data.push(s3_h1);
-        sheet3Data.push(s3_h2);
-
-        ALL_DESA_LIST.forEach((dName, idx) => {
-          const desaDocs = allDocsInDb.filter(d => d.desa && d.desa.toLowerCase() === dName.toLowerCase());
-          const row = [idx + 1, dName, DESA_DALAM_WILAYAH.includes(dName) ? 'Dalam Wilayah' : 'Luar Wilayah'];
-
-          let totDosisDesa = 0;
-          let totVialDesa = 0;
-
-          ROUTINE_GROUPS.forEach(g => {
-            let dosisBln = 0;
-            desaDocs.forEach(d => {
-              ALL_VAKSIN_KEYS.forEach(vk => {
-                if (getGroupKey(vk) === g.key) {
-                  const fieldKey = `vaksin_${vk.replace(/[\s\(\)<>-]/g, '_')}`;
-                  if (d[fieldKey]) dosisBln++;
-                }
-              });
-            });
-
-            const vialBln = Math.ceil(dosisBln / g.doses);
-            const vialKum = vialBln * 6;
-
-            totDosisDesa += dosisBln;
-            totVialDesa += vialBln;
-
-            row.push(vialBln, vialKum);
-          });
-
-          row.push(totDosisDesa, totVialDesa);
-          sheet3Data.push(row);
-        });
-
-        const wb = XLSX.utils.book_new();
-        const ws1 = XLSX.utils.aoa_to_sheet(sheet1Data);
-        const ws2 = XLSX.utils.aoa_to_sheet(sheet2Data);
-        const ws3 = XLSX.utils.aoa_to_sheet(sheet3Data);
-
-        ws1['!cols'] = sheet1Data[3].map((_, colIdx) => {
-          let maxLen = 8;
-          sheet1Data.forEach((row, rowIdx) => {
-            if (rowIdx >= 3) {
-              const val = row[colIdx] !== undefined && row[colIdx] !== null ? String(row[colIdx]) : '';
-              if (val.length > maxLen) maxLen = val.length;
-            }
-          });
-          return { wch: Math.min(maxLen + 3, 35) };
-        });
-
-        ws1['!views'] = [{ state: 'frozen', xSplit: 3, ySplit: 4 }];
-        ws2['!views'] = [{ state: 'frozen', xSplit: 2, ySplit: 5 }];
-        ws3['!views'] = [{ state: 'frozen', xSplit: 2, ySplit: 5 }];
-
-        ws2['!merges'] = [
-          { s: { r: 3, c: 0 }, e: { r: 4, c: 0 } },
-          { s: { r: 3, c: 1 }, e: { r: 4, c: 1 } },
-          { s: { r: 3, c: 2 }, e: { r: 4, c: 2 } },
-          { s: { r: 3, c: 3 }, e: { r: 4, c: 3 } }
-        ];
-
-        let colIndexS2 = 4;
-        ALL_VAKSIN_KEYS.forEach(() => {
-          ws2['!merges'].push({ s: { r: 3, c: colIndexS2 }, e: { r: 3, c: colIndexS2 + 2 } });
-          colIndexS2 += 3;
-        });
-
-        ws3['!merges'] = [
-          { s: { r: 3, c: 0 }, e: { r: 4, c: 0 } },
-          { s: { r: 3, c: 1 }, e: { r: 4, c: 1 } },
-          { s: { r: 3, c: 2 }, e: { r: 4, c: 2 } }
-        ];
-
-        let colIndexS3 = 3;
-        ROUTINE_GROUPS.forEach(() => {
-          ws3['!merges'].push({ s: { r: 3, c: colIndexS3 }, e: { r: 3, c: colIndexS3 + 1 } });
-          colIndexS3 += 2;
-        });
-
-        XLSX.utils.book_append_sheet(wb, ws1, "Register Kohort Matriks");
-        XLSX.utils.book_append_sheet(wb, ws2, "Rekapan Total Penerima");
-        XLSX.utils.book_append_sheet(wb, ws3, "Rekapan Logistik Vaksin");
-
-        XLSX.writeFile(wb, `Laporan_Imunisasi_Melata_A4_Landscape_${bln}_${thn}.xlsx`);
-
-      } catch (err) { alert("Gagal download Excel: " + err.message); }
-    }
-
-    async function doExportFiltered(format) {
-      if (format === 'json') exportDatabase();
-      else downloadExcel3Sheets();
-    }
-
-    function initBiasDropdowns() {
-      const sekolahSelect = document.getElementById('sekolah');
-      sekolahSelect.innerHTML = '<option value="">-- Pilih Sekolah --</option>';
-      Object.keys(SCHOOL_DATA).forEach(school => { sekolahSelect.innerHTML += `<option value="${school}">${school}</option>`; });
-    }
-
-    function onChangeSekolah() {
-      const sekolah = document.getElementById('sekolah').value;
-      const classContainer = document.getElementById('biasClassReportsContainer');
-      const addButton = document.getElementById('addBiasClassButton');
-      classContainer.innerHTML = ''; classInputCounter = 0;
-      if (SCHOOL_DATA[sekolah]) {
-          addNewClassInput(); addButton.disabled = false; addButton.style.opacity = 1;
-      } else {
-          classContainer.innerHTML = '<p class="muted">Pilih sekolah untuk mengaktifkan form kelas.</p>';
-          addButton.disabled = true; addButton.style.opacity = 0.5;
-      }
-    }
-
-    function addNewClassInput() {
-      const sekolah = document.getElementById('sekolah').value;
-      if (!sekolah) return;
-      const schoolType = SCHOOL_DATA[sekolah];
-      classInputCounter++; const blockId = classInputCounter;
-      const container = document.getElementById('biasClassReportsContainer');
-      const html = `
-        <div class="card" id="block_${blockId}" style="background:#F8FAFC; border:1px solid var(--border-color); margin-bottom:10px; padding:12px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                <h4 style="margin:0; font-size:0.88rem; font-weight:700; color:var(--primary)">Input Kelas BIAS #${blockId}</h4>
-                <button type="button" class="btn btn-danger" onclick="this.closest('.card').remove()" style="padding:3px 6px; font-size:0.72rem;"><i class="fas fa-times"></i> Hapus</button>
-            </div>
-            <div class="grid" style="grid-template-columns: 1fr 1fr;">
-                <div class="form-group">
-                    <label>Kelas <span class="req">*</span></label>
-                    <select id="kelas_${blockId}" required></select>
-                </div>
-                <div class="form-group">
-                    <label style="color:var(--primary)">Vaksin BIAS <span class="req">*</span></label>
-                    <select id="jenis_vaksin_${blockId}" required style="border: 2px solid var(--primary);">
-                        <option value="MR">MR</option>
-                        <option value="DT">DT</option>
-                        <option value="Td">Td</option>
-                        <option value="HPV">HPV</option>
-                    </select>
-                </div>
-                <div class="form-group"><label>Sasaran L <span class="req">*</span></label><select id="sasaran_l_${blockId}" class="bias-num" required></select></div>
-                <div class="form-group"><label>Sasaran P <span class="req">*</span></label><select id="sasaran_p_${blockId}" class="bias-num" required></select></div>
-                <div class="form-group"><label>Capaian L <span class="req">*</span></label><select id="capaian_l_${blockId}" class="bias-num" required></select></div>
-                <div class="form-group"><label>Capaian P <span class="req">*</span></label><select id="capaian_p_${blockId}" class="bias-num" required></select></div>
-                <div class="form-group full-width"><label>Drop Out</label><select id="dropout_${blockId}" class="bias-num"></select></div>
-            </div>
-        </div>
-      `;
-      container.insertAdjacentHTML('beforeend', html);
-      const classSel = document.getElementById(`kelas_${blockId}`);
-      classSel.innerHTML = '<option value="" disabled selected>-- Pilih --</option>';
-      CLASS_MAP[schoolType].forEach(c => classSel.innerHTML += `<option value="${c}">${c}</option>`);
-      container.querySelectorAll('.bias-num').forEach(s => {
-        if(s.children.length === 0){
-          s.innerHTML = '<option value="0">0</option>';
-          for(let i=1;i<=200;i++) s.innerHTML += `<option value="${i}">${i}</option>`;
-        }
+      document.getElementById('btnShowCert').addEventListener('click', () => {
+        window.generateAndShowCertificate();
       });
-    }
+      document.getElementById('btnHideCert').addEventListener('click', () => {
+        document.getElementById('certificatePrintArea').style.display = 'none';
+      });
 
-    async function handleSaveBias(e) {
-      e.preventDefault();
+      // Compare / Duplicate Modal Actions
+      document.getElementById('btnCloseCompareModal').addEventListener('click', () => {
+        document.getElementById('duplicateCompareModal').style.display = 'none';
+      });
+      document.getElementById('btnForceCreateNew').addEventListener('click', () => {
+        document.getElementById('duplicateCompareModal').style.display = 'none';
+      });
 
-      if (!activePetugasName) {
-        document.getElementById('loginModal').style.display = 'flex';
-        return alert("Silakan login terlebih dahulu!");
-      }
+      // Admin Controls
+      document.getElementById('btnToggleAdminPengaturan').addEventListener('click', () => {
+        const panel = document.getElementById('panelAdminPengaturan');
+        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+      });
 
-      const sekolah = document.getElementById('sekolah').value;
-      const classBlocks = document.querySelectorAll('#biasClassReportsContainer .card');
-      if (!sekolah || classBlocks.length === 0) return alert("Pilih sekolah dan minimal 1 data kelas.");
-      
-      const tanggal = new Date().toISOString().slice(0,10);
-      try {
-        for (let block of classBlocks) {
-          const blockId = block.id.replace('block_', '');
-          const kelas = document.getElementById(`kelas_${blockId}`).value;
-          const jenisVaksinBias = document.getElementById(`jenis_vaksin_${blockId}`).value;
-          const sasL = parseInt(document.getElementById(`sasaran_l_${blockId}`).value) || 0;
-          const sasP = parseInt(document.getElementById(`sasaran_p_${blockId}`).value) || 0;
-          const capL = parseInt(document.getElementById(`capaian_l_${blockId}`).value) || 0;
-          const capP = parseInt(document.getElementById(`capaian_p_${blockId}`).value) || 0;
-          const doVal = parseInt(document.getElementById(`dropout_${blockId}`).value) || 0;
-          
-          const docId = `${tanggal}_${sekolah}_kls${kelas}_${jenisVaksinBias}`.replace(/[\s\/]/g, '_').toLowerCase();
-          await setDoc(doc(db, COL_BIAS, docId), {
-            sekolah, kelas, tanggal, jenis_vaksin: jenisVaksinBias,
-            data: { Sasaran_L: sasL, Sasaran_P: sasP, Capaian_L: capL, Capaian_P: capP, DropOut: doVal },
-            updated_at: new Date().toISOString(),
-            last_updated_by: activePetugasName
-          }, { merge: true });
-        }
-        alert(`✅ Laporan BIAS ${sekolah} Disimpan ke Cloud oleh ${activePetugasName}!`);
-        e.target.reset(); onChangeSekolah();
-      } catch (err) { alert("❌ Error BIAS: " + err.message); }
-    }
+      document.getElementById('btnLogoutPetugas').addEventListener('click', () => {
+        localStorage.removeItem("imun_petugas_name");
+        activePetugas = "Petugas";
+        checkAuth();
+      });
 
-    async function exportDatabase() {
-      try {
-        const snap = await getDocs(collection(db, COL_KOHORT));
-        const backup = { register_imunisasi: [], date: new Date().toISOString() };
-        snap.forEach(d => backup.register_imunisasi.push(d.data()));
-        const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Backup_Kohort_Firebase_${new Date().toISOString().slice(0,10)}.json`; a.click();
-      } catch (err) { alert("Gagal Backup: " + err.message); }
-    }
-
-    async function startImport() {
-      const fileInput = document.getElementById('importFile'); const status = document.getElementById('importStatus');
-      if (!fileInput.files[0]) return alert("Pilih file CSV atau JSON!");
-      status.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Menyinkronkan...`;
-
-      for (let i = 0; i < fileInput.files.length; i++) {
-        const file = fileInput.files[i];
-        const reader = new FileReader();
-
-        reader.onload = async (e) => {
-          try {
-            let count = 0;
-            if (file.name.endsWith('.json')) {
-              const json = JSON.parse(e.target.result);
-              if (json.register_imunisasi) {
-                for (let r of json.register_imunisasi) {
-                  const uniqueChildId = `${r.desa}_${r.nama_anak}_${r.tgl_lahir}`.replace(/[\s\/]/g, '_').toLowerCase();
-                  await setDoc(doc(db, COL_KOHORT, uniqueChildId), r, { merge: true }); count++;
-                }
-              }
-            } else if (file.name.endsWith('.csv')) {
-              const text = e.target.result;
-              const lines = text.split('\n');
-              for (let j = 1; j < lines.length; j++) {
-                if (!lines[j].trim() || lines[j].startsWith('"TOTAL_CAPAIAN_DOSIS"')) continue;
-                const cols = lines[j].split(';').map(c => c.replace(/"/g, '').trim());
-                if (cols.length >= 6) {
-                  const uniqueChildId = `${cols[0]}_${cols[2]}_${cols[3]}`.replace(/[\s\/]/g, '_').toLowerCase();
-                  const payload = {
-                    desa: cols[0], kegiatan: cols[1], nama_anak: cols[2], tgl_lahir: cols[3], jk: cols[4], nama_ibu: cols[5],
-                    updated_at: new Date().toISOString()
-                  };
-                  ALL_VAKSIN_KEYS.forEach((vKey, idx) => {
-                    if (cols[6 + idx] && cols[6 + idx] !== '-') {
-                      payload[`vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`] = cols[6 + idx];
-                    }
-                  });
-                  await setDoc(doc(db, COL_KOHORT, uniqueChildId), payload, { merge: true }); count++;
-                }
-              }
-            }
-            status.innerHTML = `<div class="alert-banner" style="background:#D1FAE5; color:#065F46; border-color:#6EE7B7;">Sinkronisasi ${count} data berhasil!</div>`;
-            refreshCacheGlobalData();
-            loadRecentTransactions();
-          } catch (err) { status.innerHTML = `<div class="alert-banner" style="background:#FEE2E2; color:#991B1B; border-color:#FCA5A5;">Error Import: ${err.message}</div>`; }
-        };
-
-        reader.readAsText(file);
-      }
-    }
+      // Search Desa Change
+      document.getElementById('search_desa_anak').addEventListener('change', () => {
+        renderPreviewTables();
+      });
+      document.getElementById('btnRefreshPreview').addEventListener('click', () => {
+        fetchAllData();
+      });
+      document.getElementById('btnApplyCatchUp').addEventListener('click', () => {
+        executeCatchUpAnalysis();
+      });
+    });
   </script>
 </body>
 </html>

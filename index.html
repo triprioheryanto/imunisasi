@@ -26,7 +26,10 @@
       --border-color: #e2e8f0;
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       margin: 0;
@@ -35,7 +38,9 @@
       line-height: 1.5;
     }
 
-    /* HEADER & NAVIGATION BAR WITH ANIMATED DROPDOWNS */
+    /* ==========================================================================
+       HEADER & NAVIGATION BAR WITH DROPDOWN MENU
+       ========================================================================== */
     .app-header {
       background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
       color: #fff;
@@ -112,12 +117,12 @@
       transform: rotate(180deg);
     }
 
-    /* MENU DROPDOWN ANIMATED */
+    /* ANIMATED DROPDOWN MENU */
     .dropdown-menu {
       position: absolute;
       top: calc(100% + 8px);
       left: 0;
-      min-width: 240px;
+      min-width: 250px;
       background: #ffffff;
       border-radius: 12px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.05);
@@ -161,6 +166,9 @@
       font-size: 0.95rem;
     }
 
+    /* ==========================================================================
+       LAYOUT CONTAINER & CARD COMPONENTS
+       ========================================================================== */
     .wrap {
       max-width: 1380px;
       margin: 24px auto;
@@ -204,7 +212,9 @@
       position: relative;
     }
 
-    .form-group.full-width { grid-column: 1 / -1; }
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
 
     label {
       font-size: 0.82rem;
@@ -212,9 +222,11 @@
       color: #334155;
     }
 
-    .req { color: var(--danger); }
+    .req {
+      color: var(--danger);
+    }
 
-    input[type="text"], input[type="date"], select {
+    input[type="text"], input[type="date"], input[type="password"], select {
       padding: 9px 12px;
       border: 1px solid var(--border-color);
       border-radius: 8px;
@@ -244,7 +256,9 @@
       transition: background 0.2s;
     }
 
-    .btn-ocr-cam:hover { background: #e2e8f0; }
+    .btn-ocr-cam:hover {
+      background: #e2e8f0;
+    }
 
     .search-results-dropdown {
       position: absolute;
@@ -268,7 +282,9 @@
       font-size: 0.82rem;
     }
 
-    .search-result-item:hover { background: #f8fafc; }
+    .search-result-item:hover {
+      background: #f8fafc;
+    }
 
     .vaccine-selection-box {
       border: 1px solid var(--border-color);
@@ -319,24 +335,98 @@
       transition: all 0.2s;
     }
 
-    .btn-primary { background: var(--primary); color: #fff; }
-    .btn-primary:hover { background: var(--primary-dark); }
-    .btn-ghost { background: transparent; border: 1px solid var(--border-color); color: var(--text-muted); }
-    .btn-ghost:hover { background: #f1f5f9; }
-    .btn-success { background: var(--success); color: #fff; }
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
 
-    /* TABEL KOHORT */
-    .table-container { overflow-x: auto; margin-top: 14px; }
-    .kohort-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; white-space: nowrap; }
-    .kohort-table th, .kohort-table td { padding: 10px; border: 1px solid var(--border-color); text-align: left; }
-    .kohort-table th { background: #f1f5f9; font-weight: 700; }
-    .v-given { color: var(--success); font-weight: bold; }
-    .badge-warning-custom { background: #fef3c7; color: #b45309; padding: 2px 6px; border-radius: 4px; font-size: 0.72rem; }
-    .badge-user { color: #fff; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; }
-    .badge-urgent { background: #fee2e2; color: #dc2626; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; }
-    .alert-banner { background: #fffbebfb; border: 1px solid #fef08a; padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; color: #b45309; margin-bottom: 12px; }
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
 
-    /* MODAL OVERLAYS */
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+    }
+
+    .btn-ghost:hover {
+      background: #f1f5f9;
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: #fff;
+    }
+
+    /* ==========================================================================
+       TABEL REGISTER KOHORT
+       ========================================================================== */
+    .table-container {
+      overflow-x: auto;
+      margin-top: 14px;
+    }
+
+    .kohort-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+      white-space: nowrap;
+    }
+
+    .kohort-table th, .kohort-table td {
+      padding: 10px;
+      border: 1px solid var(--border-color);
+      text-align: left;
+    }
+
+    .kohort-table th {
+      background: #f1f5f9;
+      font-weight: 700;
+    }
+
+    .v-given {
+      color: var(--success);
+      font-weight: bold;
+    }
+
+    .badge-warning-custom {
+      background: #fef3c7;
+      color: #b45309;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+    }
+
+    .badge-user {
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+    }
+
+    .badge-urgent {
+      background: #fee2e2;
+      color: #dc2626;
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+
+    .alert-banner {
+      background: #fffbebfb;
+      border: 1px solid #fef08a;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      color: #b45309;
+      margin-bottom: 12px;
+    }
+
+    /* ==========================================================================
+       MODAL OVERLAYS
+       ========================================================================== */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -348,7 +438,9 @@
       justify-content: center;
     }
 
-    /* PREVIEW SERTIFIKAT A4 LANDSCAPE (CLEAN VERSION - TANPA LOGO / WATERMARK) */
+    /* ==========================================================================
+       PREVIEW SERTIFIKAT A4 LANDSCAPE (TANPA LOGO & WATERMARK)
+       ========================================================================== */
     .cert-preview-wrapper {
       display: flex;
       justify-content: center;
@@ -393,6 +485,7 @@
       border-color: #003366;
       border-style: solid;
     }
+
     .cert-corner-tl { top: 4px; left: 4px; border-width: 2px 0 0 2px; }
     .cert-corner-tr { top: 4px; right: 4px; border-width: 2px 2px 0 0; }
     .cert-corner-bl { bottom: 4px; left: 4px; border-width: 0 0 2px 2px; }
@@ -404,18 +497,66 @@
       padding-bottom: 8px;
     }
 
-    .cert-header-text-box h3 { margin: 0; font-size: 14px; letter-spacing: 1px; color: #334155; }
-    .cert-header-text-box h2 { margin: 2px 0; font-size: 22px; color: #003366; font-weight: 800; }
-    .cert-header-text-box p { margin: 0; font-size: 10px; color: #64748b; }
+    .cert-header-text-box h3 {
+      margin: 0;
+      font-size: 14px;
+      letter-spacing: 1px;
+      color: #334155;
+    }
 
-    .cert-title-box { text-align: center; margin: 12px 0; }
-    .cert-main-title { font-size: 20px; font-weight: 800; color: #003366; letter-spacing: 1.5px; text-decoration: underline; }
-    .cert-no-text { font-size: 11px; color: #475569; margin-top: 2px; }
+    .cert-header-text-box h2 {
+      margin: 2px 0;
+      font-size: 22px;
+      color: #003366;
+      font-weight: 800;
+    }
 
-    .cert-field-table { width: 100%; font-size: 12px; border-collapse: collapse; }
-    .cert-field-table td { padding: 4px 6px; border: none; }
-    .cert-field-label { width: 180px; font-weight: 600; color: #334155; }
-    .cert-field-val { font-weight: 700; color: #0f172a; }
+    .cert-header-text-box p {
+      margin: 0;
+      font-size: 10px;
+      color: #64748b;
+    }
+
+    .cert-title-box {
+      text-align: center;
+      margin: 12px 0;
+    }
+
+    .cert-main-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #003366;
+      letter-spacing: 1.5px;
+      text-decoration: underline;
+    }
+
+    .cert-no-text {
+      font-size: 11px;
+      color: #475569;
+      margin-top: 2px;
+    }
+
+    .cert-field-table {
+      width: 100%;
+      font-size: 12px;
+      border-collapse: collapse;
+    }
+
+    .cert-field-table td {
+      padding: 4px 6px;
+      border: none;
+    }
+
+    .cert-field-label {
+      width: 180px;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    .cert-field-val {
+      font-weight: 700;
+      color: #0f172a;
+    }
 
     .cert-photo-box-4x6 {
       width: 80px;
@@ -429,16 +570,41 @@
       color: #94a3b8;
     }
 
-    .cert-slogan { text-align: center; font-style: italic; font-size: 12px; color: #0369a1; font-weight: 600; }
+    .cert-slogan {
+      text-align: center;
+      font-style: italic;
+      font-size: 12px;
+      color: #0369a1;
+      font-weight: 600;
+    }
 
-    .cert-sig-area { display: flex; justify-content: space-between; font-size: 11px; text-align: center; margin-top: 10px; }
-    .cert-sig-col { width: 220px; display: flex; flex-direction: column; justify-content: space-between; height: 90px; }
+    .cert-sig-area {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      text-align: center;
+      margin-top: 10px;
+    }
 
-    /* PRINT LAYOUT */
+    .cert-sig-col {
+      width: 220px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 90px;
+    }
+
+    /* PRINT LAYOUT RULES */
     @media print {
-      body * { visibility: hidden; }
-      .no-print, .app-header, .site-footer { display: none !important; }
-      #certificatePrintArea, #certificatePrintArea * { visibility: visible; }
+      body * {
+        visibility: hidden;
+      }
+      .no-print, .app-header, .site-footer {
+        display: none !important;
+      }
+      #certificatePrintArea, #certificatePrintArea * {
+        visibility: visible;
+      }
       #certificatePrintArea {
         position: absolute;
         left: 0;
@@ -453,7 +619,10 @@
         width: 297mm;
         height: 210mm;
       }
-      @page { size: A4 landscape; margin: 0; }
+      @page {
+        size: A4 landscape;
+        margin: 0;
+      }
     }
   </style>
 </head>
@@ -936,7 +1105,7 @@
         </div>
         <div class="form-group" style="margin-bottom:16px;">
           <label>Password</label>
-          <input type="password" value="123456" required style="padding:9px 12px; border:1px solid var(--border-color); border-radius:8px;">
+          <input type="password" value="123456" required>
         </div>
         <button type="submit" class="btn btn-primary" style="width:100%;">Masuk Sistem</button>
       </form>

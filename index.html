@@ -1244,7 +1244,7 @@
       <!-- KARTU CETAK SERTIFIKAT IMUNISASI MEWAH A4 LANDSCAPE -->
       <div class="card" style="background: linear-gradient(135deg, #FFFDF5 0%, #FEFCE8 100%); border:1.5px solid #FDE047;">
         <h2><i class="fas fa-award" style="color:var(--warning)"></i> View / Cetak Sertifikat Imunisasi (A4 Horizontal / Landscape)</h2>
-        <p class="lead" style="font-size:0.82rem; margin-bottom:10px;">Pilih sasaran terdaftar untuk mencetak Sertifikat Imunisasi Elegan Orientasi Horizontal A4 dengan Watermark Logo Puskesmas Melata[cite: 4].</p>
+        <p class="lead" style="font-size:0.82rem; margin-bottom:10px;">Pilih sasaran terdaftar untuk mencetak Sertifikat Imunisasi Elegan Orientasi Horizontal A4 dengan Watermark Logo Puskesmas Melata.</p>
         
         <div class="grid">
           <div class="form-group">
@@ -3737,7 +3737,8 @@
             desaDocs.forEach(d => {
               const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
               const val = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
-              if (val) {
+              // PERBAIKAN: Tambahkan filter fungsi isVaccineGivenUpToMonth
+              if (val && isVaccineGivenUpToMonth(val, thn, bln)) {
                 if (d.jk === 'L') lCount++; else pCount++;
               }
             });
@@ -3762,22 +3763,10 @@
         sheet3Data.push([`Periode: ${monthNameStr} ${thn} | Matriks 13 Desa`]);
         sheet3Data.push([]);
 
-        const ROUTINE_GROUPS = [
-          { name: "Hepatitis B (HB-0)", doses: 1, unit: "Uniject", key: "HBO" },
-          { name: "BCG", doses: 10, unit: "Vial", key: "BCG" },
-          { name: "DPT-HB-Hib", doses: 4, unit: "Vial", key: "DPT-HB-Hib" },
-          { name: "Polio Oral (OPV)", doses: 7, unit: "Vial", key: "OPV" },
-          { name: "PCV", doses: 3, unit: "Vial", key: "PCV" },
-          { name: "Rotavirus", doses: 4, unit: "Vial", key: "Rotavirus" },
-          { name: "Polio Suntik (IPV)", doses: 4, unit: "Vial", key: "IPV" },
-          { name: "Campak Rubela (MR)", doses: 8, unit: "Vial", key: "Campak/MR" },
-          { name: "Td / TT", doses: 8, unit: "Vial", key: "Td/TT" }
-        ];
-
         const s3_h1 = ["No", "Nama Desa / Kelurahan", "Kategori Wilayah"];
         const s3_h2 = ["", "", ""];
 
-        ROUTINE_GROUPS.forEach(g => {
+        ANTIGEN_GROUPS.forEach(g => {
           s3_h1.push(`${g.name} (${g.unit})`, "");
           s3_h2.push("Pemakaian", "Kumulatif");
         });
@@ -3795,19 +3784,32 @@
           let totDosisDesa = 0;
           let totVialDesa = 0;
 
-          ROUTINE_GROUPS.forEach(g => {
+          // PERBAIKAN: Gunakan ANTIGEN_GROUPS dan implementasikan perhitungan dosis kumulatif yang nyata
+          ANTIGEN_GROUPS.forEach(g => {
             let dosisBln = 0;
+            let dosisKum = 0;
+
             desaDocs.forEach(d => {
               ALL_VAKSIN_KEYS.forEach(vk => {
-                if (getGroupKey(vk) === g.key) {
+                // Sesuaikan key dengan properti dari admin (g.group_key)
+                if (getGroupKey(vk) === g.group_key) {
                   const fieldKey = `vaksin_${vk.replace(/[\s\(\)<>-]/g, '_')}`;
-                  if (d[fieldKey]) dosisBln++;
+                  const val = d[fieldKey];
+                  
+                  const actualVal = val || (d.jenis_imunisasi === vk ? d.tanggal_pelayanan : null);
+                  
+                  // Filter untuk pemakaian spesifik bulan terpilih
+                  if (actualVal && isVaccineGivenExactMonth(actualVal, thn, bln)) dosisBln++;
+                  
+                  // Filter untuk pemakaian kumulatif s/d bulan terpilih
+                  if (actualVal && isVaccineGivenUpToMonth(actualVal, thn, bln)) dosisKum++;
                 }
               });
             });
 
-            const vialBln = Math.ceil(dosisBln / g.doses);
-            const vialKum = vialBln * 6;
+            // Gunakan variabel g.doses_per_vial dari pengaturan tab admin (fallback 1 untuk hindari error /0)
+            const vialBln = Math.ceil(dosisBln / (g.doses_per_vial || 1));
+            const vialKum = Math.ceil(dosisKum / (g.doses_per_vial || 1));
 
             totDosisDesa += dosisBln;
             totVialDesa += vialBln;
@@ -3859,7 +3861,7 @@
         ];
 
         let colIndexS3 = 3;
-        ROUTINE_GROUPS.forEach(() => {
+        ANTIGEN_GROUPS.forEach(() => {
           ws3['!merges'].push({ s: { r: 3, c: colIndexS3 }, e: { r: 3, c: colIndexS3 + 1 } });
           colIndexS3 += 2;
         });
@@ -4043,3 +4045,6 @@
   </script>
 </body>
 </html>
+```eof
+
+Saya telah menerapkan kedua perbaikan logika pemfilteran bulan di dalam iterasi Sheet 2, serta mengubah perhitungan logistik menggunakan konfigurasi `ANTIGEN_GROUPS` yang sesungguhnya di Sheet 3, dan semuanya telah dirangkum dalam satu file `.html` ini.

@@ -1793,9 +1793,64 @@
     let activePetugasName = "";
     let cachedGlobalKohortData = [];
 
+// --- PATCH PERBAIKAN LOGIN PETUGAS ---
     const AUTH_PASSWORD_PETUGAS = "sri26";
     const AUTH_ADMIN_USER = "admin";
     const AUTH_ADMIN_PASS = "adminsri26";
+
+    // Set default nama petugas aktif saat halaman dimuat
+    document.addEventListener("DOMContentLoaded", () => {
+      activePetugasName = "Tri Prio Heryanto";
+      const displayUser = document.getElementById("currentUserDisplay");
+      if (displayUser) {
+        displayUser.innerHTML = `<i class="fas fa-user-circle"></i> <span>Tri Prio Heryanto (Koordinator)</span>`;
+      }
+    });
+
+    // Perbaikan Handler Login Petugas (Line 645 - 675)
+    const formLoginPetugas = document.getElementById('formLoginPetugas');
+    if (formLoginPetugas) {
+      formLoginPetugas.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const usernameInput = document.getElementById('login_username').value.trim();
+        const passwordInput = document.getElementById('login_password').value.trim();
+        const errorEl = document.getElementById('loginError');
+
+        if (!usernameInput || !passwordInput) {
+          errorEl.textContent = "Username dan password wajib diisi!";
+          errorEl.style.display = 'block';
+          return;
+        }
+
+        // Validasi Kredensial Admin atau Petugas
+        if ((usernameInput.toLowerCase() === AUTH_ADMIN_USER && passwordInput === AUTH_ADMIN_PASS) ||
+            passwordInput === AUTH_PASSWORD_PETUGAS) {
+          
+          activePetugasName = usernameInput.toLowerCase() === AUTH_ADMIN_USER ? AUTH_ADMIN_USER : "Tri Prio Heryanto";
+          
+          // Sembunyikan modal login
+          document.getElementById('loginModal').style.display = 'none';
+          errorEl.style.display = 'none';
+
+          // Perbarui badge tampilan header
+          const displayUser = document.getElementById('currentUserDisplay');
+          if (displayUser) {
+            displayUser.innerHTML = `<i class="fas fa-user-shield" style="color:var(--warning);"></i> <span>${activePetugasName === 'admin' ? 'Administrator' : 'Tri Prio Heryanto (Koordinator)'}</span>`;
+          }
+          
+          alert(`Berhasil masuk sebagai ${activePetugasName}!`);
+        } else {
+          errorEl.textContent = "Password salah! Gunakan password 'sri26' untuk petugas.";
+          errorEl.style.display = 'block';
+        }
+      });
+    }
+
+    window.logoutPetugas = function() {
+      document.getElementById('login_username').value = '';
+      document.getElementById('login_password').value = '';
+      document.getElementById('loginModal').style.display = 'flex';
+    };
 
     let currentOcrTargetId = "";
     let currentOcrMode = "single"; 

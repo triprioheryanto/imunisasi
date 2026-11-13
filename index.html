@@ -638,86 +638,32 @@
     <canvas id="cropCanvas" style="display:none;"></canvas>
   </div>
 
- // --- PATCH UTAMA LOGIN PETUGAS YANG DIPERBAIKI ---
-    const AUTH_PASSWORD_PETUGAS = "sri26";
-    const AUTH_ADMIN_USER = "admin";
-    const AUTH_ADMIN_PASS = "adminsri26";
+  <!-- MODAL LOGIN PETUGAS -->
+  <div id="loginModal" class="modal-overlay">
+    <div style="background:#fff; padding:28px; border-radius:16px; max-width:400px; width:100%; box-shadow:0 25px 40px rgba(0,0,0,0.2);">
+      <div style="text-align:center; margin-bottom:20px;">
+        <div style="width:55px; height:55px; background:linear-gradient(135deg, var(--accent), var(--accent-light)); color:#fff; border-radius:14px; display:inline-flex; align-items:center; justify-content:center; font-size:24px; margin-bottom:10px; box-shadow:0 8px 16px rgba(0,51,102,0.3);">
+          <i class="fas fa-user-shield"></i>
+        </div>
+        <h3 style="margin:0; color:var(--accent); font-size:1.2rem;">Autentikasi Petugas</h3>
+        <p style="font-size:0.85rem; color:var(--muted); margin-top:4px;">Sistem Register Imunisasi Puskesmas Melata</p>
+      </div>
 
-    document.addEventListener("DOMContentLoaded", function() {
-      // Pastikan modal login terbuka saat halaman pertama kali dimuat
-      const modalLogin = document.getElementById('loginModal');
-      if (modalLogin) {
-        modalLogin.style.display = 'flex';
-      }
+      <form id="formLoginPetugas">
+        <div class="form-group">
+          <label>Nama Petugas / Username <span class="req">*</span></label>
+          <input type="text" id="login_username" placeholder="Masukkan nama/username petugas" required>
+          <small id="login_device_hint" style="font-size:0.75rem; color:var(--info); margin-top:6px;"></small>
+        </div>
 
-      // Set default nama petugas aktif
-      activePetugasName = "Tri Prio Heryanto";
-      const displayUser = document.getElementById('currentUserDisplay');
-      if (displayUser) {
-        displayUser.innerHTML = `<i class="fas fa-user-circle"></i> <span>Tri Prio Heryanto</span>`;
-      }
+        <div class="form-group">
+          <label>Password Akun <span class="req">*</span></label>
+          <input type="password" id="login_password" placeholder="Masukkan password" required>
+        </div>
 
-      // Handler Form Login Petugas
-      const formLoginPetugas = document.getElementById('formLoginPetugas');
-      if (formLoginPetugas) {
-        formLoginPetugas.onsubmit = function(e) {
-          e.preventDefault();
-          
-          const usernameInput = document.getElementById('login_username').value.trim();
-          const passwordInput = document.getElementById('login_password').value.trim();
-          const errorEl = document.getElementById('loginError');
+        <div id="loginError" style="display:none; color:var(--danger); font-size:0.85rem; margin-bottom:12px; font-weight:700;"></div>
 
-          if (!usernameInput || !passwordInput) {
-            if (errorEl) {
-              errorEl.textContent = "Username dan password wajib diisi!";
-              errorEl.style.display = 'block';
-            }
-            return;
-          }
-
-          // Cek Kredensial Admin atau Petugas (Password: sri26)
-          const isAdmin = (usernameInput.toLowerCase() === AUTH_ADMIN_USER && passwordInput === AUTH_ADMIN_PASS);
-          const isPetugas = (passwordInput === AUTH_PASSWORD_PETUGAS);
-
-          if (isAdmin || isPetugas) {
-            activePetugasName = isAdmin ? AUTH_ADMIN_USER : "Tri Prio Heryanto";
-
-            // Sembunyikan modal login
-            if (modalLogin) {
-              modalLogin.style.display = 'none';
-            }
-            if (errorEl) {
-              errorEl.style.display = 'none';
-            }
-
-            // Update badge header
-            if (displayUser) {
-              displayUser.innerHTML = `<i class="fas fa-user-shield" style="color:#10B981;"></i> <span>${isAdmin ? 'Administrator' : 'Tri Prio Heryanto'}</span>`;
-            }
-
-            console.log("Login Berhasil sebagai:", activePetugasName);
-          } else {
-            if (errorEl) {
-              errorEl.textContent = "Password salah! Gunakan password 'sri26' untuk petugas.";
-              errorEl.style.display = 'block';
-            }
-          }
-        };
-      }
-    });
-
-    // Fungsi Global Logout / Ganti Petugas
-    window.logoutPetugas = function() {
-      const uField = document.getElementById('login_username');
-      const pField = document.getElementById('login_password');
-      const errEl = document.getElementById('loginError');
-      const modalLogin = document.getElementById('loginModal');
-
-      if (uField) uField.value = '';
-      if (pField) pField.value = '';
-      if (errEl) errEl.style.display = 'none';
-      if (modalLogin) modalLogin.style.display = 'flex';
-    };
+        <button type="submit" class="btn btn-primary" style="width:100%; height:46px;"><i class="fas fa-sign-in-alt"></i> Masuk Ke Sistem</button>
         
         <!-- Tombol Cek Jadwal Publik -->
         <div style="margin-top: 16px; text-align: center; border-top: 1px dashed var(--border-color); padding-top: 16px;">
@@ -1847,64 +1793,9 @@
     let activePetugasName = "";
     let cachedGlobalKohortData = [];
 
-// --- PATCH PERBAIKAN LOGIN PETUGAS ---
     const AUTH_PASSWORD_PETUGAS = "sri26";
     const AUTH_ADMIN_USER = "admin";
     const AUTH_ADMIN_PASS = "adminsri26";
-
-    // Set default nama petugas aktif saat halaman dimuat
-    document.addEventListener("DOMContentLoaded", () => {
-      activePetugasName = "Tri Prio Heryanto";
-      const displayUser = document.getElementById("currentUserDisplay");
-      if (displayUser) {
-        displayUser.innerHTML = `<i class="fas fa-user-circle"></i> <span>Tri Prio Heryanto (Koordinator)</span>`;
-      }
-    });
-
-    // Perbaikan Handler Login Petugas (Line 645 - 675)
-    const formLoginPetugas = document.getElementById('formLoginPetugas');
-    if (formLoginPetugas) {
-      formLoginPetugas.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const usernameInput = document.getElementById('login_username').value.trim();
-        const passwordInput = document.getElementById('login_password').value.trim();
-        const errorEl = document.getElementById('loginError');
-
-        if (!usernameInput || !passwordInput) {
-          errorEl.textContent = "Username dan password wajib diisi!";
-          errorEl.style.display = 'block';
-          return;
-        }
-
-        // Validasi Kredensial Admin atau Petugas
-        if ((usernameInput.toLowerCase() === AUTH_ADMIN_USER && passwordInput === AUTH_ADMIN_PASS) ||
-            passwordInput === AUTH_PASSWORD_PETUGAS) {
-          
-          activePetugasName = usernameInput.toLowerCase() === AUTH_ADMIN_USER ? AUTH_ADMIN_USER : "Tri Prio Heryanto";
-          
-          // Sembunyikan modal login
-          document.getElementById('loginModal').style.display = 'none';
-          errorEl.style.display = 'none';
-
-          // Perbarui badge tampilan header
-          const displayUser = document.getElementById('currentUserDisplay');
-          if (displayUser) {
-            displayUser.innerHTML = `<i class="fas fa-user-shield" style="color:var(--warning);"></i> <span>${activePetugasName === 'admin' ? 'Administrator' : 'Tri Prio Heryanto (Koordinator)'}</span>`;
-          }
-          
-          alert(`Berhasil masuk sebagai ${activePetugasName}!`);
-        } else {
-          errorEl.textContent = "Password salah! Gunakan password 'sri26' untuk petugas.";
-          errorEl.style.display = 'block';
-        }
-      });
-    }
-
-    window.logoutPetugas = function() {
-      document.getElementById('login_username').value = '';
-      document.getElementById('login_password').value = '';
-      document.getElementById('loginModal').style.display = 'flex';
-    };
 
     let currentOcrTargetId = "";
     let currentOcrMode = "single"; 
@@ -2747,472 +2638,137 @@
         XLSX.writeFile(wb, `Laporan_Imunisasi_Melata_Lengkap_${bln}_${thn}.xlsx`);
 
       } catch (err) { alert("Gagal download Excel: " + err.message); }
-    }<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Sistem Register Imunisasi & BIAS — Puskesmas Melata</title>
+    }<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, setDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  <!-- Google Fonts: Plus Jakarta Sans & Cinzel for Luxury Certificate Typography -->
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <!-- OCR Engine Library -->
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-  <!-- QR Code Library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAAyGTFyAkfua9wazWH6FFkYYmnGFTEh4",
+      authDomain: "imunisasi-puskesmas.firebaseapp.com",
+      projectId: "imunisasi-puskesmas",
+      storageBucket: "imunisasi-puskesmas.firebasestorage.app",
+      messagingSenderId: "26448709630",
+      appId: "1:26448709630:web:b29b4ed7357b44c876a2af"
+    };
 
-  <style>
-    :root {
-      --primary: #FF5722; 
-      --primary-hover: #E64A19;
-      --accent: #003366; 
-      --accent-light: #004080;
-      --gold: #D4AF37;
-      --gold-dark: #B8860B;
-      --gold-light: #F3E5AB;
-      --bg: #F4F7FA; 
-      --card: #FFFFFF;
-      --text-dark: #1E293B;
-      --muted: #64748B;
-      --border-color: #E2E8F0;
-      
-      --success: #10B981;
-      --danger: #EF4444;
-      --info: #2563EB;
-      --warning: #F59E0B;
-      
-      --radius: 14px;
-      --shadow-subtle: 0 4px 15px rgba(0, 0, 0, 0.04);
-      --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.08);
-    }
-    
-    *, *::before, *::after { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const COL_KOHORT = "register_imunisasi";
+    const COL_BIAS = "laporan_bias";
+    const COL_TARGET = "target_sasaran";
 
-    html, body {
-      width: 100%; max-width: 100%; overflow-x: hidden;
-      margin: 0; padding: 0; background: var(--bg); color: var(--text-dark);
-      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-      -webkit-font-smoothing: antialiased;
-    }
+    const VAKSIN_ANAK_KEYS = [
+      "HBO (<24 Jam)", "HBO (1-7 Hari)", "BCG", "OPV1", "DPT-HB-Hib1", "OPV2", "PCV1", "Rotavirus1",
+      "DPT-HB-Hib2", "OPV3", "PCV2", "Rotavirus2", "DPT-HB-Hib3", "OPV4", "IPV1", "Rotavirus3",
+      "Campak Rubela-1", "IPV2", "JE", "PCV3", "DPT-HB-Hib4", "Campak Rubela-2"
+    ];
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(12px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    const VAKSIN_DEWASA_KEYS = [
+      "TT1 Catin", "TT2 Catin",
+      "TT1 Bumil", "TT2 Bumil", "TT3 Bumil", "TT4 Bumil", "TT5 Bumil"
+    ];
 
-    @keyframes pulseGlow {
-      0% { box-shadow: 0 0 0 0 rgba(255, 87, 34, 0.4); }
-      70% { box-shadow: 0 0 0 8px rgba(255, 87, 34, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(255, 87, 34, 0); }
-    }
+    const ALL_VAKSIN_KEYS = [...VAKSIN_ANAK_KEYS, ...VAKSIN_DEWASA_KEYS];
 
-    /* Animasi Latar Belakang Jarum & Botol Vaksin Jatuh di Sisi Kosong Kanan & Kiri */
-    .falling-bg-container {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
-      pointer-events: none; z-index: 0; overflow: hidden;
-    }
-    .fall-item { 
-      position: absolute; color: var(--primary); opacity: 0.12; 
-      animation: fallDown linear infinite;
-    }
-    .fall-bottle { color: var(--accent); opacity: 0.08; }
-    
-    @keyframes fallDown {
-      0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
-      10% { opacity: 0.12; }
-      90% { opacity: 0.12; }
-      100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
-    }
+    let ANTIGEN_GROUPS = [
+      { name: "Hepatitis B (HB-0)", group_key: "HBO", doses_per_vial: 1, unit: "Uniject", kemasan: "1 Dosis/Uniject" },
+      { name: "BCG", group_key: "BCG", doses_per_vial: 10, unit: "Vial", kemasan: "10 Dosis/Vial" },
+      { name: "DPT-HB-Hib", group_key: "DPT-HB-Hib", doses_per_vial: 4, unit: "Vial", kemasan: "4 Dosis/Vial" },
+      { name: "Polio Oral (OPV)", group_key: "OPV", doses_per_vial: 7, unit: "Vial", kemasan: "7 Dosis/Vial" },
+      { name: "PCV", group_key: "PCV", doses_per_vial: 3, unit: "Vial", kemasan: "3 Dosis/Vial" },
+      { name: "Rotavirus", group_key: "Rotavirus", doses_per_vial: 4, unit: "Vial", kemasan: "4 Dosis/Vial" },
+      { name: "Polio Suntik (IPV)", group_key: "IPV", doses_per_vial: 4, unit: "Vial", kemasan: "4 Dosis/Vial" },
+      { name: "Campak Rubela (MR)", group_key: "Campak/MR", doses_per_vial: 8, unit: "Vial", kemasan: "8 Dosis/Vial" },
+      { name: "JE", group_key: "JE", doses_per_vial: 1, unit: "Vial", kemasan: "1 Dosis/Vial" },
+      { name: "DT", group_key: "DT", doses_per_vial: 8, unit: "Vial", kemasan: "8 Dosis/Vial" },
+      { name: "Td / TT", group_key: "Td/TT", doses_per_vial: 8, unit: "Vial", kemasan: "8 Dosis/Vial" },
+      { name: "HPV", group_key: "HPV", doses_per_vial: 1, unit: "Pcs", kemasan: "1 Dosis/Pcs" }
+    ];
 
-    .fall-item.left-1 { left: 2%; font-size: 2.2rem; animation-duration: 14s; animation-delay: 0s; }
-    .fall-item.left-2 { left: 6%; font-size: 3rem; animation-duration: 18s; animation-delay: 5s; }
-    .fall-item.left-3 { left: 4%; font-size: 1.8rem; animation-duration: 12s; animation-delay: 8s; }
-    .fall-item.left-4 { left: 8%; font-size: 2.5rem; animation-duration: 16s; animation-delay: 2s; }
-    
-    .fall-item.right-1 { right: 3%; font-size: 2.5rem; animation-duration: 15s; animation-delay: 1s; }
-    .fall-item.right-2 { right: 7%; font-size: 1.9rem; animation-duration: 13s; animation-delay: 6s; }
-    .fall-item.right-3 { right: 2%; font-size: 3rem; animation-duration: 19s; animation-delay: 4s; }
-    .fall-item.right-4 { right: 9%; font-size: 2.2rem; animation-duration: 17s; animation-delay: 9s; }
+    const BULAN_NAME_MAP = {
+      '01': 'Januari', '02': 'Februari', '03': 'Maret', '04': 'April',
+      '05': 'Mei', '06': 'Juni', '07': 'Juli', '08': 'Agustus',
+      '09': 'September', '10': 'Oktober', '11': 'November', '12': 'Desember',
+      'ALL': 'Semua Bulan'
+    };
 
-    .tab-panel { animation: fadeIn 0.4s ease-out; position: relative; z-index: 10; }
+    const DESA_DALAM_WILAYAH = [
+      "Melata", "Nanuah", "Topalan", "Batu Ampar", "Lubuk Hiju", "Bukit Makmur", 
+      "Bukit Raya", "Modang Mas", "Mukti Manunggal", "Sumber Jaya", "Bukit Harum"
+    ];
+    const DESA_LUAR_WILAYAH = ["PT. TSA", "PT. SHS"];
+    const ALL_DESA_LIST = [...DESA_DALAM_WILAYAH, ...DESA_LUAR_WILAYAH];
 
-    header.app-header {
-      background: linear-gradient(135deg, var(--accent) 0%, #001F3F 100%);
-      color: #fff; padding: 14px 16px 0 16px;
-      box-shadow: 0 8px 25px rgba(0,31,63,0.25);
-      position: sticky; top: 0; z-index: 1000; width: 100%;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
+    const AUTH_PASSWORD_PETUGAS = "sri26";
+    const AUTH_ADMIN_USER = "admin";
+    const AUTH_ADMIN_PASS = "adminsri26";
 
-    .brand-row { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 1200px; margin: 0 auto; gap: 10px; }
-    .brand { display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 1.1rem; letter-spacing: -0.3px; }
+    let activePetugasName = "";
+    let cachedGlobalKohortData = [];
+    let adminLogicPriorityConfig = { p1: 'Urutan Usia Standar Nasional', p2: 'DPT4 Lalu MR2', p3: 'Kejar Berurutan (DPT->Polio->MR)' };
 
-    .brand-title-small { font-weight: 500; font-size: 0.78rem; opacity: 0.85; display: block; margin-top: 2px; }
-    .header-actions { display: flex; align-items: center; gap: 8px; }
+    // [PATCH UTAMA] Handler Form Login Petugas yang sebelumnya belum terpasang di baris login
+    document.getElementById('formLoginPetugas').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const username = document.getElementById('login_username').value.trim();
+      const password = document.getElementById('login_password').value;
+      const errEl = document.getElementById('loginError');
 
-    .app-nav-tabs {
-      display: flex; gap: 6px; width: 100%; max-width: 1200px;
-      margin: 16px auto 0 auto; overflow-x: auto; white-space: nowrap;
-      -webkit-overflow-scrolling: touch; padding-bottom: 0px;
-      scrollbar-width: none; align-items: center;
-    }
-    .app-nav-tabs::-webkit-scrollbar { display: none; }
-    
-    .app-nav-tabs .tab {
-      flex-shrink: 0; color: #94A3B8; background: transparent; border: 0;
-      padding: 12px 16px; border-radius: var(--radius) var(--radius) 0 0;
-      cursor: pointer; font-weight: 600; display: inline-flex; align-items: center;
-      gap: 8px; font-size: 0.85rem; border-bottom: 3px solid transparent;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative; overflow: hidden;
-    }
-    .app-nav-tabs .tab:hover { color: #E2E8F0; background: rgba(255,255,255,0.1); transform: translateY(-2px); }
-    .app-nav-tabs .tab:active { transform: scale(0.96); }
-    .app-nav-tabs .tab.active { 
-      background: var(--card); color: var(--accent); font-weight: 800; 
-      border-bottom: 3px solid var(--primary); 
-      box-shadow: 0 -4px 15px rgba(0,0,0,0.06);
-    }
-    
-    .tab-admin-highlight {
-      margin-left: auto;
-      background: rgba(239, 68, 68, 0.15) !important;
-      color: #FCA5A5 !important;
-      border: 1px dashed rgba(239, 68, 68, 0.4) !important;
-    }
-    .tab-admin-highlight.active {
-      background: #FFFFFF !important;
-      color: var(--danger) !important;
-      border-bottom: 3px solid var(--danger) !important;
-    }
-
-    .wrap { width: 100%; max-width: 1200px; margin: 20px auto; padding: 0 16px; position: relative; z-index: 10; }
-    .card { 
-      background: var(--card); border-radius: var(--radius); padding: 24px; 
-      box-shadow: var(--shadow-card); margin-bottom: 20px; 
-      border: 1px solid var(--border-color); width: 100%; 
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      position: relative;
-    }
-    .card:hover { transform: translateY(-3px); box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.1); }
-
-    h2 { margin: 0 0 12px 0; color: var(--accent); font-size: 1.3rem; font-weight: 800; letter-spacing: -0.3px; display: flex; align-items: center; gap: 8px; }
-    h3 { color: var(--accent); font-weight: 700; font-size: 1.15rem; }
-    p.lead { margin: 0 0 16px 0; color: var(--muted); font-size: 0.9rem; line-height: 1.6; }
-
-    .alert-banner {
-      background: linear-gradient(135deg, #FFFBEB, #FEF3C7); 
-      border: 1px solid #FCD34D; color: #92400E;
-      padding: 14px 16px; border-radius: var(--radius); font-size: 0.85rem;
-      font-weight: 600; display: flex; align-items: center; gap: 12px; margin-bottom: 20px;
-      box-shadow: var(--shadow-subtle);
-    }
-
-    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; width: 100%; }
-    .form-group { margin-bottom: 14px; display: flex; flex-direction: column; width: 100%; position: relative; }
-    .full-width { grid-column: span 2; }
-
-    label { font-weight: 700; color: #334155; margin-bottom: 8px; font-size: 0.88rem; display: flex; align-items: center; gap: 6px; }
-    .req { color: var(--danger); font-weight: 800; }
-
-    .input-with-btn { display: flex; gap: 8px; align-items: center; }
-    .input-with-btn input { flex: 1; }
-    .btn-ocr-cam {
-      background: #F1F5F9; border: 1.5px solid var(--border-color); color: var(--accent);
-      border-radius: 10px; padding: 0 14px; height: 44px; cursor: pointer;
-      display: inline-flex; align-items: center; justify-content: center;
-      transition: all 0.2s ease; flex-shrink: 0; box-shadow: var(--shadow-subtle);
-    }
-    .btn-ocr-cam:hover { background: #E2E8F0; color: var(--primary); border-color: var(--primary); transform: translateY(-1px); }
-
-    input[type="text"], input[type="password"], input[type="number"], input[type="date"], input[type="month"], select, textarea, input[type="file"], input[type="tel"] {
-      width: 100%; padding: 10px 14px; border-radius: 10px; border: 1.5px solid var(--border-color);
-      background: #F8FAFC; font-size: 0.9rem; font-family: inherit; outline: none; transition: all 0.25s ease;
-      color: var(--text-dark); font-weight: 500; height: 44px;
-    }
-    select {
-      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23003366' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-      background-repeat: no-repeat; background-position: right 12px center; background-size: 14px; padding-right: 36px;
-      cursor: pointer;
-    }
-    input:focus, select:focus, textarea:focus { 
-      box-shadow: 0 0 0 4px rgba(255, 87, 34, 0.12); 
-      border-color: var(--primary); background: #FFFFFF;
-    }
-
-    .search-results-dropdown {
-      position: absolute; top: 100%; left: 0; right: 0; z-index: 1050;
-      background: #FFFFFF; border: 1.5px solid var(--primary); border-radius: 10px;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.15); max-height: 280px; overflow-y: auto;
-      margin-top: 6px; display: none; animation: fadeIn 0.2s ease-out;
-    }
-    .search-result-item {
-      padding: 12px 14px; border-bottom: 1px solid var(--border-color); cursor: pointer;
-      transition: background 0.2s ease; font-size: 0.85rem;
-    }
-    .search-result-item:last-child { border-bottom: none; }
-    .search-result-item:hover { background: #FFF5F2; }
-    .highlight-text { background-color: #FFE082; font-weight: 800; border-radius: 4px; padding: 0 4px; }
-
-    .form-row { display: flex; gap: 12px; width: 100%; }
-    .form-row .form-group { flex: 1; margin-bottom: 0; }
-
-    .vaccine-selection-box { border: 1.5px solid #FFD8CC; border-radius: var(--radius); padding: 16px; background: #FFFDFB; margin-top: 8px; }
-    .vaccine-group-title { font-weight: 800; color: var(--accent); font-size: 0.9rem; margin: 14px 0 10px 0; padding-bottom: 6px; border-bottom: 2px dashed #F1F5F9; display: flex; align-items: center; gap: 8px; }
-    .vaccine-group-title:first-child { margin-top: 0; }
-    .vaccine-checkbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
-
-    .checkbox-item {
-      display: flex; align-items: center; gap: 10px; background: #FFFFFF;
-      padding: 10px 12px; border-radius: 10px; border: 1.5px solid var(--border-color);
-      cursor: pointer; font-size: 0.85rem; font-weight: 600; color: #334155;
-      transition: all 0.25s ease; user-select: none; box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-    }
-    .checkbox-item:hover { border-color: var(--primary); background: #FFF5F2; transform: scale(1.03); }
-    .checkbox-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer; }
-
-    .table-container {
-      width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch;
-      border-radius: var(--radius); border: 1px solid var(--border-color); 
-      margin-top: 14px; background: #FFF; box-shadow: var(--shadow-subtle);
-    }
-
-    .kohort-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.82rem; white-space: nowrap; }
-    .kohort-table th, .kohort-table td { border-right: 1px solid #F1F5F9; border-bottom: 1px solid #F1F5F9; padding: 10px 12px; text-align: center; }
-    .kohort-table thead tr:first-child th { background: var(--accent); color: #FFF; font-weight: 700; }
-    .kohort-table thead tr:nth-child(2) th { background: #002244; color: #E2E8F0; font-size: 0.78rem; font-weight: 600; }
-
-    .kohort-table .sticky-col-0 { position: sticky; left: 0; z-index: 10; background: #F8FAFC; text-align: center; font-weight: 700; color: var(--accent); min-width: 45px; }
-    .kohort-table .sticky-col-1 { position: sticky; left: 45px; z-index: 10; background: #F8FAFC; text-align: left; font-weight: 700; color: var(--accent); min-width: 140px; }
-    .kohort-table .sticky-col-2 { position: sticky; left: 185px; z-index: 10; background: #F8FAFC; text-align: left; min-width: 110px; }
-    .kohort-table thead th.sticky-col-0, .kohort-table thead th.sticky-col-1, .kohort-table thead th.sticky-col-2 { z-index: 20; background: var(--accent) !important; color: #FFF !important; }
-
-    .kohort-table tbody tr:nth-child(even) { background: #F8FAFC; }
-    .kohort-table tbody tr:hover { background: #F1F5F9; }
-
-    .v-given { background: #D1FAE5; color: #065F46; font-weight: 700; padding: 4px 8px; border-radius: 6px; font-size: 0.78rem; display:inline-block; }
-    .badge-user { background: rgba(255, 255, 255, 0.15); color: #FFF; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; display: inline-flex; align-items: center; gap: 8px; backdrop-filter: blur(4px); border: 1px solid rgba(255, 255, 255, 0.2); }
-    .badge-urgent { background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5; font-weight: 700; padding: 4px 8px; border-radius: 6px; font-size: 0.78rem; display: inline-block; }
-    .badge-warning-custom { background: #FEF3C7; color: #92400E; border: 1px solid #FCD34D; font-weight: 700; padding: 4px 8px; border-radius: 6px; font-size: 0.78rem; display: inline-block; }
-
-    .actions { display: flex; gap: 12px; justify-content: flex-end; align-items: center; margin-top: 20px; flex-wrap: wrap; }
-    .btn {
-      padding: 12px 18px; border-radius: 10px; border: 0; font-weight: 700; cursor: pointer;
-      display: inline-flex; gap: 8px; align-items: center; justify-content: center; font-size: 0.9rem;
-      box-shadow: var(--shadow-subtle); transition: all 0.3s ease; font-family: inherit;
-    }
-    .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.12); }
-    .btn:active { transform: translateY(0); }
-    .btn-primary { background: var(--primary); color: #fff; }
-    .btn-primary:hover { background: var(--primary-hover); }
-    .btn-ghost { background: transparent; border: 1.5px solid var(--border-color); color: var(--accent); }
-    .btn-ghost:hover { background: #F1F5F9; }
-    .btn-info { background: var(--info); color: #fff; } 
-    .btn-danger { background: var(--danger); color: #fff; }
-    .btn-success { background: var(--success); color: #fff; }
-    .btn-warning { background: var(--warning); color: #fff; }
-
-    .site-footer { text-align: center; margin-top: 40px; padding: 20px 0; color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--border-color); }
-
-    .modal-overlay {
-      position: fixed; inset: 0; background: rgba(15, 23, 42, 0.8); z-index: 2000;
-      display: flex; align-items: center; justify-content: center; padding: 16px; backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-      animation: fadeIn 0.3s ease-out;
-    }
-
-    .qr-public-card {
-      background: #FFFFFF; padding: 24px; border-radius: 16px; width: 100%; max-width: 420px; 
-      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); text-align: center;
-      max-height: 90vh; overflow-y: auto; position: relative;
-    }
-    .qr-public-card::-webkit-scrollbar { width: 6px; }
-    .qr-public-card::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
-    
-    .feed-container { margin-top: 16px; text-align: left; }
-    .feed-item {
-      background: #F8FAFC; border-left: 4px solid var(--info); padding: 12px; 
-      margin-bottom: 12px; border-radius: 6px; font-size: 0.85rem;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-    }
-    .feed-item.done { border-left-color: var(--success); }
-    .feed-item.next { border-left-color: var(--warning); background: #FFFBEB; }
-    .feed-item-title { font-weight: 800; color: var(--accent); margin-bottom: 4px; }
-    .feed-item-desc { color: var(--muted); font-size: 0.75rem; }
-
-    .ocr-loading-card { background: #FFFFFF; padding: 24px; border-radius: 16px; width: 100%; max-width: 380px; text-align: center; box-shadow: 0 20px 30px rgba(0,0,0,0.25); }
-    .ocr-progress-bg { width: 100%; background: #E2E8F0; border-radius: 10px; height: 18px; overflow: hidden; margin: 14px 0 8px 0; }
-    .ocr-progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary), #FF8A65); transition: width 0.15s ease; border-radius: 10px; }
-
-    .camera-scanner-modal { position: fixed; inset: 0; background: #000; z-index: 3000; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
-    .camera-container { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-    .camera-video { width: 100%; height: 100%; object-fit: cover; }
-    .scanner-overlay { position: absolute; inset: 0; pointer-events: none; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-    
-    .scan-guide-single {
-      position: relative; width: 85%; max-width: 480px; height: 48px;
-      border: 2px solid var(--primary); border-radius: 8px; box-shadow: 0 0 0 9999px rgba(0,0,0,0.5);
-      z-index: 10; display: flex; align-items: center; justify-content: center;
-    }
-    .scan-guide-single::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 2px; background: rgba(255, 87, 34, 0.7); transform: translateY(-50%); }
-
-    .scan-guide-multi {
-      position: relative; width: 88%; max-width: 480px; height: 130px;
-      border: 2px dashed #00E676; border-radius: 10px; box-shadow: 0 0 0 9999px rgba(0,0,0,0.5);
-      z-index: 10; display: flex; flex-direction: column; justify-content: space-around; padding: 6px 0;
-    }
-    .scan-guide-multi .guide-line { width: 100%; height: 1px; background: rgba(0, 230, 118, 0.4); }
-
-    .scanner-hint-text { position: absolute; top: 18%; color: #FFF; font-size: 0.9rem; font-weight: 700; background: rgba(0,0,0,0.7); padding: 8px 16px; border-radius: 20px; z-index: 12; text-align: center; }
-    .camera-controls { position: absolute; bottom: 30px; left: 0; right: 0; z-index: 20; display: flex; justify-content: space-around; align-items: center; padding: 0 30px; }
-    .btn-capture-snap { width: 70px; height: 70px; border-radius: 50%; background: #FFF; border: 4px solid var(--primary); cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px rgba(255,87,34,0.6); transition: transform 0.15s ease; }
-    .btn-capture-snap:active { transform: scale(0.9); }
-    .btn-capture-snap inner { width: 52px; height: 52px; border-radius: 50%; background: var(--primary); display: block; }
-
-    /* ==========================================================================
-       STYLE SERTIFIKAT A4 LANDSCAPE (HORIZONTAL)
-       ========================================================================== */
-    .cert-preview-wrapper {
-      display: flex; flex-direction: column; align-items: center; gap: 30px; margin: 20px auto;
-    }
-
-    .certificate-page-a4-landscape {
-      width: 297mm; height: 210mm; min-width: 297mm; min-height: 210mm; max-width: 297mm; max-height: 210mm;
-      background: #FFFFFF; position: relative; box-sizing: border-box; padding: 8mm 10mm; margin: 0 auto;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.18); font-family: 'Plus Jakarta Sans', Arial, sans-serif; color: #0F172A;
-      overflow: hidden; page-break-after: always; page-break-inside: avoid;
-    }
-
-    .cert-frame-outer { border: 3.5px solid #003366; height: 100%; width: 100%; padding: 5px; position: relative; box-sizing: border-box; }
-    .cert-frame-inner {
-      border: 1.5px solid #B8860B; outline: 1px solid #003366; outline-offset: -6px; height: 100%; width: 100%;
-      padding: 12px 24px; position: relative; box-sizing: border-box; display: flex; flex-direction: column;
-      justify-content: space-between; background: rgba(255, 255, 255, 0.96);
-    }
-
-    .cert-corner { position: absolute; width: 28px; height: 28px; border-color: #B8860B; border-style: solid; z-index: 5; }
-    .cert-corner-tl { top: 4px; left: 4px; border-width: 3.5px 0 0 3.5px; }
-    .cert-corner-tr { top: 4px; right: 4px; border-width: 3.5px 3.5px 0 0; }
-    .cert-corner-bl { bottom: 4px; left: 4px; border-width: 0 0 3.5px 3.5px; }
-    .cert-corner-br { bottom: 4px; right: 4px; border-width: 0 3.5px 3.5px 0; }
-
-    .cert-header-landscape {
-      display: flex; align-items: center; justify-content: center; gap: 16px; border-bottom: 2.5px double #B8860B;
-      padding-bottom: 6px; margin-bottom: 6px; position: relative; z-index: 2;
-    }
-    .cert-header-text-box { text-align: center; }
-    .cert-header-text-box h3 { margin: 0; font-family: 'Cinzel', serif; font-size: 1.05rem; font-weight: 700; color: #002244; letter-spacing: 1px; }
-    .cert-header-text-box h2 { margin: 1px 0; font-family: 'Cinzel', serif; font-size: 1.25rem; font-weight: 800; color: #003366; justify-content: center; letter-spacing: 0.5px; }
-    .cert-header-text-box p { margin: 1px 0 0 0; font-size: 0.78rem; font-weight: 600; color: #475569; }
-
-    .cert-title-box { text-align: center; margin: 4px 0 8px 0; position: relative; z-index: 2; }
-    .cert-main-title { font-family: 'Cinzel', serif; font-size: 1.8rem; font-weight: 900; letter-spacing: 5px; color: #003366; text-shadow: 1px 1px 2px rgba(212, 175, 55, 0.3); margin-bottom: 1px; }
-    .cert-no-text { font-size: 0.85rem; font-weight: 700; color: #334155; letter-spacing: 0.5px; }
-
-    .cert-body-content { font-size: 0.9rem; line-height: 1.4; position: relative; z-index: 2; }
-    .cert-field-table { width: 100%; border-collapse: collapse; }
-    .cert-field-table td { padding: 4px 2px; vertical-align: middle; font-size: 0.9rem; }
-    .cert-field-label { width: 170px; font-weight: 700; color: #1E293B; }
-    .cert-field-val { font-weight: 800; color: #002244; font-size: 0.95rem; }
-
-    .cert-photo-box-4x6 {
-      width: 95px; height: 125px; border: 2px dashed #B8860B; display: flex; flex-direction: column;
-      align-items: center; justify-content: center; text-align: center; color: #B8860B; font-weight: 800;
-      font-size: 0.72rem; background: #FFFDF5; border-radius: 6px; line-height: 1.3;
-      box-shadow: inset 0 0 8px rgba(212, 175, 55, 0.1); flex-shrink: 0;
-    }
-
-    .cert-slogan {
-      text-align: center; font-family: 'Cinzel', serif; font-weight: 800; font-style: italic; font-size: 1.05rem;
-      margin: 8px 0; letter-spacing: 2px; color: #003366; background: linear-gradient(90deg, transparent, #FFF8E7, transparent);
-      padding: 4px 0; border-top: 1px dashed #DAA520; border-bottom: 1px dashed #DAA520; position: relative; z-index: 2;
-    }
-
-    .cert-back-table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 0.8rem; position: relative; z-index: 2; }
-    .cert-back-table th, .cert-back-table td { border: 1px solid #002244; padding: 5px 8px; text-align: left; }
-    .cert-back-table th { background: #003366; color: #FFFFFF; font-family: 'Cinzel', serif; font-weight: 700; text-align: center; letter-spacing: 0.5px; }
-
-    @media print {
-      @page { size: A4 landscape; margin: 0; }
-      body * { visibility: hidden; }
-      #certificatePrintArea, #certificatePrintArea * { visibility: visible; }
-      #certificatePrintArea { position: absolute; left: 0; top: 0; width: 297mm; margin: 0; padding: 0; }
-      .certificate-page-a4-landscape {
-        box-shadow: none !important; margin: 0 !important; width: 297mm !important; height: 210mm !important;
-        page-break-after: always !important; page-break-inside: avoid !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important;
+      if (username === AUTH_ADMIN_USER && password === AUTH_ADMIN_PASS) {
+        activePetugasName = AUTH_ADMIN_USER;
+        document.getElementById('currentUserDisplay').innerHTML = `<i class="fas fa-user-shield"></i> <span>Admin (Pusat)</span>`;
+        document.getElementById('loginModal').style.display = 'none';
+        alert("Berhasil login sebagai Admin Sistem!");
+        loadRecentTransactions();
+      } else if (password === AUTH_PASSWORD_PETUGAS) {
+        activePetugasName = username || "Tri Prio Heryanto";
+        document.getElementById('currentUserDisplay').innerHTML = `<i class="fas fa-user-circle"></i> <span>${activePetugasName}</span>`;
+        document.getElementById('loginModal').style.display = 'none';
+        alert(`Selamat datang, ${activePetugasName}!`);
+        loadRecentTransactions();
+      } else {
+        errEl.textContent = "Password salah! Gunakan 'sri26' untuk petugas atau 'adminsri26' untuk admin.";
+        errEl.style.display = 'block';
       }
-      .no-print { display: none !important; }
-    }
+    });
 
-    @media (max-width: 768px) {
-      header.app-header { padding: 10px 12px 0 12px; }
-      .brand-title-small { display: none; }
-      .brand { font-size: 0.95rem; }
-      .wrap { padding: 0 10px; margin: 12px auto; }
-      .card { padding: 16px; margin-bottom: 14px; border-radius: 12px; }
-      .grid { grid-template-columns: 1fr !important; gap: 12px; }
-      .full-width { grid-column: span 1 !important; }
-      .form-row { flex-direction: row; gap: 8px; }
-      .vaccine-checkbox-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
-      .checkbox-item { padding: 8px 10px; font-size: 0.8rem; }
-      .actions { width: 100%; flex-direction: column; }
-      .actions .btn { width: 100%; }
-      .kohort-table { font-size: 0.75rem; }
-      .kohort-table th, .kohort-table td { padding: 8px 10px; }
-      .kohort-table .sticky-col-0 { min-width: 40px; }
-      .kohort-table .sticky-col-1 { min-width: 110px; left: 40px; }
-      .kohort-table .sticky-col-2 { min-width: 90px; left: 150px; }
-      .app-nav-tabs .tab { padding: 10px 12px; font-size: 0.8rem; }
-      .certificate-page-a4-landscape { transform: scale(0.38); transform-origin: top center; margin-bottom: -130mm; }
-    }
-  </style>
-</head>
-<body>
+    window.logoutPetugas = function() {
+      activePetugasName = "";
+      document.getElementById('login_password').value = "";
+      document.getElementById('loginError').style.display = 'none';
+      document.getElementById('loginModal').style.display = 'flex';
+    };
 
-  <!-- Animasi Jatuh Kiri & Kanan -->
-  <div class="falling-bg-container">
-    <i class="fas fa-syringe fall-item left-1"></i>
-    <i class="fas fa-vial fall-item fall-bottle left-2"></i>
-    <i class="fas fa-syringe fall-item left-3"></i>
-    <i class="fas fa-vial fall-item fall-bottle left-4"></i>
-    <i class="fas fa-vial fall-item fall-bottle right-1"></i>
-    <i class="fas fa-syringe fall-item right-2"></i>
-    <i class="fas fa-vial fall-item fall-bottle right-3"></i>
-    <i class="fas fa-syringe fall-item right-4"></i>
-  </div>
+    window.switchTab = function(e) {
+      const targetTab = e.currentTarget.getAttribute('data-tab');
+      if (targetTab === 'admin' && activePetugasName !== AUTH_ADMIN_USER) {
+        const pass = prompt("Masukkan Password Admin (adminsri26):");
+        if (pass !== AUTH_ADMIN_PASS) {
+          alert("Password Admin Salah!");
+          return;
+        }
+        activePetugasName = AUTH_ADMIN_USER;
+      }
 
-  <header class="app-header">
-    <div class="brand-row">
-      <div class="brand">
-        <div class="logo" style="width:40px; height:40px; border-radius:12px; background:linear-gradient(135deg, var(--primary), #FF8A65); display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:0 4px 15px rgba(255, 87, 34, 0.4);">
-          <i class="fas fa-syringe" style="font-size:18px;color:#fff"></i>
-        </div>
-        <div>
-          Sistem Register Imunisasi<br>
-          <span class="brand-title-small">Puskesmas Melata (Kohort Mode)</span>
-        </div>
-      </div>
-      <div class="header-actions">
-        <div class="badge-user"><i class="fas fa-user-circle"></i> <span>Petugas Utama</span></div>
-      </div>
-    </div>
-  </header>
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
 
-  <main class="wrap">
-    <div class="card">
-      <h2><i class="fas fa-check-circle" style="color:var(--success)"></i> Sistem Imunisasi Puskesmas Melata Siap</h2>
-      <p class="lead">Seluruh modul lengkap: QR Code Cek Jadwal Publik, Kontrol Prioritas Admin, Sertifikat A4 Landscape (Penandatangan: Koordinator Imunisasi Tri Prio Heryanto NIP. 19890313 201101 1 002 & dr. Anang Argo Yuwono NIP. 19830521 201403 003), serta Ekspor Excel Terfilter Berisi Sheet Kedua Baru telah terintegrasi.</p>
-    </div>
-  </main>
+      e.currentTarget.classList.add('active');
+      document.getElementById(targetTab).style.display = 'block';
+    };
 
-  <footer class="site-footer">
-    &copy; 2026 Sistem Register Imunisasi Puskesmas Melata.
-  </footer>
-</body>
-</html>
+    window.loadRecentTransactions = async function() {
+      try {
+        const snap = await getDocs(collection(db, COL_KOHORT));
+        cachedGlobalKohortData = [];
+        snap.forEach(doc => {
+          cachedGlobalKohortData.push({ id: doc.id, ...doc.data() });
+        });
+      } catch (err) {
+        console.error("Gagal memuat data kohort:", err);
+      }
+    };
+
+    // Inisialisasi awal saat load
+    loadRecentTransactions();
+  </script>

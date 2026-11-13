@@ -1868,7 +1868,7 @@
               vCols += val ? `<td><span class="v-given">${val}</span></td>` : `<td style="color:#CBD5E1;">-</td>`;
             });
             tr.innerHTML = `<td class="sticky-col-0">${countDewasa}</td><td class="sticky-col-1">${d.nama_anak}</td><td class="sticky-col-2">${d.tgl_lahir || '-'}</td><td>${d.jk || '-'}</td><td>${d.nama_ibu || '-'}</td><td>${d.wa_anak || '-'}</td><td>${d.desa || '-'}</td><td>${d.alamat_rt || '-'}</td>${vCols}<td>${petugasKet}</td><td style="display:flex; gap:4px; justify-content:center;"><button class="btn btn-warning" onclick="editDataSasaran('${jsonString}')" style="padding:3px 6px; font-size:0.72rem;"><i class="fas fa-edit"></i> Edit</button><button class="btn btn-danger" onclick="hapusTrans('${d.id}')" style="padding:3px 6px; font-size:0.72rem;"><i class="fas fa-trash"></i></button></td>`;
-            tbodyDewasa.appendChild(tr);
+            tbodyDewasa.appendChild(tr);<button class="btn btn-info" onclick="tampilkanQRKIA('${d.id}', '${d.nama_anak}')" style="padding:3px 6px; font-size:0.72rem;" title="Cetak QR KIA"><i class="fas fa-qrcode"></i></button>
           } else {
             countAnak++; const tr = document.createElement('tr'); let vCols = '';
             VAKSIN_ANAK_KEYS.forEach(vKey => {

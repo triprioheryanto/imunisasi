@@ -10,6 +10,7 @@
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
   <style>
     :root {
@@ -53,6 +54,68 @@
       100% { box-shadow: 0 0 0 0 rgba(255, 87, 34, 0); }
     }
 
+    <!-- MODAL UNTUK PETUGAS: CETAK/DOWNLOAD QR CODE KIA -->
+  <div id="qrPrintModal" class="modal-overlay" style="display:none;">
+    <div style="background:#fff; padding:24px; border-radius:16px; max-width:350px; width:100%; text-align:center; box-shadow:var(--shadow-card);">
+      <h3 style="color:var(--accent); margin-top:0;"><i class="fas fa-qrcode"></i> QR Code Buku KIA</h3>
+      <p style="font-size:0.8rem; color:var(--muted);">Tempelkan di KIA An. <strong id="qrNamaAnak">...</strong></p>
+      <div id="qrCanvasContainer" style="display:flex; justify-content:center; margin:16px 0; padding:10px; background:#F8FAFC; border:2px dashed var(--border-color); border-radius:12px;"></div>
+      <p style="font-size:0.75rem; color:var(--primary); font-weight:600;">Orang tua dapat men-scan QR ini untuk melihat jadwal & progres imunisasi tanpa login.</p>
+      <div style="display:flex; gap:10px; justify-content:center; margin-top:16px;">
+        <button class="btn btn-ghost" onclick="document.getElementById('qrPrintModal').style.display='none'">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HALAMAN PUBLIK ORANG TUA (READ ONLY) -->
+  <div id="publicTrackerContainer" style="display:none; background:var(--bg); min-height:100vh; padding:20px; z-index:9999; position:absolute; top:0; left:0; right:0;">
+    <div style="max-width:500px; margin:0 auto; padding-bottom:40px;">
+      
+      <!-- Header Publik -->
+      <div style="text-align:center; margin-bottom:24px; animation:fadeIn 0.5s ease;">
+        <div style="width:60px; height:60px; border-radius:16px; background:linear-gradient(135deg, var(--primary), #FF8A65); margin:0 auto 12px auto; display:flex; align-items:center; justify-content:center; color:#fff; font-size:24px; box-shadow:0 8px 16px rgba(255,87,34,0.3);">
+          <i class="fas fa-shield-virus"></i>
+        </div>
+        <h2 style="margin:0; color:var(--accent); font-size:1.3rem;">Buku KIA Digital</h2>
+        <p style="margin:0; font-size:0.85rem; color:var(--muted); font-weight:600;">Puskesmas Melata - Kab. Lamandau</p>
+      </div>
+
+      <!-- Kartu Profil & Progres -->
+      <div class="card" style="border-radius:20px; overflow:hidden; padding:0;">
+        <div style="background:var(--accent); color:#fff; padding:16px; text-align:center;">
+          <h3 style="margin:0; font-size:1.2rem; text-transform:uppercase;" id="pubNamaAnak">...</h3>
+          <p style="margin:4px 0 0 0; font-size:0.8rem; opacity:0.9;">Anak dari: <span id="pubNamaIbu">...</span></p>
+        </div>
+        <div style="padding:20px; text-align:center;">
+          <div style="font-size:0.85rem; font-weight:700; color:var(--muted); margin-bottom:8px;">Progres Imunisasi Dasar Lengkap (IDL)</div>
+          <div style="width:100%; background:#E2E8F0; height:12px; border-radius:10px; overflow:hidden;">
+            <div id="pubProgressBar" style="height:100%; width:0%; background:linear-gradient(90deg, #10B981, #34D399); transition:width 1s ease;"></div>
+          </div>
+          <div style="font-size:1.4rem; font-weight:900; color:#10B981; margin-top:8px;" id="pubProgressText">0%</div>
+        </div>
+      </div>
+
+      <!-- Feed Peringatan / Rekomendasi Selanjutnya -->
+      <div class="card" style="border-left:5px solid var(--warning); background:#FFFBEB; margin-top:16px;">
+        <h3 style="margin:0 0 8px 0; color:#92400E; font-size:1rem;"><i class="fas fa-bullhorn"></i> Jadwal Vaksin Selanjutnya</h3>
+        <p style="margin:0; font-size:0.88rem; color:#713F12;" id="pubNextVaccine">Menghitung jadwal...</p>
+      </div>
+
+      <!-- Preview Sertifikat -->
+      <h4 style="color:var(--accent); margin:24px 0 10px 0;"><i class="fas fa-award"></i> Reward Sertifikat IDL</h4>
+      <div id="pubCertPreview" class="card" style="text-align:center; padding:30px 16px; position:relative; overflow:hidden;">
+        <!-- Akan di-update via JS. Blur jika belum lulus, terang jika lulus -->
+      </div>
+
+      <!-- Feed History -->
+      <h4 style="color:var(--accent); margin:24px 0 10px 0;"><i class="fas fa-history"></i> Riwayat Vaksin Diterima</h4>
+      <div id="pubHistoryFeed" style="display:flex; flex-direction:column; gap:10px;">
+        <!-- Akan di-update via JS -->
+      </div>
+
+    </div>
+  </div>
+    
     /* ANIMASI BARU: Jatuh dari Atas ke Bawah (Sisi Kiri & Kanan) */
     .floating-bg-container {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -2340,6 +2403,142 @@
         reader.readAsText(file);
       }
     }
+    // ====================================================================
+    // FITUR PUBLIK: URL ROUTER & QR CODE
+    // ====================================================================
+    
+    import { getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      // CEK APAKAH INI MODE PUBLIK SCAN QR
+      const urlParams = new URLSearchParams(window.location.search);
+      const cekId = urlParams.get('cek');
+      
+      if (cekId) {
+        // SEMBUNYIKAN SEMUA MENU ADMIN
+        document.querySelector('.app-header').style.display = 'none';
+        document.querySelector('main.wrap').style.display = 'none';
+        document.querySelector('.site-footer').style.display = 'none';
+        
+        // TAMPILKAN HALAMAN TRACKER PUBLIK
+        document.getElementById('publicTrackerContainer').style.display = 'block';
+        document.body.style.background = "#F4F7FA"; 
+        
+        await loadPublicTrackerData(cekId);
+      }
+    });
+
+    async function loadPublicTrackerData(docId) {
+      try {
+        const docRef = doc(db, COL_KOHORT, docId);
+        const docSnap = await getDoc(docRef);
+        
+        if (!docSnap.exists()) {
+          document.getElementById('pubNextVaccine').innerHTML = "Data tidak ditemukan. Pastikan scan QR dari KIA yang valid.";
+          return;
+        }
+
+        const d = docSnap.data();
+        document.getElementById('pubNamaAnak').textContent = d.nama_anak;
+        document.getElementById('pubNamaIbu').textContent = d.nama_ibu;
+
+        // 1. Analisis Progres IDL
+        const idlKeys = ["HBO (<24 Jam)", "BCG", "DPT-HB-Hib1", "OPV2", "DPT-HB-Hib2", "OPV3", "DPT-HB-Hib3", "OPV4", "IPV1", "Campak Rubela-1"];
+        let doneCount = 0;
+        let riwayatHtml = '';
+        
+        idlKeys.forEach(vk => {
+          const fieldKey = `vaksin_${vk.replace(/[\s\(\)<>-]/g, '_')}`;
+          const val = d[fieldKey] || (d.jenis_imunisasi === vk ? d.tanggal_pelayanan : null);
+          if (val) {
+            doneCount++;
+            riwayatHtml += `
+              <div style="background:#fff; border:1px solid #E2E8F0; padding:12px; border-radius:12px; display:flex; align-items:center; gap:12px;">
+                <div style="width:40px; height:40px; border-radius:50%; background:#D1FAE5; color:#059669; display:flex; align-items:center; justify-content:center; font-size:1.2rem;"><i class="fas fa-check"></i></div>
+                <div><div style="font-weight:800; color:var(--accent); font-size:0.9rem;">${vk}</div><div style="font-size:0.75rem; color:var(--muted);">Diberikan: ${val}</div></div>
+              </div>`;
+          }
+        });
+
+        if (riwayatHtml === '') riwayatHtml = '<p style="text-align:center; color:var(--muted); font-size:0.8rem;">Belum ada riwayat imunisasi dasar dicatat.</p>';
+        document.getElementById('pubHistoryFeed').innerHTML = riwayatHtml;
+
+        const persen = Math.round((doneCount / idlKeys.length) * 100);
+        document.getElementById('pubProgressBar').style.width = `${persen}%`;
+        document.getElementById('pubProgressText').textContent = `${persen}% Selesai`;
+
+        // 2. Logika Jadwal Selanjutnya (Berdasarkan Umur & Dosis Terakhir)
+        const ageMonths = getAgeInMonths(d.tgl_lahir);
+        let nextMsg = "";
+        
+        if (persen === 100) {
+          nextMsg = "Luar biasa! <strong>Imunisasi Dasar Lengkap (IDL) sudah tuntas!</strong><br><br>Persiapkan untuk Imunisasi Lanjutan Baduta (DPT4 & MR2) saat anak berusia 18 bulan.";
+          document.getElementById('pubNextVaccine').closest('.card').style.borderLeftColor = "#10B981";
+          document.getElementById('pubNextVaccine').closest('.card').style.background = "#ECFDF5";
+        } else {
+          // Cari vaksin pertama yang belum dari urutan
+          const missingVaksin = idlKeys.find(vk => {
+            const fieldKey = `vaksin_${vk.replace(/[\s\(\)<>-]/g, '_')}`;
+            return !(d[fieldKey] || (d.jenis_imunisasi === vk ? d.tanggal_pelayanan : null));
+          });
+          
+          if (missingVaksin) {
+            let infoWaktu = "Segera kunjungi Posyandu atau Puskesmas Melata!";
+            if (missingVaksin.includes("DPT") || missingVaksin.includes("Polio")) {
+               infoWaktu = "Jarak minimal antar dosis adalah 4 minggu (28 hari).";
+            } else if (missingVaksin.includes("Campak")) {
+               infoWaktu = "Vaksin ini optimal diberikan saat bayi menginjak usia 9 bulan.";
+            }
+            nextMsg = `Vaksin yang direkomendasikan selanjutnya adalah: <strong>${missingVaksin}</strong>.<br><br>💡 <em>Tips: ${infoWaktu}</em>`;
+          }
+        }
+        document.getElementById('pubNextVaccine').innerHTML = nextMsg;
+
+        // 3. Status Preview Sertifikat
+        const certBox = document.getElementById('pubCertPreview');
+        if (persen >= 100) {
+          certBox.innerHTML = `
+            <div style="color:#D4AF37; font-size:3rem; margin-bottom:10px;"><i class="fas fa-certificate"></i></div>
+            <h4 style="margin:0; color:var(--accent);">Sertifikat Terbuka!</h4>
+            <p style="font-size:0.8rem; color:var(--muted); margin-top:6px;">Selamat! Anak Anda telah meraih Imunisasi Dasar Lengkap. Minta petugas Puskesmas untuk mencetak sertifikat resmi Anda.</p>
+            <div style="position:absolute; top:0; left:0; width:100%; height:100%; border:3px solid #D4AF37; border-radius:12px; pointer-events:none;"></div>
+          `;
+          certBox.style.background = "#FFFDF5";
+        } else {
+          const sisa = idlKeys.length - doneCount;
+          certBox.innerHTML = `
+            <div style="color:#CBD5E1; font-size:3rem; margin-bottom:10px;"><i class="fas fa-lock"></i></div>
+            <h4 style="margin:0; color:#64748B;">Sertifikat Terkunci</h4>
+            <p style="font-size:0.8rem; color:#94A3B8; margin-top:6px;">Selesaikan <strong>${sisa} vaksin dasar</strong> lagi untuk membuka Sertifikat Imunisasi eksklusif dari Puskesmas Melata.</p>
+          `;
+          certBox.style.background = "#F8FAFC";
+        }
+
+      } catch (err) {
+        document.getElementById('pubNextVaccine').innerHTML = "Terjadi kesalahan memuat data.";
+      }
+    }
+
+    // FUNGSI UNTUK PETUGAS MEMBUAT QR
+    window.tampilkanQRKIA = function(docId, namaAnak) {
+      document.getElementById('qrNamaAnak').textContent = namaAnak.toUpperCase();
+      const qrContainer = document.getElementById('qrCanvasContainer');
+      qrContainer.innerHTML = ''; // Bersihkan QR sebelumnya
+      
+      // Link unik untuk anak tersebut
+      const publicUrl = window.location.origin + window.location.pathname + '?cek=' + docId;
+      
+      new QRCode(qrContainer, {
+        text: publicUrl,
+        width: 180,
+        height: 180,
+        colorDark : "#003366", // Warna sesuai tema (Accent)
+        colorLight : "#F8FAFC",
+        correctLevel : QRCode.CorrectLevel.H
+      });
+      
+      document.getElementById('qrPrintModal').style.display = 'flex';
+    };
   </script>
 </body>
 </html>

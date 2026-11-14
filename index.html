@@ -1,3 +1,4 @@
+<!-- ==================== PARTISI 1 DARI 10 ==================== -->
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -246,7 +247,9 @@
     }
     .role-badge-admin { background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5; padding: 3px 8px; border-radius: 6px; font-weight: 800; font-size: 0.72rem; }
     .role-badge-petugas { background: #DBEAFE; color: #1E40AF; border: 1px solid #93C5FD; padding: 3px 8px; border-radius: 6px; font-weight: 800; font-size: 0.72rem; }
-    .role-badge-kader { background: #D1FAE5; color: #065F46; border: 1px solid #6EE7B7; padding: 3px 8px; border-radius: 6px; font-weight: 800; font-size: 0.72rem; }    .search-results-dropdown { position: absolute; top: 100%; left: 0; right: 0; z-index: 1050; background: #FFFFFF; border: 1.5px solid var(--primary); border-radius: 10px; box-shadow: 0 14px 30px rgba(0,0,0,0.16); max-height: 280px; overflow-y: auto; margin-top: 4px; display: none; animation: fadeIn 0.2s ease-out; }
+    .role-badge-kader { background: #D1FAE5; color: #065F46; border: 1px solid #6EE7B7; padding: 3px 8px; border-radius: 6px; font-weight: 800; font-size: 0.72rem; }
+<!-- ==================== PARTISI 2 DARI 10 ==================== -->
+    .search-results-dropdown { position: absolute; top: 100%; left: 0; right: 0; z-index: 1050; background: #FFFFFF; border: 1.5px solid var(--primary); border-radius: 10px; box-shadow: 0 14px 30px rgba(0,0,0,0.16); max-height: 280px; overflow-y: auto; margin-top: 4px; display: none; animation: fadeIn 0.2s ease-out; }
     .search-result-item { padding: 11px 14px; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: background 0.15s ease; font-size: 0.83rem; }
     .search-result-item:hover { background: #FFF5F2; }
     .highlight-text { background-color: #FFE082; font-weight: 800; border-radius: 3px; padding: 0 3px; }
@@ -533,7 +536,9 @@
         </button>
       </form>
     </div>
-  </div>  <!-- MODAL KEMIRIPAN NAMA -->
+  </div>
+<!-- ==================== PARTISI 3 DARI 10 ==================== -->
+  <!-- MODAL KEMIRIPAN NAMA -->
   <div id="duplicateCompareModal" class="modal-overlay" style="display:none;">
     <div style="background:#fff; padding:20px; border-radius:16px; max-width:650px; width:95%; box-shadow:0 20px 30px rgba(0,0,0,0.25); max-height:85vh; display:flex; flex-direction:column;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1.5px solid var(--border-color); padding-bottom:8px;">
@@ -803,7 +808,9 @@
       <button type="button" class="tab" data-tab="capaian" onclick="switchTab(event)"><i class="fas fa-award" style="color:#10B981;"></i> CAPAIAN</button>
       <button type="button" class="tab tab-admin-highlight" data-tab="admin" onclick="switchTab(event)"><i class="fas fa-user-gear"></i> ADMIN &amp; KONTROL</button>
     </div>
-  </header>  <main class="wrap">
+  </header>
+<!-- ==================== PARTISI 4 DARI 10 ==================== -->
+  <main class="wrap">
     <!-- TAB 1: INPUT REGISTER KOHORT INDIVIDU (TAMPILAN AWAL DISEDERHANAKAN) -->
     <section id="imunisasi" class="tab-panel">
       <div class="alert-banner">
@@ -1094,14 +1101,13 @@
           </table>
         </div>
       </div>
-    </section>    <!-- TAB 2: BIAS -->
+    </section>
+<!-- ==================== PARTISI 5 DARI 10 ==================== -->
+    <!-- TAB 2: BIAS -->
     <section id="bias" class="tab-panel" style="display:none">
       <div class="card">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:6px;">
           <h2 style="margin:0;"><i class="fas fa-school" style="color:var(--info)"></i> Form BIAS Anak Sekolah</h2>
-          <button type="button" class="btn btn-ghost" onclick="smoothScrollPage('down')" style="padding:5px 10px; font-size:0.78rem;">
-            <i class="fas fa-arrow-down"></i> Scroll Ke Bawah
-          </button>
         </div>
         <form id="biasForm">
           <div class="grid">
@@ -1124,16 +1130,16 @@
       </div>
     </section>
 
-    <!-- TAB 3: CATCH UP (DENGAN TOMBOL TRIGGER SCROLL DOWN & UP PER KATEGORI) -->
+    <!-- TAB 3: CATCH UP (TOMBOL TRIGGER ATAS: KLIK 1 BUKA & SCROLL DOWN, KLIK 2 TUTUP & SCROLL UP) -->
     <section id="catchup" class="tab-panel" style="display:none">
       <div class="card" id="catchupFilterCard">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
           <h3 style="margin:0;"><i class="fas fa-filter" style="color:var(--primary);"></i> Filter Catch Up Wilayah</h3>
           <div style="display:flex; gap:6px; flex-wrap:wrap;">
-            <button type="button" class="btn btn-ghost" onclick="toggleAllCollapsibleInContainer('catchup', true)" style="padding:5px 10px; font-size:0.75rem;">
+            <button type="button" class="btn btn-ghost" onclick="toggleAllCollapsibleInContainer('catchup', true, 'catchupFilterCard')" style="padding:5px 10px; font-size:0.75rem;">
               <i class="fas fa-angles-down"></i> Buka Semua
             </button>
-            <button type="button" class="btn btn-ghost" onclick="toggleAllCollapsibleInContainer('catchup', false)" style="padding:5px 10px; font-size:0.75rem;">
+            <button type="button" class="btn btn-ghost" onclick="toggleAllCollapsibleInContainer('catchup', false, 'catchupFilterCard')" style="padding:5px 10px; font-size:0.75rem;">
               <i class="fas fa-angles-up"></i> Tutup Semua
             </button>
           </div>
@@ -1156,18 +1162,18 @@
           <button type="button" class="btn btn-success" id="btnDownloadCatchUpExcel"><i class="fas fa-file-excel"></i> Download Excel (.xlsx)</button>
         </div>
 
-        <!-- Tombol Pemicu Aksi Scroll Down Cepat per Kategori Catch Up -->
+        <!-- Tombol Pemicu Atas Tunggal (Klik 1 = Buka & Scroll Down, Klik 2 = Tutup & Scroll Up) -->
         <div class="trigger-nav-bar">
-          <button type="button" class="trigger-pill-btn" onclick="openAndScrollSection('cardCatchup1')">
+          <button type="button" class="trigger-pill-btn" data-target-sec="cardCatchup1" onclick="toggleAndScrollSection('cardCatchup1', 'catchupFilterCard')">
             <i class="fas fa-chevron-down"></i> 1. Bayi &lt; 1 Thn (<span id="pillCountCatchup1">0</span>)
           </button>
-          <button type="button" class="trigger-pill-btn" onclick="openAndScrollSection('cardCatchup2')">
+          <button type="button" class="trigger-pill-btn" data-target-sec="cardCatchup2" onclick="toggleAndScrollSection('cardCatchup2', 'catchupFilterCard')">
             <i class="fas fa-chevron-down"></i> 2. Risiko Drop Out (<span id="pillCountCatchup2">0</span>)
           </button>
-          <button type="button" class="trigger-pill-btn" onclick="openAndScrollSection('cardCatchup3')">
+          <button type="button" class="trigger-pill-btn" data-target-sec="cardCatchup3" onclick="toggleAndScrollSection('cardCatchup3', 'catchupFilterCard')">
             <i class="fas fa-chevron-down"></i> 3. Booster Baduta (<span id="pillCountCatchup3">0</span>)
           </button>
-          <button type="button" class="trigger-pill-btn" onclick="openAndScrollSection('cardCatchup4')">
+          <button type="button" class="trigger-pill-btn" data-target-sec="cardCatchup4" onclick="toggleAndScrollSection('cardCatchup4', 'catchupFilterCard')">
             <i class="fas fa-chevron-down"></i> 4. Td Catin &amp; Bumil (<span id="pillCountCatchup4">0</span>)
           </button>
         </div>
@@ -1175,101 +1181,72 @@
 
       <!-- KATEGORI 1 CATCH UP -->
       <div class="collapsible-section-card" id="cardCatchup1">
-        <div class="collapsible-section-header" onclick="toggleCollapsibleSection('cardCatchup1')">
+        <div class="collapsible-section-header" onclick="toggleAndScrollSection('cardCatchup1', 'catchupFilterCard')">
           <div>
             <h3 style="margin:0; font-size:0.98rem;"><i class="fas fa-baby" style="color:var(--primary);"></i> 1. Catch Up Usia &lt; 1 Tahun (Bayi)</h3>
             <small style="color:var(--muted); font-size:0.75rem;">Daftar bayi usia di bawah 12 bulan untuk pemantauan jadwal rutin (<strong id="badgeCountCatchup1">0 data</strong>)</small>
           </div>
           <div class="collapsible-header-actions">
-            <span class="btn-trigger-toggle"><i class="fas fa-chevron-down"></i> Buka / Scroll</span>
+            <span class="btn-trigger-toggle"><i class="fas fa-chevron-down"></i> Buka</span>
           </div>
         </div>
         <div class="collapsible-section-body">
           <div id="panel_bayi_container" class="table-container">
             <p class="muted" style="text-align:center; padding:15px;">Klik <strong>Analisis Catch Up</strong> di atas untuk memuat data.</p>
           </div>
-          <div class="section-bottom-scroll-bar">
-            <button type="button" class="btn btn-ghost" onclick="closeAndScrollUpSection('cardCatchup1', 'catchupFilterCard')" style="padding:6px 12px; font-size:0.78rem;">
-              <i class="fas fa-chevron-up"></i> Tutup &amp; Scroll Ke Atas
-            </button>
-            <button type="button" class="btn btn-info" onclick="openAndScrollSection('cardCatchup2')" style="padding:6px 12px; font-size:0.78rem;">
-              <i class="fas fa-chevron-down"></i> Lanjut Kategori 2 (Risiko DO)
-            </button>
-          </div>
         </div>
       </div>
 
       <!-- KATEGORI 2 CATCH UP -->
       <div class="collapsible-section-card" id="cardCatchup2">
-        <div class="collapsible-section-header" onclick="toggleCollapsibleSection('cardCatchup2')">
+        <div class="collapsible-section-header" onclick="toggleAndScrollSection('cardCatchup2', 'catchupFilterCard')">
           <div>
             <h3 style="margin:0; font-size:0.98rem;"><i class="fas fa-link" style="color:var(--danger);"></i> 2. Risiko Drop Out Antigen Berkesinambungan</h3>
             <small style="color:var(--muted); font-size:0.75rem;">Pemantauan sasaran yang belum menuntaskan dosis lanjutan seri (<strong id="badgeCountCatchup2">0 data</strong>)</small>
           </div>
           <div class="collapsible-header-actions">
-            <span class="btn-trigger-toggle"><i class="fas fa-chevron-down"></i> Buka / Scroll</span>
+            <span class="btn-trigger-toggle"><i class="fas fa-chevron-down"></i> Buka</span>
           </div>
         </div>
         <div class="collapsible-section-body">
           <div id="panel_berkesinambungan_container" class="table-container">
             <p class="muted" style="text-align:center; padding:15px;">Klik <strong>Analisis Catch Up</strong> di atas untuk memuat data.</p>
           </div>
-          <div class="section-bottom-scroll-bar">
-            <button type="button" class="btn btn-ghost" onclick="closeAndScrollUpSection('cardCatchup2', 'catchupFilterCard')" style="padding:6px 12px; font-size:0.78rem;">
-              <i class="fas fa-chevron-up"></i> Tutup &amp; Scroll Ke Atas
-            </button>
-            <button type="button" class="btn btn-info" onclick="openAndScrollSection('cardCatchup3')" style="padding:6px 12px; font-size:0.78rem;">
-              <i class="fas fa-chevron-down"></i> Lanjut Kategori 3 (Booster Baduta)
-            </button>
-          </div>
         </div>
       </div>
 
       <!-- KATEGORI 3 CATCH UP -->
       <div class="collapsible-section-card" id="cardCatchup3">
-        <div class="collapsible-section-header" onclick="toggleCollapsibleSection('cardCatchup3')">
+        <div class="collapsible-section-header" onclick="toggleAndScrollSection('cardCatchup3', 'catchupFilterCard')">
           <div>
             <h3 style="margin:0; font-size:0.98rem;"><i class="fas fa-child" style="color:var(--warning);"></i> 3. Catch Up Usia 18 Bln - 3 Thn (Booster)</h3>
             <small style="color:var(--muted); font-size:0.75rem;">Pemantauan imunisasi lanjutan DPT-HB-Hib 4 &amp; Campak Rubela 2 (<strong id="badgeCountCatchup3">0 data</strong>)</small>
           </div>
           <div class="collapsible-header-actions">
-            <span class="btn-trigger-toggle"><i class="fas fa-chevron-down"></i> Buka / Scroll</span>
+            <span class="btn-trigger-toggle"><i class="fas fa-chevron-down"></i> Buka</span>
           </div>
         </div>
         <div class="collapsible-section-body">
           <div id="panel_baduta_container" class="table-container">
             <p class="muted" style="text-align:center; padding:15px;">Klik <strong>Analisis Catch Up</strong> di atas untuk memuat data.</p>
           </div>
-          <div class="section-bottom-scroll-bar">
-            <button type="button" class="btn btn-ghost" onclick="closeAndScrollUpSection('cardCatchup3', 'catchupFilterCard')" style="padding:6px 12px; font-size:0.78rem;">
-              <i class="fas fa-chevron-up"></i> Tutup &amp; Scroll Ke Atas
-            </button>
-            <button type="button" class="btn btn-info" onclick="openAndScrollSection('cardCatchup4')" style="padding:6px 12px; font-size:0.78rem;">
-              <i class="fas fa-chevron-down"></i> Lanjut Kategori 4 (Catin &amp; Bumil)
-            </button>
-          </div>
         </div>
       </div>
 
       <!-- KATEGORI 4 CATCH UP -->
       <div class="collapsible-section-card" id="cardCatchup4">
-        <div class="collapsible-section-header" onclick="toggleCollapsibleSection('cardCatchup4')">
+        <div class="collapsible-section-header" onclick="toggleAndScrollSection('cardCatchup4', 'catchupFilterCard')">
           <div>
             <h3 style="margin:0; font-size:0.98rem;"><i class="fas fa-female" style="color:#059669;"></i> 4. Catch Up Td Catin &amp; Ibu Hamil</h3>
             <small style="color:var(--muted); font-size:0.75rem;">Pemantauan status imunisasi Tetanus Difteri wanita usia subur (<strong id="badgeCountCatchup4">0 data</strong>)</small>
           </div>
           <div class="collapsible-header-actions">
-            <span class="btn-trigger-toggle"><i class="fas fa-chevron-down"></i> Buka / Scroll</span>
+            <span class="btn-trigger-toggle"><i class="fas fa-chevron-down"></i> Buka</span>
           </div>
         </div>
         <div class="collapsible-section-body">
           <div id="panel_dewasa_container" class="table-container">
             <p class="muted" style="text-align:center; padding:15px;">Klik <strong>Analisis Catch Up</strong> di atas untuk memuat data.</p>
-          </div>
-          <div class="section-bottom-scroll-bar">
-            <button type="button" class="btn btn-ghost" onclick="closeAndScrollUpSection('cardCatchup4', 'catchupFilterCard')" style="padding:6px 12px; font-size:0.78rem;">
-              <i class="fas fa-chevron-up"></i> Tutup &amp; Scroll Ke Atas
-            </button>
           </div>
         </div>
       </div>
@@ -1311,7 +1288,6 @@
           </div>
         </div>
         <div class="actions">
-          <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardReviewKumulatif')"><i class="fas fa-arrow-down"></i> Ke Tabel Hasil</button>
           <button type="button" class="btn btn-primary" id="btnApplyFilter"><i class="fas fa-search"></i> Hitung Laporan</button>
           <button type="button" class="btn btn-success" id="btnDownloadExcelFilter"><i class="fas fa-file-excel"></i> Download Excel (Sesuai Filter)</button>
         </div>
@@ -1319,16 +1295,16 @@
       <div class="card" id="cardReviewKumulatif"><h3><i class="fas fa-list-alt"></i> Hasil Rekapitulasi Matriks</h3><div id="reviewContainer" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Hitung Laporan untuk memuat data.</p></div></div>
     </section>
 
-    <!-- TAB 5: CAPAIAN (DENGAN TOMBOL TRIGGER SCROLL DOWN & UP PER KATEGORI) -->
+    <!-- TAB 5: CAPAIAN (TOMBOL TRIGGER ATAS: KLIK 1 BUKA & SCROLL DOWN, KLIK 2 TUTUP & SCROLL UP) -->
     <section id="capaian" class="tab-panel" style="display:none">
       <div class="card" id="capaianFilterCard">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
           <h3 style="margin:0;"><i class="fas fa-filter" style="color:var(--success);"></i> Filter Capaian &amp; IDL</h3>
           <div style="display:flex; gap:6px; flex-wrap:wrap;">
-            <button type="button" class="btn btn-ghost" onclick="toggleAllCollapsibleInContainer('capaian', true)" style="padding:5px 10px; font-size:0.75rem;">
+            <button type="button" class="btn btn-ghost" onclick="toggleAllCollapsibleInContainer('capaian', true, 'capaianFilterCard')" style="padding:5px 10px; font-size:0.75rem;">
               <i class="fas fa-angles-down"></i> Buka Semua
             </button>
-            <button type="button" class="btn btn-ghost" onclick="toggleAllCollapsibleInContainer('capaian', false)" style="padding:5px 10px; font-size:0.75rem;">
+            <button type="button" class="btn btn-ghost" onclick="toggleAllCollapsibleInContainer('capaian', false, 'capaianFilterCard')" style="padding:5px 10px; font-size:0.75rem;">
               <i class="fas fa-angles-up"></i> Tutup Semua
             </button>
           </div>
@@ -1352,15 +1328,15 @@
           <button type="button" class="btn btn-primary" id="btnHitungCapaian"><i class="fas fa-chart-pie"></i> Hitung Capaian &amp; IDL</button>
         </div>
 
-        <!-- Tombol Pemicu Aksi Scroll Down Cepat per Kategori Capaian -->
+        <!-- Tombol Pemicu Atas Tunggal -->
         <div class="trigger-nav-bar">
-          <button type="button" class="trigger-pill-btn" onclick="openAndScrollSection('cardCapaian1')">
+          <button type="button" class="trigger-pill-btn" data-target-sec="cardCapaian1" onclick="toggleAndScrollSection('cardCapaian1', 'capaianFilterCard')">
             <i class="fas fa-chevron-down"></i> 1. Capaian Bayi &amp; Baduta
           </button>
-          <button type="button" class="trigger-pill-btn" onclick="openAndScrollSection('cardCapaian2')">
+          <button type="button" class="trigger-pill-btn" data-target-sec="cardCapaian2" onclick="toggleAndScrollSection('cardCapaian2', 'capaianFilterCard')">
             <i class="fas fa-chevron-down"></i> 2. Tabel IDL Lengkap
           </button>
-          <button type="button" class="trigger-pill-btn" onclick="openAndScrollSection('cardCapaian3')">
+          <button type="button" class="trigger-pill-btn" data-target-sec="cardCapaian3" onclick="toggleAndScrollSection('cardCapaian3', 'capaianFilterCard')">
             <i class="fas fa-chevron-down"></i> 3. Capaian BIAS Sekolah
           </button>
         </div>
@@ -1368,115 +1344,95 @@
 
       <!-- KATEGORI 1 CAPAIAN -->
       <div class="collapsible-section-card" id="cardCapaian1">
-        <div class="collapsible-section-header" onclick="toggleCollapsibleSection('cardCapaian1')">
+        <div class="collapsible-section-header" onclick="toggleAndScrollSection('cardCapaian1', 'capaianFilterCard')">
           <div>
             <h3 style="margin:0; font-size:0.98rem;"><i class="fas fa-baby" style="color:var(--primary);"></i> 1. Capaian Bayi &amp; Baduta per Desa</h3>
             <small style="color:var(--muted); font-size:0.75rem;">Perbandingan realisasi imunisasi bayi &amp; baduta terhadap target sasaran tahunan</small>
           </div>
           <div class="collapsible-header-actions">
-            <span class="btn-trigger-toggle"><i class="fas fa-chevron-down"></i> Buka / Scroll</span>
+            <span class="btn-trigger-toggle"><i class="fas fa-chevron-down"></i> Buka</span>
           </div>
         </div>
         <div class="collapsible-section-body">
           <div id="containerCapaianBayiBaduta" class="table-container">
             <p class="muted" style="text-align:center; padding:15px;">Klik <strong>Hitung Capaian &amp; IDL</strong> di atas untuk memuat tabel.</p>
           </div>
-          <div class="section-bottom-scroll-bar">
-            <button type="button" class="btn btn-ghost" onclick="closeAndScrollUpSection('cardCapaian1', 'capaianFilterCard')" style="padding:6px 12px; font-size:0.78rem;">
-              <i class="fas fa-chevron-up"></i> Tutup &amp; Scroll Ke Atas
-            </button>
-            <button type="button" class="btn btn-info" onclick="openAndScrollSection('cardCapaian2')" style="padding:6px 12px; font-size:0.78rem;">
-              <i class="fas fa-chevron-down"></i> Lanjut Kategori 2 (Tabel IDL)
-            </button>
-          </div>
         </div>
       </div>
 
       <!-- KATEGORI 2 CAPAIAN -->
       <div class="collapsible-section-card" id="cardCapaian2">
-        <div class="collapsible-section-header" onclick="toggleCollapsibleSection('cardCapaian2')">
+        <div class="collapsible-section-header" onclick="toggleAndScrollSection('cardCapaian2', 'capaianFilterCard')">
           <div>
             <h3 style="margin:0; font-size:0.98rem;"><i class="fas fa-certificate" style="color:var(--success);"></i> 2. Imunisasi Dasar Lengkap (IDL)</h3>
             <small style="color:var(--muted); font-size:0.75rem;">Rekapitulasi persentase ketuntasan 10 antigen wajib IDL per wilayah desa</small>
           </div>
           <div class="collapsible-header-actions">
-            <span class="btn-trigger-toggle"><i class="fas fa-chevron-down"></i> Buka / Scroll</span>
+            <span class="btn-trigger-toggle"><i class="fas fa-chevron-down"></i> Buka</span>
           </div>
         </div>
         <div class="collapsible-section-body">
           <div id="containerTabelIDL" class="table-container">
             <p class="muted" style="text-align:center; padding:15px;">Klik <strong>Hitung Capaian &amp; IDL</strong> di atas untuk memuat tabel.</p>
           </div>
-          <div class="section-bottom-scroll-bar">
-            <button type="button" class="btn btn-ghost" onclick="closeAndScrollUpSection('cardCapaian2', 'capaianFilterCard')" style="padding:6px 12px; font-size:0.78rem;">
-              <i class="fas fa-chevron-up"></i> Tutup &amp; Scroll Ke Atas
-            </button>
-            <button type="button" class="btn btn-info" onclick="openAndScrollSection('cardCapaian3')" style="padding:6px 12px; font-size:0.78rem;">
-              <i class="fas fa-chevron-down"></i> Lanjut Kategori 3 (Capaian BIAS)
-            </button>
-          </div>
         </div>
       </div>
 
       <!-- KATEGORI 3 CAPAIAN -->
       <div class="collapsible-section-card" id="cardCapaian3">
-        <div class="collapsible-section-header" onclick="toggleCollapsibleSection('cardCapaian3')">
+        <div class="collapsible-section-header" onclick="toggleAndScrollSection('cardCapaian3', 'capaianFilterCard')">
           <div>
             <h3 style="margin:0; font-size:0.98rem;"><i class="fas fa-school" style="color:var(--info);"></i> 3. Capaian BIAS (Anak Sekolah)</h3>
             <small style="color:var(--muted); font-size:0.75rem;">Rekapitulasi cakupan imunisasi DT, Td, dan Campak Rubela anak sekolah</small>
           </div>
           <div class="collapsible-header-actions">
-            <span class="btn-trigger-toggle"><i class="fas fa-chevron-down"></i> Buka / Scroll</span>
+            <span class="btn-trigger-toggle"><i class="fas fa-chevron-down"></i> Buka</span>
           </div>
         </div>
         <div class="collapsible-section-body">
           <div id="containerCapaianBIAS" class="table-container">
             <p class="muted" style="text-align:center; padding:15px;">Klik <strong>Hitung Capaian &amp; IDL</strong> di atas untuk memuat tabel.</p>
           </div>
-          <div class="section-bottom-scroll-bar">
-            <button type="button" class="btn btn-ghost" onclick="closeAndScrollUpSection('cardCapaian3', 'capaianFilterCard')" style="padding:6px 12px; font-size:0.78rem;">
-              <i class="fas fa-chevron-up"></i> Tutup &amp; Scroll Ke Atas
-            </button>
-          </div>
         </div>
       </div>
-    </section>    <!-- TAB 6: ADMIN & KONTROL (DENGAN TOMBOL TRIGGER SCROLL DOWN & UP) -->
+    </section>
+<!-- ==================== PARTISI 6 DARI 10 ==================== -->
+    <!-- TAB 6: ADMIN & KONTROL (TOMBOL TRIGGER ATAS: KLIK 1 BUKA & SCROLL DOWN, KLIK 2 TUTUP & SCROLL UP) -->
     <section id="admin" class="tab-panel" style="display:none">
-      <!-- HEADER BANNER & TOMBOL TRIGGER FUNGSI ADMIN -->
       <div class="card" id="adminHeaderCard" style="background:linear-gradient(135deg, #FFF5F5 0%, #FFE4E6 100%); border:1.5px solid #FDA4AF;">
         <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px;">
           <div>
             <h2 style="margin:0;"><i class="fas fa-user-shield" style="color:var(--danger)"></i> Panel Kontrol &amp; Administrasi Sistem</h2>
-            <p class="lead" style="margin:4px 0 0 0;">Klik salah satu tombol fungsi di bawah untuk membuka dan menggulir otomatis (*scroll down*) ke menu pengaturan yang diinginkan.</p>
+            <p class="lead" style="margin:4px 0 0 0;">Klik tombol fungsi di bawah untuk membuka &amp; menggulir ke menu pengaturan. Klik tombol yang sama kedua kalinya untuk menutup kembali.</p>
           </div>
           <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
             <span id="adminAccessStatusBadge" style="background:#FFFFFF; border:1px solid #FCA5A5; color:#991B1B; padding:6px 12px; border-radius:20px; font-size:0.76rem; font-weight:800;">
               <i class="fas fa-key"></i> Mode Pemeriksaan Akses
             </span>
-            <button type="button" class="btn btn-ghost" onclick="toggleAllCollapsibleInContainer('admin', false)" style="padding:5px 10px; font-size:0.75rem; background:#FFF;">
+            <button type="button" class="btn btn-ghost" onclick="toggleAllCollapsibleInContainer('admin', false, 'adminHeaderCard')" style="padding:5px 10px; font-size:0.75rem; background:#FFF;">
               <i class="fas fa-angles-up"></i> Tutup Semua Panel
             </button>
           </div>
         </div>
 
-        <!-- TOMBOL TRIGGER PEMICU SCROLL DOWN FUNGSI ADMIN -->
+        <!-- TOMBOL TRIGGER ATAS TUNGGAL -->
         <div class="trigger-nav-bar">
-          <button type="button" class="trigger-pill-btn" onclick="openAndScrollSection('accAdminUsers')">
+          <button type="button" class="trigger-pill-btn" data-target-sec="accAdminUsers" onclick="toggleAndScrollSection('accAdminUsers', 'adminHeaderCard')">
             <i class="fas fa-users-cog" style="color:var(--primary);"></i> 1. Pengguna &amp; Password
           </button>
-          <button type="button" class="trigger-pill-btn" onclick="openAndScrollSection('accAdminCertQr')">
+          <button type="button" class="trigger-pill-btn" data-target-sec="accAdminCertQr" onclick="toggleAndScrollSection('accAdminCertQr', 'adminHeaderCard')">
             <i class="fas fa-award" style="color:var(--warning);"></i> 2. Sertifikat A4 &amp; QR
           </button>
-          <button type="button" class="trigger-pill-btn" onclick="openAndScrollSection('accAdminExportImport')">
+          <button type="button" class="trigger-pill-btn" data-target-sec="accAdminExportImport" onclick="toggleAndScrollSection('accAdminExportImport', 'adminHeaderCard')">
             <i class="fas fa-file-export" style="color:var(--info);"></i> 3. Ekspor &amp; Impor Data
           </button>
-          <button type="button" class="trigger-pill-btn" onclick="openAndScrollSection('accAdminTarget')">
+          <button type="button" class="trigger-pill-btn" data-target-sec="accAdminTarget" onclick="toggleAndScrollSection('accAdminTarget', 'adminHeaderCard')">
             <i class="fas fa-bullseye" style="color:var(--success);"></i> 4. Target Sasaran
           </button>
-          <button type="button" class="trigger-pill-btn" onclick="openAndScrollSection('accAdminQrPriority')">
+          <button type="button" class="trigger-pill-btn" data-target-sec="accAdminQrPriority" onclick="toggleAndScrollSection('accAdminQrPriority', 'adminHeaderCard')">
             <i class="fas fa-qrcode" style="color:var(--accent);"></i> 5. Prioritas Pop-Up QR
           </button>
-          <button type="button" class="trigger-pill-btn" onclick="openAndScrollSection('accAdminLogistics')">
+          <button type="button" class="trigger-pill-btn" data-target-sec="accAdminLogistics" onclick="toggleAndScrollSection('accAdminLogistics', 'adminHeaderCard')">
             <i class="fas fa-box" style="color:#B45309;"></i> 6. Kemasan Vaksin
           </button>
         </div>
@@ -1484,7 +1440,7 @@
 
       <!-- PANEL 1: MANAJEMEN PENGGUNA, PASSWORD, PENGUNCIAN DESA & KINERJA INPUT -->
       <div class="collapsible-section-card" id="accAdminUsers">
-        <div class="collapsible-section-header" onclick="toggleCollapsibleSection('accAdminUsers')">
+        <div class="collapsible-section-header" onclick="toggleAndScrollSection('accAdminUsers', 'adminHeaderCard')">
           <div style="display:flex; align-items:center; gap:12px;">
             <div style="width:40px; height:40px; border-radius:11px; background:rgba(255,87,34,0.14); color:var(--primary); display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0;">
               <i class="fas fa-users-cog"></i>
@@ -1495,12 +1451,11 @@
             </div>
           </div>
           <div class="collapsible-header-actions">
-            <span class="btn-trigger-toggle"><i class="fas fa-chevron-down"></i> Buka / Scroll</span>
+            <span class="btn-trigger-toggle"><i class="fas fa-chevron-down"></i> Buka</span>
           </div>
         </div>
 
         <div class="collapsible-section-body">
-          <!-- DASBOR MINI STATISTIK PENGGUNA & INPUT -->
           <div class="admin-stats-grid">
             <div class="stat-mini-box">
               <div class="stat-mini-val" id="statTotalUsers">0</div>
@@ -1520,7 +1475,6 @@
             </div>
           </div>
 
-          <!-- FORM TAMBAH / EDIT AKUN PENGGUNA & PASSWORD -->
           <div style="background:#F8FAFC; border:1.5px solid var(--border-color); border-radius:12px; padding:16px; margin-bottom:16px;">
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
               <h4 style="margin:0; color:var(--accent); font-size:0.94rem;"><i class="fas fa-user-plus" style="color:var(--primary);"></i> <span id="userFormModeTitle">Tambah Akun Pengguna Baru</span></h4>
@@ -1573,7 +1527,6 @@
             </form>
           </div>
 
-          <!-- TABEL DAFTAR PENGGUNA, PASSWORD & KINERJA INPUT -->
           <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:6px;">
             <h4 style="margin:0; color:var(--accent); font-size:0.92rem;"><i class="fas fa-list-ul"></i> Daftar Pengguna, Password &amp; Statistik Kinerja</h4>
             <button type="button" class="btn btn-ghost" onclick="loadAdminUsersAndStats()" style="padding:5px 10px; font-size:0.76rem;"><i class="fas fa-sync-alt"></i> Refresh Daftar Akun</button>
@@ -1597,18 +1550,12 @@
               </tbody>
             </table>
           </div>
-
-          <div class="section-bottom-scroll-bar">
-            <button type="button" class="btn btn-ghost" onclick="closeAndScrollUpSection('accAdminUsers', 'adminHeaderCard')" style="padding:6px 12px; font-size:0.78rem;">
-              <i class="fas fa-chevron-up"></i> Tutup &amp; Scroll Ke Atas
-            </button>
-          </div>
         </div>
       </div>
 
       <!-- PANEL 2: VIEW / CETAK SERTIFIKAT A4 LANDSCAPE & KARTU QR -->
       <div class="collapsible-section-card" id="accAdminCertQr">
-        <div class="collapsible-section-header" onclick="toggleCollapsibleSection('accAdminCertQr')">
+        <div class="collapsible-section-header" onclick="toggleAndScrollSection('accAdminCertQr', 'adminHeaderCard')">
           <div style="display:flex; align-items:center; gap:12px;">
             <div style="width:40px; height:40px; border-radius:11px; background:rgba(245,158,11,0.16); color:var(--warning); display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0;">
               <i class="fas fa-award"></i>
@@ -1619,7 +1566,7 @@
             </div>
           </div>
           <div class="collapsible-header-actions">
-            <span class="btn-trigger-toggle"><i class="fas fa-chevron-down"></i> Buka / Scroll</span>
+            <span class="btn-trigger-toggle"><i class="fas fa-chevron-down"></i> Buka</span>
           </div>
         </div>
 
@@ -1642,7 +1589,6 @@
             <button type="button" class="btn btn-info" onclick="openQrModalFromAdminSelect()"><i class="fas fa-qrcode"></i> Cetak Kartu QR Sasaran</button>
           </div>
 
-          <!-- AREA PRINTER SERTIFIKAT A4 LANDSCAPE (DENGAN PETUNJUK GESER DI SMARTPHONE) -->
           <div id="certificatePrintArea" style="display:none; margin-top:20px;">
             <div class="cert-mobile-scroll-notice">
               <i class="fas fa-arrows-left-right" style="font-size:1.1rem;"></i>
@@ -1678,7 +1624,6 @@
                       </div>
                       <div class="cert-slogan" style="margin-top: 2px; margin-bottom: 6px;">"ANAK SEHAT GENERASI KUAT"</div>
                       
-                      <!-- PENANDATANGAN RESMI SERTIFIKAT -->
                       <div style="display:flex; justify-content:space-between; align-items:flex-start; padding: 0 36px; font-size:0.85rem; color:#002244; position:relative; z-index:2;">
                         <div style="text-align:center; margin-top: 0px;">
                           <div style="font-weight:600; margin-bottom: 42px;">Melata, <span id="cert_tanggal_cetak">...</span><br>Koordinator Imunisasi</div>
@@ -1720,18 +1665,12 @@
               <button type="button" class="btn btn-ghost" onclick="document.getElementById('certificatePrintArea').style.display='none'"><i class="fas fa-times"></i> Sembunyikan Preview</button>
             </div>
           </div>
-
-          <div class="section-bottom-scroll-bar">
-            <button type="button" class="btn btn-ghost" onclick="closeAndScrollUpSection('accAdminCertQr', 'adminHeaderCard')" style="padding:6px 12px; font-size:0.78rem;">
-              <i class="fas fa-chevron-up"></i> Tutup &amp; Scroll Ke Atas
-            </button>
-          </div>
         </div>
       </div>
 
       <!-- PANEL 3: EKSPOR & IMPOR DATA TERFILTER -->
       <div class="collapsible-section-card" id="accAdminExportImport">
-        <div class="collapsible-section-header" onclick="toggleCollapsibleSection('accAdminExportImport')">
+        <div class="collapsible-section-header" onclick="toggleAndScrollSection('accAdminExportImport', 'adminHeaderCard')">
           <div style="display:flex; align-items:center; gap:12px;">
             <div style="width:40px; height:40px; border-radius:11px; background:rgba(37,99,235,0.14); color:var(--info); display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0;">
               <i class="fas fa-file-export"></i>
@@ -1742,7 +1681,7 @@
             </div>
           </div>
           <div class="collapsible-header-actions">
-            <span class="btn-trigger-toggle"><i class="fas fa-chevron-down"></i> Buka / Scroll</span>
+            <span class="btn-trigger-toggle"><i class="fas fa-chevron-down"></i> Buka</span>
           </div>
         </div>
 
@@ -1792,18 +1731,12 @@
               <div class="actions" style="justify-content:flex-start"><button type="button" class="btn btn-primary" id="btnStartImport"><i class="fas fa-cloud-upload-alt"></i> Mulai Import &amp; Sync</button></div>
             </div>
           </div>
-
-          <div class="section-bottom-scroll-bar">
-            <button type="button" class="btn btn-ghost" onclick="closeAndScrollUpSection('accAdminExportImport', 'adminHeaderCard')" style="padding:6px 12px; font-size:0.78rem;">
-              <i class="fas fa-chevron-up"></i> Tutup &amp; Scroll Ke Atas
-            </button>
-          </div>
         </div>
       </div>
 
       <!-- PANEL 4: TARGET SASARAN WILAYAH -->
       <div class="collapsible-section-card" id="accAdminTarget">
-        <div class="collapsible-section-header" onclick="toggleCollapsibleSection('accAdminTarget')">
+        <div class="collapsible-section-header" onclick="toggleAndScrollSection('accAdminTarget', 'adminHeaderCard')">
           <div style="display:flex; align-items:center; gap:12px;">
             <div style="width:40px; height:40px; border-radius:11px; background:rgba(16,185,129,0.15); color:var(--success); display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0;">
               <i class="fas fa-bullseye"></i>
@@ -1814,7 +1747,7 @@
             </div>
           </div>
           <div class="collapsible-header-actions">
-            <span class="btn-trigger-toggle"><i class="fas fa-chevron-down"></i> Buka / Scroll</span>
+            <span class="btn-trigger-toggle"><i class="fas fa-chevron-down"></i> Buka</span>
           </div>
         </div>
 
@@ -1837,18 +1770,12 @@
             </div>
             <div class="actions" style="justify-content:flex-start;"><button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Simpan Target Sasaran</button></div>
           </form>
-
-          <div class="section-bottom-scroll-bar">
-            <button type="button" class="btn btn-ghost" onclick="closeAndScrollUpSection('accAdminTarget', 'adminHeaderCard')" style="padding:6px 12px; font-size:0.78rem;">
-              <i class="fas fa-chevron-up"></i> Tutup &amp; Scroll Ke Atas
-            </button>
-          </div>
         </div>
       </div>
 
       <!-- PANEL 5: KONTROL LOGIKA URUTAN PRIORITAS POP-UP IMUNISASI QR -->
       <div class="collapsible-section-card" id="accAdminQrPriority">
-        <div class="collapsible-section-header" onclick="toggleCollapsibleSection('accAdminQrPriority')">
+        <div class="collapsible-section-header" onclick="toggleAndScrollSection('accAdminQrPriority', 'adminHeaderCard')">
           <div style="display:flex; align-items:center; gap:12px;">
             <div style="width:40px; height:40px; border-radius:11px; background:rgba(0,43,91,0.12); color:var(--accent); display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0;">
               <i class="fas fa-qrcode"></i>
@@ -1859,7 +1786,7 @@
             </div>
           </div>
           <div class="collapsible-header-actions">
-            <span class="btn-trigger-toggle"><i class="fas fa-chevron-down"></i> Buka / Scroll</span>
+            <span class="btn-trigger-toggle"><i class="fas fa-chevron-down"></i> Buka</span>
           </div>
         </div>
 
@@ -1894,18 +1821,12 @@
               <button type="submit" class="btn btn-info"><i class="fas fa-save"></i> Simpan Urutan Prioritas Pop-Up QR</button>
             </div>
           </form>
-
-          <div class="section-bottom-scroll-bar">
-            <button type="button" class="btn btn-ghost" onclick="closeAndScrollUpSection('accAdminQrPriority', 'adminHeaderCard')" style="padding:6px 12px; font-size:0.78rem;">
-              <i class="fas fa-chevron-up"></i> Tutup &amp; Scroll Ke Atas
-            </button>
-          </div>
         </div>
       </div>
 
       <!-- PANEL 6: PENGATURAN LOGIKA KONSUMSI & KEMASAN VAKSIN -->
       <div class="collapsible-section-card" id="accAdminLogistics">
-        <div class="collapsible-section-header" onclick="toggleCollapsibleSection('accAdminLogistics')">
+        <div class="collapsible-section-header" onclick="toggleAndScrollSection('accAdminLogistics', 'adminHeaderCard')">
           <div style="display:flex; align-items:center; gap:12px;">
             <div style="width:40px; height:40px; border-radius:11px; background:rgba(180,83,9,0.14); color:#B45309; display:flex; align-items:center; justify-content:center; font-size:1.1rem; flex-shrink:0;">
               <i class="fas fa-box"></i>
@@ -1916,7 +1837,7 @@
             </div>
           </div>
           <div class="collapsible-header-actions">
-            <span class="btn-trigger-toggle"><i class="fas fa-chevron-down"></i> Buka / Scroll</span>
+            <span class="btn-trigger-toggle"><i class="fas fa-chevron-down"></i> Buka</span>
           </div>
         </div>
 
@@ -1925,12 +1846,6 @@
             <div class="grid" id="gridLogikaVaksinContainer"></div>
             <div class="actions" style="justify-content:flex-start;"><button type="submit" class="btn btn-warning"><i class="fas fa-sliders"></i> Simpan Aturan Kemasan Vaksin</button></div>
           </form>
-
-          <div class="section-bottom-scroll-bar">
-            <button type="button" class="btn btn-ghost" onclick="closeAndScrollUpSection('accAdminLogistics', 'adminHeaderCard')" style="padding:6px 12px; font-size:0.78rem;">
-              <i class="fas fa-chevron-up"></i> Tutup &amp; Scroll Ke Atas
-            </button>
-          </div>
         </div>
       </div>
     </section>
@@ -1945,23 +1860,33 @@
         <button type="button" class="btn btn-ghost" onclick="document.getElementById('helpModal').style.display='none'">Tutup</button>
       </div>
       <hr style="margin: 10px 0; border:0; border-top:1px solid var(--border-color);">
-      <p class="lead">Sistem dilengkapi kontrol pengguna &amp; password di Tab Admin, penguncian wilayah desa bagi kader, navigasi trigger scroll down/up per kategori, cetak Kartu QR &amp; Sertifikat responsif smartphone, serta ekspor laporan Excel terfilter ketat.</p>
+      <p class="lead">Sistem terhubung ke database Cloud Puskesmas Melata (<code>register_imunisasi</code>, <code>laporan_bias</code>, <code>target_sasaran</code>), dilengkapi kontrol pengguna &amp; password, penguncian wilayah desa kader, cetak Kartu QR &amp; Sertifikat A4, serta ekspor Excel terfilter.</p>
     </div>
-  </div>  <script type="module">
+  </div>
+<!-- ==================== PARTISI 7 - 10 (SCRIPT LENGKAP TERPERBAIKI) ==================== -->
+  <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import {
       getFirestore, collection, doc, setDoc, getDoc, getDocs, deleteDoc
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    // KONFIGURASI FIREBASE (Sesuaikan dengan kredensial project Firebase imunku.my.id Anda)
+    // KONFIGURASI FIREBASE ASLI PROYEK IMUNISASI PUSKESMAS MELATA
     const firebaseConfig = window.__FIREBASE_CONFIG__ || {
-      apiKey: "AIzaSyDemoImunkuPuskesmasMelataKey",
-      authDomain: "database-imunisasi.firebaseapp.com",
-      projectId: "database-imunisasi",
-      storageBucket: "database-imunisasi.appspot.com",
-      messagingSenderId: "102938475610",
-      appId: "1:102938475610:web:imunkumelata2026"
+      apiKey: "AIzaSyAAyGTFyAkfua9wazWH6FFkYYmnGFTEh4",
+      authDomain: "imunisasi-puskesmas.firebaseapp.com",
+      databaseURL: "https://database-imunisasi-default-rtdb.firebaseio.com",
+      projectId: "imunisasi-puskesmas",
+      storageBucket: "imunisasi-puskesmas.appspot.com",
+      messagingSenderId: "26448709630",
+      appId: "1:26448709630:web:b29b4ed7357b44c876a2af"
     };
+
+    // NAMA KOLEKSI FIRESTORE SESUAI STRUKTUR DATABASE LAMA & BARU
+    const COL_KOHORT = "register_imunisasi";
+    const COL_BIAS = "laporan_bias";
+    const COL_TARGET = "target_sasaran";
+    const COL_USERS = "users";
+    const COL_CONFIG = "system_config";
 
     let db = null;
     let isCloudReady = false;
@@ -1970,19 +1895,18 @@
       db = getFirestore(app);
       isCloudReady = true;
     } catch (err) {
-      console.warn("Mode Offline Lokal aktif:", err);
+      console.warn("Firebase init warning:", err);
     }
 
-    // ==================== STATE GLOBAL & KONSTANTA VAKSIN ====================
     const STORAGE_KEYS = {
-      KOHORT: 'imunku_melata_kohort_v2',
-      BIAS: 'imunku_melata_bias_v2',
-      USERS: 'imunku_melata_users_v2',
-      TARGETS: 'imunku_melata_targets_v2',
-      QR_PRIO: 'imunku_melata_qr_prio_v2',
-      LOGISTICS: 'imunku_melata_logistics_v2',
-      SESSION: 'imunku_melata_session_v2',
-      BASE_URL: 'imunku_melata_public_url_v2'
+      KOHORT: "imunku_melata_kohort_cache",
+      BIAS: "imunku_melata_bias_cache",
+      USERS: "imunku_melata_users_cache",
+      TARGETS: "imunku_melata_targets_cache",
+      QR_PRIO: "imunku_melata_qr_prio_cache",
+      LOGISTICS: "imunku_melata_logistics_cache",
+      SESSION: "imunku_melata_session_active",
+      BASE_URL: "imunku_melata_public_url"
     };
 
     const DAFTAR_DESA = [
@@ -2060,6 +1984,142 @@
     let currentEditingKohortId = null;
     let currentQrRecordId = null;
 
+    // ==================== NORMALISER DATA LAMA (SNAKE_CASE) & BARU (CAMELCASE) ====================
+    function normalizeVaccineName(rawName) {
+      const k = String(rawName || "").trim();
+      const aliases = {
+        "HBO <24 Jam": "HBO (<24 Jam)",
+        "HBO 0": "HBO (<24 Jam)",
+        "HB0": "HBO (<24 Jam)",
+        "HBO 1-7 Hari": "HBO (1-7 Hari)",
+        "OPV 1": "OPV1", "OPV 2": "OPV2", "OPV 3": "OPV3", "OPV 4": "OPV4",
+        "DPT1": "DPT-HB-Hib1", "DPT 1": "DPT-HB-Hib1", "DPT-HB-Hib 1": "DPT-HB-Hib1",
+        "DPT2": "DPT-HB-Hib2", "DPT 2": "DPT-HB-Hib2", "DPT-HB-Hib 2": "DPT-HB-Hib2",
+        "DPT3": "DPT-HB-Hib3", "DPT 3": "DPT-HB-Hib3", "DPT-HB-Hib 3": "DPT-HB-Hib3",
+        "DPT4": "DPT-HB-Hib4", "DPT 4": "DPT-HB-Hib4", "DPT-HB-Hib 4": "DPT-HB-Hib4",
+        "PCV 1": "PCV1", "PCV 2": "PCV2", "PCV 3": "PCV3",
+        "RV1": "Rotavirus1", "RV2": "Rotavirus2", "RV3": "Rotavirus3",
+        "Rotavirus 1": "Rotavirus1", "Rotavirus 2": "Rotavirus2", "Rotavirus 3": "Rotavirus3",
+        "IPV 1": "IPV1", "IPV 2": "IPV2",
+        "MR1": "Campak Rubela-1", "MR 1": "Campak Rubela-1", "Campak Rubela 1": "Campak Rubela-1", "Campak": "Campak Rubela-1",
+        "MR2": "Campak Rubela-2", "MR 2": "Campak Rubela-2", "Campak Rubela 2": "Campak Rubela-2"
+      };
+      return aliases[k] || k;
+    }
+
+    function extractNormalizedVaksinDates(raw) {
+      const result = {};
+      const fallbackDate = String(
+        raw.tgl_pelayanan || raw.tglPelayanan || raw.tanggal_pelayanan ||
+        raw.tanggal || raw.createdAt || "2026-01-01"
+      ).slice(0, 10);
+
+      const candidates = [
+        raw.vaksinDates,
+        raw.riwayat_vaksin,
+        raw.vaksin_diberikan,
+        raw.vaksin,
+        raw.imunisasi
+      ];
+
+      candidates.forEach(src => {
+        if (!src) return;
+        if (Array.isArray(src)) {
+          src.forEach(entry => {
+            if (typeof entry === "string" && entry.trim()) {
+              const norm = normalizeVaccineName(entry);
+              if (!result[norm]) result[norm] = fallbackDate;
+            } else if (entry && typeof entry === "object") {
+              const vName = normalizeVaccineName(entry.vaksin || entry.nama || entry.antigen || "");
+              const vDate = String(entry.tanggal || entry.tgl || entry.date || fallbackDate).slice(0, 10);
+              if (vName) result[vName] = vDate;
+            }
+          });
+        } else if (typeof src === "object") {
+          Object.entries(src).forEach(([k, v]) => {
+            if (!v) return;
+            const norm = normalizeVaccineName(k);
+            if (typeof v === "string") {
+              result[norm] = v.slice(0, 10);
+            } else if (typeof v === "object" && (v.tanggal || v.tgl)) {
+              result[norm] = String(v.tanggal || v.tgl).slice(0, 10);
+            } else if (v === true) {
+              if (!result[norm]) result[norm] = fallbackDate;
+            }
+          });
+        } else if (typeof src === "string") {
+          src.split(",").forEach(part => {
+            const norm = normalizeVaccineName(part);
+            if (norm && !result[norm]) result[norm] = fallbackDate;
+          });
+        }
+      });
+
+      // Cek juga jika nama antigen tersimpan langsung sebagai field tingkat atas di dokumen Firestore
+      ALL_ANTIGENS.forEach(ant => {
+        if (raw[ant] && typeof raw[ant] === "string") {
+          result[ant] = raw[ant].slice(0, 10);
+        }
+      });
+
+      return result;
+    }
+
+    function normalizeKohortRecord(docId, raw) {
+      const vaksinDates = extractNormalizedVaksinDates(raw);
+      let peran = raw.peran || raw.kategori || "Bayi/Baduta";
+      const vKeys = Object.keys(vaksinDates);
+      if (peran === "Bayi/Baduta" && vKeys.length > 0 && vKeys.every(k => k.includes("Catin"))) {
+        peran = "Catin";
+      } else if (peran === "Bayi/Baduta" && vKeys.length > 0 && vKeys.every(k => k.includes("Bumil"))) {
+        peran = "Bumil";
+      }
+
+      return {
+        ...raw,
+        id: String(docId || raw.id || ""),
+        desa: String(raw.desa || raw.kelurahan || "").trim(),
+        kegiatan: String(raw.kegiatan || raw.posyandu || "").trim(),
+        peran,
+        namaAnak: String(raw.namaAnak || raw.nama_anak || raw.nama || "").trim(),
+        tglLahir: String(raw.tglLahir || raw.tgl_lahir || raw.tanggal_lahir || "").slice(0, 10),
+        jk: String(raw.jk || raw.jenis_kelamin || raw.gender || "").trim(),
+        nikAnak: String(raw.nikAnak || raw.nik_anak || raw.nik || "").trim(),
+        waAnak: String(raw.waAnak || raw.wa_anak || raw.no_wa || raw.no_hp || "").trim(),
+        namaIbu: String(raw.namaIbu || raw.nama_ibu || raw.nama_ortu || raw.orang_tua || "").trim(),
+        nikIbu: String(raw.nikIbu || raw.nik_ibu || "").trim(),
+        alamat: String(raw.alamat || raw.rt || "").trim(),
+        vaksinDates,
+        petugasInput: String(raw.petugasInput || raw.petugas_input || raw.petugas || raw.createdBy || "-").trim(),
+        lastUpdatedBy: String(raw.lastUpdatedBy || raw.updated_by || raw.petugasInput || raw.petugas || "-").trim()
+      };
+    }
+
+    function normalizeBiasRecord(docId, raw) {
+      return {
+        ...raw,
+        id: String(docId || raw.id || ""),
+        sekolah: String(raw.sekolah || raw.nama_sekolah || "").trim(),
+        desa: String(raw.desa || "").trim(),
+        kelasAntigen: String(raw.kelasAntigen || raw.kelas_antigen || raw.kelas || "").trim(),
+        tanggal: String(raw.tanggal || raw.tgl_pelayanan || "").slice(0, 10),
+        sasaran: Number(raw.sasaran ?? raw.jumlah_sasaran ?? 0),
+        capaian: Number(raw.capaian ?? raw.jumlah_capaian ?? raw.diimunisasi ?? 0),
+        petugas: String(raw.petugas || "-")
+      };
+    }
+
+    function normalizeUserRecord(docId, raw) {
+      return {
+        id: String(docId || raw.id || ""),
+        username: String(raw.username || raw.user || "").trim(),
+        fullname: String(raw.fullname || raw.nama_lengkap || raw.nama || raw.username || "").trim(),
+        password: String(raw.password || raw.pass || "melata2026"),
+        role: String(raw.role || raw.peran || "petugas").toLowerCase(),
+        desaLock: String(raw.desaLock || raw.desa_lock || raw.desa || "").trim()
+      };
+    }
+
     // ==================== UTILITAS UMUM & SMOOTH SCROLL ====================
     function escapeHtml(str) {
       if (str === null || str === undefined) return "";
@@ -2100,11 +2160,8 @@
     window.smoothScrollPage = function(direction) {
       const step = Math.max(380, window.innerHeight * 0.72);
       if (direction === "up") {
-        if (window.scrollY < 450) {
-          window.scrollTo({ top: 0, behavior: "smooth" });
-        } else {
-          window.scrollBy({ top: -step, behavior: "smooth" });
-        }
+        if (window.scrollY < 450) window.scrollTo({ top: 0, behavior: "smooth" });
+        else window.scrollBy({ top: -step, behavior: "smooth" });
       } else {
         window.scrollBy({ top: step, behavior: "smooth" });
       }
@@ -2118,58 +2175,69 @@
       window.scrollTo({ top: Math.max(0, topPos), behavior: "smooth" });
     };
 
-    // ==================== PENGENDALI TOMBOL TRIGGER SCROLL DOWN & UP ====================
-    function updateCollapsibleToggleVisual(card) {
-      if (!card) return;
-      const btnToggle = card.querySelector(".btn-trigger-toggle");
-      if (!btnToggle) return;
-      if (card.classList.contains("open")) {
-        btnToggle.innerHTML = `<i class="fas fa-chevron-up"></i> Tutup`;
-      } else {
-        btnToggle.innerHTML = `<i class="fas fa-chevron-down"></i> Buka / Scroll`;
+    // ==================== PENGENDALI TOMBOL TRIGGER ATAS (KLIK 1 BUKA, KLIK 2 TUTUP) ====================
+    function syncCollapsibleVisualState(secId, isOpen) {
+      const card = document.getElementById(secId);
+      if (card) {
+        const btnToggle = card.querySelector(".btn-trigger-toggle");
+        if (btnToggle) {
+          btnToggle.innerHTML = isOpen
+            ? `<i class="fas fa-chevron-up"></i> Tutup`
+            : `<i class="fas fa-chevron-down"></i> Buka`;
+        }
       }
+      document.querySelectorAll(`.trigger-pill-btn[data-target-sec="${secId}"]`).forEach(pill => {
+        const icon = pill.querySelector("i");
+        if (isOpen) {
+          pill.classList.add("active-trigger");
+          if (icon && (icon.classList.contains("fa-chevron-down") || icon.classList.contains("fa-chevron-up"))) {
+            icon.className = "fas fa-chevron-up";
+          }
+        } else {
+          pill.classList.remove("active-trigger");
+          if (icon && (icon.classList.contains("fa-chevron-down") || icon.classList.contains("fa-chevron-up"))) {
+            icon.className = "fas fa-chevron-down";
+          }
+        }
+      });
     }
 
-    window.toggleCollapsibleSection = function(secId) {
+    window.toggleAndScrollSection = function(secId, topAnchorId = null) {
       const card = document.getElementById(secId);
       if (!card) return;
       const willOpen = !card.classList.contains("open");
-      card.classList.toggle("open");
-      updateCollapsibleToggleVisual(card);
+      card.classList.toggle("open", willOpen);
+      syncCollapsibleVisualState(secId, willOpen);
+
       if (willOpen) {
-        setTimeout(() => smoothScrollToId(secId), 70);
+        setTimeout(() => smoothScrollToId(secId), 60);
+      } else if (topAnchorId) {
+        setTimeout(() => smoothScrollToId(topAnchorId), 60);
       }
+    };
+
+    window.toggleCollapsibleSection = function(secId) {
+      window.toggleAndScrollSection(secId, null);
     };
 
     window.openAndScrollSection = function(secId) {
       const card = document.getElementById(secId);
       if (!card) return;
       card.classList.add("open");
-      updateCollapsibleToggleVisual(card);
-      setTimeout(() => smoothScrollToId(secId), 70);
+      syncCollapsibleVisualState(secId, true);
+      setTimeout(() => smoothScrollToId(secId), 60);
     };
 
-    window.closeAndScrollUpSection = function(secId, topAnchorId) {
-      const card = document.getElementById(secId);
-      if (card) {
-        card.classList.remove("open");
-        updateCollapsibleToggleVisual(card);
-      }
-      if (topAnchorId) {
-        setTimeout(() => smoothScrollToId(topAnchorId), 70);
-      } else {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      }
-    };
-
-    window.toggleAllCollapsibleInContainer = function(containerId, shouldOpen) {
+    window.toggleAllCollapsibleInContainer = function(containerId, shouldOpen, topAnchorId = null) {
       const container = document.getElementById(containerId);
       if (!container) return;
       container.querySelectorAll(".collapsible-section-card").forEach(card => {
-        if (shouldOpen) card.classList.add("open");
-        else card.classList.remove("open");
-        updateCollapsibleToggleVisual(card);
+        card.classList.toggle("open", shouldOpen);
+        syncCollapsibleVisualState(card.id, shouldOpen);
       });
+      if (!shouldOpen && topAnchorId) {
+        setTimeout(() => smoothScrollToId(topAnchorId), 60);
+      }
     };
 
     window.toggleInputPasswordVisibility = function(inputId, btnEl) {
@@ -2212,18 +2280,16 @@
         p.style.display = (p.id === targetTab) ? "block" : "none";
       });
 
-      if (targetTab === "admin") {
-        loadAdminUsersAndStats();
-      }
+      if (targetTab === "admin") loadAdminUsersAndStats();
       window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
-    // ==================== SINKRONISASI PENYIMPANAN (LOCAL + CLOUD) ====================
+    // ==================== SINKRONISASI PENYIMPANAN (FIRESTORE + CACHE LOKAL) ====================
     function saveLocal(key, data) {
       try {
         localStorage.setItem(key, JSON.stringify(data));
       } catch (e) {
-        console.warn("Local storage penuh:", e);
+        console.warn("Cache lokal penuh:", e);
       }
     }
 
@@ -2233,6 +2299,22 @@
         return raw ? JSON.parse(raw) : fallback;
       } catch (e) {
         return fallback;
+      }
+    }
+
+    function updateSystemSyncStatusBanner(messageHtml, isError = false) {
+      const banner = document.querySelector("#imunisasi .alert-banner");
+      if (!banner) return;
+      if (isError) {
+        banner.style.background = "linear-gradient(135deg, #FEF2F2, #FEE2E2)";
+        banner.style.borderColor = "#FCA5A5";
+        banner.style.color = "#991B1B";
+        banner.innerHTML = `<i class="fas fa-exclamation-triangle" style="font-size:1.15rem; color:#DC2626;"></i><div>${messageHtml}</div>`;
+      } else {
+        banner.style.background = "linear-gradient(135deg, #ECFDF5, #D1FAE5)";
+        banner.style.borderColor = "#6EE7B7";
+        banner.style.color = "#065F46";
+        banner.innerHTML = `<i class="fas fa-cloud-check fas fa-shield-alt" style="font-size:1.15rem; color:#059669;"></i><div>${messageHtml}</div>`;
       }
     }
 
@@ -2255,51 +2337,84 @@
     }
 
     async function loadAllMasterData() {
-      allKohortData = loadLocal(STORAGE_KEYS.KOHORT, []);
-      allBiasData = loadLocal(STORAGE_KEYS.BIAS, []);
-      allUsersData = loadLocal(STORAGE_KEYS.USERS, [...DEFAULT_USERS]);
+      // 1. Muat cache lokal terlebih dahulu agar langsung responsif
+      const cachedKohort = loadLocal(STORAGE_KEYS.KOHORT, []);
+      allKohortData = Array.isArray(cachedKohort) ? cachedKohort.map(r => normalizeKohortRecord(r.id, r)) : [];
+
+      const cachedBias = loadLocal(STORAGE_KEYS.BIAS, []);
+      allBiasData = Array.isArray(cachedBias) ? cachedBias.map(b => normalizeBiasRecord(b.id, b)) : [];
+
+      const cachedUsers = loadLocal(STORAGE_KEYS.USERS, []);
+      allUsersData = Array.isArray(cachedUsers) && cachedUsers.length > 0
+        ? cachedUsers.map(u => normalizeUserRecord(u.id, u))
+        : [...DEFAULT_USERS];
+
       targetSasaranMap = loadLocal(STORAGE_KEYS.TARGETS, {});
       qrPriorityConfig = { ...DEFAULT_QR_PRIORITY, ...loadLocal(STORAGE_KEYS.QR_PRIO, {}) };
       vaccineLogisticsConfig = { ...DEFAULT_LOGISTICS_RULES, ...loadLocal(STORAGE_KEYS.LOGISTICS, {}) };
 
-      if (!allUsersData || allUsersData.length === 0) {
-        allUsersData = [...DEFAULT_USERS];
-        saveLocal(STORAGE_KEYS.USERS, allUsersData);
-      }
-
+      // 2. Ambil data real-time dari koleksi Firestore asli (`register_imunisasi`, `laporan_bias`, `target_sasaran`, `users`)
       if (isCloudReady && db) {
         try {
-          const kohortSnap = await getDocs(collection(db, "kohort_imunisasi"));
-          if (!kohortSnap.empty) {
-            const cloudList = [];
-            kohortSnap.forEach(d => cloudList.push({ id: d.id, ...d.data() }));
-            allKohortData = cloudList;
-            saveLocal(STORAGE_KEYS.KOHORT, allKohortData);
+          const kohortSnap = await getDocs(collection(db, COL_KOHORT));
+          const cloudKohort = [];
+          kohortSnap.forEach(d => {
+            const norm = normalizeKohortRecord(d.id, d.data());
+            if (norm.namaAnak) cloudKohort.push(norm);
+          });
+          if (cloudKohort.length > 0 || kohortSnap.size === 0) {
+            // Gabungkan jika ada data baru dari cloud
+            if (cloudKohort.length > 0) {
+              allKohortData = cloudKohort;
+              saveLocal(STORAGE_KEYS.KOHORT, allKohortData);
+            }
           }
 
-          const usersSnap = await getDocs(collection(db, "users_imunisasi"));
-          if (!usersSnap.empty) {
-            const uList = [];
-            usersSnap.forEach(d => uList.push({ id: d.id, ...d.data() }));
-            allUsersData = uList;
-            saveLocal(STORAGE_KEYS.USERS, allUsersData);
-          }
-
-          const biasSnap = await getDocs(collection(db, "bias_imunisasi"));
+          const biasSnap = await getDocs(collection(db, COL_BIAS));
           if (!biasSnap.empty) {
-            const bList = [];
-            biasSnap.forEach(d => bList.push({ id: d.id, ...d.data() }));
-            allBiasData = bList;
+            const cloudBias = [];
+            biasSnap.forEach(d => cloudBias.push(normalizeBiasRecord(d.id, d.data())));
+            allBiasData = cloudBias;
             saveLocal(STORAGE_KEYS.BIAS, allBiasData);
           }
 
-          const cfgSnap = await getDoc(doc(db, "system_config", "global_settings"));
+          const targetSnap = await getDocs(collection(db, COL_TARGET));
+          if (!targetSnap.empty) {
+            targetSnap.forEach(d => {
+              const rawT = d.data();
+              const desaName = rawT.desa || d.id.split("_")[0];
+              const thnStr = String(rawT.tahun || d.id.split("_")[1] || "2026");
+              if (desaName) {
+                targetSasaranMap[`${desaName}_${thnStr}`] = {
+                  bayi: Number(rawT.target_bayi ?? rawT.bayi ?? 20),
+                  baduta: Number(rawT.target_baduta ?? rawT.baduta ?? 20),
+                  bias: Number(rawT.target_bias ?? rawT.bias ?? 30)
+                };
+              }
+            });
+            saveLocal(STORAGE_KEYS.TARGETS, targetSasaranMap);
+          }
+
+          const usersSnap = await getDocs(collection(db, COL_USERS));
+          if (!usersSnap.empty) {
+            const cloudUsers = [];
+            usersSnap.forEach(d => {
+              const u = normalizeUserRecord(d.id, d.data());
+              if (u.username) cloudUsers.push(u);
+            });
+            if (cloudUsers.length > 0) {
+              // Pastikan akun admin default tetap tersedia jika belum ada di cloud
+              if (!cloudUsers.some(u => u.username.toLowerCase() === "admin")) {
+                cloudUsers.unshift(DEFAULT_USERS[0]);
+              }
+              allUsersData = cloudUsers;
+              saveLocal(STORAGE_KEYS.USERS, allUsersData);
+            }
+          }
+
+          const cfgSnap = await getDoc(doc(db, COL_CONFIG, "global_settings"));
           if (cfgSnap.exists()) {
             const cfg = cfgSnap.data();
-            if (cfg.targets) {
-              targetSasaranMap = cfg.targets;
-              saveLocal(STORAGE_KEYS.TARGETS, targetSasaranMap);
-            }
             if (cfg.qrPriority) {
               qrPriorityConfig = { ...DEFAULT_QR_PRIORITY, ...cfg.qrPriority };
               saveLocal(STORAGE_KEYS.QR_PRIO, qrPriorityConfig);
@@ -2309,8 +2424,16 @@
               saveLocal(STORAGE_KEYS.LOGISTICS, vaccineLogisticsConfig);
             }
           }
+
+          updateSystemSyncStatusBanner(
+            `<strong>DATABASE CLOUD TERHUBUNG:</strong> Berhasil memuat <strong>${allKohortData.length} data sasaran</strong> dari koleksi <code>${COL_KOHORT}</code>.`
+          );
         } catch (err) {
-          console.warn("Menggunakan cache lokal karena Firestore belum merespons:", err.message);
+          console.error("Firestore read error:", err);
+          updateSystemSyncStatusBanner(
+            `<strong>PERINGATAN KONEKSI CLOUD:</strong> ${escapeHtml(err.message)}. Menampilkan <strong>${allKohortData.length} data</strong> dari cache lokal.`,
+            true
+          );
         }
       }
     }
@@ -2429,12 +2552,10 @@
             if (lockStyle) lockStyle.remove();
             document.getElementById("publicQrBackdropScreen").style.display = "none";
             document.getElementById("publicQrFeedModal").style.display = "none";
-            if (typeof window.openRecordInFormById === "function") {
-              window.openRecordInFormById(targetId, true);
-            }
+            openRecordInFormById(targetId, true);
           } else {
-            if (typeof window.populateSasaranDropdowns === "function") window.populateSasaranDropdowns();
-            if (typeof window.loadRecentTransactions === "function") window.loadRecentTransactions();
+            populateSasaranDropdowns();
+            loadRecentTransactions();
           }
         });
       }
@@ -2480,15 +2601,10 @@
       const totalPetugas = allUsersData.filter(u => u.role === "admin" || u.role === "petugas").length;
       const totalKader = allUsersData.filter(u => u.role === "kader").length;
 
-      const elTotalUsers = document.getElementById("statTotalUsers");
-      const elTotalPetugas = document.getElementById("statTotalPetugas");
-      const elTotalKader = document.getElementById("statTotalKader");
-      const elTotalKohort = document.getElementById("statTotalKohortRecords");
-
-      if (elTotalUsers) elTotalUsers.textContent = totalUsers;
-      if (elTotalPetugas) elTotalPetugas.textContent = totalPetugas;
-      if (elTotalKader) elTotalKader.textContent = totalKader;
-      if (elTotalKohort) elTotalKohort.textContent = allKohortData.length;
+      document.getElementById("statTotalUsers").textContent = totalUsers;
+      document.getElementById("statTotalPetugas").textContent = totalPetugas;
+      document.getElementById("statTotalKader").textContent = totalKader;
+      document.getElementById("statTotalKohortRecords").textContent = allKohortData.length;
 
       if (allUsersData.length === 0) {
         tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;">Belum ada akun terdaftar.</td></tr>`;
@@ -2501,7 +2617,7 @@
         const unameLow = String(u.username || "").toLowerCase();
         const fnameLow = String(u.fullname || "").toLowerCase();
         const inputCount = allKohortData.filter(rec => {
-          const p = String(rec.petugasInput || rec.createdBy || "").toLowerCase();
+          const p = String(rec.petugasInput || rec.lastUpdatedBy || "").toLowerCase();
           return p && (p === unameLow || p === fnameLow || p.includes(unameLow));
         }).length;
 
@@ -2565,16 +2681,12 @@
         return;
       }
       const target = allUsersData.find(u => u.id === docId);
-      if (!target) return;
-      if (target.username === "admin") {
-        alert("Akun utama admin tidak dapat dihapus.");
-        return;
-      }
+      if (!target || target.username === "admin") return;
       if (!confirm(`Hapus akun "${target.fullname}" (${target.username})?`)) return;
 
       allUsersData = allUsersData.filter(u => u.id !== docId);
       saveLocal(STORAGE_KEYS.USERS, allUsersData);
-      await deleteDocFromCloud("users_imunisasi", docId);
+      await deleteDocFromCloud(COL_USERS, docId);
       loadAdminUsersAndStats();
     };
 
@@ -2598,22 +2710,17 @@
 
         if (password.length < 4) {
           alert("Password minimal 4 karakter!");
-          document.getElementById("usr_password").focus();
           return;
         }
-
         if (role === "kader" && !desaLock) {
-          alert("Untuk peran Kader Posyandu, wajib memilih Desa Tugas pada kolom Penguncian Wilayah Desa!");
-          document.getElementById("usr_desa_lock").focus();
+          alert("Untuk peran Kader Posyandu, wajib memilih Desa Tugas!");
           return;
         }
-        if (role !== "kader" && !desaLock) {
-          desaLock = "";
-        }
+        if (role !== "kader" && !desaLock) desaLock = "";
 
         const duplicate = allUsersData.find(u => u.username === username && u.id !== editId);
         if (duplicate) {
-          alert(`Username "${username}" sudah digunakan oleh akun lain!`);
+          alert(`Username "${username}" sudah digunakan!`);
           return;
         }
 
@@ -2625,6 +2732,7 @@
           password,
           role,
           desaLock,
+          desa_lock: desaLock,
           updatedAt: new Date().toISOString()
         };
 
@@ -2636,13 +2744,15 @@
         }
 
         saveLocal(STORAGE_KEYS.USERS, allUsersData);
-        await syncDocToCloud("users_imunisasi", docId, userPayload);
+        await syncDocToCloud(COL_USERS, docId, userPayload);
 
         resetUserAccountForm();
         loadAdminUsersAndStats();
         alert(`Akun pengguna "${fullname}" berhasil disimpan!`);
       });
-    }    // ==================== PENCARIAN, FORM INPUT & PREVIEW KOHORT ====================
+    }
+
+    // ==================== PENCARIAN, FORM INPUT & PREVIEW KOHORT ====================
     function getFilteredKohortByDesa(desaVal) {
       if (!desaVal || desaVal === "ALL") return [...allKohortData];
       return allKohortData.filter(item => String(item.desa || "").toLowerCase() === String(desaVal).toLowerCase());
@@ -2740,9 +2850,7 @@
     window.openNewSasaranFormSmooth = function() {
       const typedName = document.getElementById("input_search_sasaran")?.value.trim() || "";
       resetFormRegisterIndividu();
-      if (typedName) {
-        document.getElementById("reg_nama_anak").value = typedName;
-      }
+      if (typedName) document.getElementById("reg_nama_anak").value = typedName;
       document.getElementById("notFoundAddContainer").style.display = "none";
       document.getElementById("liveSearchResults").style.display = "none";
       const cardForm = document.getElementById("cardFormUtama");
@@ -2758,7 +2866,7 @@
     window.openRecordInFormById = function(recordId, isQuickImunMode = false) {
       const rec = allKohortData.find(item => String(item.id) === String(recordId));
       if (!rec) {
-        alert("Data sasaran tidak ditemukan di database.");
+        alert("Data sasaran tidak ditemukan.");
         return;
       }
 
@@ -2768,7 +2876,7 @@
         currentUserSession.desaLock &&
         String(rec.desa || "").toLowerCase() !== String(currentUserSession.desaLock).toLowerCase()
       ) {
-        alert(`Akses ditolak: Akun Kader Anda terkunci pada Desa ${currentUserSession.desaLock}, sedangkan sasaran ini terdaftar di Desa ${rec.desa}.`);
+        alert(`Akses ditolak: Akun Kader Anda terkunci pada Desa ${currentUserSession.desaLock}.`);
         return;
       }
 
@@ -2932,10 +3040,7 @@
         });
       }
 
-      const peranSel = document.getElementById("reg_peran");
-      if (peranSel) {
-        peranSel.addEventListener("change", updateFormRoleVisibility);
-      }
+      document.getElementById("reg_peran")?.addEventListener("change", updateFormRoleVisibility);
 
       const namaAnakInp = document.getElementById("reg_nama_anak");
       if (namaAnakInp) {
@@ -2987,12 +3092,10 @@
           const updatedVaksinDates = existingRec ? { ...(existingRec.vaksinDates || {}) } : {};
           const checkedSet = new Set(checkedBoxes.map(cb => cb.value));
 
-          // Hapus centang yang sengaja dibatalkan petugas saat edit
           Object.keys(updatedVaksinDates).forEach(k => {
             if (!checkedSet.has(k)) delete updatedVaksinDates[k];
           });
 
-          // Pertahankan tanggal lama untuk vaksin yang sudah ada, isi tanggal baru untuk vaksin baru dicentang
           checkedSet.forEach(vaxName => {
             if (!updatedVaksinDates[vaxName]) {
               updatedVaksinDates[vaxName] = tglPelayanan;
@@ -3002,20 +3105,29 @@
           const docId = existingRec ? existingRec.id : `kohort_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
           const petugasNama = currentUserSession ? (currentUserSession.username || currentUserSession.fullname) : "petugas";
 
+          // Simpan dalam format ganda (snake_case & camelCase) agar kompatibel penuh dengan database lama & baru
           const recordPayload = {
             id: docId,
             desa,
             kegiatan,
             peran,
             namaAnak,
+            nama_anak: namaAnak,
             tglLahir,
+            tgl_lahir: tglLahir,
             jk,
+            jenis_kelamin: jk,
             nikAnak,
+            nik_anak: nikAnak,
             waAnak,
+            no_wa: waAnak,
             namaIbu,
+            nama_ibu: namaIbu,
             nikIbu,
+            nik_ibu: nikIbu,
             alamat,
             vaksinDates: updatedVaksinDates,
+            riwayat_vaksin: updatedVaksinDates,
             petugasInput: existingRec?.petugasInput || petugasNama,
             lastUpdatedBy: petugasNama,
             updatedAt: new Date().toISOString()
@@ -3028,7 +3140,7 @@
           }
 
           saveLocal(STORAGE_KEYS.KOHORT, allKohortData);
-          await syncDocToCloud("kohort_imunisasi", docId, recordPayload);
+          await syncDocToCloud(COL_KOHORT, docId, recordPayload);
 
           currentEditingKohortId = docId;
           const btnQr = document.getElementById("btnCetakQrFromForm");
@@ -3045,18 +3157,16 @@
       const target = allKohortData.find(r => String(r.id) === String(recordId));
       if (!target) return;
       if (currentUserSession && currentUserSession.role === "kader") {
-        alert("Akun Kader tidak memiliki izin menghapus data kohort. Hubungi Petugas/Admin Puskesmas.");
+        alert("Akun Kader tidak memiliki izin menghapus data kohort.");
         return;
       }
       if (!confirm(`Hapus permanen data kohort atas nama "${target.namaAnak}" (${target.desa})?`)) return;
 
       allKohortData = allKohortData.filter(r => String(r.id) !== String(recordId));
       saveLocal(STORAGE_KEYS.KOHORT, allKohortData);
-      await deleteDocFromCloud("kohort_imunisasi", recordId);
+      await deleteDocFromCloud(COL_KOHORT, recordId);
 
-      if (String(currentEditingKohortId) === String(recordId)) {
-        hideFormRegisterSmooth();
-      }
+      if (String(currentEditingKohortId) === String(recordId)) hideFormRegisterSmooth();
       populateSasaranDropdowns();
       loadRecentTransactions();
     };
@@ -3157,9 +3267,7 @@
 
       if (guideBox) {
         guideBox.className = (scanMode === "multi") ? "scan-guide-multi" : "scan-guide-single";
-        guideBox.innerHTML = (scanMode === "multi")
-          ? `<div class="guide-line"></div><div class="guide-line"></div>`
-          : "";
+        guideBox.innerHTML = (scanMode === "multi") ? `<div class="guide-line"></div><div class="guide-line"></div>` : "";
       }
       if (hintTxt) {
         hintTxt.textContent = (scanMode === "multi")
@@ -3182,7 +3290,7 @@
         video.srcObject = activeMediaStream;
       } catch (err) {
         closeCameraScanner();
-        alert("Kamera tidak dapat diakses. Pastikan izin kamera browser aktif dan halaman diakses via HTTPS.");
+        alert("Kamera tidak dapat diakses. Pastikan izin kamera aktif dan dibuka via HTTPS.");
       }
     }
 
@@ -3217,8 +3325,7 @@
 
       canvas.width = cropW;
       canvas.height = cropH;
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(video, sx, sy, cropW, cropH, 0, 0, cropW, cropH);
+      canvas.getContext("2d").drawImage(video, sx, sy, cropW, cropH, 0, 0, cropW, cropH);
 
       lastCapturedCanvas = canvas;
       closeCameraScanner();
@@ -3251,17 +3358,13 @@
           }
         });
 
-        let cleaned = String(result?.data?.text || "")
-          .replace(/\s+/g, " ")
-          .replace(/[|_=~`^*]/g, "")
-          .trim();
-
+        let cleaned = String(result?.data?.text || "").replace(/\s+/g, " ").replace(/[|_=~`^*]/g, "").trim();
         if (activeOcrTargetId && activeOcrTargetId.includes("nik")) {
           cleaned = cleaned.replace(/[^0-9]/g, "");
         }
 
         if (!cleaned) {
-          statusTxt.textContent = "Teks tidak terbaca jelas. Silakan coba lagi dengan pencahayaan cukup.";
+          statusTxt.textContent = "Teks tidak terbaca jelas. Silakan coba lagi.";
           retryGrp.style.display = "flex";
           return;
         }
@@ -3287,7 +3390,9 @@
 
     window.cancelOCRProcess = function() {
       document.getElementById("ocrModal").style.display = "none";
-    };    // ==================== MODUL CETAK KARTU QR IMUNISASI ====================
+    };
+
+    // ==================== MODUL CETAK KARTU QR IMUNISASI ====================
     function getPublicBaseUrl() {
       const saved = localStorage.getItem(STORAGE_KEYS.BASE_URL);
       if (saved && saved.startsWith("http")) return saved.endsWith("/") ? saved : `${saved}/`;
@@ -3354,15 +3459,13 @@
       const urlInput = document.getElementById("qr_public_base_url");
       if (urlInput) urlInput.value = getPublicBaseUrl();
 
-      const fullUrl = buildQrTargetUrl(rec.id);
-      renderQrCodeGraphic(fullUrl);
-
+      renderQrCodeGraphic(buildQrTargetUrl(rec.id));
       document.getElementById("qrPrintModal").style.display = "flex";
     };
 
     window.openQrModalFromCurrentForm = function() {
       if (!currentEditingKohortId) {
-        alert("Simpan data sasaran terlebih dahulu sebelum mencetak Kartu QR.");
+        alert("Simpan data sasaran terlebih dahulu.");
         return;
       }
       openQrPrintModalById(currentEditingKohortId);
@@ -3387,9 +3490,7 @@
       if (!val.endsWith("/")) val += "/";
       localStorage.setItem(STORAGE_KEYS.BASE_URL, val);
       if (urlInput) urlInput.value = val;
-      if (currentQrRecordId) {
-        renderQrCodeGraphic(buildQrTargetUrl(currentQrRecordId));
-      }
+      if (currentQrRecordId) renderQrCodeGraphic(buildQrTargetUrl(currentQrRecordId));
     };
 
     window.closeQrPrintModal = function() {
@@ -3416,10 +3517,7 @@
 
     // ==================== MODE PUBLIK SCAN QR (ORANG TUA & KADER) ====================
     function parsePriorityList(csvStr) {
-      return String(csvStr || "")
-        .split(",")
-        .map(s => s.trim())
-        .filter(Boolean);
+      return String(csvStr || "").split(",").map(s => s.trim()).filter(Boolean);
     }
 
     function computeNextRecommendedVaccines(record) {
@@ -3438,8 +3536,6 @@
 
       const prioQueue = parsePriorityList(priorityRaw);
       const emptyStockSet = new Set(parsePriorityList(qrPriorityConfig.stokKosong).map(s => s.toLowerCase()));
-
-      // Jika sudah mendapat salah satu HBO (<24 Jam atau 1-7 Hari), anggap HBO terpenuhi
       const hasAnyHbo = Boolean(vMap["HBO (<24 Jam)"] || vMap["HBO (1-7 Hari)"]);
 
       const pendingCandidates = prioQueue.filter(vax => {
@@ -3466,7 +3562,6 @@
       document.getElementById("feed_ttl_desa").textContent = `Lahir: ${formatDateIndo(record.tglLahir)} (${ageMonths} Bulan) • Desa ${record.desa || "-"}`;
       document.getElementById("feed_ortu").textContent = `Orang Tua / Ibu: ${record.namaIbu || "-"} ${record.alamat ? `• ${record.alamat}` : ""}`;
 
-      // Hitung IDL (10 antigen wajib)
       const completedIdl = IDL_WAJIB_LIST.filter(v => Boolean(vMap[v]));
       const idlPct = Math.round((completedIdl.length / IDL_WAJIB_LIST.length) * 100);
       const isIdlComplete = completedIdl.length === IDL_WAJIB_LIST.length;
@@ -3489,7 +3584,6 @@
         certPill.style.color = "#92400E";
       }
 
-      // Rekomendasi vaksin berikutnya sesuai aturan prioritas Admin
       const recInfo = computeNextRecommendedVaccines(record);
       document.getElementById("feed_next_due_badge").textContent = recInfo.ageCategoryLabel;
       const nextContentEl = document.getElementById("feed_next_vaccine_content");
@@ -3515,30 +3609,19 @@
         `;
       } else {
         nextContentEl.innerHTML = `
-          <div style="color:#065F46; font-weight:800;">
-            <i class="fas fa-award"></i> Seluruh jadwal vaksinasi prioritas pada kelompok usia ini telah terpenuhi!
-          </div>
-          <div style="font-size:0.78rem; color:#334155; margin-top:4px;">
-            ${escapeHtml(qrPriorityConfig.catatan || DEFAULT_QR_PRIORITY.catatan)}
-          </div>
+          <div style="color:#065F46; font-weight:800;"><i class="fas fa-award"></i> Seluruh jadwal vaksinasi prioritas pada kelompok usia ini telah terpenuhi!</div>
+          <div style="font-size:0.78rem; color:#334155; margin-top:4px;">${escapeHtml(qrPriorityConfig.catatan || DEFAULT_QR_PRIORITY.catatan)}</div>
         `;
       }
 
-      // Daftar vaksin yang sudah diterima
       const receivedKeys = Object.keys(vMap);
       const receivedBox = document.getElementById("feed_received_list");
-      if (receivedKeys.length === 0) {
-        receivedBox.innerHTML = `<span style="color:var(--muted);">Belum ada riwayat imunisasi yang tercatat.</span>`;
-      } else {
-        receivedBox.innerHTML = receivedKeys.map(k => `
-          <span class="v-given"><i class="fas fa-check"></i> ${escapeHtml(k)} (${formatDateIndo(vMap[k])})</span>
-        `).join("");
-      }
+      receivedBox.innerHTML = receivedKeys.length === 0
+        ? `<span style="color:var(--muted);">Belum ada riwayat imunisasi yang tercatat.</span>`
+        : receivedKeys.map(k => `<span class="v-given"><i class="fas fa-check"></i> ${escapeHtml(k)} (${formatDateIndo(vMap[k])})</span>`).join("");
 
-      // Mini Preview Sertifikat di Pop-up
       document.getElementById("feed_cert_child_name").textContent = record.namaAnak || "-";
-      const tbodyCert = document.getElementById("feed_cert_antigen_rows");
-      tbodyCert.innerHTML = IDL_WAJIB_LIST.map(vax => {
+      document.getElementById("feed_cert_antigen_rows").innerHTML = IDL_WAJIB_LIST.map(vax => {
         const givenDate = vMap[vax];
         return `
           <tr style="border-bottom:1px solid #E2E8F0;">
@@ -3556,7 +3639,6 @@
 
     async function initPublicQrScanMode() {
       if (!window.__IS_PUBLIC_QR_MODE__) return;
-
       const params = new URLSearchParams(window.location.search);
       const qrId = params.get("qr_id") || params.get("id") || params.get("anak");
       if (!qrId) return;
@@ -3566,9 +3648,9 @@
 
       if (!record && isCloudReady && db) {
         try {
-          const snap = await getDoc(doc(db, "kohort_imunisasi", String(qrId)));
+          const snap = await getDoc(doc(db, COL_KOHORT, String(qrId)));
           if (snap.exists()) {
-            record = { id: snap.id, ...snap.data() };
+            record = normalizeKohortRecord(snap.id, snap.data());
             allKohortData.push(record);
             saveLocal(STORAGE_KEYS.KOHORT, allKohortData);
           }
@@ -3582,7 +3664,7 @@
       } else {
         document.getElementById("feed_nama_anak").textContent = "Data Sasaran Tidak Ditemukan";
         document.getElementById("feed_next_vaccine_content").innerHTML =
-          `<span style="color:var(--danger); font-weight:700;">ID Kartu QR tidak terdaftar atau belum tersinkron ke server. Hubungi Petugas Puskesmas Melata.</span>`;
+          `<span style="color:var(--danger); font-weight:700;">ID Kartu QR tidak terdaftar di server. Hubungi Petugas Puskesmas Melata.</span>`;
       }
     }
 
@@ -3603,7 +3685,6 @@
       const rec = allKohortData.find(r => String(r.id) === String(currentQrRecordId));
       if (!rec) return;
 
-      // Buka tampilan sertifikat penuh tanpa memaksa login terlebih dahulu
       const lockStyle = document.getElementById("qr-public-mode-lock-style");
       if (lockStyle) lockStyle.remove();
 
@@ -3621,16 +3702,12 @@
       renderCertificateForRecord(rec);
     };
 
-    // HANDLER TOMBOL "LAKUKAN IMUNISASI" DARI POP-UP SCAN QR
     window.__moduleStartQuickImmunization = function() {
       const btn = document.getElementById("btnQuickLakukanImunisasi");
       if (btn) btn.innerHTML = `<i class="fas fa-syringe"></i> Lakukan Imunisasi`;
 
       const targetId = currentQrRecordId;
-      if (!targetId) {
-        alert("ID sasaran QR tidak valid.");
-        return;
-      }
+      if (!targetId) return;
 
       if (currentUserSession && currentUserSession.username) {
         window.__IS_PUBLIC_QR_MODE__ = false;
@@ -3699,30 +3776,23 @@
         return;
       }
       const rec = allKohortData.find(r => String(r.id) === String(selectedId));
-      if (!rec) {
-        alert("Data sasaran tidak ditemukan.");
-        return;
-      }
+      if (!rec) return;
       renderCertificateForRecord(rec);
     };
 
     window.printCertificateNow = function() {
       document.body.classList.remove("printing-qr");
       window.print();
-    };    // ==================== MODUL BIAS ANAK SEKOLAH ====================
+    };
+
+    // ==================== MODUL BIAS ANAK SEKOLAH ====================
     const DAFTAR_SEKOLAH_BIAS = [
-      { nama: "SDN Melata", desa: "Melata" },
-      { nama: "SDN Nanuah", desa: "Nanuah" },
-      { nama: "SDN Topalan", desa: "Topalan" },
-      { nama: "SDN Batu Ampar", desa: "Batu Ampar" },
-      { nama: "SDN Lubuk Hiju", desa: "Lubuk Hiju" },
-      { nama: "SDN Bukit Makmur", desa: "Bukit Makmur" },
-      { nama: "SDN Bukit Raya", desa: "Bukit Raya" },
-      { nama: "SDN Modang Mas", desa: "Modang Mas" },
-      { nama: "SDN Mukti Manunggal", desa: "Mukti Manunggal" },
-      { nama: "SDN Sumber Jaya", desa: "Sumber Jaya" },
-      { nama: "SDN Bukit Harum", desa: "Bukit Harum" },
-      { nama: "SDS PT. TSA", desa: "PT. TSA" },
+      { nama: "SDN Melata", desa: "Melata" }, { nama: "SDN Nanuah", desa: "Nanuah" },
+      { nama: "SDN Topalan", desa: "Topalan" }, { nama: "SDN Batu Ampar", desa: "Batu Ampar" },
+      { nama: "SDN Lubuk Hiju", desa: "Lubuk Hiju" }, { nama: "SDN Bukit Makmur", desa: "Bukit Makmur" },
+      { nama: "SDN Bukit Raya", desa: "Bukit Raya" }, { nama: "SDN Modang Mas", desa: "Modang Mas" },
+      { nama: "SDN Mukti Manunggal", desa: "Mukti Manunggal" }, { nama: "SDN Sumber Jaya", desa: "Sumber Jaya" },
+      { nama: "SDN Bukit Harum", desa: "Bukit Harum" }, { nama: "SDS PT. TSA", desa: "PT. TSA" },
       { nama: "SDS PT. SHS", desa: "PT. SHS" }
     ];
 
@@ -3776,9 +3846,7 @@
           if (selSekolah.value) {
             btnAdd.disabled = false;
             btnAdd.style.opacity = "1";
-            if (!container.querySelector(".bias-class-item")) {
-              container.innerHTML = renderBiasClassRow(0);
-            }
+            if (!container.querySelector(".bias-class-item")) container.innerHTML = renderBiasClassRow(0);
           } else {
             btnAdd.disabled = true;
             btnAdd.style.opacity = "0.5";
@@ -3787,57 +3855,52 @@
         });
       }
 
-      if (btnAdd) {
-        btnAdd.addEventListener("click", () => {
-          const count = container.querySelectorAll(".bias-class-item").length;
-          container.insertAdjacentHTML("beforeend", renderBiasClassRow(count));
-        });
-      }
+      btnAdd?.addEventListener("click", () => {
+        const count = container.querySelectorAll(".bias-class-item").length;
+        container.insertAdjacentHTML("beforeend", renderBiasClassRow(count));
+      });
 
-      if (formBias) {
-        formBias.addEventListener("submit", async (e) => {
-          e.preventDefault();
-          const sekolahVal = selSekolah.value;
-          const selectedOpt = selSekolah.options[selSekolah.selectedIndex];
-          const desaVal = selectedOpt?.getAttribute("data-desa") || "Melata";
-          const items = Array.from(container.querySelectorAll(".bias-class-item"));
+      formBias?.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const sekolahVal = selSekolah.value;
+        const selectedOpt = selSekolah.options[selSekolah.selectedIndex];
+        const desaVal = selectedOpt?.getAttribute("data-desa") || "Melata";
+        const items = Array.from(container.querySelectorAll(".bias-class-item"));
 
-          if (!sekolahVal || items.length === 0) {
-            alert("Pilih sekolah dan isi minimal satu kelas BIAS.");
-            return;
-          }
+        if (!sekolahVal || items.length === 0) return;
 
-          for (const row of items) {
-            const kelasAntigen = row.querySelector(".bias-kelas").value;
-            const tgl = row.querySelector(".bias-tgl").value;
-            const sasaran = parseInt(row.querySelector(".bias-sasaran").value || "0", 10);
-            const capaian = parseInt(row.querySelector(".bias-capaian").value || "0", 10);
-            const docId = `bias_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+        for (const row of items) {
+          const kelasAntigen = row.querySelector(".bias-kelas").value;
+          const tgl = row.querySelector(".bias-tgl").value;
+          const sasaran = parseInt(row.querySelector(".bias-sasaran").value || "0", 10);
+          const capaian = parseInt(row.querySelector(".bias-capaian").value || "0", 10);
+          const docId = `bias_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
 
-            const biasRec = {
-              id: docId,
-              sekolah: sekolahVal,
-              desa: desaVal,
-              kelasAntigen,
-              tanggal: tgl,
-              sasaran,
-              capaian,
-              petugas: currentUserSession?.username || "petugas",
-              updatedAt: new Date().toISOString()
-            };
+          const biasRec = {
+            id: docId,
+            sekolah: sekolahVal,
+            nama_sekolah: sekolahVal,
+            desa: desaVal,
+            kelasAntigen,
+            kelas_antigen: kelasAntigen,
+            tanggal: tgl,
+            sasaran,
+            capaian,
+            petugas: currentUserSession?.username || "petugas",
+            updatedAt: new Date().toISOString()
+          };
 
-            allBiasData.push(biasRec);
-            await syncDocToCloud("bias_imunisasi", docId, biasRec);
-          }
+          allBiasData.push(biasRec);
+          await syncDocToCloud(COL_BIAS, docId, biasRec);
+        }
 
-          saveLocal(STORAGE_KEYS.BIAS, allBiasData);
-          alert(`Laporan BIAS untuk ${sekolahVal} berhasil disimpan!`);
-          formBias.reset();
-          container.innerHTML = `<p class="muted">Pilih sekolah di atas untuk mengaktifkan form.</p>`;
-          btnAdd.disabled = true;
-          btnAdd.style.opacity = "0.5";
-        });
-      }
+        saveLocal(STORAGE_KEYS.BIAS, allBiasData);
+        alert(`Laporan BIAS untuk ${sekolahVal} berhasil disimpan!`);
+        formBias.reset();
+        container.innerHTML = `<p class="muted">Pilih sekolah di atas untuk mengaktifkan form.</p>`;
+        btnAdd.disabled = true;
+        btnAdd.style.opacity = "0.5";
+      });
     }
 
     // ==================== MODUL CATCH UP & RISIKO DROP OUT ====================
@@ -3858,15 +3921,11 @@
         const ageMonths = calcAgeMonths(rec.tglLahir);
 
         if (peran === "Bayi/Baduta") {
-          // 1. Bayi < 1 Tahun yang belum tuntas IDL dasar
           if (ageMonths < 12) {
             const missingIdl = IDL_WAJIB_LIST.filter(v => !vMap[v]);
-            if (missingIdl.length > 0) {
-              bayiList.push({ ...rec, ageMonths, missingText: missingIdl.join(", ") });
-            }
+            if (missingIdl.length > 0) bayiList.push({ ...rec, ageMonths, missingText: missingIdl.join(", ") });
           }
 
-          // 2. Risiko Drop Out Antigen Berkesinambungan
           const doNotes = [];
           if (vMap["DPT-HB-Hib1"] && (!vMap["DPT-HB-Hib2"] || !vMap["DPT-HB-Hib3"])) {
             doNotes.push(!vMap["DPT-HB-Hib2"] ? "Putus DPT-HB-Hib 2 & 3" : "Putus DPT-HB-Hib 3");
@@ -3874,25 +3933,17 @@
           if (vMap["OPV1"] && (!vMap["OPV2"] || !vMap["OPV3"] || !vMap["OPV4"])) {
             doNotes.push("Belum Tuntas Seri OPV (1-4)");
           }
-          if (vMap["PCV1"] && !vMap["PCV2"]) {
-            doNotes.push("Putus PCV 2");
-          }
+          if (vMap["PCV1"] && !vMap["PCV2"]) doNotes.push("Putus PCV 2");
           if (vMap["Rotavirus1"] && (!vMap["Rotavirus2"] || !vMap["Rotavirus3"])) {
             doNotes.push("Belum Tuntas Seri Rotavirus");
           }
-          if (doNotes.length > 0) {
-            doSeriesList.push({ ...rec, ageMonths, missingText: doNotes.join(" | ") });
-          }
+          if (doNotes.length > 0) doSeriesList.push({ ...rec, ageMonths, missingText: doNotes.join(" | ") });
 
-          // 3. Catch Up Usia 18 Bulan - 3 Tahun (Booster Baduta)
           if (ageMonths >= 18 && ageMonths <= 36) {
             const missingBooster = VAKSIN_BADUTA_LIST.filter(v => !vMap[v]);
-            if (missingBooster.length > 0) {
-              badutaList.push({ ...rec, ageMonths, missingText: missingBooster.join(", ") });
-            }
+            if (missingBooster.length > 0) badutaList.push({ ...rec, ageMonths, missingText: missingBooster.join(", ") });
           }
         } else {
-          // 4. Catin & Ibu Hamil belum TT5
           const receivedTt = VAKSIN_DEWASA_ALL.filter(v => Boolean(vMap[v]));
           if (!vMap["TT5 Bumil"]) {
             dewasaList.push({
@@ -3933,14 +3984,9 @@
         <table class="kohort-table">
           <thead>
             <tr>
-              <th class="sticky-col-0">No</th>
-              <th class="sticky-col-1">Nama Sasaran</th>
-              <th>Desa</th>
-              <th>Tgl Lahir / Usia</th>
-              <th>Ortu / Pasangan</th>
-              <th>No. WA</th>
-              <th>Status / Vaksin Tertunda</th>
-              <th>Aksi</th>
+              <th class="sticky-col-0">No</th><th class="sticky-col-1">Nama Sasaran</th>
+              <th>Desa</th><th>Tgl Lahir / Usia</th><th>Ortu / Pasangan</th><th>No. WA</th>
+              <th>Status / Vaksin Tertunda</th><th>Aksi</th>
             </tr>
           </thead>
           <tbody>
@@ -3969,20 +4015,12 @@
       document.getElementById("btnApplyCatchUp")?.addEventListener("click", runCatchUpAnalysis);
       document.getElementById("btnDownloadCatchUpExcel")?.addEventListener("click", () => {
         runCatchUpAnalysis();
-        if (!window.XLSX) {
-          alert("Library Excel belum termuat.");
-          return;
-        }
+        if (!window.XLSX) return;
         const wb = window.XLSX.utils.book_new();
         const mapRows = (arr) => arr.map((r, i) => ({
-          No: i + 1,
-          Nama_Sasaran: r.namaAnak,
-          Desa: r.desa,
-          Tgl_Lahir: r.tglLahir,
-          Usia_Bulan: r.ageMonths,
-          Orang_Tua_Pasangan: r.namaIbu || "-",
-          WhatsApp: r.waAnak || "-",
-          Keterangan_Catch_Up: r.missingText
+          No: i + 1, Nama_Sasaran: r.namaAnak, Desa: r.desa, Tgl_Lahir: r.tglLahir,
+          Usia_Bulan: r.ageMonths, Orang_Tua_Pasangan: r.namaIbu || "-",
+          WhatsApp: r.waAnak || "-", Keterangan_Catch_Up: r.missingText
         }));
 
         window.XLSX.utils.book_append_sheet(wb, window.XLSX.utils.json_to_sheet(mapRows(lastCatchUpResults.bayi)), "1_Bayi_Under_1Thn");
@@ -4042,12 +4080,8 @@
             matrix[b.desa][b.kelasAntigen] = (matrix[b.desa][b.kelasAntigen] || 0) + Number(b.capaian || 0);
           }
           recipientList.push({
-            Desa: b.desa,
-            Nama_Sekolah_Sasaran: b.sekolah,
-            Antigen: b.kelasAntigen,
-            Tanggal_Pelayanan: b.tanggal,
-            Jumlah_Sasaran: b.sasaran,
-            Jumlah_Capaian: b.capaian
+            Desa: b.desa, Nama_Sekolah_Sasaran: b.sekolah, Antigen: b.kelasAntigen,
+            Tanggal_Pelayanan: b.tanggal, Jumlah_Sasaran: b.sasaran, Jumlah_Capaian: b.capaian
           });
         });
       } else {
@@ -4057,18 +4091,11 @@
           activeAntigens.forEach(vax => {
             const givenDate = vMap[vax];
             if (givenDate && matchesYearMonth(givenDate, tahun, bulan)) {
-              if (matrix[rec.desa]) {
-                matrix[rec.desa][vax] = (matrix[rec.desa][vax] || 0) + 1;
-              }
+              if (matrix[rec.desa]) matrix[rec.desa][vax] = (matrix[rec.desa][vax] || 0) + 1;
               recipientList.push({
-                Desa: rec.desa,
-                Nama_Sasaran: rec.namaAnak,
-                Tgl_Lahir: rec.tglLahir,
-                JK: rec.jk || "-",
-                Orang_Tua_Pasangan: rec.namaIbu || "-",
-                Alamat: rec.alamat || "-",
-                Antigen_Diberikan: vax,
-                Tanggal_Imunisasi: givenDate
+                Desa: rec.desa, Nama_Sasaran: rec.namaAnak, Tgl_Lahir: rec.tglLahir,
+                JK: rec.jk || "-", Orang_Tua_Pasangan: rec.namaIbu || "-",
+                Alamat: rec.alamat || "-", Antigen_Diberikan: vax, Tanggal_Imunisasi: givenDate
               });
             }
           });
@@ -4111,8 +4138,7 @@
         <table class="kohort-table">
           <thead>
             <tr>
-              <th class="sticky-col-0">No</th>
-              <th class="sticky-col-1">Desa / Kelurahan</th>
+              <th class="sticky-col-0">No</th><th class="sticky-col-1">Desa / Kelurahan</th>
               ${res.activeAntigens.map(a => `<th>${escapeHtml(a)}</th>`).join("")}
               <th>Total Dosis</th>
             </tr>
@@ -4151,15 +4177,9 @@
       document.getElementById("btnDownloadExcelFilter")?.addEventListener("click", () => {
         const res = computeKumulatifData();
         renderKumulatifTable();
-
-        if (!window.XLSX) {
-          alert("Library Excel belum termuat.");
-          return;
-        }
+        if (!window.XLSX) return;
 
         const wb = window.XLSX.utils.book_new();
-
-        // Sheet 1: Rekapitulasi Matriks
         const sheet1Rows = res.desaRows.map((desa, idx) => {
           const rowObj = { No: idx + 1, Desa: desa };
           let total = 0;
@@ -4173,28 +4193,24 @@
         });
         window.XLSX.utils.book_append_sheet(wb, window.XLSX.utils.json_to_sheet(sheet1Rows), "1_Rekap_Kumulatif");
 
-        // Sheet 2: Daftar Penerima Terfilter Ketat (Tahun, Bulan Spesifik, Desa, Antigen)
         const sheet2Rows = res.recipientList.length > 0
           ? res.recipientList.map((r, i) => ({ No: i + 1, ...r }))
           : [{ Keterangan: "Tidak ada data penerima pada filter bulan/tahun/antigen ini." }];
         window.XLSX.utils.book_append_sheet(wb, window.XLSX.utils.json_to_sheet(sheet2Rows), "2_Daftar_Penerima");
 
-        const fileTag = `${res.kategori}_${res.desaSpec}_${res.tahun}_${res.bulan}`;
-        window.XLSX.writeFile(wb, `Laporan_Kumulatif_${fileTag}.xlsx`);
+        window.XLSX.writeFile(wb, `Laporan_Kumulatif_${res.kategori}_${res.desaSpec}_${res.tahun}_${res.bulan}.xlsx`);
       });
     }
 
     // ==================== MODUL CAPAIAN & IDL WILAYAH ====================
     function getDesaTargets(desa, tahun) {
-      const key = `${desa}_${tahun}`;
-      return targetSasaranMap[key] || { bayi: 20, baduta: 20, bias: 30 };
+      return targetSasaranMap[`${desa}_${tahun}`] || { bayi: 20, baduta: 20, bias: 30 };
     }
 
     function computeAndRenderCapaian() {
       const tahun = document.getElementById("cap_filter_tahun")?.value || "2026";
       const bulan = document.getElementById("cap_filter_bulan")?.value || "ALL";
 
-      // 1. Capaian Bayi & Baduta
       const rowsBayiBaduta = DAFTAR_DESA.map((desa, idx) => {
         const tgt = getDesaTargets(desa, tahun);
         const desaRecs = allKohortData.filter(r => r.desa === desa && (!r.peran || r.peran === "Bayi/Baduta"));
@@ -4203,20 +4219,13 @@
         const realisasiDpt3 = desaRecs.filter(r => matchesYearMonth(r.vaksinDates?.["DPT-HB-Hib3"], tahun, bulan)).length;
         const realisasiMr2 = desaRecs.filter(r => matchesYearMonth(r.vaksinDates?.["Campak Rubela-2"], tahun, bulan)).length;
         const realisasiDpt4 = desaRecs.filter(r => matchesYearMonth(r.vaksinDates?.["DPT-HB-Hib4"], tahun, bulan)).length;
-
         const pctMr2 = tgt.baduta > 0 ? ((realisasiMr2 / tgt.baduta) * 100).toFixed(1) : "0.0";
 
         return `
           <tr>
-            <td class="sticky-col-0">${idx + 1}</td>
-            <td class="sticky-col-1">${escapeHtml(desa)}</td>
-            <td>${tgt.bayi}</td>
-            <td>${realisasiBcG}</td>
-            <td>${realisasiDpt3}</td>
-            <td>${tgt.baduta}</td>
-            <td>${realisasiDpt4}</td>
-            <td>${realisasiMr2}</td>
-            <td><strong>${pctMr2}%</strong></td>
+            <td class="sticky-col-0">${idx + 1}</td><td class="sticky-col-1">${escapeHtml(desa)}</td>
+            <td>${tgt.bayi}</td><td>${realisasiBcG}</td><td>${realisasiDpt3}</td>
+            <td>${tgt.baduta}</td><td>${realisasiDpt4}</td><td>${realisasiMr2}</td><td><strong>${pctMr2}%</strong></td>
           </tr>
         `;
       }).join("");
@@ -4234,24 +4243,20 @@
         </table>
       `;
 
-      // 2. Tabel IDL (10 Antigen Wajib)
       const rowsIdl = DAFTAR_DESA.map((desa, idx) => {
         const tgt = getDesaTargets(desa, tahun);
         const desaRecs = allKohortData.filter(r => r.desa === desa && (!r.peran || r.peran === "Bayi/Baduta"));
         const idlCount = desaRecs.filter(r => {
           const vMap = r.vaksinDates || {};
-          const hasAll10 = IDL_WAJIB_LIST.every(v => Boolean(vMap[v]));
-          if (!hasAll10) return false;
+          if (!IDL_WAJIB_LIST.every(v => Boolean(vMap[v]))) return false;
           return matchesYearMonth(vMap["Campak Rubela-1"], tahun, bulan);
         }).length;
 
         const pctIdl = tgt.bayi > 0 ? ((idlCount / tgt.bayi) * 100).toFixed(1) : "0.0";
         return `
           <tr>
-            <td class="sticky-col-0">${idx + 1}</td>
-            <td class="sticky-col-1">${escapeHtml(desa)}</td>
-            <td>${tgt.bayi}</td>
-            <td><strong>${idlCount}</strong></td>
+            <td class="sticky-col-0">${idx + 1}</td><td class="sticky-col-1">${escapeHtml(desa)}</td>
+            <td>${tgt.bayi}</td><td><strong>${idlCount}</strong></td>
             <td><span class="${Number(pctIdl) >= 80 ? "v-given" : "badge-warning-custom"}">${pctIdl}%</span></td>
           </tr>
         `;
@@ -4269,7 +4274,6 @@
         </table>
       `;
 
-      // 3. Capaian BIAS
       const rowsBias = DAFTAR_DESA.map((desa, idx) => {
         const tgt = getDesaTargets(desa, tahun);
         const biasRecs = allBiasData.filter(b => b.desa === desa && matchesYearMonth(b.tanggal, tahun, bulan));
@@ -4278,11 +4282,8 @@
 
         return `
           <tr>
-            <td class="sticky-col-0">${idx + 1}</td>
-            <td class="sticky-col-1">${escapeHtml(desa)}</td>
-            <td>${tgt.bias}</td>
-            <td><strong>${totalCap}</strong></td>
-            <td><strong>${pctBias}%</strong></td>
+            <td class="sticky-col-0">${idx + 1}</td><td class="sticky-col-1">${escapeHtml(desa)}</td>
+            <td>${tgt.bias}</td><td><strong>${totalCap}</strong></td><td><strong>${pctBias}%</strong></td>
           </tr>
         `;
       }).join("");
@@ -4333,7 +4334,6 @@
     }
 
     function initAdminSettingsModule() {
-      // Populate antigen dropdown di Admin Export
       const expAntSel = document.getElementById("exp_filter_antigen");
       if (expAntSel) {
         expAntSel.innerHTML = `<option value="ALL">-- Semua Antigen --</option>` +
@@ -4342,7 +4342,6 @@
 
       document.getElementById("cert_filter_desa")?.addEventListener("change", populateSasaranDropdowns);
 
-      // Load & Save Target Sasaran
       const sasDesa = document.getElementById("sas_desa");
       const sasTahun = document.getElementById("sas_tahun");
       const fillTargetInputs = () => {
@@ -4360,17 +4359,20 @@
       document.getElementById("formTargetSasaran")?.addEventListener("submit", async (e) => {
         e.preventDefault();
         const key = `${sasDesa.value}_${sasTahun.value}`;
-        targetSasaranMap[key] = {
-          bayi: parseInt(document.getElementById("sas_target_bayi").value || "0", 10),
-          baduta: parseInt(document.getElementById("sas_target_baduta").value || "0", 10),
-          bias: parseInt(document.getElementById("sas_target_bias").value || "0", 10)
-        };
+        const bayi = parseInt(document.getElementById("sas_target_bayi").value || "0", 10);
+        const baduta = parseInt(document.getElementById("sas_target_baduta").value || "0", 10);
+        const bias = parseInt(document.getElementById("sas_target_bias").value || "0", 10);
+
+        targetSasaranMap[key] = { bayi, baduta, bias };
         saveLocal(STORAGE_KEYS.TARGETS, targetSasaranMap);
-        await syncDocToCloud("system_config", "global_settings", { targets: targetSasaranMap });
+        await syncDocToCloud(COL_TARGET, key, {
+          desa: sasDesa.value, tahun: sasTahun.value,
+          target_bayi: bayi, target_baduta: baduta, target_bias: bias,
+          bayi, baduta, bias
+        });
         alert(`Target sasaran Desa ${sasDesa.value} Tahun ${sasTahun.value} berhasil disimpan!`);
       });
 
-      // Load & Save Prioritas Pop-Up QR
       document.getElementById("prio_qr_under1").value = qrPriorityConfig.under1;
       document.getElementById("prio_qr_age2").value = qrPriorityConfig.age2;
       document.getElementById("prio_qr_over2").value = qrPriorityConfig.over2;
@@ -4387,32 +4389,25 @@
           catatan: document.getElementById("prio_qr_catatan").value.trim()
         };
         saveLocal(STORAGE_KEYS.QR_PRIO, qrPriorityConfig);
-        await syncDocToCloud("system_config", "global_settings", { qrPriority: qrPriorityConfig });
+        await syncDocToCloud(COL_CONFIG, "global_settings", { qrPriority: qrPriorityConfig });
         alert("Aturan urutan prioritas pop-up QR berhasil diperbarui!");
       });
 
-      // Load & Save Kemasan Vaksin
       renderVaccineLogisticsInputs();
       document.getElementById("formLogikaVaksinAdmin")?.addEventListener("submit", async (e) => {
         e.preventDefault();
         document.querySelectorAll(".logistik-dosis-input").forEach(inp => {
           const k = inp.getAttribute("data-vkey");
           const val = Math.max(1, parseInt(inp.value || "1", 10));
-          if (vaccineLogisticsConfig[k]) {
-            vaccineLogisticsConfig[k].dosisPerVial = val;
-          }
+          if (vaccineLogisticsConfig[k]) vaccineLogisticsConfig[k].dosisPerVial = val;
         });
         saveLocal(STORAGE_KEYS.LOGISTICS, vaccineLogisticsConfig);
-        await syncDocToCloud("system_config", "global_settings", { logistics: vaccineLogisticsConfig });
+        await syncDocToCloud(COL_CONFIG, "global_settings", { logistics: vaccineLogisticsConfig });
         alert("Aturan kemasan & rasio dosis per vial berhasil disimpan!");
       });
 
-      // Ekspor Excel 4 Sheet Terfilter Ketat
       document.getElementById("btnExportFilteredExcel")?.addEventListener("click", () => {
-        if (!window.XLSX) {
-          alert("Library Excel belum termuat.");
-          return;
-        }
+        if (!window.XLSX) return;
         const desa = document.getElementById("exp_filter_desa").value;
         const tahun = document.getElementById("exp_filter_tahun").value;
         const bulan = document.getElementById("exp_filter_bulan").value;
@@ -4441,42 +4436,29 @@
               dosisPerKemasan[logKey] = (dosisPerKemasan[logKey] || 0) + 1;
 
               penerimaRows.push({
-                Desa: rec.desa,
-                Nama_Sasaran: rec.namaAnak,
-                Tgl_Lahir: rec.tglLahir,
-                JK: rec.jk || "-",
-                Orang_Tua_Suami: rec.namaIbu || "-",
-                Alamat: rec.alamat || "-",
-                Antigen: vax,
-                Tanggal_Pemberian: tgl,
-                Petugas: rec.lastUpdatedBy || rec.petugasInput || "-"
+                Desa: rec.desa, Nama_Sasaran: rec.namaAnak, Tgl_Lahir: rec.tglLahir,
+                JK: rec.jk || "-", Orang_Tua_Suami: rec.namaIbu || "-", Alamat: rec.alamat || "-",
+                Antigen: vax, Tanggal_Pemberian: tgl, Petugas: rec.lastUpdatedBy || rec.petugasInput || "-"
               });
             }
           });
         });
 
         const wb = window.XLSX.utils.book_new();
-
-        // Sheet 1: Rekap Antigen per Desa
         const s1 = desaList.map((d, i) => {
           const obj = { No: i + 1, Desa: d };
           let tot = 0;
-          antList.forEach(a => {
-            obj[a] = rekapMatrix[d][a] || 0;
-            tot += obj[a];
-          });
+          antList.forEach(a => { obj[a] = rekapMatrix[d][a] || 0; tot += obj[a]; });
           obj["Total"] = tot;
           return obj;
         });
         window.XLSX.utils.book_append_sheet(wb, window.XLSX.utils.json_to_sheet(s1), "1_Rekap_Antigen");
 
-        // Sheet 2: Daftar Individu Penerima (Strict Filter)
         const s2 = penerimaRows.length > 0
           ? penerimaRows.map((r, i) => ({ No: i + 1, ...r }))
           : [{ Info: "Tidak ada data penerima pada filter ini." }];
         window.XLSX.utils.book_append_sheet(wb, window.XLSX.utils.json_to_sheet(s2), "2_Daftar_Penerima");
 
-        // Sheet 3: Capaian IDL Wilayah
         const s3 = desaList.map((d, i) => {
           const tgt = getDesaTargets(d, tahun === "ALL" ? "2026" : tahun);
           const idlTot = allKohortData.filter(r =>
@@ -4485,27 +4467,19 @@
             matchesYearMonth(r.vaksinDates?.["Campak Rubela-1"], tahun, bulan)
           ).length;
           return {
-            No: i + 1,
-            Desa: d,
-            Target_Bayi: tgt.bayi,
-            Lulus_IDL: idlTot,
+            No: i + 1, Desa: d, Target_Bayi: tgt.bayi, Lulus_IDL: idlTot,
             Persentase_IDL: tgt.bayi > 0 ? `${((idlTot / tgt.bayi) * 100).toFixed(1)}%` : "0.0%"
           };
         });
         window.XLSX.utils.book_append_sheet(wb, window.XLSX.utils.json_to_sheet(s3), "3_Capaian_IDL");
 
-        // Sheet 4: Estimasi Logistik & Kemasan Vaksin
         const s4 = Object.keys(DEFAULT_LOGISTICS_RULES).map((k, i) => {
           const rule = vaccineLogisticsConfig[k] || DEFAULT_LOGISTICS_RULES[k];
           const totalDosis = dosisPerKemasan[k] || 0;
-          const estVial = totalDosis > 0 ? Math.ceil(totalDosis / rule.dosisPerVial) : 0;
           return {
-            No: i + 1,
-            Jenis_Vaksin: k,
-            Kemasan: rule.kemasan,
-            Dosis_Per_Kemasan: rule.dosisPerVial,
-            Total_Dosis_Terpakai: totalDosis,
-            Estimasi_Vial_Terpakai: estVial
+            No: i + 1, Jenis_Vaksin: k, Kemasan: rule.kemasan,
+            Dosis_Per_Kemasan: rule.dosisPerVial, Total_Dosis_Terpakai: totalDosis,
+            Estimasi_Vial_Terpakai: totalDosis > 0 ? Math.ceil(totalDosis / rule.dosisPerVial) : 0
           };
         });
         window.XLSX.utils.book_append_sheet(wb, window.XLSX.utils.json_to_sheet(s4), "4_Logistik_Vaksin");
@@ -4513,27 +4487,19 @@
         window.XLSX.writeFile(wb, `Ekspor_Imunisasi_${desa}_${tahun}_${bulan}.xlsx`);
       });
 
-      // Ekspor JSON Terfilter & Full Backup
       document.getElementById("btnExportFilteredJSON")?.addEventListener("click", () => {
         const desa = document.getElementById("exp_filter_desa").value;
-        const filtered = getFilteredKohortByDesa(desa);
-        downloadJsonFile(filtered, `Backup_Kohort_${desa}_${getTodayISO()}.json`);
+        downloadJsonFile(getFilteredKohortByDesa(desa), `Backup_Kohort_${desa}_${getTodayISO()}.json`);
       });
 
       document.getElementById("btnExportDb")?.addEventListener("click", () => {
-        const fullBackup = {
+        downloadJsonFile({
           exportedAt: new Date().toISOString(),
-          kohort: allKohortData,
-          bias: allBiasData,
-          users: allUsersData,
-          targets: targetSasaranMap,
-          qrPriority: qrPriorityConfig,
-          logistics: vaccineLogisticsConfig
-        };
-        downloadJsonFile(fullBackup, `Full_Database_Imunku_Melata_${getTodayISO()}.json`);
+          kohort: allKohortData, bias: allBiasData, users: allUsersData,
+          targets: targetSasaranMap, qrPriority: qrPriorityConfig, logistics: vaccineLogisticsConfig
+        }, `Full_Database_Imunku_Melata_${getTodayISO()}.json`);
       });
 
-      // Import JSON / CSV Ke Cloud
       document.getElementById("btnStartImport")?.addEventListener("click", async () => {
         const fileInp = document.getElementById("importFile");
         const statusEl = document.getElementById("importStatus");
@@ -4549,18 +4515,18 @@
           try {
             const text = await file.text();
             const parsed = JSON.parse(text);
-            const records = Array.isArray(parsed) ? parsed : (parsed.kohort || []);
+            const records = Array.isArray(parsed) ? parsed : (parsed.kohort || parsed.register_imunisasi || []);
 
-            for (const item of records) {
+            for (const rawItem of records) {
+              const docId = rawItem.id || `kohort_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+              const item = normalizeKohortRecord(docId, rawItem);
               if (!item.namaAnak) continue;
-              const docId = item.id || `kohort_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
-              item.id = docId;
 
               const idx = allKohortData.findIndex(r => String(r.id) === String(docId));
               if (idx >= 0) allKohortData[idx] = item;
               else allKohortData.push(item);
 
-              await syncDocToCloud("kohort_imunisasi", docId, item);
+              await syncDocToCloud(COL_KOHORT, docId, item);
               importedCount++;
             }
           } catch (err) {
@@ -4571,7 +4537,7 @@
         saveLocal(STORAGE_KEYS.KOHORT, allKohortData);
         populateSasaranDropdowns();
         loadRecentTransactions();
-        statusEl.innerHTML = `<strong style="color:var(--success);">Berhasil mengimpor &amp; menyinkronkan ${importedCount} data sasaran!</strong>`;
+        statusEl.innerHTML = `<strong style="color:var(--success);">Berhasil mengimpor &amp; menyinkronkan ${importedCount} data sasaran ke ${COL_KOHORT}!</strong>`;
       });
     }
 

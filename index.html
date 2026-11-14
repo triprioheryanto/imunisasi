@@ -305,7 +305,7 @@
       .full-width { grid-column: span 1; }
       .wrap { padding: 0 12px; }
     }
-    .table-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: var(--radius); border: 1px solid var(--border-color); margin-top: 12px; background: #FFF; box-shadow: var(--shadow-subtle); }
+.table-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: var(--radius); border: 1px solid var(--border-color); margin-top: 12px; background: #FFF; box-shadow: var(--shadow-subtle); }
     .kohort-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.8rem; white-space: nowrap; }
     .kohort-table th, .kohort-table td { border-right: 1px solid #F1F5F9; border-bottom: 1px solid #F1F5F9; padding: 8px 10px; text-align: center; }
     .kohort-table thead tr:first-child th { background: var(--accent); color: #FFF; font-weight: 700; }
@@ -1303,54 +1303,91 @@
 <div id="admin" class="tab-panel" style="display:none;">
 
   <style>
+    .admin-hero-banner {
+      background: linear-gradient(135deg, #001F3F 0%, var(--accent) 60%, #004080 100%);
+      color: #FFFFFF;
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow-card);
+      border-bottom: 3px solid var(--gold);
+      position: relative;
+      overflow: hidden;
+    }
+    .admin-hero-banner h2 {
+      color: #FFFFFF;
+      margin: 0 0 6px 0;
+      font-size: 1.24rem;
+    }
+    .admin-hero-banner p {
+      color: #CBD5E1;
+      margin: 0;
+      font-size: 0.84rem;
+      line-height: 1.5;
+    }
+
     .admin-menu-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 10px;
-      margin-top: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+      margin-top: 14px;
     }
     .btn-admin-menu {
       display: flex;
       align-items: center;
       gap: 12px;
       text-align: left;
-      background: #F8FAFC;
+      background: #FFFFFF;
       border: 1.5px solid var(--border-color);
-      border-radius: 12px;
-      padding: 12px 14px;
+      border-radius: 13px;
+      padding: 13px 15px;
       cursor: pointer;
-      transition: all 0.22s ease;
+      transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
       color: var(--text-dark);
       font-family: inherit;
+      position: relative;
     }
     .btn-admin-menu:hover {
       border-color: var(--primary);
-      background: #FFF5F2;
+      background: #FFF8F6;
       transform: translateY(-2px);
-      box-shadow: 0 6px 14px rgba(255, 87, 34, 0.12);
+      box-shadow: 0 8px 18px rgba(255, 87, 34, 0.13);
     }
     .btn-admin-menu.active-admin-btn {
       background: linear-gradient(135deg, #001F3F, var(--accent));
       color: #FFFFFF;
-      border-color: var(--accent);
-      box-shadow: 0 8px 18px rgba(0, 43, 91, 0.24);
+      border-color: var(--gold);
+      box-shadow: 0 10px 22px rgba(0, 43, 91, 0.26);
     }
     .btn-admin-menu.active-admin-btn .admin-menu-sub {
       color: #CBD5E1;
     }
+    .btn-admin-menu.active-admin-btn::after {
+      content: "TERBUKA";
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      font-size: 0.6rem;
+      font-weight: 800;
+      background: var(--primary);
+      color: #FFFFFF;
+      padding: 2px 7px;
+      border-radius: 20px;
+      letter-spacing: 0.4px;
+    }
     .admin-menu-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
+      width: 42px;
+      height: 42px;
+      border-radius: 11px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.05rem;
+      font-size: 1.1rem;
       flex-shrink: 0;
     }
     .admin-menu-title {
       font-weight: 800;
-      font-size: 0.85rem;
+      font-size: 0.86rem;
       line-height: 1.25;
       display: block;
     }
@@ -1358,11 +1395,49 @@
       font-size: 0.72rem;
       color: var(--muted);
       display: block;
-      margin-top: 2px;
+      margin-top: 3px;
+      line-height: 1.35;
     }
     .admin-feature-section {
       display: none;
       animation: fadeIn 0.28s ease-out;
+    }
+
+    /* KPI MINI MANAJEMEN PENGGUNA */
+    .usr-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .usr-kpi-box {
+      background: #F8FAFC;
+      border: 1px solid var(--border-color);
+      border-radius: 11px;
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .usr-kpi-val {
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: var(--accent);
+      line-height: 1.1;
+    }
+    .usr-kpi-lbl {
+      font-size: 0.71rem;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    /* KARTU PRIORITAS AGE GROUP */
+    .prio-box-card {
+      border-radius: 11px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+      border: 1.5px solid var(--border-color);
+      background: #F8FAFC;
     }
 
     /* SERTIFIKAT A4 LANDSCAPE */
@@ -1370,16 +1445,30 @@
       background: #FFFDF7;
       border: 6px double #B8860B;
       border-radius: 12px;
-      padding: 26px 32px;
+      padding: 24px 30px;
       margin-bottom: 18px;
       position: relative;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
       color: #1E293B;
     }
     .cert-inner-border {
       border: 1.5px solid #D4AF37;
       padding: 20px 26px;
       border-radius: 8px;
+      position: relative;
+    }
+    .cert-seal-badge {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #D4AF37, #B8860B);
+      color: #FFFFFF;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.35rem;
+      box-shadow: 0 4px 12px rgba(184, 134, 11, 0.35);
+      border: 2px solid #FFFDF7;
     }
     .cert-table-back {
       width: 100%;
@@ -1397,6 +1486,10 @@
     }
 
     @media print {
+      @page {
+        size: A4 landscape;
+        margin: 8mm;
+      }
       body:not(.printing-qr) > *:not(main.wrap) {
         display: none !important;
       }
@@ -1406,11 +1499,18 @@
       body:not(.printing-qr) #admin > *:not(#sec_admin_cert_qr) {
         display: none !important;
       }
+      body:not(.printing-qr) #sec_admin_cert_qr {
+        box-shadow: none !important;
+        border: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
       body:not(.printing-qr) #sec_admin_cert_qr > *:not(#certificatePrintArea) {
         display: none !important;
       }
       body:not(.printing-qr) #certificatePrintArea {
         display: block !important;
+        margin: 0 !important;
       }
       body:not(.printing-qr) .cert-page-sheet {
         box-shadow: none !important;
@@ -1425,21 +1525,28 @@
     }
   </style>
 
-  <!-- PANEL MENU UTAMA ADMIN (PILIH FITUR UNTUK SCROLL DOWN OTOMATIS) -->
-  <div class="card" id="adminMainMenuCard" style="border-top: 4px solid var(--danger);">
-    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-      <h2 style="margin:0;"><i class="fas fa-user-shield" style="color:var(--danger);"></i> Panel Admin &amp; Kontrol Sistem</h2>
-      <span style="background:#FEF2F2; color:var(--danger); border:1px solid #FECACA; padding:4px 10px; border-radius:20px; font-size:0.74rem; font-weight:800;">
-        Klik Salah Satu Fitur di Bawah
-      </span>
+  <!-- HEADER & PANEL MENU UTAMA ADMIN -->
+  <div class="admin-hero-banner no-print" id="adminMainMenuCard">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px;">
+      <div>
+        <h2><i class="fas fa-user-shield" style="color:var(--gold);"></i> Panel Admin &amp; Kontrol Sistem Puskesmas Melata</h2>
+        <p>Pilih salah satu modul kontrol di bawah untuk membuka pengaturan dan otomatis menggulir ke panel yang dipilih.</p>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+        <span id="adminSessionRolePill" style="background:rgba(255,255,255,0.14); border:1px solid rgba(255,255,255,0.28); padding:5px 11px; border-radius:20px; font-size:0.74rem; font-weight:700;">
+          <i class="fas fa-lock-open" style="color:#34D399;"></i> Sesi Aktif (Timeout 30 Menit)
+        </span>
+        <button type="button" class="btn btn-ghost" onclick="closeAllAdminSections()" style="color:#FFF; border-color:rgba(255,255,255,0.32); padding:5px 10px; font-size:0.74rem;" title="Ringkas Semua Panel">
+          <i class="fas fa-compress-alt"></i> Ringkas Panel
+        </button>
+      </div>
     </div>
-    <p class="lead" style="margin-bottom:6px;">Pilih menu kontrol yang ingin dibuka. Halaman akan otomatis membuka panel yang dipilih dan menggulir ke bawah agar tampilan tetap ringkas.</p>
 
     <div class="admin-menu-grid">
       <button type="button" class="btn-admin-menu" onclick="toggleAdminFeatureSection('sec_admin_users', this)">
         <div class="admin-menu-icon" style="background:#DBEAFE; color:#1D4ED8;"><i class="fas fa-users-cog"></i></div>
         <div>
-          <span class="admin-menu-title">1. Manajemen Pengguna</span>
+          <span class="admin-menu-title">1. Manajemen Pengguna &amp; Password</span>
           <span class="admin-menu-sub">Tambah/Edit/Hapus Petugas &amp; Kader, Kunci Desa</span>
         </div>
       </button>
@@ -1487,18 +1594,39 @@
   </div>
 
   <!-- ===================================================================== -->
-  <!-- FITUR 1: MANAJEMEN PENGGUNA & HAK AKSES PENGINPUT                     -->
+  <!-- FITUR 1: MANAJEMEN PENGGUNA, KONTROL PASSWORD & HAK AKSES PENGINPUT   -->
   <!-- ===================================================================== -->
   <div class="card admin-feature-section" id="sec_admin_users" style="border-top: 4px solid var(--info);">
     <div id="cardManajemenPengguna">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
-        <h2 style="margin:0;"><i class="fas fa-users-cog" style="color:var(--info);"></i> 1. Manajemen Pengguna &amp; Hak Akses Penginput</h2>
+        <h2 style="margin:0;"><i class="fas fa-users-cog" style="color:var(--info);"></i> 1. Manajemen Pengguna, Password &amp; Hak Akses</h2>
         <button type="button" class="btn btn-ghost" onclick="closeAllAdminSections()" style="padding:5px 10px; font-size:0.76rem;">
           <i class="fas fa-chevron-up"></i> Tutup Fitur
         </button>
       </div>
-      <p class="lead">Kelola akun Petugas Puskesmas dan Kader Posyandu. Akun dengan peran <strong>Kader Posyandu</strong> otomatis terkunci pada <strong>Desa Tugas</strong> masing-masing untuk mencegah salah input wilayah.</p>
+      <p class="lead">Kelola akun Petugas Puskesmas dan Kader Posyandu. Akun <strong>Kader Posyandu</strong> otomatis terkunci pada <strong>Desa Tugas</strong> masing-masing untuk mencegah salah input wilayah.</p>
 
+      <!-- STATISTIK RINGKAS PENGGUNA -->
+      <div class="usr-kpi-grid">
+        <div class="usr-kpi-box" style="border-left:4px solid var(--accent);">
+          <span class="usr-kpi-val" id="statUsrTotal">0</span>
+          <span class="usr-kpi-lbl">Total Akun Terdaftar</span>
+        </div>
+        <div class="usr-kpi-box" style="border-left:4px solid var(--success);">
+          <span class="usr-kpi-val" id="statUsrAktif" style="color:var(--success);">0</span>
+          <span class="usr-kpi-lbl">Akun Status Aktif</span>
+        </div>
+        <div class="usr-kpi-box" style="border-left:4px solid var(--warning);">
+          <span class="usr-kpi-val" id="statUsrKader" style="color:#B45309;">0</span>
+          <span class="usr-kpi-lbl">Kader (Terkunci Desa)</span>
+        </div>
+        <div class="usr-kpi-box" style="border-left:4px solid var(--info);">
+          <span class="usr-kpi-val" id="statUsrPetugas" style="color:var(--info);">0</span>
+          <span class="usr-kpi-lbl">Petugas Lintas Desa</span>
+        </div>
+      </div>
+
+      <!-- FORM TAMBAH / EDIT PENGGUNA -->
       <form id="formManajemenPengguna" style="background:#F8FAFC; border:1.5px solid var(--border-color); border-radius:12px; padding:16px; margin-bottom:16px;">
         <input type="hidden" id="usr_edit_original_username" value="">
         <div style="font-weight:800; color:var(--accent); font-size:0.9rem; margin-bottom:12px; display:flex; align-items:center; gap:6px;" id="usrFormModeTitle">
@@ -1513,7 +1641,7 @@
 
           <div class="form-group">
             <label>Username Login <span class="req">*</span></label>
-            <input type="text" id="usr_username" placeholder="Contoh: kader_melata (tanpa spasi)" required>
+            <input type="text" id="usr_username" placeholder="Contoh: kader_melata (tanpa spasi)" required oninput="this.value=this.value.toLowerCase().replace(/\s+/g,'_')">
           </div>
 
           <div class="form-group">
@@ -1526,12 +1654,15 @@
               <button type="button" class="btn-ocr-cam" onclick="generateRandomUsrPassword()" title="Buat Password Acak Cepat">
                 <i class="fas fa-key"></i>
               </button>
+              <button type="button" class="btn-ocr-cam" onclick="copyCurrentUsrFormCredentials()" title="Salin Username &amp; Password">
+                <i class="fas fa-copy"></i>
+              </button>
             </div>
           </div>
 
           <div class="form-group">
             <label>Peran &amp; Hak Akses <span class="req">*</span></label>
-            <select id="usr_role" required>
+            <select id="usr_role" required onchange="onChangeAdminUsrRole()">
               <option value="kader">Kader Posyandu (Input Terkunci per Desa Tugas)</option>
               <option value="petugas">Petugas Puskesmas (Input Semua Desa &amp; Cetak QR/Sertifikat)</option>
               <option value="admin">Admin Koordinator (Akses Penuh &amp; Kelola Pengguna)</option>
@@ -1543,6 +1674,7 @@
             <select id="usr_desa_tugas" required>
               <option value="ALL">Semua Desa (Lintas Wilayah Puskesmas)</option>
             </select>
+            <small id="usr_desa_role_hint" style="font-size:0.71rem; color:var(--info); margin-top:4px;">Pilih desa spesifik jika peran adalah Kader Posyandu.</small>
           </div>
 
           <div class="form-group">
@@ -1564,27 +1696,34 @@
         </div>
       </form>
 
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px; background:#FFFBEB; border:1px solid #FDE68A; padding:10px 14px; border-radius:10px;">
-        <label style="margin:0; cursor:pointer; font-size:0.8rem; color:#92400E; display:flex; align-items:center; gap:8px;">
-          <input type="checkbox" id="chkStrictUserLogin" checked onchange="toggleStrictUserLoginSetting(this.checked)" style="width:16px; height:16px; accent-color:var(--primary);">
-          <span><strong>Mode Login Ketat:</strong> Hanya username &amp; password terdaftar di bawah (plus Master Admin) yang dapat masuk.</span>
-        </label>
+      <!-- KONTROL KEAMANAN LOGIN & PENCARIAN AKUN -->
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px; background:#FFFBEB; border:1px solid #FDE68A; padding:11px 14px; border-radius:10px;">
+        <div style="flex:1; min-width:250px;">
+          <label style="margin:0; cursor:pointer; font-size:0.8rem; color:#92400E; display:flex; align-items:center; gap:8px;">
+            <input type="checkbox" id="chkStrictUserLogin" checked onchange="toggleStrictUserLoginSetting(this.checked)" style="width:16px; height:16px; accent-color:var(--primary);">
+            <span><strong>Mode Login Ketat:</strong> Hanya username &amp; password terdaftar di bawah (plus Master Admin) yang dapat masuk.</span>
+          </label>
+          <div style="font-size:0.72rem; color:#B45309; margin-top:4px; padding-left:24px;">
+            <i class="fas fa-info-circle"></i> Master Admin: <code>admin</code> (Pass: <code>adminsri26</code>) &bull; Jika Mode Ketat dimatikan, petugas umum dapat masuk dengan pass cadangan <code>sri26</code>.
+          </div>
+        </div>
         <div style="min-width:220px; flex:1; max-width:300px;">
-          <input type="text" id="searchUserAdminInput" oninput="renderUsersTable()" placeholder="Cari nama, username, atau desa..." style="height:36px; font-size:0.8rem;">
+          <input type="text" id="searchUserAdminInput" oninput="renderUsersTable()" placeholder="Cari nama, username, peran, atau desa..." style="height:38px; font-size:0.8rem;">
         </div>
       </div>
 
+      <!-- TABEL DAFTAR PENGGUNA -->
       <div style="overflow-x:auto; border:1px solid var(--border-color); border-radius:12px;">
-        <table style="width:100%; border-collapse:collapse; font-size:0.8rem; min-width:720px;">
+        <table style="width:100%; border-collapse:collapse; font-size:0.8rem; min-width:740px;">
           <thead>
             <tr style="background:var(--accent); color:#FFF; text-align:left;">
               <th style="padding:10px 12px; width:40px;">No</th>
-              <th style="padding:10px 12px;">Nama &amp; Username</th>
+              <th style="padding:10px 12px;">Nama &amp; Kredensial Login</th>
               <th style="padding:10px 12px;">Peran</th>
               <th style="padding:10px 12px;">Desa Tugas</th>
               <th style="padding:10px 12px; text-align:center;">Kinerja Input &amp; Login Terakhir</th>
               <th style="padding:10px 12px; text-align:center;">Status</th>
-              <th style="padding:10px 12px; text-align:center; width:165px;">Aksi</th>
+              <th style="padding:10px 12px; text-align:center; width:175px;">Aksi</th>
             </tr>
           </thead>
           <tbody id="tbodyDaftarPengguna">
@@ -1644,32 +1783,36 @@
       <!-- HALAMAN DEPAN SERTIFIKAT -->
       <div class="cert-page-sheet">
         <div class="cert-inner-border">
-          <div style="text-align:center; border-bottom:2px solid #D4AF37; padding-bottom:10px; margin-bottom:14px;">
-            <div style="font-size:0.82rem; font-weight:800; color:#002B5B; letter-spacing:1px;">PEMERINTAH KABUPATEN LAMANDAU • DINAS KESEHATAN</div>
-            <div style="font-size:1.05rem; font-weight:900; color:#002B5B;">UPTD PUSKESMAS MELATA</div>
-            <div style="font-size:0.74rem; color:#475569;">Kecamatan Menthobi Raya, Kabupaten Lamandau, Kalimantan Tengah</div>
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #D4AF37; padding-bottom:10px; margin-bottom:14px; gap:12px;">
+            <div class="cert-seal-badge"><i class="fas fa-shield-virus"></i></div>
+            <div style="text-align:center; flex:1;">
+              <div style="font-size:0.8rem; font-weight:800; color:#002B5B; letter-spacing:1px;">PEMERINTAH KABUPATEN LAMANDAU • DINAS KESEHATAN</div>
+              <div style="font-size:1.08rem; font-weight:900; color:#002B5B;">UPTD PUSKESMAS MELATA</div>
+              <div style="font-size:0.74rem; color:#475569;">Kecamatan Menthobi Raya, Kabupaten Lamandau, Kalimantan Tengah</div>
+            </div>
+            <div class="cert-seal-badge"><i class="fas fa-award"></i></div>
           </div>
 
-          <div style="text-align:center; margin-bottom:14px;">
-            <div style="font-family:'Cinzel', serif; font-size:1.55rem; font-weight:900; color:#B8860B; letter-spacing:2px;">SERTIFIKAT IMUNISASI</div>
+          <div style="text-align:center; margin-bottom:12px;">
+            <div style="font-family:'Cinzel', serif; font-size:1.58rem; font-weight:900; color:#B8860B; letter-spacing:2px;">SERTIFIKAT IMUNISASI</div>
             <div style="font-size:0.78rem; font-weight:700; color:#334155;">Nomor Register: <span id="cert_no_reg">-</span></div>
           </div>
 
-          <p style="text-align:center; font-size:0.86rem; margin:0 0 12px 0;">Diberikan dengan bangga kepada:</p>
-          <div style="text-align:center; font-family:'Cinzel', serif; font-size:1.45rem; font-weight:900; color:#002B5B; margin-bottom:14px; text-decoration:underline;" id="cert_nama_anak">-</div>
+          <p style="text-align:center; font-size:0.86rem; margin:0 0 10px 0;">Diberikan dengan bangga kepada:</p>
+          <div style="text-align:center; font-family:'Cinzel', serif; font-size:1.45rem; font-weight:900; color:#002B5B; margin-bottom:12px; text-decoration:underline;" id="cert_nama_anak">-</div>
 
-          <div style="max-width:520px; margin:0 auto 14px auto; font-size:0.84rem; line-height:1.65;">
+          <div style="max-width:520px; margin:0 auto 12px auto; font-size:0.84rem; line-height:1.65; background:rgba(255,255,255,0.75); padding:10px 16px; border-radius:8px; border:1px dashed #D4AF37;">
             <div><strong>Tanggal Lahir / Jenis Kelamin:</strong> <span id="cert_ttl_jk">-</span></div>
             <div><strong>Nama Orang Tua / Ibu:</strong> <span id="cert_nama_ibu">-</span></div>
             <div><strong>Alamat / Desa:</strong> <span id="cert_desa_alamat">-</span></div>
           </div>
 
-          <p style="text-align:center; font-size:0.83rem; line-height:1.55; max-width:640px; margin:0 auto 18px auto;">
+          <p style="text-align:center; font-size:0.83rem; line-height:1.55; max-width:650px; margin:0 auto 16px auto;">
             Telah mengikuti dan menyelesaikan program <strong>Imunisasi Dasar Lengkap (IDL)</strong> sesuai jadwal imunisasi nasional sebagai upaya perlindungan kesehatan dan kekebalan tubuh anak.
           </p>
 
           <!-- TANDA TANGAN KOORDINATOR (KIRI AGAK ATAS) & KEPALA PUSKESMAS (KANAN AGAK BAWAH) -->
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:14px; font-size:0.82rem; color:#002B5B; text-align:center;">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:12px; font-size:0.82rem; color:#002B5B; text-align:center;">
             <div style="margin-top:0px;">
               <div>Koordinator Imunisasi</div>
               <div>UPTD Puskesmas Melata</div>
@@ -1677,10 +1820,10 @@
               <div style="font-weight:800; text-decoration:underline;">Tri Prio Heryanto</div>
               <div>NIP. 19890313 201101 1 002</div>
             </div>
-            <div style="margin-top:16px;">
+            <div style="margin-top:18px;">
               <div>Melata, <span id="cert_tanggal_cetak">-</span></div>
               <div>Mengetahui, Kepala UPTD Puskesmas Melata</div>
-              <div style="height:50px;"></div>
+              <div style="height:48px;"></div>
               <div style="font-weight:800; text-decoration:underline;">dr. Anang Argo Yuwono</div>
               <div>NIP. 19830521 201403 003</div>
             </div>
@@ -1696,7 +1839,7 @@
               <div style="font-weight:900; font-size:0.98rem; color:#002B5B;">CATATAN RIWAYAT PEMBERIAN IMUNISASI</div>
               <div style="font-size:0.78rem; color:#475569;">Nama Anak: <strong id="cert_back_nama_anak">-</strong> &bull; Wilayah: <strong id="cert_back_desa">-</strong></div>
             </div>
-            <div style="font-size:0.75rem; font-weight:800; color:#B8860B;">PUSKESMAS MELATA</div>
+            <div style="font-size:0.75rem; font-weight:800; color:#B8860B;">UPTD PUSKESMAS MELATA</div>
           </div>
 
           <table class="cert-table-back">
@@ -1728,30 +1871,35 @@
     <p class="lead">Atur urutan prioritas vaksin yang direkomendasikan saat orang tua/kader memindai QR Code berdasarkan kelompok usia anak, serta tandai vaksin yang sedang kosong stoknya.</p>
 
     <form id="formPrioritasQrAdmin">
-      <div class="form-group">
-        <label>Urutan Prioritas Usia &lt; 1 Tahun (0–11 Bulan) — Pisahkan dengan koma:</label>
+      <div class="prio-box-card" style="border-left:4px solid var(--info);">
+        <label style="color:var(--info);"><i class="fas fa-baby"></i> Urutan Prioritas Usia &lt; 1 Tahun (0–11 Bulan) — Pisahkan dengan koma:</label>
         <textarea id="prio_qr_under1" rows="2" style="height:auto;"></textarea>
       </div>
-      <div class="form-group">
-        <label>Urutan Prioritas Usia 2 Tahun (12–24 Bulan) — Pisahkan dengan koma:</label>
+
+      <div class="prio-box-card" style="border-left:4px solid var(--success);">
+        <label style="color:#047857;"><i class="fas fa-child"></i> Urutan Prioritas Usia 2 Tahun (12–24 Bulan) — Pisahkan dengan koma:</label>
         <textarea id="prio_qr_age2" rows="2" style="height:auto;"></textarea>
       </div>
-      <div class="form-group">
-        <label>Urutan Prioritas Usia &gt; 2 Tahun (Kejar / Lanjutan) — Pisahkan dengan koma:</label>
+
+      <div class="prio-box-card" style="border-left:4px solid var(--warning);">
+        <label style="color:#B45309;"><i class="fas fa-running"></i> Urutan Prioritas Usia &gt; 2 Tahun (Kejar / Lanjutan) — Pisahkan dengan koma:</label>
         <textarea id="prio_qr_over2" rows="2" style="height:auto;"></textarea>
       </div>
+
       <div class="grid">
         <div class="form-group">
-          <label>Vaksin Stok Kosong / Ditunda Sementara (Dilewati di Pop-Up):</label>
+          <label><i class="fas fa-ban" style="color:var(--danger);"></i> Vaksin Stok Kosong / Ditunda Sementara (Dilewati di Pop-Up):</label>
           <input type="text" id="prio_qr_stok_kosong" placeholder="Contoh: JE, Rotavirus1 (kosongkan jika semua tersedia)">
         </div>
         <div class="form-group">
-          <label>Pesan / Catatan Tambahan di Pop-Up Orang Tua:</label>
+          <label><i class="fas fa-comment-medical" style="color:var(--accent);"></i> Pesan / Catatan Tambahan di Pop-Up Orang Tua:</label>
           <input type="text" id="prio_qr_catatan" placeholder="Pesan jadwal Posyandu / Puskesmas">
         </div>
       </div>
+
       <div class="actions">
         <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Simpan Pengaturan Prioritas QR</button>
+        <button type="button" class="btn btn-ghost" onclick="resetDefaultQrPriorityValues()"><i class="fas fa-undo"></i> Kembalikan Urutan Standar</button>
       </div>
     </form>
   </div>
@@ -1782,15 +1930,21 @@
         </div>
         <div class="form-group">
           <label>Target Sasaran Bayi (0–11 Bulan / Surviving Infant)</label>
-          <input type="number" id="target_bayi" min="0" value="0" placeholder="Jumlah sasaran bayi">
+          <input type="number" id="target_bayi" min="0" value="0" placeholder="Jumlah sasaran bayi" oninput="updateTargetTotalPreview()">
         </div>
         <div class="form-group">
           <label>Target Sasaran Baduta (12–24 Bulan)</label>
-          <input type="number" id="target_baduta" min="0" value="0" placeholder="Jumlah sasaran baduta">
+          <input type="number" id="target_baduta" min="0" value="0" placeholder="Jumlah sasaran baduta" oninput="updateTargetTotalPreview()">
         </div>
         <div class="form-group">
           <label>Target Sasaran Ibu Hamil / WUS</label>
-          <input type="number" id="target_bumil" min="0" value="0" placeholder="Jumlah sasaran bumil">
+          <input type="number" id="target_bumil" min="0" value="0" placeholder="Jumlah sasaran bumil" oninput="updateTargetTotalPreview()">
+        </div>
+        <div class="form-group" style="justify-content:center;">
+          <div style="background:#ECFDF5; border:1px solid #A7F3D0; border-radius:10px; padding:10px 14px; margin-top:18px;">
+            <span style="font-size:0.75rem; color:#065F46; font-weight:700;">Total Gabungan Sasaran Input:</span>
+            <div style="font-size:1.1rem; font-weight:900; color:#047857;" id="targetTotalPreviewText">0 Sasaran</div>
+          </div>
         </div>
       </div>
       <div class="actions">
@@ -1809,7 +1963,11 @@
         <i class="fas fa-chevron-up"></i> Tutup Fitur
       </button>
     </div>
-    <p class="lead">Atur jumlah kapasitas dosis per vial/uniject untuk perhitungan otomatis kebutuhan logistik vaksin pada tab <strong>Kumulatif</strong> dan <strong>Catch Up</strong>.</p>
+    <p class="lead">Atur jumlah kapasitas dosis efektif per vial/uniject untuk perhitungan otomatis kebutuhan logistik vaksin pada tab <strong>Kumulatif</strong> dan <strong>Catch Up</strong>.</p>
+
+    <div style="background:#FFFBEB; border:1px solid #FDE68A; border-radius:9px; padding:8px 12px; font-size:0.76rem; color:#92400E; margin-bottom:12px;">
+      <i class="fas fa-info-circle"></i> Format kolom tiap antigen: <strong>[Dosis Efektif/Vial]</strong> &bull; <strong>[Satuan Kemasan]</strong> &bull; <strong>[Keterangan Label]</strong>
+    </div>
 
     <form id="formLogikaVaksinAdmin">
       <div class="grid" id="gridLogikaVaksinContainer"></div>
@@ -1831,8 +1989,8 @@
     </div>
     <p class="lead">Unduh laporan Excel/JSON berdasarkan filter spesifik (Desa, Bulan, Tahun, Antigen), backup seluruh database, atau pulihkan data dari file cadangan.</p>
 
-    <div style="background:#F8FAFC; border:1px solid var(--border-color); border-radius:12px; padding:14px; margin-bottom:16px;">
-      <div style="font-weight:800; color:var(--accent); font-size:0.88rem; margin-bottom:10px;">
+    <div style="background:#F8FAFC; border:1.5px solid var(--border-color); border-radius:12px; padding:16px; margin-bottom:16px;">
+      <div style="font-weight:800; color:var(--accent); font-size:0.9rem; margin-bottom:10px;">
         <i class="fas fa-filter" style="color:var(--primary);"></i> Ekspor Data Terfilter (Excel &amp; JSON)
       </div>
       <div class="grid">
@@ -1887,8 +2045,8 @@
     </div>
 
     <div class="grid">
-      <div style="background:#FFFDFB; border:1px solid #FFD8CC; border-radius:12px; padding:14px;">
-        <div style="font-weight:800; color:var(--accent); font-size:0.88rem; margin-bottom:6px;">
+      <div style="background:#FFFDFB; border:1px solid #FFD8CC; border-radius:12px; padding:15px;">
+        <div style="font-weight:800; color:var(--accent); font-size:0.9rem; margin-bottom:6px;">
           <i class="fas fa-cloud-download-alt" style="color:var(--primary);"></i> Full Backup Database
         </div>
         <p style="font-size:0.78rem; color:var(--muted); margin:0 0 12px 0;">Simpan seluruh salinan data Register Kohort, BIAS, dan Target Sasaran dalam format JSON.</p>
@@ -1897,26 +2055,28 @@
         </button>
       </div>
 
-      <div style="background:#F8FAFC; border:1px solid var(--border-color); border-radius:12px; padding:14px;">
-        <div style="font-weight:800; color:var(--accent); font-size:0.88rem; margin-bottom:6px;">
+      <div style="background:#F8FAFC; border:1px solid var(--border-color); border-radius:12px; padding:15px;">
+        <div style="font-weight:800; color:var(--accent); font-size:0.9rem; margin-bottom:6px;">
           <i class="fas fa-cloud-upload-alt" style="color:var(--info);"></i> Import / Restore Data
         </div>
         <input type="file" id="importFileInput" accept=".json,.xlsx,.xls,.csv" style="margin-bottom:10px;">
         <button type="button" class="btn btn-warning" id="btnStartImport">
           <i class="fas fa-upload"></i> Mulai Import Data
         </button>
+        <div id="importStatus" style="margin-top:8px; font-size:0.76rem; font-weight:700; color:var(--accent);"></div>
       </div>
     </div>
   </div>
 
   <script>
-    // INISIALISASI DROPDOWN DESA ADMIN & KONTROL ACCORDION + SMOOTH SCROLL DOWN
+    // INISIALISASI DROPDOWN DESA ADMIN, ACCORDION MENU & HELPER PENGGUNA
     (function() {
       var desaList = [
         "Melata", "Nanuah", "Topalan", "Batu Ampar", "Lubuk Hiju",
         "Bukit Makmur", "Bukit Raya", "Modang Mas", "Mukti Manunggal",
         "Sumber Jaya", "Bukit Harum", "PT. TSA", "PT. SHS"
       ];
+
       document.querySelectorAll('#admin select.admin-desa-dropdown').forEach(function(sel) {
         if (sel.options.length <= 1) {
           desaList.forEach(function(d) {
@@ -1927,6 +2087,39 @@
           });
         }
       });
+
+      var usrDesaSel = document.getElementById('usr_desa_tugas');
+      if (usrDesaSel && usrDesaSel.options.length <= 1) {
+        desaList.forEach(function(d) {
+          var opt = document.createElement('option');
+          opt.value = d;
+          opt.textContent = 'Desa ' + d;
+          usrDesaSel.appendChild(opt);
+        });
+      }
+
+      // Sinkronisasi otomatis kartu statistik pengguna saat tabel #tbodyDaftarPengguna diperbarui
+      var tbodyUsr = document.getElementById('tbodyDaftarPengguna');
+      if (tbodyUsr && window.MutationObserver) {
+        var obs = new MutationObserver(function() {
+          try {
+            var cached = JSON.parse(localStorage.getItem('pkm_users_cache') || '[]');
+            var total = cached.length;
+            var aktif = cached.filter(function(u) { return u.status !== 'nonaktif'; }).length;
+            var kader = cached.filter(function(u) { return u.role === 'kader'; }).length;
+            var petugas = cached.filter(function(u) { return u.role === 'petugas' || u.role === 'admin'; }).length;
+            var elT = document.getElementById('statUsrTotal');
+            var elA = document.getElementById('statUsrAktif');
+            var elK = document.getElementById('statUsrKader');
+            var elP = document.getElementById('statUsrPetugas');
+            if (elT) elT.textContent = total;
+            if (elA) elA.textContent = aktif;
+            if (elK) elK.textContent = kader;
+            if (elP) elP.textContent = petugas;
+          } catch (e) {}
+        });
+        obs.observe(tbodyUsr, { childList: true });
+      }
     })();
 
     window.toggleAdminFeatureSection = function(sectionId, btnEl) {
@@ -1935,7 +2128,6 @@
 
       var wasVisible = targetEl.style.display === 'block';
 
-      // Sembunyikan semua panel fitur admin terlebih dahulu agar tidak berbaris panjang
       document.querySelectorAll('#admin .admin-feature-section').forEach(function(sec) {
         sec.style.display = 'none';
       });
@@ -1943,10 +2135,12 @@
         btn.classList.remove('active-admin-btn');
       });
 
-      // Jika sebelumnya belum terbuka, buka fitur yang dipilih & smooth scroll down ke panel tsb
       if (!wasVisible) {
         targetEl.style.display = 'block';
         if (btnEl) btnEl.classList.add('active-admin-btn');
+        if (sectionId === 'sec_admin_users' && typeof window.renderUsersTable === 'function') {
+          window.renderUsersTable();
+        }
         setTimeout(function() {
           var yOffset = -78;
           var y = targetEl.getBoundingClientRect().top + window.pageYOffset + yOffset;
@@ -1969,9 +2163,62 @@
         window.scrollTo({ top: y, behavior: 'smooth' });
       }
     };
+
+    window.onChangeAdminUsrRole = function() {
+      var role = document.getElementById('usr_role').value;
+      var desaSel = document.getElementById('usr_desa_tugas');
+      var hint = document.getElementById('usr_desa_role_hint');
+      if (!desaSel || !hint) return;
+      if (role === 'kader') {
+        hint.innerHTML = '<strong style="color:#B45309;"><i class="fas fa-lock"></i> Wajib pilih 1 Desa Tugas spesifik agar Kader tidak salah input ke desa lain.</strong>';
+      } else if (role === 'petugas') {
+        desaSel.value = 'ALL';
+        hint.innerHTML = 'Petugas Puskesmas memiliki akses input ke seluruh desa wilayah kerja.';
+      } else {
+        desaSel.value = 'ALL';
+        hint.innerHTML = 'Admin Koordinator memiliki akses penuh ke seluruh fitur & manajemen pengguna.';
+      }
+    };
+
+    window.copyCurrentUsrFormCredentials = function() {
+      var nama = document.getElementById('usr_nama_lengkap').value.trim();
+      var user = document.getElementById('usr_username').value.trim();
+      var pass = document.getElementById('usr_password').value.trim();
+      if (!user || !pass) {
+        alert("Isi Username dan Password terlebih dahulu sebelum menyalin.");
+        return;
+      }
+      var text = "Akun Register Imunisasi Puskesmas Melata\nNama: " + (nama || user) + "\nUsername: " + user + "\nPassword: " + pass + "\nLink: https://imunku.my.id/";
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function() {
+          alert("✅ Kredensial akun berhasil disalin! Siap ditempel ke WhatsApp petugas/kader.");
+        });
+      } else {
+        prompt("Salin kredensial akun berikut:", text);
+      }
+    };
+
+    window.updateTargetTotalPreview = function() {
+      var b = parseInt(document.getElementById('target_bayi').value || '0', 10);
+      var bd = parseInt(document.getElementById('target_baduta').value || '0', 10);
+      var bm = parseInt(document.getElementById('target_bumil').value || '0', 10);
+      var total = b + bd + bm;
+      var out = document.getElementById('targetTotalPreviewText');
+      if (out) out.textContent = total + ' Sasaran';
+    };
+
+    window.resetDefaultQrPriorityValues = function() {
+      if (!confirm("Kembalikan urutan prioritas vaksin ke standar nasional?")) return;
+      document.getElementById('prio_qr_under1').value = "HBO (<24 Jam), HBO (1-7 Hari), BCG, OPV1, DPT-HB-Hib1, OPV2, PCV1, Rotavirus1, DPT-HB-Hib2, OPV3, PCV2, Rotavirus2, DPT-HB-Hib3, OPV4, IPV1, Rotavirus3, Campak Rubela-1, IPV2, JE";
+      document.getElementById('prio_qr_age2').value = "PCV3, DPT-HB-Hib4, Campak Rubela-2, Campak Rubela-1, IPV2, DPT-HB-Hib3, IPV1, OPV4, BCG";
+      document.getElementById('prio_qr_over2').value = "Campak Rubela-2, DPT-HB-Hib4, Campak Rubela-1, DPT-HB-Hib3, IPV2, IPV1, OPV4";
+      document.getElementById('prio_qr_stok_kosong').value = "";
+      document.getElementById('prio_qr_catatan').value = "Silakan datang ke Posyandu atau Puskesmas Melata sesuai jadwal dengan membawa Kartu QR / Buku KIA.";
+    };
   </script>
 </div>
   </main>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, setDoc, getDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";

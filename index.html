@@ -305,8 +305,7 @@
       .full-width { grid-column: span 1; }
       .wrap { padding: 0 12px; }
     }
-
-.table-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: var(--radius); border: 1px solid var(--border-color); margin-top: 12px; background: #FFF; box-shadow: var(--shadow-subtle); }
+    .table-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: var(--radius); border: 1px solid var(--border-color); margin-top: 12px; background: #FFF; box-shadow: var(--shadow-subtle); }
     .kohort-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.8rem; white-space: nowrap; }
     .kohort-table th, .kohort-table td { border-right: 1px solid #F1F5F9; border-bottom: 1px solid #F1F5F9; padding: 8px 10px; text-align: center; }
     .kohort-table thead tr:first-child th { background: var(--accent); color: #FFF; font-weight: 700; }
@@ -535,7 +534,6 @@
     <i class="fas fa-syringe falling-item" style="right: 2.3%; font-size: 1.5rem; color: #059669; animation-duration: 18.5s; animation-delay: 10.5s;"></i>
     <i class="fas fa-syringe falling-item" style="right: 5.1%; font-size: 2rem; color: var(--accent); animation-duration: 15s; animation-delay: 14s;"></i>
   </div>
-
 <!-- TOMBOL NAVIGASI SMOOTH SCROLL MELAYANG (UNTUK HALAMAN/TAB DATA PANJANG) -->
   <div class="floating-scroll-nav no-print" id="floatingScrollNav" title="Navigasi Scroll Cepat">
     <button type="button" class="btn-float-scroll" onclick="smoothScrollPage('up')" title="Scroll Halus Ke Atas">
@@ -878,7 +876,6 @@
       <button class="tab tab-admin-highlight" data-tab="admin" onclick="switchTab(event)"><i class="fas fa-user-gear"></i> ADMIN &amp; KONTROL</button>
     </div>
   </header>
-
 <main class="wrap">
     <!-- TAB 1: INPUT REGISTER KOHORT INDIVIDU (TAMPILAN AWAL DISEDERHANAKAN) -->
     <section id="imunisasi" class="tab-panel">
@@ -1165,7 +1162,6 @@
         </div>
       </div>
     </section>
-
 <!-- TAB 2: BIAS -->
     <section id="bias" class="tab-panel" style="display:none">
       <div class="card">
@@ -1301,121 +1297,681 @@
       <div class="card" id="cardCapaian2"><h3><i class="fas fa-certificate" style="color:var(--success)"></i> 2. Imunisasi Dasar Lengkap (IDL)</h3><div id="containerTabelIDL" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Hitung Capaian.</p></div></div>
       <div class="card" id="cardCapaian3"><h3><i class="fas fa-school" style="color:var(--info)"></i> 3. Capaian BIAS</h3><div id="containerCapaianBIAS" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Hitung Capaian.</p></div></div>
     </section>
+<!-- ======================================================================= -->
+<!-- TAB 6: ADMIN & KONTROL (MENU PILIHAN FITUR + SMOOTH SCROLL ACCORDION)   -->
+<!-- ======================================================================= -->
+<div id="admin" class="tab-panel" style="display:none;">
 
-<!-- TAB 6: ADMIN & KONTROL -->
-    <section id="admin" class="tab-panel" style="display:none">
-<!-- KARTU MANAJEMEN PENGGUNA & HAK AKSES (ADMIN) -->
-<div class="card" id="cardManajemenPengguna" style="border-top: 4px solid var(--accent);">
-  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
-    <h2 style="margin:0;"><i class="fas fa-users-cog" style="color:var(--primary);"></i> Manajemen Pengguna &amp; Hak Akses Penginput</h2>
-    <span style="background:#EFF6FF; color:var(--accent); border:1px solid #BFDBFE; padding:4px 10px; border-radius:20px; font-size:0.75rem; font-weight:800;">
-      <i class="fas fa-shield-alt"></i> Kontrol Anti-Salah Input
-    </span>
-  </div>
-  <p class="lead">Kelola akun Petugas Puskesmas dan Kader Posyandu. Akun dengan peran <strong>Kader Posyandu</strong> otomatis terkunci pada <strong>Desa Tugas</strong> masing-masing untuk mencegah kesalahan input wilayah.</p>
+  <style>
+    .admin-menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .btn-admin-menu {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-align: left;
+      background: #F8FAFC;
+      border: 1.5px solid var(--border-color);
+      border-radius: 12px;
+      padding: 12px 14px;
+      cursor: pointer;
+      transition: all 0.22s ease;
+      color: var(--text-dark);
+      font-family: inherit;
+    }
+    .btn-admin-menu:hover {
+      border-color: var(--primary);
+      background: #FFF5F2;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(255, 87, 34, 0.12);
+    }
+    .btn-admin-menu.active-admin-btn {
+      background: linear-gradient(135deg, #001F3F, var(--accent));
+      color: #FFFFFF;
+      border-color: var(--accent);
+      box-shadow: 0 8px 18px rgba(0, 43, 91, 0.24);
+    }
+    .btn-admin-menu.active-admin-btn .admin-menu-sub {
+      color: #CBD5E1;
+    }
+    .admin-menu-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.05rem;
+      flex-shrink: 0;
+    }
+    .admin-menu-title {
+      font-weight: 800;
+      font-size: 0.85rem;
+      line-height: 1.25;
+      display: block;
+    }
+    .admin-menu-sub {
+      font-size: 0.72rem;
+      color: var(--muted);
+      display: block;
+      margin-top: 2px;
+    }
+    .admin-feature-section {
+      display: none;
+      animation: fadeIn 0.28s ease-out;
+    }
 
-  <!-- FORM TAMBAH / EDIT PENGGUNA -->
-  <form id="formManajemenPengguna" style="background:#F8FAFC; border:1.5px solid var(--border-color); border-radius:12px; padding:16px; margin-bottom:16px;">
-    <input type="hidden" id="usr_edit_original_username" value="">
-    <div style="font-weight:800; color:var(--accent); font-size:0.9rem; margin-bottom:12px; display:flex; align-items:center; gap:6px;" id="usrFormModeTitle">
-      <i class="fas fa-user-plus" style="color:var(--primary);"></i> Tambah Pengguna Baru
+    /* SERTIFIKAT A4 LANDSCAPE */
+    .cert-page-sheet {
+      background: #FFFDF7;
+      border: 6px double #B8860B;
+      border-radius: 12px;
+      padding: 26px 32px;
+      margin-bottom: 18px;
+      position: relative;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      color: #1E293B;
+    }
+    .cert-inner-border {
+      border: 1.5px solid #D4AF37;
+      padding: 20px 26px;
+      border-radius: 8px;
+    }
+    .cert-table-back {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.78rem;
+      margin-top: 10px;
+    }
+    .cert-table-back th, .cert-table-back td {
+      border: 1px solid #94A3B8;
+      padding: 6px 8px;
+    }
+    .cert-table-back th {
+      background: #002B5B;
+      color: #FFFFFF;
+    }
+
+    @media print {
+      body:not(.printing-qr) > *:not(main.wrap) {
+        display: none !important;
+      }
+      body:not(.printing-qr) main.wrap > *:not(#admin) {
+        display: none !important;
+      }
+      body:not(.printing-qr) #admin > *:not(#sec_admin_cert_qr) {
+        display: none !important;
+      }
+      body:not(.printing-qr) #sec_admin_cert_qr > *:not(#certificatePrintArea) {
+        display: none !important;
+      }
+      body:not(.printing-qr) #certificatePrintArea {
+        display: block !important;
+      }
+      body:not(.printing-qr) .cert-page-sheet {
+        box-shadow: none !important;
+        page-break-after: always;
+        break-after: page;
+        margin: 0 !important;
+      }
+      body:not(.printing-qr) .cert-page-sheet:last-child {
+        page-break-after: auto;
+        break-after: auto;
+      }
+    }
+  </style>
+
+  <!-- PANEL MENU UTAMA ADMIN (PILIH FITUR UNTUK SCROLL DOWN OTOMATIS) -->
+  <div class="card" id="adminMainMenuCard" style="border-top: 4px solid var(--danger);">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+      <h2 style="margin:0;"><i class="fas fa-user-shield" style="color:var(--danger);"></i> Panel Admin &amp; Kontrol Sistem</h2>
+      <span style="background:#FEF2F2; color:var(--danger); border:1px solid #FECACA; padding:4px 10px; border-radius:20px; font-size:0.74rem; font-weight:800;">
+        Klik Salah Satu Fitur di Bawah
+      </span>
     </div>
+    <p class="lead" style="margin-bottom:6px;">Pilih menu kontrol yang ingin dibuka. Halaman akan otomatis membuka panel yang dipilih dan menggulir ke bawah agar tampilan tetap ringkas.</p>
 
-    <div class="grid">
-      <div class="form-group">
-        <label>Nama Lengkap Petugas / Kader <span class="req">*</span></label>
-        <input type="text" id="usr_nama_lengkap" placeholder="Contoh: Bd. Siti Aminah, A.Md.Keb" required>
+    <div class="admin-menu-grid">
+      <button type="button" class="btn-admin-menu" onclick="toggleAdminFeatureSection('sec_admin_users', this)">
+        <div class="admin-menu-icon" style="background:#DBEAFE; color:#1D4ED8;"><i class="fas fa-users-cog"></i></div>
+        <div>
+          <span class="admin-menu-title">1. Manajemen Pengguna</span>
+          <span class="admin-menu-sub">Tambah/Edit/Hapus Petugas &amp; Kader, Kunci Desa</span>
+        </div>
+      </button>
+
+      <button type="button" class="btn-admin-menu" onclick="toggleAdminFeatureSection('sec_admin_cert_qr', this)">
+        <div class="admin-menu-icon" style="background:#FEF3C7; color:#B45309;"><i class="fas fa-award"></i></div>
+        <div>
+          <span class="admin-menu-title">2. Sertifikat IDL &amp; Kartu QR</span>
+          <span class="admin-menu-sub">Cetak Sertifikat Kelulusan &amp; Kartu QR Sasaran</span>
+        </div>
+      </button>
+
+      <button type="button" class="btn-admin-menu" onclick="toggleAdminFeatureSection('sec_admin_qr_prio', this)">
+        <div class="admin-menu-icon" style="background:#FFEDD5; color:#C2410C;"><i class="fas fa-list-ol"></i></div>
+        <div>
+          <span class="admin-menu-title">3. Prioritas Pop-Up QR &amp; Stok</span>
+          <span class="admin-menu-sub">Urutan vaksin (&lt;1 thn, 2 thn, &gt;2 thn) &amp; stok kosong</span>
+        </div>
+      </button>
+
+      <button type="button" class="btn-admin-menu" onclick="toggleAdminFeatureSection('sec_admin_target', this)">
+        <div class="admin-menu-icon" style="background:#D1FAE5; color:#047857;"><i class="fas fa-bullseye"></i></div>
+        <div>
+          <span class="admin-menu-title">4. Target Sasaran Desa</span>
+          <span class="admin-menu-sub">Atur sasaran Bayi, Baduta &amp; Bumil per Desa</span>
+        </div>
+      </button>
+
+      <button type="button" class="btn-admin-menu" onclick="toggleAdminFeatureSection('sec_admin_logika_vaksin', this)">
+        <div class="admin-menu-icon" style="background:#E0E7FF; color:#4338CA;"><i class="fas fa-vials"></i></div>
+        <div>
+          <span class="admin-menu-title">5. Logika Kemasan Vaksin</span>
+          <span class="admin-menu-sub">Atur kapasitas dosis per vial / uniject</span>
+        </div>
+      </button>
+
+      <button type="button" class="btn-admin-menu" onclick="toggleAdminFeatureSection('sec_admin_backup_import', this)">
+        <div class="admin-menu-icon" style="background:#F1F5F9; color:#0F172A;"><i class="fas fa-database"></i></div>
+        <div>
+          <span class="admin-menu-title">6. Ekspor, Backup &amp; Import</span>
+          <span class="admin-menu-sub">Download Excel/JSON terfilter &amp; Restore Database</span>
+        </div>
+      </button>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- FITUR 1: MANAJEMEN PENGGUNA & HAK AKSES PENGINPUT                     -->
+  <!-- ===================================================================== -->
+  <div class="card admin-feature-section" id="sec_admin_users" style="border-top: 4px solid var(--info);">
+    <div id="cardManajemenPengguna">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
+        <h2 style="margin:0;"><i class="fas fa-users-cog" style="color:var(--info);"></i> 1. Manajemen Pengguna &amp; Hak Akses Penginput</h2>
+        <button type="button" class="btn btn-ghost" onclick="closeAllAdminSections()" style="padding:5px 10px; font-size:0.76rem;">
+          <i class="fas fa-chevron-up"></i> Tutup Fitur
+        </button>
       </div>
+      <p class="lead">Kelola akun Petugas Puskesmas dan Kader Posyandu. Akun dengan peran <strong>Kader Posyandu</strong> otomatis terkunci pada <strong>Desa Tugas</strong> masing-masing untuk mencegah salah input wilayah.</p>
 
-      <div class="form-group">
-        <label>Username Login <span class="req">*</span></label>
-        <input type="text" id="usr_username" placeholder="Contoh: kader_melata (tanpa spasi)" required>
-      </div>
+      <form id="formManajemenPengguna" style="background:#F8FAFC; border:1.5px solid var(--border-color); border-radius:12px; padding:16px; margin-bottom:16px;">
+        <input type="hidden" id="usr_edit_original_username" value="">
+        <div style="font-weight:800; color:var(--accent); font-size:0.9rem; margin-bottom:12px; display:flex; align-items:center; gap:6px;" id="usrFormModeTitle">
+          <i class="fas fa-user-plus" style="color:var(--primary);"></i> Tambah Pengguna Baru
+        </div>
 
-      <div class="form-group">
-        <label>Password Akun <span class="req">*</span></label>
-        <div class="input-with-btn">
-          <input type="password" id="usr_password" placeholder="Minimal 4 karakter" required>
-          <button type="button" class="btn-ocr-cam" onclick="toggleAdminUsrPasswordVisibility()" title="Tampilkan / Sembunyikan Password">
-            <i class="fas fa-eye" id="iconToggleUsrPass"></i>
+        <div class="grid">
+          <div class="form-group">
+            <label>Nama Lengkap Petugas / Kader <span class="req">*</span></label>
+            <input type="text" id="usr_nama_lengkap" placeholder="Contoh: Bd. Siti Aminah, A.Md.Keb" required>
+          </div>
+
+          <div class="form-group">
+            <label>Username Login <span class="req">*</span></label>
+            <input type="text" id="usr_username" placeholder="Contoh: kader_melata (tanpa spasi)" required>
+          </div>
+
+          <div class="form-group">
+            <label>Password Akun <span class="req">*</span></label>
+            <div class="input-with-btn">
+              <input type="password" id="usr_password" placeholder="Minimal 4 karakter" required>
+              <button type="button" class="btn-ocr-cam" onclick="toggleAdminUsrPasswordVisibility()" title="Tampilkan / Sembunyikan Password">
+                <i class="fas fa-eye" id="iconToggleUsrPass"></i>
+              </button>
+              <button type="button" class="btn-ocr-cam" onclick="generateRandomUsrPassword()" title="Buat Password Acak Cepat">
+                <i class="fas fa-key"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Peran &amp; Hak Akses <span class="req">*</span></label>
+            <select id="usr_role" required>
+              <option value="kader">Kader Posyandu (Input Terkunci per Desa Tugas)</option>
+              <option value="petugas">Petugas Puskesmas (Input Semua Desa &amp; Cetak QR/Sertifikat)</option>
+              <option value="admin">Admin Koordinator (Akses Penuh &amp; Kelola Pengguna)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Desa Tugas / Wilayah Binaan <span class="req">*</span></label>
+            <select id="usr_desa_tugas" required>
+              <option value="ALL">Semua Desa (Lintas Wilayah Puskesmas)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Status Akun</label>
+            <select id="usr_status">
+              <option value="aktif">Aktif (Diizinkan Login &amp; Input)</option>
+              <option value="nonaktif">Nonaktif / Tangguhkan Sementara</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="actions" style="margin-top:10px;">
+          <button type="submit" class="btn btn-primary" id="btnSubmitUserAdmin">
+            <i class="fas fa-save"></i> Simpan Pengguna
           </button>
-          <button type="button" class="btn-ocr-cam" onclick="generateRandomUsrPassword()" title="Buat Password Acak Cepat" style="font-size:0.75rem; font-weight:800;">
-            <i class="fas fa-key"></i>
+          <button type="button" class="btn btn-ghost" id="btnCancelEditUser" onclick="resetFormManajemenPengguna()" style="display:none;">
+            <i class="fas fa-times"></i> Batal Edit
           </button>
+        </div>
+      </form>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px; background:#FFFBEB; border:1px solid #FDE68A; padding:10px 14px; border-radius:10px;">
+        <label style="margin:0; cursor:pointer; font-size:0.8rem; color:#92400E; display:flex; align-items:center; gap:8px;">
+          <input type="checkbox" id="chkStrictUserLogin" checked onchange="toggleStrictUserLoginSetting(this.checked)" style="width:16px; height:16px; accent-color:var(--primary);">
+          <span><strong>Mode Login Ketat:</strong> Hanya username &amp; password terdaftar di bawah (plus Master Admin) yang dapat masuk.</span>
+        </label>
+        <div style="min-width:220px; flex:1; max-width:300px;">
+          <input type="text" id="searchUserAdminInput" oninput="renderUsersTable()" placeholder="Cari nama, username, atau desa..." style="height:36px; font-size:0.8rem;">
         </div>
       </div>
 
-      <div class="form-group">
-        <label>Peran &amp; Hak Akses <span class="req">*</span></label>
-        <select id="usr_role" required>
-          <option value="kader">Kader Posyandu (Input Terkunci per Desa Tugas)</option>
-          <option value="petugas">Petugas Puskesmas (Input Semua Desa &amp; Cetak QR/Sertifikat)</option>
-          <option value="admin">Admin Koordinator (Akses Penuh &amp; Kelola Pengguna)</option>
-        </select>
+      <div style="overflow-x:auto; border:1px solid var(--border-color); border-radius:12px;">
+        <table style="width:100%; border-collapse:collapse; font-size:0.8rem; min-width:720px;">
+          <thead>
+            <tr style="background:var(--accent); color:#FFF; text-align:left;">
+              <th style="padding:10px 12px; width:40px;">No</th>
+              <th style="padding:10px 12px;">Nama &amp; Username</th>
+              <th style="padding:10px 12px;">Peran</th>
+              <th style="padding:10px 12px;">Desa Tugas</th>
+              <th style="padding:10px 12px; text-align:center;">Kinerja Input &amp; Login Terakhir</th>
+              <th style="padding:10px 12px; text-align:center;">Status</th>
+              <th style="padding:10px 12px; text-align:center; width:165px;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyDaftarPengguna">
+            <tr>
+              <td colspan="7" style="padding:16px; text-align:center; color:var(--muted);">Memuat daftar pengguna...</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-
-      <div class="form-group">
-        <label>Desa Tugas / Wilayah Binaan <span class="req">*</span></label>
-        <select id="usr_desa_tugas" required>
-          <option value="ALL">Semua Desa (Lintas Wilayah Puskesmas)</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label>Status Akun</label>
-        <select id="usr_status">
-          <option value="aktif">Aktif (Diizinkan Login &amp; Input)</option>
-          <option value="nonaktif">Nonaktif / Tangguhkan Sementara</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="actions" style="margin-top:10px;">
-      <button type="submit" class="btn btn-primary" id="btnSubmitUserAdmin">
-        <i class="fas fa-save"></i> Simpan Pengguna
-      </button>
-      <button type="button" class="btn btn-ghost" id="btnCancelEditUser" onclick="resetFormManajemenPengguna()" style="display:none;">
-        <i class="fas fa-times"></i> Batal Edit
-      </button>
-    </div>
-  </form>
-
-  <!-- OPSI KEAMANAN LOGIN & FILTER DAFTAR PENGGUNA -->
-  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px; background:#FFFBEB; border:1px solid #FDE68A; padding:10px 14px; border-radius:10px;">
-    <label style="margin:0; cursor:pointer; font-size:0.8rem; color:#92400E; display:flex; align-items:center; gap:8px;">
-      <input type="checkbox" id="chkStrictUserLogin" checked onchange="toggleStrictUserLoginSetting(this.checked)" style="width:16px; height:16px; accent-color:var(--primary);">
-      <span><strong>Mode Login Ketat:</strong> Hanya username &amp; password yang terdaftar di bawah (plus Master Admin) yang dapat masuk ke sistem.</span>
-    </label>
-    <div style="min-width:220px; flex:1; max-width:300px;">
-      <input type="text" id="searchUserAdminInput" oninput="renderUsersTable()" placeholder="Cari nama, username, atau desa..." style="height:36px; font-size:0.8rem;">
     </div>
   </div>
 
-  <!-- TABEL DAFTAR PENGGUNA -->
-  <div style="overflow-x:auto; border:1px solid var(--border-color); border-radius:12px;">
-    <table style="width:100%; border-collapse:collapse; font-size:0.8rem; min-width:720px;">
-      <thead>
-        <tr style="background:var(--accent); color:#FFF; text-align:left;">
-          <th style="padding:10px 12px; width:40px;">No</th>
-          <th style="padding:10px 12px;">Nama &amp; Username</th>
-          <th style="padding:10px 12px;">Peran</th>
-          <th style="padding:10px 12px;">Desa Tugas</th>
-          <th style="padding:10px 12px; text-align:center;">Kinerja Input &amp; Login Terakhir</th>
-          <th style="padding:10px 12px; text-align:center;">Status</th>
-          <th style="padding:10px 12px; text-align:center; width:170px;">Aksi</th>
-        </tr>
-      </thead>
-      <tbody id="tbodyDaftarPengguna">
-        <tr>
-          <td colspan="7" style="padding:16px; text-align:center; color:var(--muted);">Memuat daftar pengguna...</td>
-        </tr>
-      </tbody>
-    </table>
+  <!-- ===================================================================== -->
+  <!-- FITUR 2: CETAK SERTIFIKAT IDL & KARTU QR SASARAN                      -->
+  <!-- ===================================================================== -->
+  <div class="card admin-feature-section" id="sec_admin_cert_qr" style="border-top: 4px solid var(--gold-dark);">
+    <div class="no-print" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
+      <h2 style="margin:0;"><i class="fas fa-award" style="color:var(--gold-dark);"></i> 2. Cetak Sertifikat Imunisasi (IDL) &amp; Kartu QR</h2>
+      <button type="button" class="btn btn-ghost" onclick="closeAllAdminSections()" style="padding:5px 10px; font-size:0.76rem;">
+        <i class="fas fa-chevron-up"></i> Tutup Fitur
+      </button>
+    </div>
+    <p class="lead no-print">Pilih Desa dan Nama Sasaran untuk mencetak <strong>Kartu QR Imunisasi (1 Lembar)</strong> maupun <strong>Sertifikat Imunisasi Dasar Lengkap (2 Halaman Bolak-Balik A4 Landscape)</strong>.</p>
+
+    <div class="grid no-print">
+      <div class="form-group">
+        <label>Pilih Desa / Wilayah</label>
+        <select id="cert_filter_desa" class="admin-desa-dropdown">
+          <option value="">-- Pilih Desa --</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Pilih Nama Anak / Sasaran</label>
+        <select id="cert_select_sasaran">
+          <option value="">-- Pilih Desa Terlebih Dahulu --</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="actions no-print">
+      <button type="button" class="btn btn-primary" onclick="generateAndShowCertificate()">
+        <i class="fas fa-certificate"></i> Preview Sertifikat IDL
+      </button>
+      <button type="button" class="btn btn-info" onclick="openQrModalFromAdminSelect()">
+        <i class="fas fa-qrcode"></i> Cetak Kartu QR Anak
+      </button>
+    </div>
+
+    <!-- AREA PREVIEW & CETAK SERTIFIKAT (DEPAN & BELAKANG) -->
+    <div id="certificatePrintArea" style="display:none; margin-top:20px;">
+      <div class="actions no-print" style="margin-bottom:12px; justify-content:flex-end;">
+        <button type="button" class="btn btn-success" onclick="printCertificateNow()">
+          <i class="fas fa-print"></i> Cetak Sertifikat Sekarang (A4 Landscape)
+        </button>
+      </div>
+
+      <!-- HALAMAN DEPAN SERTIFIKAT -->
+      <div class="cert-page-sheet">
+        <div class="cert-inner-border">
+          <div style="text-align:center; border-bottom:2px solid #D4AF37; padding-bottom:10px; margin-bottom:14px;">
+            <div style="font-size:0.82rem; font-weight:800; color:#002B5B; letter-spacing:1px;">PEMERINTAH KABUPATEN LAMANDAU • DINAS KESEHATAN</div>
+            <div style="font-size:1.05rem; font-weight:900; color:#002B5B;">UPTD PUSKESMAS MELATA</div>
+            <div style="font-size:0.74rem; color:#475569;">Kecamatan Menthobi Raya, Kabupaten Lamandau, Kalimantan Tengah</div>
+          </div>
+
+          <div style="text-align:center; margin-bottom:14px;">
+            <div style="font-family:'Cinzel', serif; font-size:1.55rem; font-weight:900; color:#B8860B; letter-spacing:2px;">SERTIFIKAT IMUNISASI</div>
+            <div style="font-size:0.78rem; font-weight:700; color:#334155;">Nomor Register: <span id="cert_no_reg">-</span></div>
+          </div>
+
+          <p style="text-align:center; font-size:0.86rem; margin:0 0 12px 0;">Diberikan dengan bangga kepada:</p>
+          <div style="text-align:center; font-family:'Cinzel', serif; font-size:1.45rem; font-weight:900; color:#002B5B; margin-bottom:14px; text-decoration:underline;" id="cert_nama_anak">-</div>
+
+          <div style="max-width:520px; margin:0 auto 14px auto; font-size:0.84rem; line-height:1.65;">
+            <div><strong>Tanggal Lahir / Jenis Kelamin:</strong> <span id="cert_ttl_jk">-</span></div>
+            <div><strong>Nama Orang Tua / Ibu:</strong> <span id="cert_nama_ibu">-</span></div>
+            <div><strong>Alamat / Desa:</strong> <span id="cert_desa_alamat">-</span></div>
+          </div>
+
+          <p style="text-align:center; font-size:0.83rem; line-height:1.55; max-width:640px; margin:0 auto 18px auto;">
+            Telah mengikuti dan menyelesaikan program <strong>Imunisasi Dasar Lengkap (IDL)</strong> sesuai jadwal imunisasi nasional sebagai upaya perlindungan kesehatan dan kekebalan tubuh anak.
+          </p>
+
+          <!-- TANDA TANGAN KOORDINATOR (KIRI AGAK ATAS) & KEPALA PUSKESMAS (KANAN AGAK BAWAH) -->
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; margin-top:14px; font-size:0.82rem; color:#002B5B; text-align:center;">
+            <div style="margin-top:0px;">
+              <div>Koordinator Imunisasi</div>
+              <div>UPTD Puskesmas Melata</div>
+              <div style="height:54px;"></div>
+              <div style="font-weight:800; text-decoration:underline;">Tri Prio Heryanto</div>
+              <div>NIP. 19890313 201101 1 002</div>
+            </div>
+            <div style="margin-top:16px;">
+              <div>Melata, <span id="cert_tanggal_cetak">-</span></div>
+              <div>Mengetahui, Kepala UPTD Puskesmas Melata</div>
+              <div style="height:50px;"></div>
+              <div style="font-weight:800; text-decoration:underline;">dr. Anang Argo Yuwono</div>
+              <div>NIP. 19830521 201403 003</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HALAMAN BELAKANG SERTIFIKAT (RINCIAN ANTIGEN) -->
+      <div class="cert-page-sheet">
+        <div class="cert-inner-border">
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #002B5B; padding-bottom:8px; margin-bottom:10px;">
+            <div>
+              <div style="font-weight:900; font-size:0.98rem; color:#002B5B;">CATATAN RIWAYAT PEMBERIAN IMUNISASI</div>
+              <div style="font-size:0.78rem; color:#475569;">Nama Anak: <strong id="cert_back_nama_anak">-</strong> &bull; Wilayah: <strong id="cert_back_desa">-</strong></div>
+            </div>
+            <div style="font-size:0.75rem; font-weight:800; color:#B8860B;">PUSKESMAS MELATA</div>
+          </div>
+
+          <table class="cert-table-back">
+            <thead>
+              <tr>
+                <th style="text-align:left;">Jenis Vaksin / Antigen</th>
+                <th style="text-align:center; width:115px;">Tanggal Diberikan</th>
+                <th style="text-align:left;">Jenis Vaksin / Antigen</th>
+                <th style="text-align:center; width:115px;">Tanggal Diberikan</th>
+              </tr>
+            </thead>
+            <tbody id="cert_back_table_body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   </div>
+
+  <!-- ===================================================================== -->
+  <!-- FITUR 3: KONTROL PRIORITAS POP-UP QR & STOK VAKSIN KOSONG             -->
+  <!-- ===================================================================== -->
+  <div class="card admin-feature-section" id="sec_admin_qr_prio" style="border-top: 4px solid var(--primary);">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
+      <h2 style="margin:0;"><i class="fas fa-list-ol" style="color:var(--primary);"></i> 3. Kontrol Logika Prioritas Pop-Up QR &amp; Stok Vaksin</h2>
+      <button type="button" class="btn btn-ghost" onclick="closeAllAdminSections()" style="padding:5px 10px; font-size:0.76rem;">
+        <i class="fas fa-chevron-up"></i> Tutup Fitur
+      </button>
+    </div>
+    <p class="lead">Atur urutan prioritas vaksin yang direkomendasikan saat orang tua/kader memindai QR Code berdasarkan kelompok usia anak, serta tandai vaksin yang sedang kosong stoknya.</p>
+
+    <form id="formPrioritasQrAdmin">
+      <div class="form-group">
+        <label>Urutan Prioritas Usia &lt; 1 Tahun (0–11 Bulan) — Pisahkan dengan koma:</label>
+        <textarea id="prio_qr_under1" rows="2" style="height:auto;"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Urutan Prioritas Usia 2 Tahun (12–24 Bulan) — Pisahkan dengan koma:</label>
+        <textarea id="prio_qr_age2" rows="2" style="height:auto;"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Urutan Prioritas Usia &gt; 2 Tahun (Kejar / Lanjutan) — Pisahkan dengan koma:</label>
+        <textarea id="prio_qr_over2" rows="2" style="height:auto;"></textarea>
+      </div>
+      <div class="grid">
+        <div class="form-group">
+          <label>Vaksin Stok Kosong / Ditunda Sementara (Dilewati di Pop-Up):</label>
+          <input type="text" id="prio_qr_stok_kosong" placeholder="Contoh: JE, Rotavirus1 (kosongkan jika semua tersedia)">
+        </div>
+        <div class="form-group">
+          <label>Pesan / Catatan Tambahan di Pop-Up Orang Tua:</label>
+          <input type="text" id="prio_qr_catatan" placeholder="Pesan jadwal Posyandu / Puskesmas">
+        </div>
+      </div>
+      <div class="actions">
+        <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Simpan Pengaturan Prioritas QR</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- FITUR 4: PENGATURAN TARGET SASARAN IMUNISASI PER DESA                 -->
+  <!-- ===================================================================== -->
+  <div class="card admin-feature-section" id="sec_admin_target" style="border-top: 4px solid var(--success);">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
+      <h2 style="margin:0;"><i class="fas fa-bullseye" style="color:var(--success);"></i> 4. Pengaturan Target Sasaran Imunisasi Per Desa</h2>
+      <button type="button" class="btn btn-ghost" onclick="closeAllAdminSections()" style="padding:5px 10px; font-size:0.76rem;">
+        <i class="fas fa-chevron-up"></i> Tutup Fitur
+      </button>
+    </div>
+    <p class="lead">Tentukan jumlah target sasaran tahunan per desa sebagai pembagi perhitungan persentase cakupan pada tab <strong>Capaian</strong>.</p>
+
+    <form id="formTargetSasaran">
+      <div class="grid">
+        <div class="form-group">
+          <label>Desa / Wilayah <span class="req">*</span></label>
+          <select id="target_desa" class="admin-desa-dropdown" required>
+            <option value="">-- Pilih Desa --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Tahun Target <span class="req">*</span></label>
+          <input type="number" id="target_tahun" value="2026" min="2024" max="2035" required>
+        </div>
+        <div class="form-group">
+          <label>Target Sasaran Bayi (0–11 Bulan / Surviving Infant)</label>
+          <input type="number" id="target_bayi" min="0" value="0" placeholder="Jumlah sasaran bayi">
+        </div>
+        <div class="form-group">
+          <label>Target Sasaran Baduta (12–24 Bulan)</label>
+          <input type="number" id="target_baduta" min="0" value="0" placeholder="Jumlah sasaran baduta">
+        </div>
+        <div class="form-group">
+          <label>Target Sasaran Ibu Hamil / WUS</label>
+          <input type="number" id="target_bumil" min="0" value="0" placeholder="Jumlah sasaran bumil">
+        </div>
+      </div>
+      <div class="actions">
+        <button type="submit" class="btn btn-success"><i class="fas fa-save"></i> Simpan Target Sasaran Desa</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- FITUR 5: LOGIKA KEMASAN & KAPASITAS DOSIS VAKSIN                      -->
+  <!-- ===================================================================== -->
+  <div class="card admin-feature-section" id="sec_admin_logika_vaksin" style="border-top: 4px solid var(--warning);">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
+      <h2 style="margin:0;"><i class="fas fa-vials" style="color:var(--warning);"></i> 5. Logika Kemasan &amp; Kapasitas Dosis Vaksin</h2>
+      <button type="button" class="btn btn-ghost" onclick="closeAllAdminSections()" style="padding:5px 10px; font-size:0.76rem;">
+        <i class="fas fa-chevron-up"></i> Tutup Fitur
+      </button>
+    </div>
+    <p class="lead">Atur jumlah kapasitas dosis per vial/uniject untuk perhitungan otomatis kebutuhan logistik vaksin pada tab <strong>Kumulatif</strong> dan <strong>Catch Up</strong>.</p>
+
+    <form id="formLogikaVaksinAdmin">
+      <div class="grid" id="gridLogikaVaksinContainer"></div>
+      <div class="actions">
+        <button type="submit" class="btn btn-warning"><i class="fas fa-save"></i> Simpan Aturan Kemasan Vaksin</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- FITUR 6: EKSPOR TERFILTER, BACKUP DATABASE & IMPORT RESTORE           -->
+  <!-- ===================================================================== -->
+  <div class="card admin-feature-section" id="sec_admin_backup_import" style="border-top: 4px solid var(--accent);">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
+      <h2 style="margin:0;"><i class="fas fa-database" style="color:var(--accent);"></i> 6. Ekspor Data Terfilter, Backup &amp; Import Database</h2>
+      <button type="button" class="btn btn-ghost" onclick="closeAllAdminSections()" style="padding:5px 10px; font-size:0.76rem;">
+        <i class="fas fa-chevron-up"></i> Tutup Fitur
+      </button>
+    </div>
+    <p class="lead">Unduh laporan Excel/JSON berdasarkan filter spesifik (Desa, Bulan, Tahun, Antigen), backup seluruh database, atau pulihkan data dari file cadangan.</p>
+
+    <div style="background:#F8FAFC; border:1px solid var(--border-color); border-radius:12px; padding:14px; margin-bottom:16px;">
+      <div style="font-weight:800; color:var(--accent); font-size:0.88rem; margin-bottom:10px;">
+        <i class="fas fa-filter" style="color:var(--primary);"></i> Ekspor Data Terfilter (Excel &amp; JSON)
+      </div>
+      <div class="grid">
+        <div class="form-group">
+          <label>Filter Desa</label>
+          <select id="exp_filter_desa" class="admin-desa-dropdown">
+            <option value="ALL">Semua Desa</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Filter Antigen Spesifik</label>
+          <select id="exp_filter_antigen">
+            <option value="ALL">Semua Antigen / Vaksin</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Filter Bulan Pelayanan</label>
+          <select id="exp_filter_bulan">
+            <option value="ALL">Semua Bulan</option>
+            <option value="01">Januari</option>
+            <option value="02">Februari</option>
+            <option value="03">Maret</option>
+            <option value="04">April</option>
+            <option value="05">Mei</option>
+            <option value="06">Juni</option>
+            <option value="07">Juli</option>
+            <option value="08">Agustus</option>
+            <option value="09">September</option>
+            <option value="10">Oktober</option>
+            <option value="11">November</option>
+            <option value="12">Desember</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Filter Tahun</label>
+          <select id="exp_filter_tahun">
+            <option value="ALL">Semua Tahun</option>
+            <option value="2025">2025</option>
+            <option value="2026" selected>2026</option>
+            <option value="2027">2027</option>
+          </select>
+        </div>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn btn-success" id="btnExportFilteredExcel">
+          <i class="fas fa-file-excel"></i> Download Excel Terfilter (+Sheet Kumulatif)
+        </button>
+        <button type="button" class="btn btn-info" id="btnExportFilteredJSON">
+          <i class="fas fa-file-code"></i> Download JSON Terfilter
+        </button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div style="background:#FFFDFB; border:1px solid #FFD8CC; border-radius:12px; padding:14px;">
+        <div style="font-weight:800; color:var(--accent); font-size:0.88rem; margin-bottom:6px;">
+          <i class="fas fa-cloud-download-alt" style="color:var(--primary);"></i> Full Backup Database
+        </div>
+        <p style="font-size:0.78rem; color:var(--muted); margin:0 0 12px 0;">Simpan seluruh salinan data Register Kohort, BIAS, dan Target Sasaran dalam format JSON.</p>
+        <button type="button" class="btn btn-primary" id="btnExportDb">
+          <i class="fas fa-download"></i> Backup Seluruh Database (.JSON)
+        </button>
+      </div>
+
+      <div style="background:#F8FAFC; border:1px solid var(--border-color); border-radius:12px; padding:14px;">
+        <div style="font-weight:800; color:var(--accent); font-size:0.88rem; margin-bottom:6px;">
+          <i class="fas fa-cloud-upload-alt" style="color:var(--info);"></i> Import / Restore Data
+        </div>
+        <input type="file" id="importFileInput" accept=".json,.xlsx,.xls,.csv" style="margin-bottom:10px;">
+        <button type="button" class="btn btn-warning" id="btnStartImport">
+          <i class="fas fa-upload"></i> Mulai Import Data
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // INISIALISASI DROPDOWN DESA ADMIN & KONTROL ACCORDION + SMOOTH SCROLL DOWN
+    (function() {
+      var desaList = [
+        "Melata", "Nanuah", "Topalan", "Batu Ampar", "Lubuk Hiju",
+        "Bukit Makmur", "Bukit Raya", "Modang Mas", "Mukti Manunggal",
+        "Sumber Jaya", "Bukit Harum", "PT. TSA", "PT. SHS"
+      ];
+      document.querySelectorAll('#admin select.admin-desa-dropdown').forEach(function(sel) {
+        if (sel.options.length <= 1) {
+          desaList.forEach(function(d) {
+            var opt = document.createElement('option');
+            opt.value = d;
+            opt.textContent = d;
+            sel.appendChild(opt);
+          });
+        }
+      });
+    })();
+
+    window.toggleAdminFeatureSection = function(sectionId, btnEl) {
+      var targetEl = document.getElementById(sectionId);
+      if (!targetEl) return;
+
+      var wasVisible = targetEl.style.display === 'block';
+
+      // Sembunyikan semua panel fitur admin terlebih dahulu agar tidak berbaris panjang
+      document.querySelectorAll('#admin .admin-feature-section').forEach(function(sec) {
+        sec.style.display = 'none';
+      });
+      document.querySelectorAll('#admin .btn-admin-menu').forEach(function(btn) {
+        btn.classList.remove('active-admin-btn');
+      });
+
+      // Jika sebelumnya belum terbuka, buka fitur yang dipilih & smooth scroll down ke panel tsb
+      if (!wasVisible) {
+        targetEl.style.display = 'block';
+        if (btnEl) btnEl.classList.add('active-admin-btn');
+        setTimeout(function() {
+          var yOffset = -78;
+          var y = targetEl.getBoundingClientRect().top + window.pageYOffset + yOffset;
+          window.scrollTo({ top: y, behavior: 'smooth' });
+        }, 70);
+      }
+    };
+
+    window.closeAllAdminSections = function() {
+      document.querySelectorAll('#admin .admin-feature-section').forEach(function(sec) {
+        sec.style.display = 'none';
+      });
+      document.querySelectorAll('#admin .btn-admin-menu').forEach(function(btn) {
+        btn.classList.remove('active-admin-btn');
+      });
+      var menuCard = document.getElementById('adminMainMenuCard');
+      if (menuCard) {
+        var yOffset = -78;
+        var y = menuCard.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }
+    };
+  </script>
 </div>
-    </section>
   </main>
-
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, setDoc, getDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -2008,7 +2564,6 @@
       cardForm.style.display = 'none';
       smoothScrollToId('cardSearchSasaran');
     };
-
 window.goToEdit = function(encodedJson) {
       const tabBtn = document.querySelector('.tab[data-tab="imunisasi"]');
       if (tabBtn) tabBtn.click();
@@ -2738,7 +3293,6 @@ window.goToEdit = function(encodedJson) {
         });
       }
     }
-
 window.selectFromLiveSearch = function(encodedJson) {
       const data = JSON.parse(decodeURIComponent(encodedJson));
       document.getElementById('input_search_sasaran').value = data.nama_anak;
@@ -3221,7 +3775,6 @@ window.selectFromLiveSearch = function(encodedJson) {
         alert("Gagal menyimpan prioritas QR: " + err.message);
       }
     }
-
 // =========================================================================
     // TAB 5: PERHITUNGAN CAPAIAN & IMUNISASI DASAR LENGKAP (IDL)
     // =========================================================================

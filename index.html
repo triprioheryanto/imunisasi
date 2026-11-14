@@ -535,6 +535,7 @@
     <i class="fas fa-syringe falling-item" style="right: 2.3%; font-size: 1.5rem; color: #059669; animation-duration: 18.5s; animation-delay: 10.5s;"></i>
     <i class="fas fa-syringe falling-item" style="right: 5.1%; font-size: 2rem; color: var(--accent); animation-duration: 15s; animation-delay: 14s;"></i>
   </div>
+
 <!-- TOMBOL NAVIGASI SMOOTH SCROLL MELAYANG (UNTUK HALAMAN/TAB DATA PANJANG) -->
   <div class="floating-scroll-nav no-print" id="floatingScrollNav" title="Navigasi Scroll Cepat">
     <button type="button" class="btn-float-scroll" onclick="smoothScrollPage('up')" title="Scroll Halus Ke Atas">
@@ -877,6 +878,7 @@
       <button class="tab tab-admin-highlight" data-tab="admin" onclick="switchTab(event)"><i class="fas fa-user-gear"></i> ADMIN &amp; KONTROL</button>
     </div>
   </header>
+
 <main class="wrap">
     <!-- TAB 1: INPUT REGISTER KOHORT INDIVIDU (TAMPILAN AWAL DISEDERHANAKAN) -->
     <section id="imunisasi" class="tab-panel">
@@ -1163,6 +1165,7 @@
         </div>
       </div>
     </section>
+
 <!-- TAB 2: BIAS -->
     <section id="bias" class="tab-panel" style="display:none">
       <div class="card">
@@ -1298,259 +1301,121 @@
       <div class="card" id="cardCapaian2"><h3><i class="fas fa-certificate" style="color:var(--success)"></i> 2. Imunisasi Dasar Lengkap (IDL)</h3><div id="containerTabelIDL" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Hitung Capaian.</p></div></div>
       <div class="card" id="cardCapaian3"><h3><i class="fas fa-school" style="color:var(--info)"></i> 3. Capaian BIAS</h3><div id="containerCapaianBIAS" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Hitung Capaian.</p></div></div>
     </section>
+
 <!-- TAB 6: ADMIN & KONTROL -->
     <section id="admin" class="tab-panel" style="display:none">
-      <div class="card" style="background:linear-gradient(135deg, #FFF5F5 0%, #FFE4E6 100%); border:1.5px solid #FDA4AF;">
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-          <div>
-            <h2 style="margin:0;"><i class="fas fa-user-shield" style="color:var(--danger)"></i> Panel Kontrol &amp; Administrasi Sistem</h2>
-            <p class="lead" style="margin:4px 0 0 0;">Pusat kendali pengguna, cetak sertifikat &amp; kartu QR, ekspor-impor terfilter, target sasaran, serta logika urutan prioritas pop-up QR.</p>
-          </div>
-          <div style="display:flex; gap:6px; flex-wrap:wrap;">
-            <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardAdminExportImport')" style="padding:5px 10px; font-size:0.75rem; background:#FFF;"><i class="fas fa-arrow-down"></i> Ekspor/Impor</button>
-            <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardAdminSettings')" style="padding:5px 10px; font-size:0.75rem; background:#FFF;"><i class="fas fa-arrow-down"></i> Pengaturan Prioritas QR</button>
-          </div>
+<!-- KARTU MANAJEMEN PENGGUNA & HAK AKSES (ADMIN) -->
+<div class="card" id="cardManajemenPengguna" style="border-top: 4px solid var(--accent);">
+  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
+    <h2 style="margin:0;"><i class="fas fa-users-cog" style="color:var(--primary);"></i> Manajemen Pengguna &amp; Hak Akses Penginput</h2>
+    <span style="background:#EFF6FF; color:var(--accent); border:1px solid #BFDBFE; padding:4px 10px; border-radius:20px; font-size:0.75rem; font-weight:800;">
+      <i class="fas fa-shield-alt"></i> Kontrol Anti-Salah Input
+    </span>
+  </div>
+  <p class="lead">Kelola akun Petugas Puskesmas dan Kader Posyandu. Akun dengan peran <strong>Kader Posyandu</strong> otomatis terkunci pada <strong>Desa Tugas</strong> masing-masing untuk mencegah kesalahan input wilayah.</p>
+
+  <!-- FORM TAMBAH / EDIT PENGGUNA -->
+  <form id="formManajemenPengguna" style="background:#F8FAFC; border:1.5px solid var(--border-color); border-radius:12px; padding:16px; margin-bottom:16px;">
+    <input type="hidden" id="usr_edit_original_username" value="">
+    <div style="font-weight:800; color:var(--accent); font-size:0.9rem; margin-bottom:12px; display:flex; align-items:center; gap:6px;" id="usrFormModeTitle">
+      <i class="fas fa-user-plus" style="color:var(--primary);"></i> Tambah Pengguna Baru
+    </div>
+
+    <div class="grid">
+      <div class="form-group">
+        <label>Nama Lengkap Petugas / Kader <span class="req">*</span></label>
+        <input type="text" id="usr_nama_lengkap" placeholder="Contoh: Bd. Siti Aminah, A.Md.Keb" required>
+      </div>
+
+      <div class="form-group">
+        <label>Username Login <span class="req">*</span></label>
+        <input type="text" id="usr_username" placeholder="Contoh: kader_melata (tanpa spasi)" required>
+      </div>
+
+      <div class="form-group">
+        <label>Password Akun <span class="req">*</span></label>
+        <div class="input-with-btn">
+          <input type="password" id="usr_password" placeholder="Minimal 4 karakter" required>
+          <button type="button" class="btn-ocr-cam" onclick="toggleAdminUsrPasswordVisibility()" title="Tampilkan / Sembunyikan Password">
+            <i class="fas fa-eye" id="iconToggleUsrPass"></i>
+          </button>
+          <button type="button" class="btn-ocr-cam" onclick="generateRandomUsrPassword()" title="Buat Password Acak Cepat" style="font-size:0.75rem; font-weight:800;">
+            <i class="fas fa-key"></i>
+          </button>
         </div>
       </div>
 
-      <!-- KARTU CETAK SERTIFIKAT A4 LANDSCAPE & KARTU QR -->
-      <div class="card" style="background: linear-gradient(135deg, #FFFDF5 0%, #FEFCE8 100%); border:1.5px solid #FDE047;">
-        <h2><i class="fas fa-award" style="color:var(--warning)"></i> View / Cetak Sertifikat Imunisasi &amp; Kartu QR</h2>
-        <p class="lead" style="font-size:0.82rem; margin-bottom:10px;">Pilih desa dan nama sasaran terdaftar untuk mencetak <strong>Sertifikat Imunisasi A4 Landscape</strong> atau <strong>Kartu QR Monitoring Orang Tua/Kader</strong>.</p>
-        <div class="grid">
-          <div class="form-group">
-            <label>Pilih Desa</label>
-            <select id="cert_filter_desa">
-              <option value="">-- Pilih Desa --</option>
-              <option value="Melata">Melata</option><option value="Nanuah">Nanuah</option><option value="Topalan">Topalan</option>
-              <option value="Batu Ampar">Batu Ampar</option><option value="Lubuk Hiju">Lubuk Hiju</option><option value="Bukit Makmur">Bukit Makmur</option>
-              <option value="Bukit Raya">Bukit Raya</option><option value="Modang Mas">Modang Mas</option><option value="Mukti Manunggal">Mukti Manunggal</option>
-              <option value="Sumber Jaya">Sumber Jaya</option><option value="Bukit Harum">Bukit Harum</option><option value="PT. TSA">PT. TSA</option><option value="PT. SHS">PT. SHS</option>
-            </select>
-          </div>
-          <div class="form-group"><label>Pilih Nama Sasaran</label><select id="cert_select_sasaran"><option value="">-- Pilih Desa Terlebih Dahulu --</option></select></div>
-        </div>
-        <div class="actions" style="justify-content:flex-start;">
-          <button type="button" class="btn btn-warning" onclick="generateAndShowCertificate()"><i class="fas fa-file-invoice"></i> Tampilkan Sertifikat A4</button>
-          <button type="button" class="btn btn-info" onclick="openQrModalFromAdminSelect()"><i class="fas fa-qrcode"></i> Cetak Kartu QR Sasaran</button>
-        </div>
+      <div class="form-group">
+        <label>Peran &amp; Hak Akses <span class="req">*</span></label>
+        <select id="usr_role" required>
+          <option value="kader">Kader Posyandu (Input Terkunci per Desa Tugas)</option>
+          <option value="petugas">Petugas Puskesmas (Input Semua Desa &amp; Cetak QR/Sertifikat)</option>
+          <option value="admin">Admin Koordinator (Akses Penuh &amp; Kelola Pengguna)</option>
+        </select>
       </div>
 
-      <!-- AREA PRINTER SERTIFIKAT A4 LANDSCAPE -->
-      <div id="certificatePrintArea" style="display:none; margin-bottom:30px;">
-        <div class="cert-preview-wrapper">
-          
-          <!-- HALAMAN DEPAN -->
-          <div class="certificate-page-a4-landscape">
-            <div class="cert-frame-outer">
-              <div class="cert-corner cert-corner-tl"></div><div class="cert-corner cert-corner-tr"></div><div class="cert-corner cert-corner-bl"></div><div class="cert-corner cert-corner-br"></div>
-              <div class="cert-frame-inner">
-                <div>
-                  <div class="cert-header-landscape">
-                    <div class="cert-header-text-box">
-                      <h3>PEMERINTAH KABUPATEN LAMANDAU</h3><h2>DINAS KESEHATAN — PUSKESMAS MELATA</h2>
-                      <p>Jln. Tri Setya No. 01 Ds. Melata Kec. Menthobi Raya Kab. Lamandau, Kalimantan Tengah</p>
-                    </div>
-                  </div>
-                  <div class="cert-title-box"><div class="cert-main-title">SERTIFIKAT IMUNISASI</div><div class="cert-no-text">Nomor Register: <span id="cert_no_reg">MM/IDL/415/2026</span></div></div>
-                  <div class="cert-body-content">
-                    <p style="margin-bottom:6px; font-weight:600; color:#334155; text-align:center;">Diberikan sebagai penghargaan atas ketuntasan imunisasi kepada:</p>
-                    <div style="display:flex; justify-content:space-between; align-items:center; gap:20px; background:rgba(255,255,255,0.85); padding:6px 16px; border-radius:8px; border:1px solid #E2E8F0;">
-                      <table class="cert-field-table">
-                        <tr><td class="cert-field-label">Nama Lengkap Anak</td><td>: <span class="cert-field-val" id="cert_nama_anak">-</span></td></tr>
-                        <tr><td class="cert-field-label">Tanggal Lahir / Gender</td><td>: <span class="cert-field-val" id="cert_ttl_jk">-</span></td></tr>
-                        <tr><td class="cert-field-label">Nama Orang Tua / Ibu</td><td>: <span class="cert-field-val" id="cert_nama_ibu">-</span></td></tr>
-                        <tr><td class="cert-field-label">Desa / Alamat</td><td>: <span class="cert-field-val" id="cert_desa_alamat">-</span></td></tr>
-                      </table>
-                      <div class="cert-photo-box-4x6"><i class="fas fa-camera" style="font-size:1.1rem; margin-bottom:2px; opacity:0.8;"></i>FOTO<br>ANAK/BAYI<br>4 x 6</div>
-                    </div>
-                    <p style="margin-top:6px; font-size:0.9rem; line-height:1.3; color:#1E293B; text-align:center;">Menyatakan bahwa anak tersebut di atas telah menyelesaikan seluruh rangkaian pelayanan imunisasi dan dinyatakan telah mendapatkan <strong>Imunisasi Dasar Lengkap (IDL)</strong> sesuai standar kesehatan nasional.</p>
-                  </div>
-                  <div class="cert-slogan" style="margin-top: 2px; margin-bottom: 6px;">"ANAK SEHAT GENERASI KUAT"</div>
-                  
-                  <!-- PENANDATANGAN RESMI SERTIFIKAT (KOORDINATOR DI KIRI LEBIH TINGGI, KEPALA DI KANAN LEBIH RENDAH) -->
-                  <div style="display:flex; justify-content:space-between; align-items:flex-start; padding: 0 36px; font-size:0.85rem; color:#002244; position:relative; z-index:2;">
-                    <div style="text-align:center; margin-top: 0px;">
-                      <div style="font-weight:600; margin-bottom: 42px;">Melata, <span id="cert_tanggal_cetak">...</span><br>Koordinator Imunisasi</div>
-                      <div style="font-weight:800; border-bottom: 1.5px solid #002244; display:inline-block; padding:0 12px;">Tri Prio Heryanto</div>
-                      <div style="font-weight:700; margin-top: 3px;">NIP. 19890313 201101 1 002</div>
-                    </div>
-                    <div style="text-align:center; margin-top: 16px;">
-                      <div style="font-weight:600; margin-bottom: 42px;">Mengetahui,<br>Kepala Puskesmas Melata</div>
-                      <div style="font-weight:800; border-bottom: 1.5px solid #002244; display:inline-block; padding:0 12px;">dr. Anang Argo Yuwono</div>
-                      <div style="font-weight:700; margin-top: 3px;">NIP. 19830521 201403 003</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- HALAMAN BELAKANG -->
-          <div class="certificate-page-a4-landscape">
-            <div class="cert-frame-outer">
-              <div class="cert-corner cert-corner-tl"></div><div class="cert-corner cert-corner-tr"></div><div class="cert-corner cert-corner-bl"></div><div class="cert-corner cert-corner-br"></div>
-              <div class="cert-frame-inner">
-                <div>
-                  <div style="text-align:center; font-family:'Cinzel', serif; font-weight:800; font-size:1.15rem; color:#003366; margin-bottom:2px; text-transform:uppercase; letter-spacing:1px; border-bottom:2px solid #D4AF37; padding-bottom:4px;">CATATAN RIWAYAT IMUNISASI DASAR LENGKAP</div>
-                  <div style="text-align:center; font-size:0.85rem; font-weight:700; color:#475569; margin-bottom:10px; margin-top:4px;">Lampiran Halaman Belakang Sertifikat An. <span id="cert_back_nama_anak" style="color:#002244; text-transform:uppercase;">-</span> (<span id="cert_back_desa" style="color:#002244;">-</span>)</div>
-                  <table class="cert-back-table">
-                    <thead><tr><th style="width:32%;">NAMA ANTIGEN</th><th style="width:18%;">TGL DIBERIKAN</th><th style="width:32%;">NAMA ANTIGEN</th><th style="width:18%;">TGL DIBERIKAN</th></tr></thead>
-                    <tbody id="cert_back_table_body"></tbody>
-                  </table>
-                </div>
-                <div style="text-align:center; font-size:0.75rem; font-weight:700; color:#64748B; border-top:1.5px dashed #DAA520; padding-top:6px;">Dokumen Rekam Imunisasi Resmi — Puskesmas Melata, Kabupaten Lamandau</div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-        <div class="actions no-print" style="justify-content:center; margin-top:16px;">
-          <button class="btn btn-primary" onclick="printCertificateNow()"><i class="fas fa-print"></i> Cetak / Download PDF Sertifikat</button>
-          <button class="btn btn-ghost" onclick="document.getElementById('certificatePrintArea').style.display='none'"><i class="fas fa-times"></i> Sembunyikan Preview</button>
-        </div>
+      <div class="form-group">
+        <label>Desa Tugas / Wilayah Binaan <span class="req">*</span></label>
+        <select id="usr_desa_tugas" required>
+          <option value="ALL">Semua Desa (Lintas Wilayah Puskesmas)</option>
+        </select>
       </div>
 
-      <!-- EKSPOR & IMPOR DATA -->
-      <div class="grid" id="cardAdminExportImport">
-        <div class="card">
-          <h3><i class="fas fa-file-export" style="color:var(--info)"></i> Ekspor Data Spesifik (Filter Ketat)</h3>
-          <p style="font-size:0.8rem; color:var(--muted);">Hasil ekspor menghitung tepat sesuai Tahun, Bulan, Desa, dan Antigen yang dipilih.</p>
-          <div class="form-group">
-            <label>Pilih Desa</label>
-            <select id="exp_filter_desa">
-              <option value="ALL">-- Semua Desa --</option>
-              <option value="Melata">Melata</option><option value="Nanuah">Nanuah</option><option value="Topalan">Topalan</option>
-              <option value="Batu Ampar">Batu Ampar</option><option value="Lubuk Hiju">Lubuk Hiju</option><option value="Bukit Makmur">Bukit Makmur</option>
-              <option value="Bukit Raya">Bukit Raya</option><option value="Modang Mas">Modang Mas</option><option value="Mukti Manunggal">Mukti Manunggal</option>
-              <option value="Sumber Jaya">Sumber Jaya</option><option value="Bukit Harum">Bukit Harum</option><option value="PT. TSA">PT. TSA</option><option value="PT. SHS">PT. SHS</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Tahun &amp; Bulan Spesifik</label>
-            <div class="form-row">
-              <select id="exp_filter_tahun"><option value="2026">2026</option><option value="2025">2025</option><option value="ALL">-- Semua Tahun --</option></select>
-              <select id="exp_filter_bulan">
-                <option value="ALL">-- Semua Bulan --</option>
-                <option value="01">Januari (01)</option><option value="02">Februari (02)</option><option value="03">Maret (03)</option>
-                <option value="04">April (04)</option><option value="05">Mei (05)</option><option value="06">Juni (06)</option>
-                <option value="07">Juli (07)</option><option value="08">Agustus (08)</option><option value="09">September (09)</option>
-                <option value="10">Oktober (10)</option><option value="11">November (11)</option><option value="12">Desember (12)</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Antigen Spesifik (Opsional)</label>
-            <select id="exp_filter_antigen"><option value="ALL">-- Semua Antigen --</option></select>
-          </div>
-          <div class="actions" style="justify-content:flex-start;">
-            <button class="btn btn-primary" id="btnExportFilteredJSON"><i class="fas fa-download"></i> JSON</button>
-            <button class="btn btn-success" id="btnExportFilteredExcel"><i class="fas fa-file-excel"></i> Excel 4 Sheet Terfilter</button>
-            <button class="btn btn-ghost" id="btnExportDb"><i class="fas fa-database"></i> Backup Full DB</button>
-          </div>
-        </div>
-
-        <div class="card">
-          <h3><i class="fas fa-upload" style="color:var(--primary)"></i> Import Database Ke Cloud</h3>
-          <p style="font-size:0.8rem; color:var(--muted);">Unggah file JSON/CSV untuk memperbarui basis data server.</p>
-          <div class="form-group"><label>Pilih File (.json / .csv)</label><input type="file" id="importFile" accept=".json,.csv" multiple></div>
-          <div id="importStatus" class="small" style="margin-top:6px;"></div>
-          <div class="actions" style="justify-content:flex-start"><button class="btn btn-primary" id="btnStartImport"><i class="fas fa-cloud-upload-alt"></i> Mulai Import &amp; Sync</button></div>
-        </div>
+      <div class="form-group">
+        <label>Status Akun</label>
+        <select id="usr_status">
+          <option value="aktif">Aktif (Diizinkan Login &amp; Input)</option>
+          <option value="nonaktif">Nonaktif / Tangguhkan Sementara</option>
+        </select>
       </div>
+    </div>
 
-      <!-- PENGATURAN ADMIN: TARGET SASARAN, KEMASAN VAKSIN, & LOGIKA URUTAN PRIORITAS POP-UP QR -->
-      <div class="card" id="cardAdminSettings" style="background:#FFFBEB; border:1.5px solid #FCD34D;">
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-          <div>
-            <h3 style="margin:0; color:#92400E; font-size:0.98rem;"><i class="fas fa-sliders"></i> Pengaturan Target Sasaran, Logistik &amp; Urutan Prioritas Pop-Up QR</h3>
-            <span style="font-size:0.76rem; color:#B45309;">Khusus akun Admin untuk menyesuaikan urutan rekomendasi jadwal vaksin QR sesuai stok lapangan.</span>
-          </div>
-          <button class="btn btn-warning" onclick="toggleFormAdminSasaran()" style="padding:6px 12px; font-size:0.8rem;"><i class="fas fa-user-lock"></i> Buka / Tutup Pengaturan</button>
-        </div>
+    <div class="actions" style="margin-top:10px;">
+      <button type="submit" class="btn btn-primary" id="btnSubmitUserAdmin">
+        <i class="fas fa-save"></i> Simpan Pengguna
+      </button>
+      <button type="button" class="btn btn-ghost" id="btnCancelEditUser" onclick="resetFormManajemenPengguna()" style="display:none;">
+        <i class="fas fa-times"></i> Batal Edit
+      </button>
+    </div>
+  </form>
 
-        <div id="panelAdminPengaturan" style="display:none; margin-top:14px; border-top:1px dashed #FCD34D; padding-top:14px;">
-          <!-- BAGIAN 1: TARGET SASARAN -->
-          <h4 style="color:#92400E; margin-bottom:8px;"><i class="fas fa-bullseye"></i> 1. Form Target Sasaran Wilayah</h4>
-          <form id="formTargetSasaran">
-            <div class="grid">
-              <div class="form-group">
-                <label>Desa <span class="req">*</span></label>
-                <select id="sas_desa" required>
-                  <option value="Melata">Melata</option><option value="Nanuah">Nanuah</option><option value="Topalan">Topalan</option><option value="Batu Ampar">Batu Ampar</option>
-                  <option value="Lubuk Hiju">Lubuk Hiju</option><option value="Bukit Makmur">Bukit Makmur</option><option value="Bukit Raya">Bukit Raya</option>
-                  <option value="Modang Mas">Modang Mas</option><option value="Mukti Manunggal">Mukti Manunggal</option><option value="Sumber Jaya">Sumber Jaya</option>
-                  <option value="Bukit Harum">Bukit Harum</option><option value="PT. TSA">PT. TSA</option><option value="PT. SHS">PT. SHS</option>
-                </select>
-              </div>
-              <div class="form-group"><label>Tahun <span class="req">*</span></label><input type="number" id="sas_tahun" value="2026" required></div>
-              <div class="form-group"><label>Target Bayi <span class="req">*</span></label><input type="number" id="sas_target_bayi" placeholder="Jumlah sasaran bayi" required></div>
-              <div class="form-group"><label>Target Baduta <span class="req">*</span></label><input type="number" id="sas_target_baduta" placeholder="Jumlah sasaran baduta" required></div>
-              <div class="form-group full-width"><label>Target BIAS <span class="req">*</span></label><input type="number" id="sas_target_bias" placeholder="Jumlah sasaran anak sekolah BIAS" required></div>
-            </div>
-            <div class="actions" style="margin-bottom:20px;"><button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Simpan Target Sasaran</button></div>
-          </form>
+  <!-- OPSI KEAMANAN LOGIN & FILTER DAFTAR PENGGUNA -->
+  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px; background:#FFFBEB; border:1px solid #FDE68A; padding:10px 14px; border-radius:10px;">
+    <label style="margin:0; cursor:pointer; font-size:0.8rem; color:#92400E; display:flex; align-items:center; gap:8px;">
+      <input type="checkbox" id="chkStrictUserLogin" checked onchange="toggleStrictUserLoginSetting(this.checked)" style="width:16px; height:16px; accent-color:var(--primary);">
+      <span><strong>Mode Login Ketat:</strong> Hanya username &amp; password yang terdaftar di bawah (plus Master Admin) yang dapat masuk ke sistem.</span>
+    </label>
+    <div style="min-width:220px; flex:1; max-width:300px;">
+      <input type="text" id="searchUserAdminInput" oninput="renderUsersTable()" placeholder="Cari nama, username, atau desa..." style="height:36px; font-size:0.8rem;">
+    </div>
+  </div>
 
-          <hr style="border:0; border-top:1px dashed #FCD34D; margin:16px 0;">
-
-          <!-- BAGIAN 2: KONTROL LOGIKA URUTAN PRIORITAS POP-UP IMUNISASI QR -->
-          <h4 style="color:#92400E; margin-bottom:6px;"><i class="fas fa-qrcode"></i> 2. Kontrol Logika Urutan Prioritas Pop-Up Imunisasi QR (Sesuai Stok Lapangan)</h4>
-          <p style="font-size:0.78rem; color:#78350F; margin-top:0; margin-bottom:12px;">
-            Tentukan urutan prioritas vaksin yang direkomendasikan kepada orang tua/kader saat scan QR. Pisahkan dengan tanda koma (<code>,</code>). Vaksin yang diletakkan paling kiri akan diprioritaskan muncul pertama jika belum diterima anak.
-          </p>
-          <form id="formPrioritasQrAdmin">
-            <div class="grid">
-              <div class="form-group full-width">
-                <label style="color:#002B5B;"><i class="fas fa-baby"></i> Prioritas Usia &lt; 1 Tahun (0 - 11 Bulan)</label>
-                <input type="text" id="prio_qr_under1" value="HBO (<24 Jam), HBO (1-7 Hari), BCG, OPV1, DPT-HB-Hib1, OPV2, PCV1, Rotavirus1, DPT-HB-Hib2, OPV3, PCV2, Rotavirus2, DPT-HB-Hib3, OPV4, IPV1, Rotavirus3, Campak Rubela-1, IPV2, JE" required>
-              </div>
-              <div class="form-group full-width">
-                <label style="color:#002B5B;"><i class="fas fa-child"></i> Prioritas Usia 2 Tahun (12 - 24 Bulan)</label>
-                <input type="text" id="prio_qr_age2" value="PCV3, DPT-HB-Hib4, Campak Rubela-2, Campak Rubela-1, IPV2, DPT-HB-Hib3, IPV1, OPV4, BCG" required>
-              </div>
-              <div class="form-group full-width">
-                <label style="color:#002B5B;"><i class="fas fa-walking"></i> Prioritas Usia &gt; 2 Tahun (&gt; 24 Bulan / Imunisasi Kejar)</label>
-                <input type="text" id="prio_qr_over2" value="Campak Rubela-2, DPT-HB-Hib4, Campak Rubela-1, DPT-HB-Hib3, IPV2, IPV1, OPV4" required>
-              </div>
-              <div class="form-group">
-                <label style="color:var(--danger);"><i class="fas fa-ban"></i> Vaksin Stok Kosong / Ditunda Sementara (Opsional)</label>
-                <input type="text" id="prio_qr_stok_kosong" placeholder="Contoh: Rotavirus1, PCV3 (kosongkan jika tersedia semua)">
-              </div>
-              <div class="form-group">
-                <label style="color:#065F46;"><i class="fas fa-bullhorn"></i> Pesan Lapangan Untuk Orang Tua/Kader</label>
-                <input type="text" id="prio_qr_catatan" value="Silakan datang ke Posyandu atau Puskesmas Melata sesuai jadwal dengan membawa Kartu QR / Buku KIA.">
-              </div>
-            </div>
-            <div class="actions" style="margin-bottom:20px;">
-              <button type="submit" class="btn btn-info"><i class="fas fa-save"></i> Simpan Urutan Prioritas Pop-Up QR</button>
-            </div>
-          </form>
-
-          <hr style="border:0; border-top:1px dashed #FCD34D; margin:16px 0;">
-
-          <!-- BAGIAN 3: LOGIKA KEMASAN VAKSIN -->
-          <h4 style="color:#92400E; margin-bottom:8px;"><i class="fas fa-box"></i> 3. Pengaturan Logika Konsumsi &amp; Kemasan Vaksin</h4>
-          <form id="formLogikaVaksinAdmin">
-            <div class="grid" id="gridLogikaVaksinContainer"></div>
-            <div class="actions"><button type="submit" class="btn btn-warning"><i class="fas fa-sliders"></i> Simpan Aturan Kemasan Vaksin</button></div>
-          </form>
-        </div>
-      </div>
+  <!-- TABEL DAFTAR PENGGUNA -->
+  <div style="overflow-x:auto; border:1px solid var(--border-color); border-radius:12px;">
+    <table style="width:100%; border-collapse:collapse; font-size:0.8rem; min-width:720px;">
+      <thead>
+        <tr style="background:var(--accent); color:#FFF; text-align:left;">
+          <th style="padding:10px 12px; width:40px;">No</th>
+          <th style="padding:10px 12px;">Nama &amp; Username</th>
+          <th style="padding:10px 12px;">Peran</th>
+          <th style="padding:10px 12px;">Desa Tugas</th>
+          <th style="padding:10px 12px; text-align:center;">Kinerja Input &amp; Login Terakhir</th>
+          <th style="padding:10px 12px; text-align:center;">Status</th>
+          <th style="padding:10px 12px; text-align:center; width:170px;">Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="tbodyDaftarPengguna">
+        <tr>
+          <td colspan="7" style="padding:16px; text-align:center; color:var(--muted);">Memuat daftar pengguna...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
     </section>
   </main>
 
-  <footer class="site-footer">&copy; 2026 Sistem Register Imunisasi Puskesmas Melata.</footer>
-
-  <div id="helpModal" class="modal-overlay" style="display:none;">
-    <div style="background:#fff;padding:20px;border-radius:14px;max-width:420px;margin:16px; width:90%;">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <h3 style="margin:0; color:var(--accent);"><i class="fas fa-circle-info"></i> Bantuan Sistem</h3>
-        <button class="btn btn-ghost" onclick="document.getElementById('helpModal').style.display='none'">Tutup</button>
-      </div>
-      <hr style="margin: 10px 0; border:0; border-top:1px solid var(--border-color);">
-      <p class="lead">Sistem dilengkapi jejak audit otomatis per petugas, fitur anti-duplikasi sasaran, cetak Kartu QR monitoring untuk orang tua/kader tanpa login, serta ekspor laporan Excel terfilter ketat.</p>
-    </div>
-  </div>
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, setDoc, getDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -1659,6 +1524,9 @@
     let classInputCounter = 0;
     let currentInputDesa = "";
     let activePetugasName = "";
+    let activeUserProfile = { username: "", nama_lengkap: "", role: "petugas", desa_tugas: "ALL" };
+    let REGISTERED_USERS = [];
+    let STRICT_USER_LOGIN = true;
     let cachedGlobalKohortData = [];
     let currentQrChildData = null;
     let isPublicQrMode = Boolean(window.__IS_PUBLIC_QR_MODE__);
@@ -1667,7 +1535,7 @@
     const AUTH_PASSWORD_PETUGAS = "sri26";
     const AUTH_ADMIN_USER = "admin";
     const AUTH_ADMIN_PASS = "adminsri26";
-    const SESSION_TIMEOUT_MS = 30 * 60 * 1000; // Timeout sesi 30 menit tanpa aktivitas
+    const SESSION_TIMEOUT_MS = 30 * 60 * 1000;
 
     let currentOcrTargetId = "";
     let currentOcrMode = "single"; 
@@ -1677,21 +1545,408 @@
     let lastCapturedImageData = null;
 
     // =========================================================================
+    // MANAJEMEN PENGGUNA & HAK AKSES (ADMIN)
+    // =========================================================================
+    function getCachedUsersList() {
+      try {
+        const raw = localStorage.getItem('pkm_users_cache');
+        return raw ? JSON.parse(raw) : [];
+      } catch (e) { return []; }
+    }
+
+    function saveCachedUsersList(list, strictFlag) {
+      REGISTERED_USERS = Array.isArray(list) ? list : [];
+      if (typeof strictFlag === 'boolean') STRICT_USER_LOGIN = strictFlag;
+      localStorage.setItem('pkm_users_cache', JSON.stringify(REGISTERED_USERS));
+      localStorage.setItem('pkm_users_strict', STRICT_USER_LOGIN ? '1' : '0');
+    }
+
+    async function loadUsersManagement() {
+      REGISTERED_USERS = getCachedUsersList();
+      const savedStrict = localStorage.getItem('pkm_users_strict');
+      if (savedStrict !== null) STRICT_USER_LOGIN = savedStrict === '1';
+
+      const desaSelect = document.getElementById('usr_desa_tugas');
+      if (desaSelect && desaSelect.options.length <= 1) {
+        ALL_DESA_LIST.forEach(d => {
+          const opt = document.createElement('option');
+          opt.value = d;
+          opt.textContent = `Desa ${d}`;
+          desaSelect.appendChild(opt);
+        });
+      }
+
+      try {
+        if (navigator.onLine) {
+          const snap = await getDoc(doc(db, COL_TARGET, 'CONFIG_USERS'));
+          if (snap.exists()) {
+            const data = snap.data();
+            saveCachedUsersList(data.users || [], data.strict_login !== false);
+          }
+        }
+      } catch (e) { console.warn("Menggunakan cache daftar pengguna:", e.message); }
+
+      const strictChk = document.getElementById('chkStrictUserLogin');
+      if (strictChk) strictChk.checked = STRICT_USER_LOGIN;
+      renderUsersTable();
+    }
+
+    async function persistUsersToFirestore() {
+      saveCachedUsersList(REGISTERED_USERS, STRICT_USER_LOGIN);
+      await setDoc(doc(db, COL_TARGET, 'CONFIG_USERS'), {
+        users: REGISTERED_USERS,
+        strict_login: STRICT_USER_LOGIN,
+        updated_by: activePetugasName,
+        updated_at: new Date().toISOString()
+      }, { merge: true });
+    }
+
+    window.toggleAdminUsrPasswordVisibility = function() {
+      const inp = document.getElementById('usr_password');
+      const icon = document.getElementById('iconToggleUsrPass');
+      if (!inp) return;
+      if (inp.type === 'password') {
+        inp.type = 'text';
+        if (icon) icon.className = 'fas fa-eye-slash';
+      } else {
+        inp.type = 'password';
+        if (icon) icon.className = 'fas fa-eye';
+      }
+    };
+
+    window.generateRandomUsrPassword = function() {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let pass = 'PKM';
+      for (let i = 0; i < 4; i++) pass += chars.charAt(Math.floor(Math.random() * chars.length));
+      const inp = document.getElementById('usr_password');
+      if (inp) {
+        inp.type = 'text';
+        inp.value = pass;
+        const icon = document.getElementById('iconToggleUsrPass');
+        if (icon) icon.className = 'fas fa-eye-slash';
+      }
+    };
+
+    window.resetFormManajemenPengguna = function() {
+      const form = document.getElementById('formManajemenPengguna');
+      if (form) form.reset();
+      document.getElementById('usr_edit_original_username').value = '';
+      document.getElementById('usr_username').readOnly = false;
+      document.getElementById('usr_username').style.background = '#F8FAFC';
+      document.getElementById('usrFormModeTitle').innerHTML = '<i class="fas fa-user-plus" style="color:var(--primary);"></i> Tambah Pengguna Baru';
+      document.getElementById('btnSubmitUserAdmin').innerHTML = '<i class="fas fa-save"></i> Simpan Pengguna';
+      document.getElementById('btnCancelEditUser').style.display = 'none';
+      const inpPass = document.getElementById('usr_password');
+      if (inpPass) inpPass.type = 'password';
+      const icon = document.getElementById('iconToggleUsrPass');
+      if (icon) icon.className = 'fas fa-eye';
+    };
+
+    window.toggleStrictUserLoginSetting = async function(isChecked) {
+      if (activeUserProfile.role !== 'admin' && activePetugasName.toLowerCase() !== AUTH_ADMIN_USER) {
+        alert("🔒 Hanya Admin yang berhak mengubah aturan keamanan login!");
+        document.getElementById('chkStrictUserLogin').checked = STRICT_USER_LOGIN;
+        return;
+      }
+      STRICT_USER_LOGIN = isChecked;
+      try {
+        await persistUsersToFirestore();
+      } catch (err) {
+        alert("Gagal menyimpan pengaturan login ketat: " + err.message);
+      }
+    };
+
+    window.handleSaveUserAdmin = async function(e) {
+      e.preventDefault();
+      if (activeUserProfile.role !== 'admin' && activePetugasName.toLowerCase() !== AUTH_ADMIN_USER) {
+        return alert("🔒 Hanya Admin yang berhak menambah atau mengubah data pengguna!");
+      }
+
+      const origUsername = document.getElementById('usr_edit_original_username').value.trim().toLowerCase();
+      const namaLengkap = document.getElementById('usr_nama_lengkap').value.trim();
+      const username = document.getElementById('usr_username').value.trim().toLowerCase().replace(/\s+/g, '_');
+      const password = document.getElementById('usr_password').value.trim();
+      const role = document.getElementById('usr_role').value;
+      const desaTugas = document.getElementById('usr_desa_tugas').value;
+      const status = document.getElementById('usr_status').value;
+
+      if (!namaLengkap || !username || !password) {
+        return alert("Nama lengkap, username, dan password wajib diisi!");
+      }
+      if (username === AUTH_ADMIN_USER) {
+        return alert("Username 'admin' dicadangkan untuk Master Admin sistem.");
+      }
+
+      const existingIdx = REGISTERED_USERS.findIndex(u => u.username.toLowerCase() === username);
+
+      if (!origUsername) {
+        if (existingIdx !== -1) {
+          return alert(`❌ Username "${username}" sudah digunakan oleh ${REGISTERED_USERS[existingIdx].nama_lengkap}! Gunakan username lain.`);
+        }
+        REGISTERED_USERS.push({
+          username,
+          nama_lengkap: namaLengkap,
+          password,
+          role,
+          desa_tugas: desaTugas,
+          status,
+          created_at: new Date().toISOString(),
+          last_login: null
+        });
+      } else {
+        const targetIdx = REGISTERED_USERS.findIndex(u => u.username.toLowerCase() === origUsername);
+        if (targetIdx === -1) return alert("Data pengguna yang diedit tidak ditemukan.");
+        REGISTERED_USERS[targetIdx] = {
+          ...REGISTERED_USERS[targetIdx],
+          nama_lengkap: namaLengkap,
+          password,
+          role,
+          desa_tugas: desaTugas,
+          status,
+          updated_at: new Date().toISOString()
+        };
+      }
+
+      try {
+        await persistUsersToFirestore();
+        renderUsersTable();
+        resetFormManajemenPengguna();
+        alert(`✅ Data pengguna "${namaLengkap}" (${username}) berhasil disimpan!`);
+      } catch (err) {
+        alert("Gagal menyimpan pengguna ke database: " + err.message);
+      }
+    };
+
+    window.editUserAdmin = function(username) {
+      if (activeUserProfile.role !== 'admin' && activePetugasName.toLowerCase() !== AUTH_ADMIN_USER) {
+        return alert("🔒 Hanya Admin yang berhak mengedit pengguna!");
+      }
+      const userObj = REGISTERED_USERS.find(u => u.username.toLowerCase() === username.toLowerCase());
+      if (!userObj) return;
+
+      document.getElementById('usr_edit_original_username').value = userObj.username;
+      document.getElementById('usr_nama_lengkap').value = userObj.nama_lengkap || '';
+      const usrInput = document.getElementById('usr_username');
+      usrInput.value = userObj.username;
+      usrInput.readOnly = true;
+      usrInput.style.background = '#E2E8F0';
+      document.getElementById('usr_password').value = userObj.password || '';
+      document.getElementById('usr_role').value = userObj.role || 'petugas';
+      document.getElementById('usr_desa_tugas').value = userObj.desa_tugas || 'ALL';
+      document.getElementById('usr_status').value = userObj.status || 'aktif';
+
+      document.getElementById('usrFormModeTitle').innerHTML = `<i class="fas fa-user-edit" style="color:var(--warning);"></i> Edit Akun Pengguna: ${userObj.username}`;
+      document.getElementById('btnSubmitUserAdmin').innerHTML = '<i class="fas fa-check-circle"></i> Simpan Perubahan';
+      document.getElementById('btnCancelEditUser').style.display = 'inline-flex';
+      smoothScrollToId('cardManajemenPengguna');
+    };
+
+    window.toggleUserStatusAdmin = async function(username) {
+      if (activeUserProfile.role !== 'admin' && activePetugasName.toLowerCase() !== AUTH_ADMIN_USER) {
+        return alert("🔒 Hanya Admin yang berhak mengubah status pengguna!");
+      }
+      const idx = REGISTERED_USERS.findIndex(u => u.username.toLowerCase() === username.toLowerCase());
+      if (idx === -1) return;
+      const nextStatus = REGISTERED_USERS[idx].status === 'nonaktif' ? 'aktif' : 'nonaktif';
+      REGISTERED_USERS[idx].status = nextStatus;
+      try {
+        await persistUsersToFirestore();
+        renderUsersTable();
+      } catch (err) {
+        alert("Gagal mengubah status pengguna: " + err.message);
+      }
+    };
+
+    window.deleteUserAdmin = async function(username) {
+      if (activeUserProfile.role !== 'admin' && activePetugasName.toLowerCase() !== AUTH_ADMIN_USER) {
+        return alert("🔒 Hanya Admin yang berhak menghapus pengguna!");
+      }
+      const userObj = REGISTERED_USERS.find(u => u.username.toLowerCase() === username.toLowerCase());
+      if (!userObj) return;
+      if (!confirm(`Hapus permanen akun pengguna "${userObj.nama_lengkap}" (${userObj.username})?\nRiwayat data imunisasi yang pernah diinput tetap aman di database.`)) return;
+
+      REGISTERED_USERS = REGISTERED_USERS.filter(u => u.username.toLowerCase() !== username.toLowerCase());
+      try {
+        await persistUsersToFirestore();
+        renderUsersTable();
+        if (document.getElementById('usr_edit_original_username').value === username) {
+          resetFormManajemenPengguna();
+        }
+      } catch (err) {
+        alert("Gagal menghapus pengguna: " + err.message);
+      }
+    };
+
+    window.renderUsersTable = function() {
+      const tbody = document.getElementById('tbodyDaftarPengguna');
+      if (!tbody) return;
+      const query = (document.getElementById('searchUserAdminInput')?.value || '').trim().toLowerCase();
+
+      const filtered = REGISTERED_USERS.filter(u => {
+        if (!query) return true;
+        return (u.nama_lengkap || '').toLowerCase().includes(query) ||
+               (u.username || '').toLowerCase().includes(query) ||
+               (u.desa_tugas || '').toLowerCase().includes(query) ||
+               (u.role || '').toLowerCase().includes(query);
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" style="padding:18px; text-align:center; color:var(--muted);">
+              ${REGISTERED_USERS.length === 0
+                ? 'Belum ada akun Petugas/Kader yang ditambahkan. Gunakan formulir di atas untuk mendaftarkan penginput.'
+                : 'Tidak ada pengguna yang cocok dengan kata kunci pencarian.'}
+            </td>
+          </tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map((u, i) => {
+        const uNameLow = (u.username || '').toLowerCase();
+        const uFullLow = (u.nama_lengkap || '').toLowerCase();
+        const inputCount = cachedGlobalKohortData.filter(rec => {
+          const p = String(rec.petugas_input || rec.updated_by || rec.created_by || '').toLowerCase();
+          return p && (p === uNameLow || p === uFullLow || p.includes(uNameLow));
+        }).length;
+
+        const roleBadge = u.role === 'admin'
+          ? '<span style="background:#FEE2E2; color:#991B1B; padding:3px 8px; border-radius:6px; font-weight:800; font-size:0.72rem;">ADMIN</span>'
+          : u.role === 'petugas'
+            ? '<span style="background:#DBEAFE; color:#1E40AF; padding:3px 8px; border-radius:6px; font-weight:800; font-size:0.72rem;">PETUGAS PKM</span>'
+            : '<span style="background:#FEF3C7; color:#92400E; padding:3px 8px; border-radius:6px; font-weight:800; font-size:0.72rem;">KADER POSYANDU</span>';
+
+        const desaLabel = (!u.desa_tugas || u.desa_tugas === 'ALL')
+          ? '<span style="color:var(--info); font-weight:700;">Semua Desa</span>'
+          : `<strong>Desa ${u.desa_tugas}</strong>`;
+
+        const isAktif = u.status !== 'nonaktif';
+        const statusPill = isAktif
+          ? '<span style="background:#D1FAE5; color:#065F46; padding:3px 9px; border-radius:20px; font-weight:800; font-size:0.72rem;"><i class="fas fa-check-circle"></i> Aktif</span>'
+          : '<span style="background:#F1F5F9; color:#64748B; padding:3px 9px; border-radius:20px; font-weight:800; font-size:0.72rem;"><i class="fas fa-ban"></i> Nonaktif</span>';
+
+        const lastLoginStr = u.last_login
+          ? new Date(u.last_login).toLocaleString('id-ID', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
+          : 'Belum pernah login';
+
+        return `
+          <tr style="border-bottom:1px solid var(--border-color); background:${isAktif ? '#FFFFFF' : '#F8FAFC'};">
+            <td style="padding:10px 12px; font-weight:700;">${i + 1}</td>
+            <td style="padding:10px 12px;">
+              <div style="font-weight:800; color:var(--accent);">${u.nama_lengkap || '-'}</div>
+              <div style="font-size:0.74rem; color:var(--muted);">User: <strong>${u.username}</strong> &bull; Pass: <code style="background:#F1F5F9; padding:1px 5px; border-radius:4px;">${u.password}</code></div>
+            </td>
+            <td style="padding:10px 12px;">${roleBadge}</td>
+            <td style="padding:10px 12px;">${desaLabel}</td>
+            <td style="padding:10px 12px; text-align:center;">
+              <div style="font-weight:800; color:var(--success);">${inputCount} Sasaran</div>
+              <div style="font-size:0.7rem; color:var(--muted);"><i class="fas fa-clock"></i> ${lastLoginStr}</div>
+            </td>
+            <td style="padding:10px 12px; text-align:center;">${statusPill}</td>
+            <td style="padding:10px 12px; text-align:center;">
+              <div style="display:inline-flex; gap:5px;">
+                <button type="button" class="btn btn-warning" onclick="editUserAdmin('${u.username}')" style="padding:5px 8px; font-size:0.74rem;" title="Edit Pengguna">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button type="button" class="btn ${isAktif ? 'btn-ghost' : 'btn-success'}" onclick="toggleUserStatusAdmin('${u.username}')" style="padding:5px 8px; font-size:0.74rem;" title="${isAktif ? 'Nonaktifkan Akun' : 'Aktifkan Kembali'}">
+                  <i class="fas ${isAktif ? 'fa-user-slash' : 'fa-user-check'}"></i>
+                </button>
+                <button type="button" class="btn btn-danger" onclick="deleteUserAdmin('${u.username}')" style="padding:5px 8px; font-size:0.74rem;" title="Hapus Pengguna">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    };
+
+    function applyUserRoleRestrictions() {
+      const badgeSpan = document.querySelector('#currentUserDisplay span');
+      if (badgeSpan) {
+        const displayTitle = activeUserProfile.nama_lengkap || activePetugasName || 'Petugas';
+        const desaTag = (activeUserProfile.desa_tugas && activeUserProfile.desa_tugas !== 'ALL')
+          ? ` • ${activeUserProfile.desa_tugas}`
+          : '';
+        badgeSpan.textContent = `${displayTitle}${desaTag}`;
+      }
+
+      const isKaderLocked = activeUserProfile.role === 'kader' &&
+        activeUserProfile.desa_tugas &&
+        activeUserProfile.desa_tugas !== 'ALL';
+
+      const searchDesaEl = document.getElementById('search_desa_anak');
+      const regDesaEl = document.getElementById('reg_desa');
+
+      if (isKaderLocked) {
+        currentInputDesa = activeUserProfile.desa_tugas;
+        if (searchDesaEl) {
+          searchDesaEl.value = activeUserProfile.desa_tugas;
+          searchDesaEl.style.pointerEvents = 'none';
+          searchDesaEl.style.background = '#E2E8F0';
+          searchDesaEl.title = `Desa dikunci otomatis sesuai wilayah tugas Kader (${activeUserProfile.desa_tugas})`;
+        }
+        if (regDesaEl) {
+          regDesaEl.value = activeUserProfile.desa_tugas;
+          regDesaEl.style.pointerEvents = 'none';
+          regDesaEl.style.background = '#E2E8F0';
+          regDesaEl.title = `Desa dikunci otomatis sesuai wilayah tugas Kader (${activeUserProfile.desa_tugas})`;
+        }
+      } else {
+        if (searchDesaEl) {
+          searchDesaEl.style.pointerEvents = 'auto';
+          searchDesaEl.style.background = '#F8FAFC';
+          searchDesaEl.title = '';
+        }
+        if (regDesaEl) {
+          regDesaEl.style.pointerEvents = 'auto';
+          regDesaEl.style.background = '#F8FAFC';
+          regDesaEl.title = '';
+        }
+      }
+    }
+
+    // =========================================================================
     // MANAJEMEN SESI PETUGAS / KADER + AUTO TIMEOUT INAKTIVITAS
     // =========================================================================
-    function savePetugasSession(username) {
+    function savePetugasSession(username, userMeta = null) {
       activePetugasName = username;
+      if (userMeta) {
+        activeUserProfile = {
+          username: userMeta.username || username,
+          nama_lengkap: userMeta.nama_lengkap || username,
+          role: userMeta.role || (username.toLowerCase() === AUTH_ADMIN_USER ? 'admin' : 'petugas'),
+          desa_tugas: userMeta.desa_tugas || 'ALL'
+        };
+        localStorage.setItem('pkm_app_user_meta', JSON.stringify(activeUserProfile));
+      } else {
+        try {
+          const savedMeta = JSON.parse(localStorage.getItem('pkm_app_user_meta') || 'null');
+          if (savedMeta && savedMeta.username) {
+            activeUserProfile = savedMeta;
+          } else {
+            activeUserProfile = {
+              username,
+              nama_lengkap: username,
+              role: username.toLowerCase() === AUTH_ADMIN_USER ? 'admin' : 'petugas',
+              desa_tugas: 'ALL'
+            };
+          }
+        } catch (e) {}
+      }
+
       localStorage.setItem('pkm_app_username', username);
       localStorage.setItem('pkm_session_active', '1');
       localStorage.setItem('pkm_last_activity', String(Date.now()));
-      const badgeSpan = document.querySelector('#currentUserDisplay span');
-      if (badgeSpan) badgeSpan.textContent = username;
+      applyUserRoleRestrictions();
     }
 
     function clearPetugasSession() {
       activePetugasName = "";
+      activeUserProfile = { username: "", nama_lengkap: "", role: "petugas", desa_tugas: "ALL" };
       localStorage.removeItem('pkm_session_active');
       localStorage.removeItem('pkm_last_activity');
+      localStorage.removeItem('pkm_app_user_meta');
     }
 
     function isPetugasSessionValid() {
@@ -1737,7 +1992,11 @@
       const desaSearch = document.getElementById('search_desa_anak').value;
       resetFormRegisterIndividu();
       if (typedSearch) document.getElementById('reg_nama_anak').value = typedSearch;
-      if (desaSearch) document.getElementById('reg_desa').value = desaSearch;
+      if (activeUserProfile.role === 'kader' && activeUserProfile.desa_tugas && activeUserProfile.desa_tugas !== 'ALL') {
+        document.getElementById('reg_desa').value = activeUserProfile.desa_tugas;
+      } else if (desaSearch) {
+        document.getElementById('reg_desa').value = desaSearch;
+      }
       document.getElementById('btnCetakQrFromForm').style.display = 'none';
       const cardForm = document.getElementById('cardFormUtama');
       cardForm.style.display = 'block';
@@ -1750,747 +2009,6 @@
       smoothScrollToId('cardSearchSasaran');
     };
 
-    // =========================================================================
-    // POP-UP ORANG TUA / KADER TANPA LOGIN & TOMBOL LAKUKAN IMUNISASI
-    // =========================================================================
-    function decodeCompactQrPayload(rawStr) {
-      if (!rawStr) return null;
-      const parts = rawStr.split('|');
-      if (parts.length < 5) return null;
-      const obj = {
-        nama_anak: parts[0] || '-',
-        tgl_lahir: parts[1] || '',
-        jk: parts[2] || 'L',
-        nama_ibu: parts[3] || '-',
-        desa: parts[4] || '-',
-        alamat_rt: parts[5] || '-'
-      };
-      if (parts[6]) {
-        parts[6].split(',').forEach(entry => {
-          const [idxStr, dtStr] = entry.split(':');
-          const idx = parseInt(idxStr, 10);
-          if (!isNaN(idx) && VAKSIN_ANAK_KEYS[idx] && dtStr) {
-            const vk = VAKSIN_ANAK_KEYS[idx];
-            const fieldKey = `vaksin_${vk.replace(/[\s\(\)<>-]/g, '_')}`;
-            const fullDate = /^\d{6}$/.test(dtStr)
-              ? `20${dtStr.slice(0, 2)}-${dtStr.slice(2, 4)}-${dtStr.slice(4, 6)}`
-              : dtStr;
-            obj[fieldKey] = fullDate;
-          }
-        });
-      }
-      return obj;
-    }
-
-    function decodeLegacyQrPayload(str) {
-      let b64 = str.replace(/-/g, '+').replace(/_/g, '/');
-      while (b64.length % 4) b64 += '=';
-      const jsonStr = decodeURIComponent(escape(atob(b64)));
-      return JSON.parse(jsonStr);
-    }
-
-    function getPublicQrBaseUrl() {
-      const inputEl = document.getElementById('qr_public_base_url');
-      if (inputEl && inputEl.value.trim().startsWith('http')) {
-        return inputEl.value.trim().split('?')[0].split('#')[0];
-      }
-      if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
-        const cleanCurrent = window.location.href.split('?')[0].split('#')[0];
-        if (inputEl) inputEl.value = cleanCurrent;
-        return cleanCurrent;
-      }
-      const savedDomain = localStorage.getItem('pkm_qr_public_url') || 'https://imunku.my.id/';
-      if (inputEl) inputEl.value = savedDomain;
-      return savedDomain;
-    }
-
-    window.regenerateCurrentQrUrl = function() {
-      const inputEl = document.getElementById('qr_public_base_url');
-      if (inputEl && inputEl.value.trim().startsWith('http')) {
-        localStorage.setItem('pkm_qr_public_url', inputEl.value.trim());
-      }
-      if (currentQrChildData) openQrPrintModal(currentQrChildData);
-    };
-
-    async function loadQrPrioritySettings() {
-      try {
-        const snap = await getDocs(collection(db, COL_TARGET));
-        snap.forEach(d => {
-          if (d.id === 'CONFIG_QR_PRIORITAS') {
-            const cfg = d.data();
-            if (cfg.under1) QR_PRIORITY_CONFIG.under1 = cfg.under1;
-            if (cfg.age2) QR_PRIORITY_CONFIG.age2 = cfg.age2;
-            if (cfg.over2) QR_PRIORITY_CONFIG.over2 = cfg.over2;
-            if (cfg.stok_kosong) QR_PRIORITY_CONFIG.stok_kosong = cfg.stok_kosong;
-            if (cfg.catatan) QR_PRIORITY_CONFIG.catatan = cfg.catatan;
-          }
-        });
-      } catch (e) { console.warn("Menggunakan default prioritas QR:", e); }
-
-      const elU1 = document.getElementById('prio_qr_under1');
-      const elA2 = document.getElementById('prio_qr_age2');
-      const elO2 = document.getElementById('prio_qr_over2');
-      const elSK = document.getElementById('prio_qr_stok_kosong');
-      const elCT = document.getElementById('prio_qr_catatan');
-      if (elU1) elU1.value = QR_PRIORITY_CONFIG.under1.join(', ');
-      if (elA2) elA2.value = QR_PRIORITY_CONFIG.age2.join(', ');
-      if (elO2) elO2.value = QR_PRIORITY_CONFIG.over2.join(', ');
-      if (elSK) elSK.value = (QR_PRIORITY_CONFIG.stok_kosong || []).join(', ');
-      if (elCT) elCT.value = QR_PRIORITY_CONFIG.catatan || '';
-    }
-
-    function getChildAgeMonthsLocal(tglLahir) {
-      if (!tglLahir) return 0;
-      const birth = new Date(tglLahir); const now = new Date();
-      return Math.max(0, (now.getFullYear() - birth.getFullYear()) * 12 + (now.getMonth() - birth.getMonth()));
-    }
-
-    function computeIdealNextDateForVaccine(nextVaccine, childData, receivedMap) {
-      if (!nextVaccine || !childData.tgl_lahir) return null;
-      const birthDate = new Date(childData.tgl_lahir);
-      const idealMo = VAKSIN_IDEAL_MONTHS[nextVaccine] ?? 0;
-      const chronoDate = new Date(birthDate);
-      if (nextVaccine === "HBO (1-7 Hari)") {
-        chronoDate.setDate(chronoDate.getDate() + 1);
-      } else {
-        chronoDate.setMonth(chronoDate.getMonth() + idealMo);
-      }
-
-      let intervalDate = null;
-      SERIES_SEQUENCES.forEach(series => {
-        const idx = series.items.findIndex(it => it.key === nextVaccine);
-        if (idx > 0) {
-          const prevKey = series.items[idx - 1].key;
-          const prevGivenStr = receivedMap[prevKey];
-          if (prevGivenStr) {
-            const prevDt = new Date(prevGivenStr);
-            if (!isNaN(prevDt.getTime())) {
-              const minDt = new Date(prevDt);
-              if (nextVaccine === "DPT-HB-Hib4" || nextVaccine === "Campak Rubela-2") {
-                minDt.setFullYear(minDt.getFullYear() + 1);
-              } else if (nextVaccine === "PCV3") {
-                minDt.setDate(minDt.getDate() + 56);
-              } else if (nextVaccine === "IPV2") {
-                minDt.setMonth(minDt.getMonth() + 4);
-              } else {
-                minDt.setDate(minDt.getDate() + 28);
-              }
-              intervalDate = minDt;
-            }
-          }
-        }
-      });
-
-      if (intervalDate && intervalDate > chronoDate) return intervalDate;
-      return chronoDate;
-    }
-
-    function evaluateChildImmunizationStatus(childData) {
-      const receivedMap = {};
-      VAKSIN_ANAK_KEYS.forEach(vk => {
-        const fieldKey = `vaksin_${vk.replace(/[\s\(\)<>-]/g, '_')}`;
-        const val = childData[fieldKey] || (childData.jenis_imunisasi === vk ? childData.tanggal_pelayanan : null);
-        if (val && val !== '-') receivedMap[vk] = val;
-      });
-
-      const hasHb0 = Boolean(receivedMap["HBO (<24 Jam)"] || receivedMap["HBO (1-7 Hari)"]);
-      const ageMonths = getChildAgeMonthsLocal(childData.tgl_lahir);
-
-      let priorityList = QR_PRIORITY_CONFIG.under1;
-      let ageGroupLabel = "Kelompok Usia < 1 Tahun (0-11 Bulan)";
-      if (ageMonths >= 12 && ageMonths <= 24) {
-        priorityList = QR_PRIORITY_CONFIG.age2;
-        ageGroupLabel = "Kelompok Usia 2 Tahun (12-24 Bulan)";
-      } else if (ageMonths > 24) {
-        priorityList = QR_PRIORITY_CONFIG.over2;
-        ageGroupLabel = "Kelompok Usia > 2 Tahun (Imunisasi Lanjutan/Kejar)";
-      }
-
-      const emptyStockSet = new Set((QR_PRIORITY_CONFIG.stok_kosong || []).map(s => s.trim().toLowerCase()));
-      const candidates = [];
-
-      priorityList.forEach(vkRaw => {
-        const vk = vkRaw.trim();
-        if (!vk) return;
-        if (emptyStockSet.has(vk.toLowerCase())) return;
-        if ((vk === "HBO (<24 Jam)" || vk === "HBO (1-7 Hari)") && hasHb0) return;
-        if (receivedMap[vk]) return;
-        if (vk.startsWith("Rotavirus") && ageMonths >= 7) return;
-        candidates.push(vk);
-      });
-
-      const nextVaccine = candidates.length > 0 ? candidates[0] : null;
-      const nextIdealMonth = nextVaccine ? (VAKSIN_IDEAL_MONTHS[nextVaccine] ?? 0) : null;
-
-      const sameVisitVaccines = nextVaccine
-        ? candidates.filter(vk => (VAKSIN_IDEAL_MONTHS[vk] ?? 0) === nextIdealMonth)
-        : [];
-
-      let nextDueDateStr = "Segera pada jadwal Posyandu terdekat";
-      let idealDateOnlyStr = "-";
-      let isDueNow = false;
-
-      if (nextVaccine && childData.tgl_lahir) {
-        const due = computeIdealNextDateForVaccine(nextVaccine, childData, receivedMap);
-        if (due && !isNaN(due.getTime())) {
-          idealDateOnlyStr = due.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-          const today = new Date();
-          today.setHours(0, 0, 0, 0);
-          if (due <= today) {
-            isDueNow = true;
-            nextDueDateStr = `Sudah Jatuh Tempo (Jadwal Ideal: ${idealDateOnlyStr})`;
-          } else {
-            isDueNow = false;
-            nextDueDateStr = idealDateOnlyStr;
-          }
-        }
-      }
-
-      const totalTargetCount = 21;
-      let completedCount = hasHb0 ? 1 : 0;
-      VAKSIN_ANAK_KEYS.forEach(vk => {
-        if (!vk.startsWith("HBO") && receivedMap[vk]) completedCount++;
-      });
-      const pct = Math.min(100, Math.round((completedCount / totalTargetCount) * 100));
-
-      const isIdlComplete = hasHb0 && receivedMap["BCG"] && receivedMap["DPT-HB-Hib3"] && receivedMap["OPV4"] && receivedMap["IPV1"] && receivedMap["Campak Rubela-1"];
-      const isBadutaComplete = isIdlComplete && receivedMap["DPT-HB-Hib4"] && receivedMap["Campak Rubela-2"];
-
-      return {
-        receivedMap,
-        ageMonths,
-        ageGroupLabel,
-        nextVaccine,
-        nextIdealMonth,
-        sameVisitVaccines,
-        nextDueDateStr,
-        idealDateOnlyStr,
-        isDueNow,
-        nextThree: candidates.slice(0, 4),
-        completedCount,
-        totalTargetCount,
-        pct,
-        isIdlComplete,
-        isBadutaComplete
-      };
-    }
-
-    function renderPublicQrFeedModal(childData) {
-      currentQrChildData = childData;
-      const evalRes = evaluateChildImmunizationStatus(childData);
-      document.getElementById('feed_nama_anak').textContent = (childData.nama_anak || '-').toUpperCase();
-      document.getElementById('feed_ttl_desa').innerHTML = `Lahir: <strong>${childData.tgl_lahir || '-'}</strong> (Usia ${evalRes.ageMonths} Bulan) &bull; Desa <strong>${childData.desa || '-'}</strong>`;
-      document.getElementById('feed_ortu').innerHTML = `Orang Tua / Ibu: <strong>${childData.nama_ibu || '-'}</strong>`;
-
-      document.getElementById('feed_progress_text').textContent = `${evalRes.pct}% (${evalRes.completedCount}/${evalRes.totalTargetCount} Dosis)`;
-      document.getElementById('feed_progress_bar').style.width = `${evalRes.pct}%`;
-
-      if (evalRes.isBadutaComplete) {
-        document.getElementById('feed_status_idl_badge').innerHTML = `<span style="color:#065F46; font-weight:800;"><i class="fas fa-award"></i> LULUS IMUNISASI DASAR &amp; LANJUTAN BADUTA!</span>`;
-        document.getElementById('feed_cert_status_pill').textContent = "LULUS LENGKAP";
-        document.getElementById('feed_cert_status_pill').style.background = "#D1FAE5";
-        document.getElementById('feed_cert_status_pill').style.color = "#065F46";
-      } else if (evalRes.isIdlComplete) {
-        document.getElementById('feed_status_idl_badge').innerHTML = `<span style="color:#047857; font-weight:800;"><i class="fas fa-check-circle"></i> LULUS IMUNISASI DASAR LENGKAP (IDL) — Lanjutkan Booster Baduta</span>`;
-        document.getElementById('feed_cert_status_pill').textContent = "LULUS IDL";
-        document.getElementById('feed_cert_status_pill').style.background = "#D1FAE5";
-        document.getElementById('feed_cert_status_pill').style.color = "#065F46";
-      } else {
-        document.getElementById('feed_status_idl_badge').innerHTML = `Kategori Pemantauan: <strong>${evalRes.ageGroupLabel}</strong>`;
-        document.getElementById('feed_cert_status_pill').textContent = "DALAM PROSES";
-        document.getElementById('feed_cert_status_pill').style.background = "#FEF3C7";
-        document.getElementById('feed_cert_status_pill').style.color = "#92400E";
-      }
-
-      const nextBox = document.getElementById('feed_next_vaccine_content');
-      const dueBadge = document.getElementById('feed_next_due_badge');
-
-      if (evalRes.nextVaccine) {
-        if (dueBadge) {
-          dueBadge.textContent = evalRes.isDueNow ? "SUDAH WAKTUNYA / SEGERA" : `USIA IDEAL ${evalRes.nextIdealMonth} BULAN`;
-          dueBadge.style.background = evalRes.isDueNow ? "#FEE2E2" : "#DBEAFE";
-          dueBadge.style.color = evalRes.isDueNow ? "#991B1B" : "#1E40AF";
-        }
-        const vaksinPaketLabel = evalRes.sameVisitVaccines.length > 1
-          ? evalRes.sameVisitVaccines.join(', ')
-          : evalRes.nextVaccine;
-        const antrianHtml = evalRes.nextThree.length > 1
-          ? `<div style="font-size:0.75rem; color:#7C2D12; margin-top:5px;">Urutan prioritas selanjutnya: <strong>${evalRes.nextThree.join(' &rarr; ')}</strong></div>`
-          : '';
-        nextBox.innerHTML = `
-          <div style="font-size:1.05rem; font-weight:900; color:#EA580C;">
-            <i class="fas fa-syringe"></i> ${vaksinPaketLabel}
-          </div>
-          <div style="font-size:0.82rem; margin-top:4px; color:#0F172A;">
-            <i class="fas fa-calendar-day" style="color:#EA580C;"></i> Tanggal Jadwal Ideal: <strong>${evalRes.nextDueDateStr}</strong>
-          </div>
-          ${antrianHtml}
-          <div style="font-size:0.74rem; color:#475569; margin-top:6px; border-top:1px dashed #FDBA74; padding-top:5px;">
-            <i class="fas fa-info-circle"></i> ${QR_PRIORITY_CONFIG.catatan}
-          </div>
-        `;
-      } else {
-        if (dueBadge) {
-          dueBadge.textContent = "LENGKAP";
-          dueBadge.style.background = "#D1FAE5";
-          dueBadge.style.color = "#065F46";
-        }
-        nextBox.innerHTML = `
-          <div style="font-size:0.95rem; font-weight:800; color:#065F46;">
-            <i class="fas fa-check-circle"></i> Seluruh Imunisasi Dasar &amp; Lanjutan Sudah Lengkap!
-          </div>
-          <div style="font-size:0.78rem; color:#334155; margin-top:3px;">Terima kasih Ayah/Bunda telah melengkapi imunisasi buah hati.</div>
-        `;
-      }
-
-      const receivedContainer = document.getElementById('feed_received_list');
-      const receivedEntries = Object.entries(evalRes.receivedMap);
-      if (receivedEntries.length === 0) {
-        receivedContainer.innerHTML = `<span style="color:var(--muted);">Belum ada riwayat imunisasi tercatat.</span>`;
-      } else {
-        receivedContainer.innerHTML = receivedEntries.map(([k, tgl]) =>
-          `<span class="v-given"><i class="fas fa-check"></i> ${k} (${tgl})</span>`
-        ).join('');
-      }
-
-      document.getElementById('feed_cert_child_name').textContent = (childData.nama_anak || '-').toUpperCase();
-      const certTbody = document.getElementById('feed_cert_antigen_rows');
-      if (certTbody) {
-        const IDL_LIST = [
-          { label: "Hepatitis B (HB-0)", keys: ["HBO (<24 Jam)", "HBO (1-7 Hari)"] },
-          { label: "BCG", keys: ["BCG"] },
-          { label: "Polio Oral (OPV 1 - 4)", keys: ["OPV1", "OPV2", "OPV3", "OPV4"] },
-          { label: "DPT-HB-Hib (1 - 3)", keys: ["DPT-HB-Hib1", "DPT-HB-Hib2", "DPT-HB-Hib3"] },
-          { label: "PCV (1 - 2)", keys: ["PCV1", "PCV2"] },
-          { label: "Rotavirus (RV 1 - 3)", keys: ["Rotavirus1", "Rotavirus2", "Rotavirus3"] },
-          { label: "Polio Suntik (IPV 1 - 2)", keys: ["IPV1", "IPV2"] },
-          { label: "Campak Rubela (MR 1)", keys: ["Campak Rubela-1"] }
-        ];
-        certTbody.innerHTML = IDL_LIST.map(row => {
-          const doneList = row.keys.filter(k => evalRes.receivedMap[k]).map(k => `${k}: ${evalRes.receivedMap[k]}`);
-          const statusHtml = doneList.length > 0
-            ? `<span style="color:#065F46; font-weight:700;"><i class="fas fa-check-circle"></i> ${doneList.join(', ')}</span>`
-            : `<span style="color:#94A3B8;">Belum</span>`;
-          return `<tr style="border-bottom:1px solid #F1F5F9;"><td style="padding:5px 7px; font-weight:700; color:#1E293B;">${row.label}</td><td style="padding:5px 7px; text-align:center;">${statusHtml}</td></tr>`;
-        }).join('');
-      }
-
-      document.getElementById('publicQrFeedModal').style.display = 'flex';
-    }
-
-    function activatePublicQrViewMode() {
-      isPublicQrMode = true;
-      window.__IS_PUBLIC_QR_MODE__ = true;
-      document.getElementById('loginModal').style.display = 'none';
-      const headerEl = document.querySelector('header.app-header');
-      const mainEl = document.querySelector('main.wrap');
-      const footerEl = document.querySelector('footer.site-footer');
-      const scrollNav = document.getElementById('floatingScrollNav');
-      const backdrop = document.getElementById('publicQrBackdropScreen');
-      if (headerEl) headerEl.style.display = 'none';
-      if (mainEl) mainEl.style.display = 'none';
-      if (footerEl) footerEl.style.display = 'none';
-      if (scrollNav) scrollNav.style.display = 'none';
-      if (backdrop) backdrop.style.display = 'flex';
-    }
-
-    function exitPublicQrViewMode() {
-      isPublicQrMode = false;
-      window.__IS_PUBLIC_QR_MODE__ = false;
-      const lockStyle = document.getElementById('qr-public-mode-lock-style');
-      if (lockStyle) lockStyle.remove();
-      const backdrop = document.getElementById('publicQrBackdropScreen');
-      const feedModal = document.getElementById('publicQrFeedModal');
-      const headerEl = document.querySelector('header.app-header');
-      const mainEl = document.querySelector('main.wrap');
-      const footerEl = document.querySelector('footer.site-footer');
-      const scrollNav = document.getElementById('floatingScrollNav');
-      if (backdrop) backdrop.style.display = 'none';
-      if (feedModal) feedModal.style.display = 'none';
-      if (headerEl) headerEl.style.display = 'block';
-      if (mainEl) mainEl.style.display = 'block';
-      if (footerEl) footerEl.style.display = 'block';
-      if (scrollNav) scrollNav.style.display = 'flex';
-    }
-
-    // MEMBUKA FORM INPUT IMUNISASI ANAK/BAYI SECARA LANGSUNG DARI SCAN QR
-    window.openChildImmunizationFormDirect = function(childData) {
-      if (!childData) return;
-      exitPublicQrViewMode();
-
-      const btnQuick = document.getElementById('btnQuickLakukanImunisasi');
-      if (btnQuick) btnQuick.innerHTML = '<i class="fas fa-syringe"></i> Lakukan Imunisasi';
-
-      // Pastikan aktif di tab INPUT KOHORT
-      document.querySelectorAll('.app-nav-tabs .tab').forEach(t => t.classList.remove('active'));
-      const tabImun = document.querySelector('.tab[data-tab="imunisasi"]');
-      if (tabImun) tabImun.classList.add('active');
-      document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
-      const panelImun = document.getElementById('imunisasi');
-      if (panelImun) panelImun.style.display = 'block';
-
-      // Set Peran ke Bayi/Anak agar form imunisasi anak terbuka sesuai sasaran
-      const peranEl = document.getElementById('reg_peran');
-      if (peranEl) {
-        peranEl.value = childData.peran || 'Bayi/Anak';
-        applyPeranUIFilter();
-      }
-
-      // Isi seluruh identitas anak dari data QR/Firestore
-      const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
-      setVal('reg_nama_anak', childData.nama_anak);
-      setVal('reg_nik_anak', childData.nik_anak);
-      setVal('reg_tgl_lahir', childData.tgl_lahir);
-      setVal('reg_jk', childData.jk || 'L');
-      setVal('reg_nama_ibu', childData.nama_ibu);
-      setVal('reg_nik_ibu', childData.nik_ibu);
-      setVal('reg_no_hp', childData.no_hp);
-      setVal('reg_desa', childData.desa);
-      setVal('reg_alamat_rt', childData.alamat_rt);
-      setVal('reg_tgl_pelayanan', new Date().toISOString().split('T')[0]);
-
-      if (childData.desa) {
-        currentInputDesa = childData.desa;
-        const searchDesaEl = document.getElementById('search_desa_anak');
-        if (searchDesaEl) searchDesaEl.value = childData.desa;
-      }
-
-      // Centang riwayat vaksin yang sudah diterima sebelumnya
-      document.querySelectorAll('input[name="chk_vaksin"]').forEach(cb => {
-        cb.checked = false;
-        const labelParent = cb.closest('.checkbox-item');
-        if (labelParent) labelParent.classList.remove('already-given');
-
-        const vk = cb.value;
-        const fieldKey = `vaksin_${vk.replace(/[\s\(\)<>-]/g, '_')}`;
-        const existingDate = childData[fieldKey] || (childData.jenis_imunisasi === vk ? childData.tanggal_pelayanan : null);
-        if (existingDate && existingDate !== '-') {
-          cb.checked = true;
-          if (labelParent) labelParent.classList.add('already-given');
-        }
-      });
-
-      currentQrChildData = childData;
-      const btnQrForm = document.getElementById('btnCetakQrFromForm');
-      if (btnQrForm) btnQrForm.style.display = 'inline-flex';
-
-      const cardForm = document.getElementById('cardFormUtama');
-      if (cardForm) {
-        let quickBanner = document.getElementById('quickQrActiveFormBanner');
-        if (!quickBanner) {
-          quickBanner = document.createElement('div');
-          quickBanner.id = 'quickQrActiveFormBanner';
-          quickBanner.style.cssText = 'background:#ECFDF5; border:1.5px solid #10B981; color:#065F46; padding:10px 14px; border-radius:10px; font-size:0.82rem; font-weight:700; margin-bottom:14px;';
-          cardForm.insertBefore(quickBanner, cardForm.firstChild);
-        }
-        quickBanner.innerHTML = `<i class="fas fa-qrcode"></i> Input Cepat QR: <strong>${(childData.nama_anak || '-').toUpperCase()}</strong> (Desa ${childData.desa || '-'}). Vaksin lama sudah tercentang hijau—silakan centang vaksin baru hari ini lalu klik <strong>Simpan Data</strong>.`;
-        cardForm.style.display = 'block';
-        setTimeout(() => smoothScrollToId('cardFormUtama'), 100);
-      }
-
-      refreshCacheGlobalData();
-      loadRecentTransactions();
-    };
-
-    // AKSI TOMBOL "LAKUKAN IMUNISASI" PADA POP-UP QR
-    function startQuickImmunizationFromQr() {
-      if (!currentQrChildData) {
-        alert("Data sasaran belum ditemukan. Silakan pastikan koneksi internet aktif atau periksa tautan QR.");
-        return;
-      }
-
-      // 1. Jika petugas/kader sudah login & sesi masih aktif (< 30 menit), langsung buka form input anak!
-      if (isPetugasSessionValid()) {
-        const savedUser = localStorage.getItem('pkm_app_username');
-        savePetugasSession(savedUser);
-        openChildImmunizationFormDirect(currentQrChildData);
-        return;
-      }
-
-      // 2. Jika belum login atau sesi sudah timeout, tampilkan modal login petugas di atas pop-up QR
-      pendingQuickImunisasiChild = currentQrChildData;
-      const btnQuick = document.getElementById('btnQuickLakukanImunisasi');
-      if (btnQuick) btnQuick.innerHTML = '<i class="fas fa-syringe"></i> Lakukan Imunisasi';
-
-      const banner = document.getElementById('loginQuickImunisasiBanner');
-      if (banner) {
-        banner.innerHTML = `<i class="fas fa-syringe"></i> Input Cepat Imunisasi: <strong>${(currentQrChildData.nama_anak || '-').toUpperCase()}</strong> (Desa ${currentQrChildData.desa || '-'}). Silakan login petugas/kader.`;
-        banner.style.display = 'block';
-      }
-      const btnBackQr = document.getElementById('btnCancelLoginToQr');
-      if (btnBackQr) btnBackQr.style.display = 'inline-flex';
-
-      const loginModalEl = document.getElementById('loginModal');
-      document.getElementById('login_password').value = '';
-      document.getElementById('loginError').style.display = 'none';
-      loginModalEl.style.display = 'flex';
-      loginModalEl.style.visibility = 'visible';
-      loginModalEl.style.pointerEvents = 'auto';
-      loginModalEl.style.zIndex = '4000';
-    }
-
-    window.__moduleStartQuickImmunization = startQuickImmunizationFromQr;
-    window.startQuickImmunizationFromQr = startQuickImmunizationFromQr;
-
-    window.cancelLoginBackToQr = function() {
-      pendingQuickImunisasiChild = null;
-      document.getElementById('loginModal').style.display = 'none';
-      const banner = document.getElementById('loginQuickImunisasiBanner');
-      if (banner) banner.style.display = 'none';
-      const btnBackQr = document.getElementById('btnCancelLoginToQr');
-      if (btnBackQr) btnBackQr.style.display = 'none';
-    };
-
-    async function checkIncomingQrUrlAndOpenFeed() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const hashStr = window.location.hash || '';
-      const hashParams = new URLSearchParams(hashStr.startsWith('#') ? hashStr.substring(1) : hashStr);
-
-      const childIdParam = urlParams.get('id') || hashParams.get('id');
-      const compactParam = hashParams.get('kia') || hashParams.get('p') || urlParams.get('p');
-      const legacyQrParam = urlParams.get('qr') || hashParams.get('qr');
-
-      // Ambil identitas dasar ringkas dari hash jika ada (agar tetap instan meski jaringan lambat)
-      const hashNama = hashParams.get('n') || urlParams.get('n');
-      const hashTgl = hashParams.get('t') || urlParams.get('t');
-      const hashJk = hashParams.get('g') || urlParams.get('g') || 'L';
-      const hashIbu = hashParams.get('o') || urlParams.get('o');
-      const hashDesa = hashParams.get('d') || urlParams.get('d');
-
-      if (!childIdParam && !compactParam && !legacyQrParam && !hashNama) return false;
-
-      activatePublicQrViewMode();
-
-      let childObj = null;
-
-      if (compactParam) {
-        childObj = decodeCompactQrPayload(compactParam);
-      } else if (legacyQrParam) {
-        try {
-          const decoded = decodeLegacyQrPayload(legacyQrParam);
-          childObj = {
-            id: decoded.i || '',
-            nama_anak: decoded.n || '-',
-            tgl_lahir: decoded.t || '',
-            jk: decoded.g || 'L',
-            nama_ibu: decoded.o || '-',
-            desa: decoded.d || '-'
-          };
-        } catch (e) { console.warn("Legacy QR decode skip:", e); }
-      } else if (hashNama) {
-        childObj = {
-          id: childIdParam || '',
-          nama_anak: hashNama,
-          tgl_lahir: hashTgl || '',
-          jk: hashJk,
-          nama_ibu: hashIbu || '-',
-          desa: hashDesa || '-'
-        };
-      }
-
-      if (childObj) {
-        currentQrChildData = childObj;
-        renderPublicQrFeedModal(childObj);
-      }
-
-      try {
-        await loadQrPrioritySettings();
-        let liveDoc = null;
-        if (childIdParam && navigator.onLine) {
-          const docSnap = await getDoc(doc(db, COL_KOHORT, childIdParam));
-          if (docSnap.exists()) {
-            liveDoc = { id: docSnap.id, ...docSnap.data() };
-          } else {
-            const allSnap = await getDocs(collection(db, COL_KOHORT));
-            allSnap.forEach(d => {
-              const dt = d.data();
-              const generatedId = `${dt.desa}_${dt.nama_anak}_${dt.tgl_lahir}`.replace(/[\s\/]/g, '_').toLowerCase();
-              if (d.id === childIdParam || generatedId === childIdParam) {
-                liveDoc = { id: d.id, ...dt };
-              }
-            });
-          }
-        }
-        if (liveDoc) {
-          childObj = liveDoc;
-          currentQrChildData = liveDoc;
-          renderPublicQrFeedModal(childObj);
-        } else if (!childObj) {
-          document.getElementById('feed_nama_anak').textContent = "Data Sasaran Tidak Ditemukan";
-          document.getElementById('feed_next_vaccine_content').innerHTML = `<span style="color:var(--danger); font-weight:700;">Data imunisasi tidak ditemukan di database. Pastikan koneksi internet aktif atau hubungi petugas Puskesmas Melata.</span>`;
-        }
-      } catch (err) {
-        console.warn("Gagal mengambil data live dari Firestore:", err.message);
-        if (!childObj) {
-          document.getElementById('feed_next_vaccine_content').innerHTML = `<span style="color:var(--danger); font-weight:700;">Gagal memuat data server: ${err.message}</span>`;
-        }
-      }
-
-      // Jika petugas sudah menekan tombol Lakukan Imunisasi saat module masih dimuat, lanjutkan otomatis
-      if (window.__PENDING_QUICK_IMUN_CLICK__) {
-        window.__PENDING_QUICK_IMUN_CLICK__ = false;
-        startQuickImmunizationFromQr();
-      }
-
-      return true;
-    }
-
-    window.closePublicQrFeed = function() {
-      document.getElementById('publicQrFeedModal').style.display = 'none';
-      if (!isPublicQrMode && !activePetugasName) {
-        document.getElementById('loginModal').style.display = 'flex';
-      }
-    };
-
-    window.reopenPublicQrFeed = function() {
-      if (currentQrChildData) {
-        renderPublicQrFeedModal(currentQrChildData);
-      } else {
-        document.getElementById('publicQrFeedModal').style.display = 'flex';
-      }
-    };
-
-    // =========================================================================
-    // CETAK KARTU QR RINGKAS (SEKALI CETAK — HANYA QR + IDENTITAS + INSTRUKSI)
-    // =========================================================================
-    window.openQrPrintModal = function(encodedJson) {
-      try {
-        const data = typeof encodedJson === 'string' ? JSON.parse(decodeURIComponent(encodedJson)) : encodedJson;
-        currentQrChildData = data;
-
-        document.getElementById('qr_card_nama').textContent = (data.nama_anak || '-').toUpperCase();
-        document.getElementById('qr_card_ttl').textContent = data.tgl_lahir || '-';
-        document.getElementById('qr_card_ortu').textContent = data.nama_ibu || '-';
-        document.getElementById('qr_card_desa').textContent = `Desa ${data.desa || '-'}${data.alamat_rt ? ' (' + data.alamat_rt + ')' : ''}`;
-
-        const childDocId = data.id || `${data.desa}_${data.nama_anak}_${data.tgl_lahir}`.replace(/[\s\/]/g, '_').toLowerCase();
-        const baseUrl = getPublicQrBaseUrl();
-        const separator = baseUrl.includes('?') ? '&' : '?';
-        // Tautan ringkas membawa ID + identitas dasar agar ringan dicetak & langsung siap untuk input cepat
-        const qrUrl = `${baseUrl}${separator}id=${encodeURIComponent(childDocId)}#id=${encodeURIComponent(childDocId)}&n=${encodeURIComponent(data.nama_anak || '')}&t=${encodeURIComponent(data.tgl_lahir || '')}&g=${encodeURIComponent(data.jk || 'L')}&o=${encodeURIComponent(data.nama_ibu || '')}&d=${encodeURIComponent(data.desa || '')}`;
-
-        const clickableLinkEl = document.getElementById('qr_url_clickable_link');
-        if (clickableLinkEl) {
-          clickableLinkEl.href = qrUrl;
-          clickableLinkEl.textContent = qrUrl;
-        }
-        const canvasLinkEl = document.getElementById('qr_canvas_link');
-        if (canvasLinkEl) {
-          canvasLinkEl.href = qrUrl;
-        }
-
-        const qrContainer = document.getElementById('qrCanvasContainer');
-        qrContainer.innerHTML = '';
-        new QRCode(qrContainer, {
-          text: qrUrl,
-          width: 175,
-          height: 175,
-          colorDark: "#000000",
-          colorLight: "#FFFFFF",
-          correctLevel: QRCode.CorrectLevel.M
-        });
-
-        document.getElementById('qrPrintModal').style.display = 'flex';
-      } catch (e) {
-        alert("Gagal membuat Kartu QR: " + e.message);
-      }
-    };
-
-    window.openQrModalFromCurrentForm = function() {
-      if (currentQrChildData) {
-        openQrPrintModal(currentQrChildData);
-      } else {
-        alert("Pilih sasaran terdaftar terlebih dahulu untuk mencetak QR.");
-      }
-    };
-
-    window.openQrModalFromAdminSelect = function() {
-      const sel = document.getElementById('cert_select_sasaran');
-      if (!sel || !sel.value) return alert("Pilih desa dan nama sasaran terlebih dahulu!");
-      openQrPrintModal(JSON.parse(sel.value));
-    };
-
-    window.closeQrPrintModal = function() {
-      document.getElementById('qrPrintModal').style.display = 'none';
-    };
-
-    window.printQrCardNow = function() {
-      document.body.classList.add('printing-qr');
-      window.print();
-      setTimeout(() => document.body.classList.remove('printing-qr'), 500);
-    };
-
-    window.previewPublicFeedFromCurrentQr = function() {
-      if (!currentQrChildData) return;
-      document.getElementById('qrPrintModal').style.display = 'none';
-      renderPublicQrFeedModal(currentQrChildData);
-    };
-
-    // =========================================================================
-    // PREVIEW & CETAK SERTIFIKAT A4 LANDSCAPE
-    // =========================================================================
-    window.generateAndShowCertificate = function() {
-      const selectElem = document.getElementById('cert_select_sasaran');
-      if (!selectElem.value) return alert("Pilih sasaran terlebih dahulu!");
-
-      const data = JSON.parse(selectElem.value);
-      const genderStr = data.jk === 'P' ? 'Perempuan' : 'Laki-Laki';
-      
-      document.getElementById('cert_no_reg').textContent = `MM/IDL/${Math.floor(100 + Math.random() * 900)}/2026`;
-      document.getElementById('cert_nama_anak').textContent = (data.nama_anak || '-').toUpperCase();
-      document.getElementById('cert_ttl_jk').textContent = `${data.tgl_lahir || '-'} (${genderStr})`;
-      document.getElementById('cert_nama_ibu').textContent = data.nama_ibu || '-';
-      document.getElementById('cert_desa_alamat').textContent = `Desa ${data.desa || '-'}, ${data.alamat_rt || '-'}`;
-      
-      document.getElementById('cert_back_nama_anak').textContent = data.nama_anak || '-';
-      document.getElementById('cert_back_desa').textContent = `Desa ${data.desa || '-'}`;
-
-      const todayStr = new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'});
-      document.getElementById('cert_tanggal_cetak').textContent = todayStr;
-
-      const IDL_MAPPING_ACUAN = [
-        { labelLeft: "Hepatitis B (HB-0 <24 Jam)", keyLeft: "HBO (<24 Jam)", labelRight: "Hepatitis B (HB-0 1-7 Hari)", keyRight: "HBO (1-7 Hari)" },
-        { labelLeft: "BCG", keyLeft: "BCG", labelRight: "Polio Oral 1 (OPV 1)", keyRight: "OPV1" },
-        { labelLeft: "DPT-HB-Hib 1", keyLeft: "DPT-HB-Hib1", labelRight: "Polio Oral 2 (OPV 2)", keyRight: "OPV2" },
-        { labelLeft: "PCV 1", keyLeft: "PCV1", labelRight: "Rotavirus 1 (RV 1)", keyRight: "Rotavirus1" },
-        { labelLeft: "DPT-HB-Hib 2", keyLeft: "DPT-HB-Hib2", labelRight: "Polio Oral 3 (OPV 3)", keyRight: "OPV3" },
-        { labelLeft: "PCV 2", keyLeft: "PCV2", labelRight: "Rotavirus 2 (RV 2)", keyRight: "Rotavirus2" },
-        { labelLeft: "DPT-HB-Hib 3", keyLeft: "DPT-HB-Hib3", labelRight: "Polio Oral 4 (OPV 4)", keyRight: "OPV4" },
-        { labelLeft: "Inactivated Polio Vaccine 1 (IPV 1)", keyLeft: "IPV1", labelRight: "Rotavirus 3 (RV 3)", keyRight: "Rotavirus3" },
-        { labelLeft: "Campak Rubella 1 (MR 1)", keyLeft: "Campak Rubela-1", labelRight: "Inactivated Polio Vaccine 2 (IPV 2)", keyRight: "IPV2" }
-      ];
-
-      const tbodyBack = document.getElementById('cert_back_table_body');
-      tbodyBack.innerHTML = '';
-
-      IDL_MAPPING_ACUAN.forEach(rowPair => {
-        const fieldLeft = `vaksin_${rowPair.keyLeft.replace(/[\s\(\)<>-]/g, '_')}`;
-        const fieldRight = `vaksin_${rowPair.keyRight.replace(/[\s\(\)<>-]/g, '_')}`;
-
-        const valLeft = data[fieldLeft] || (data.jenis_imunisasi === rowPair.keyLeft ? data.tanggal_pelayanan : null);
-        const valRight = data[fieldRight] || (data.jenis_imunisasi === rowPair.keyRight ? data.tanggal_pelayanan : null);
-
-        const textLeft = valLeft ? valLeft : '-';
-        const textRight = valRight ? valRight : '-';
-
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td style="font-weight:700; color:#1E293B;">${rowPair.labelLeft}</td>
-          <td style="text-align:center; font-weight:800; color:#002244;">${textLeft}</td>
-          <td style="font-weight:700; color:#1E293B;">${rowPair.labelRight}</td>
-          <td style="text-align:center; font-weight:800; color:#002244;">${textRight}</td>
-        `;
-        tbodyBack.appendChild(tr);
-      });
-
-      document.getElementById('certificatePrintArea').style.display = 'block';
-      document.getElementById('certificatePrintArea').scrollIntoView({ behavior: 'smooth' });
-    };
-
-    window.printCertificateNow = function() {
-      document.body.classList.remove('printing-qr');
-      window.print();
-    };
 window.goToEdit = function(encodedJson) {
       const tabBtn = document.querySelector('.tab[data-tab="imunisasi"]');
       if (tabBtn) tabBtn.click();
@@ -2699,6 +2217,7 @@ window.goToEdit = function(encodedJson) {
       const btnQrForm = document.getElementById('btnCetakQrFromForm');
       if (btnQrForm) btnQrForm.style.display = 'none';
       applyPeranUIFilter();
+      applyUserRoleRestrictions();
     };
 
     // =========================================================================
@@ -2824,7 +2343,7 @@ window.goToEdit = function(encodedJson) {
 
     async function handleSaveLogikaVaksinAdmin(e) {
       e.preventDefault();
-      if (activePetugasName.toLowerCase() !== AUTH_ADMIN_USER) {
+      if (activeUserProfile.role !== 'admin' && activePetugasName.toLowerCase() !== AUTH_ADMIN_USER) {
         return alert("🔒 Hanya Admin yang berhak merubah Logika Kemasan Vaksin!");
       }
       const newGroups = ANTIGEN_GROUPS.map((g, idx) => {
@@ -2847,7 +2366,7 @@ window.goToEdit = function(encodedJson) {
     }
 
     // =========================================================================
-    // SISTEM LOGIN PETUGAS & ADMIN + SESSION PERSISTENCE & IDLE TIMEOUT
+    // SISTEM LOGIN PETUGAS & ADMIN (TERINTEGRASI DAFTAR PENGGUNA + TIMEOUT 30M)
     // =========================================================================
     function initUserAuthCheck() {
       const savedUser = localStorage.getItem('pkm_app_username');
@@ -2857,7 +2376,7 @@ window.goToEdit = function(encodedJson) {
 
       if (savedUser && userInputEl) {
         userInputEl.value = savedUser;
-        if (hintEl) hintEl.innerHTML = `<i class="fas fa-mobile-alt"></i> Akun tersimpan: <strong>${savedUser}</strong>`;
+        if (hintEl) hintEl.innerHTML = `<i class="fas fa-mobile-alt"></i> Akun terakhir: <strong>${savedUser}</strong>`;
       }
 
       if (isPetugasSessionValid()) {
@@ -2882,7 +2401,7 @@ window.goToEdit = function(encodedJson) {
       }, 30000);
 
       if (formLogin) {
-        formLogin.addEventListener('submit', (e) => {
+        formLogin.addEventListener('submit', async (e) => {
           e.preventDefault();
           const usernameInput = (document.getElementById('login_username').value || '').trim();
           const passwordInput = (document.getElementById('login_password').value || '').trim();
@@ -2894,36 +2413,89 @@ window.goToEdit = function(encodedJson) {
             return;
           }
 
-          const isAdminMatch = usernameInput.toLowerCase() === AUTH_ADMIN_USER &&
-            (passwordInput === AUTH_ADMIN_PASS || passwordInput === AUTH_PASSWORD_PETUGAS);
-          const isPetugasMatch = usernameInput.toLowerCase() !== AUTH_ADMIN_USER &&
-            passwordInput === AUTH_PASSWORD_PETUGAS;
+          const unameLow = usernameInput.toLowerCase();
 
-          if (isAdminMatch || isPetugasMatch) {
-            const finalUser = usernameInput.toLowerCase() === AUTH_ADMIN_USER ? AUTH_ADMIN_USER : usernameInput;
-            savePetugasSession(finalUser);
+          // 1. Cek Master Admin
+          if (unameLow === AUTH_ADMIN_USER && (passwordInput === AUTH_ADMIN_PASS || passwordInput === AUTH_PASSWORD_PETUGAS)) {
+            savePetugasSession(AUTH_ADMIN_USER, {
+              username: AUTH_ADMIN_USER,
+              nama_lengkap: "Admin Koordinator",
+              role: "admin",
+              desa_tugas: "ALL"
+            });
+            completeLoginTransition();
+            return;
+          }
 
-            document.getElementById('loginModal').style.display = 'none';
-            errDiv.style.display = 'none';
-            const banner = document.getElementById('loginQuickImunisasiBanner');
-            if (banner) banner.style.display = 'none';
-            const btnBackQr = document.getElementById('btnCancelLoginToQr');
-            if (btnBackQr) btnBackQr.style.display = 'none';
+          // Pastikan daftar pengguna terbaru sudah dimuat
+          if (REGISTERED_USERS.length === 0) {
+            await loadUsersManagement();
+          }
 
-            // Jika login dipicu dari tombol "Lakukan Imunisasi" pada scan QR, langsung buka form anak tsb
-            if (pendingQuickImunisasiChild) {
-              const targetChild = pendingQuickImunisasiChild;
-              pendingQuickImunisasiChild = null;
-              openChildImmunizationFormDirect(targetChild);
-            } else {
-              refreshCacheGlobalData();
-              loadRecentTransactions();
+          // 2. Cek kecocokan pada Daftar Pengguna Terdaftar
+          const matchedUser = REGISTERED_USERS.find(u => (u.username || '').toLowerCase() === unameLow);
+
+          if (matchedUser) {
+            if (matchedUser.status === 'nonaktif') {
+              errDiv.textContent = "🚫 Akun Anda sedang dinonaktifkan oleh Admin. Hubungi Koordinator Imunisasi.";
+              errDiv.style.display = 'block';
+              return;
             }
+            if (matchedUser.password !== passwordInput) {
+              errDiv.textContent = "❌ Password salah untuk akun tersebut! Periksa kembali password Anda.";
+              errDiv.style.display = 'block';
+              return;
+            }
+
+            // Catat waktu login terakhir ke Firestore secara latar belakang
+            matchedUser.last_login = new Date().toISOString();
+            persistUsersToFirestore().catch(() => {});
+
+            savePetugasSession(matchedUser.username, matchedUser);
+            completeLoginTransition();
+            return;
+          }
+
+          // 3. Jika Mode Login Ketat aktif (dan daftar pengguna sudah ada), tolak username tak terdaftar
+          if (STRICT_USER_LOGIN && REGISTERED_USERS.length > 0) {
+            errDiv.textContent = `❌ Username "${usernameInput}" tidak terdaftar di sistem. Minta Admin mendaftarkan akun Anda terlebih dahulu.`;
+            errDiv.style.display = 'block';
+            return;
+          }
+
+          // 4. Fallback petugas umum jika belum ada daftar pengguna
+          if (passwordInput === AUTH_PASSWORD_PETUGAS) {
+            savePetugasSession(usernameInput, {
+              username: usernameInput,
+              nama_lengkap: usernameInput,
+              role: "petugas",
+              desa_tugas: "ALL"
+            });
+            completeLoginTransition();
           } else {
-            errDiv.textContent = "❌ Password salah! Silakan periksa kembali password akun Anda.";
+            errDiv.textContent = "❌ Username tidak dikenali atau password salah!";
             errDiv.style.display = 'block';
           }
         });
+      }
+    }
+
+    function completeLoginTransition() {
+      const errDiv = document.getElementById('loginError');
+      document.getElementById('loginModal').style.display = 'none';
+      if (errDiv) errDiv.style.display = 'none';
+      const banner = document.getElementById('loginQuickImunisasiBanner');
+      if (banner) banner.style.display = 'none';
+      const btnBackQr = document.getElementById('btnCancelLoginToQr');
+      if (btnBackQr) btnBackQr.style.display = 'none';
+
+      if (pendingQuickImunisasiChild) {
+        const targetChild = pendingQuickImunisasiChild;
+        pendingQuickImunisasiChild = null;
+        openChildImmunizationFormDirect(targetChild);
+      } else {
+        refreshCacheGlobalData().then(() => renderUsersTable());
+        loadRecentTransactions();
       }
     }
 
@@ -2981,6 +2553,7 @@ window.goToEdit = function(encodedJson) {
       if (target === 'imunisasi') loadRecentTransactions();
       if (target === 'catchup') loadCatchUpAnalysis();
       if (target === 'capaian') loadCapanTabContent();
+      if (target === 'admin') loadUsersManagement();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -2997,6 +2570,7 @@ window.goToEdit = function(encodedJson) {
 
       loadLogikaVaksinSettings();
       if (!isQrMode && !window.__IS_PUBLIC_QR_MODE__) loadQrPrioritySettings();
+      await loadUsersManagement();
 
       const filterAntigenSelect = document.getElementById('filter_antigen_spesifik');
       const expAntigenSelect = document.getElementById('exp_filter_antigen');
@@ -3042,6 +2616,7 @@ window.goToEdit = function(encodedJson) {
       bindEvent('formTargetSasaran', 'submit', handleSaveTargetSasaran);
       bindEvent('formPrioritasQrAdmin', 'submit', handleSavePrioritasQrAdmin);
       bindEvent('formLogikaVaksinAdmin', 'submit', handleSaveLogikaVaksinAdmin);
+      bindEvent('formManajemenPengguna', 'submit', handleSaveUserAdmin);
 
       bindEvent('search_desa_anak', 'change', (e) => {
         currentInputDesa = e.target.value;
@@ -3065,6 +2640,7 @@ window.goToEdit = function(encodedJson) {
 
       initBiasDropdowns();
       applyPeranUIFilter();
+      applyUserRoleRestrictions();
       if (!isQrMode && !window.__IS_PUBLIC_QR_MODE__) loadRecentTransactions();
       window.addEventListener('online', syncOfflineQueueToCloud);
     });
@@ -3075,6 +2651,7 @@ window.goToEdit = function(encodedJson) {
           const snap = await getDocs(collection(db, COL_KOHORT));
           cachedGlobalKohortData = [];
           snap.forEach(d => cachedGlobalKohortData.push({ id: d.id, ...d.data() }));
+          renderUsersTable();
         }
       } catch (e) { console.error("Error Caching Data:", e); }
     }
@@ -3161,6 +2738,7 @@ window.goToEdit = function(encodedJson) {
         });
       }
     }
+
 window.selectFromLiveSearch = function(encodedJson) {
       const data = JSON.parse(decodeURIComponent(encodedJson));
       document.getElementById('input_search_sasaran').value = data.nama_anak;
@@ -3643,6 +3221,7 @@ window.selectFromLiveSearch = function(encodedJson) {
         alert("Gagal menyimpan prioritas QR: " + err.message);
       }
     }
+
 // =========================================================================
     // TAB 5: PERHITUNGAN CAPAIAN & IMUNISASI DASAR LENGKAP (IDL)
     // =========================================================================

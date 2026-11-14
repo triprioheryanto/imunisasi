@@ -17,7 +17,7 @@
           var lockStyle = document.createElement('style');
           lockStyle.id = 'qr-public-mode-lock-style';
           lockStyle.textContent =
-            '#loginModal, header.app-header, main.wrap, footer.site-footer, #floatingScrollNav {' +
+            'header.app-header, main.wrap, footer.site-footer, #floatingScrollNav {' +
             '  display: none !important; visibility: hidden !important; pointer-events: none !important;' +
             '}' +
             '#publicQrBackdropScreen { display: flex !important; }';
@@ -187,6 +187,7 @@
       display: inline-flex; align-items: center; justify-content: center; gap: 8px;
       padding: 10px 18px; border-radius: 10px; border: 0; font-weight: 700;
       font-size: 0.85rem; cursor: pointer; transition: all 0.2s ease; text-decoration: none;
+      touch-action: manipulation;
     }
     .btn:hover { transform: translateY(-1px); filter: brightness(1.04); }
     .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-hover)); color: #fff; box-shadow: 0 6px 16px rgba(255, 87, 34, 0.28); }
@@ -261,7 +262,6 @@
         display: none !important;
       }
 
-      /* MODE CETAK KARTU QR: PASTI 1 LEMBAR PDF SAJA */
       body.printing-qr {
         background: #FFFFFF !important;
         margin: 0 !important;
@@ -305,6 +305,7 @@
       .full-width { grid-column: span 1; }
       .wrap { padding: 0 12px; }
     }
+
 .table-container { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: var(--radius); border: 1px solid var(--border-color); margin-top: 12px; background: #FFF; box-shadow: var(--shadow-subtle); }
     .kohort-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 0.8rem; white-space: nowrap; }
     .kohort-table th, .kohort-table td { border-right: 1px solid #F1F5F9; border-bottom: 1px solid #F1F5F9; padding: 8px 10px; text-align: center; }
@@ -583,7 +584,7 @@
   </div>
 
   <!-- MODAL LOGIN PETUGAS -->
-  <div id="loginModal" class="modal-overlay" style="display:none; z-index:3200;">
+  <div id="loginModal" class="modal-overlay" style="display:none; z-index:4000;">
     <div style="background:#fff; padding:26px; border-radius:18px; max-width:390px; width:100%; box-shadow:0 25px 40px rgba(0,0,0,0.3);">
       <div style="text-align:center; margin-bottom:16px;">
         <div style="width:54px; height:54px; background:linear-gradient(135deg, var(--accent), var(--accent-light)); color:#fff; border-radius:15px; display:inline-flex; align-items:center; justify-content:center; font-size:24px; margin-bottom:10px; box-shadow:0 8px 18px rgba(0,43,91,0.3);">
@@ -811,10 +812,10 @@
 
         <!-- TOMBOL AKSI: INPUT CEPAT PETUGAS/KADER & TUTUP -->
         <div style="margin-top:14px; display:flex; gap:8px; flex-wrap:wrap;">
-          <button type="button" class="btn btn-success" onclick="startQuickImmunizationFromQr()" style="flex:1; min-width:185px; font-size:0.84rem; padding:11px 14px;">
+          <button type="button" id="btnQuickLakukanImunisasi" class="btn btn-success" onclick="window.startQuickImmunizationFromQr()" style="flex:1; min-width:185px; font-size:0.86rem; padding:12px 14px; cursor:pointer;">
             <i class="fas fa-syringe"></i> Lakukan Imunisasi
           </button>
-          <button type="button" class="btn btn-ghost" onclick="closePublicQrFeed()" style="font-size:0.84rem; padding:11px 14px;">
+          <button type="button" class="btn btn-ghost" onclick="closePublicQrFeed()" style="font-size:0.84rem; padding:12px 14px;">
             <i class="fas fa-times-circle"></i> Tutup
           </button>
         </div>
@@ -823,7 +824,20 @@
   </div>
 
   <script>
-    // BUKA POP-UP SEGERA SAAT MODE QR TERDETEKSI AGAR LANGSUNG TAMPIL TANPA MENUNGGU MODULE
+    // HANDLER SINKRON LANGSUNG SAAT MODE QR TERDETEKSI (ANTI-MACET SAAT MODULE MASIH LOADING)
+    window.__PENDING_QUICK_IMUN_CLICK__ = false;
+    window.startQuickImmunizationFromQr = function() {
+      if (typeof window.__moduleStartQuickImmunization === 'function') {
+        window.__moduleStartQuickImmunization();
+      } else {
+        window.__PENDING_QUICK_IMUN_CLICK__ = true;
+        var btn = document.getElementById('btnQuickLakukanImunisasi');
+        if (btn) {
+          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Membuka Form Imunisasi...';
+        }
+      }
+    };
+
     (function() {
       if (!window.__IS_PUBLIC_QR_MODE__) return;
       try {
@@ -2104,6 +2118,9 @@
       if (!childData) return;
       exitPublicQrViewMode();
 
+      const btnQuick = document.getElementById('btnQuickLakukanImunisasi');
+      if (btnQuick) btnQuick.innerHTML = '<i class="fas fa-syringe"></i> Lakukan Imunisasi';
+
       // Pastikan aktif di tab INPUT KOHORT
       document.querySelectorAll('.app-nav-tabs .tab').forEach(t => t.classList.remove('active'));
       const tabImun = document.querySelector('.tab[data-tab="imunisasi"]');
@@ -2159,6 +2176,14 @@
 
       const cardForm = document.getElementById('cardFormUtama');
       if (cardForm) {
+        let quickBanner = document.getElementById('quickQrActiveFormBanner');
+        if (!quickBanner) {
+          quickBanner = document.createElement('div');
+          quickBanner.id = 'quickQrActiveFormBanner';
+          quickBanner.style.cssText = 'background:#ECFDF5; border:1.5px solid #10B981; color:#065F46; padding:10px 14px; border-radius:10px; font-size:0.82rem; font-weight:700; margin-bottom:14px;';
+          cardForm.insertBefore(quickBanner, cardForm.firstChild);
+        }
+        quickBanner.innerHTML = `<i class="fas fa-qrcode"></i> Input Cepat QR: <strong>${(childData.nama_anak || '-').toUpperCase()}</strong> (Desa ${childData.desa || '-'}). Vaksin lama sudah tercentang hijau—silakan centang vaksin baru hari ini lalu klik <strong>Simpan Data</strong>.`;
         cardForm.style.display = 'block';
         setTimeout(() => smoothScrollToId('cardFormUtama'), 100);
       }
@@ -2168,13 +2193,13 @@
     };
 
     // AKSI TOMBOL "LAKUKAN IMUNISASI" PADA POP-UP QR
-    window.startQuickImmunizationFromQr = function() {
+    function startQuickImmunizationFromQr() {
       if (!currentQrChildData) {
-        alert("Data sasaran belum selesai dimuat. Silakan tunggu sebentar...");
+        alert("Data sasaran belum ditemukan. Silakan pastikan koneksi internet aktif atau periksa tautan QR.");
         return;
       }
 
-      // Jika petugas/kader sudah login & sesi belum timeout (30 menit), langsung buka form input anak!
+      // 1. Jika petugas/kader sudah login & sesi masih aktif (< 30 menit), langsung buka form input anak!
       if (isPetugasSessionValid()) {
         const savedUser = localStorage.getItem('pkm_app_username');
         savePetugasSession(savedUser);
@@ -2182,8 +2207,11 @@
         return;
       }
 
-      // Jika belum login atau sesi sudah timeout, tampilkan modal login petugas
+      // 2. Jika belum login atau sesi sudah timeout, tampilkan modal login petugas di atas pop-up QR
       pendingQuickImunisasiChild = currentQrChildData;
+      const btnQuick = document.getElementById('btnQuickLakukanImunisasi');
+      if (btnQuick) btnQuick.innerHTML = '<i class="fas fa-syringe"></i> Lakukan Imunisasi';
+
       const banner = document.getElementById('loginQuickImunisasiBanner');
       if (banner) {
         banner.innerHTML = `<i class="fas fa-syringe"></i> Input Cepat Imunisasi: <strong>${(currentQrChildData.nama_anak || '-').toUpperCase()}</strong> (Desa ${currentQrChildData.desa || '-'}). Silakan login petugas/kader.`;
@@ -2192,10 +2220,17 @@
       const btnBackQr = document.getElementById('btnCancelLoginToQr');
       if (btnBackQr) btnBackQr.style.display = 'inline-flex';
 
+      const loginModalEl = document.getElementById('loginModal');
       document.getElementById('login_password').value = '';
       document.getElementById('loginError').style.display = 'none';
-      document.getElementById('loginModal').style.display = 'flex';
-    };
+      loginModalEl.style.display = 'flex';
+      loginModalEl.style.visibility = 'visible';
+      loginModalEl.style.pointerEvents = 'auto';
+      loginModalEl.style.zIndex = '4000';
+    }
+
+    window.__moduleStartQuickImmunization = startQuickImmunizationFromQr;
+    window.startQuickImmunizationFromQr = startQuickImmunizationFromQr;
 
     window.cancelLoginBackToQr = function() {
       pendingQuickImunisasiChild = null;
@@ -2215,7 +2250,14 @@
       const compactParam = hashParams.get('kia') || hashParams.get('p') || urlParams.get('p');
       const legacyQrParam = urlParams.get('qr') || hashParams.get('qr');
 
-      if (!childIdParam && !compactParam && !legacyQrParam) return false;
+      // Ambil identitas dasar ringkas dari hash jika ada (agar tetap instan meski jaringan lambat)
+      const hashNama = hashParams.get('n') || urlParams.get('n');
+      const hashTgl = hashParams.get('t') || urlParams.get('t');
+      const hashJk = hashParams.get('g') || urlParams.get('g') || 'L';
+      const hashIbu = hashParams.get('o') || urlParams.get('o');
+      const hashDesa = hashParams.get('d') || urlParams.get('d');
+
+      if (!childIdParam && !compactParam && !legacyQrParam && !hashNama) return false;
 
       activatePublicQrViewMode();
 
@@ -2235,9 +2277,19 @@
             desa: decoded.d || '-'
           };
         } catch (e) { console.warn("Legacy QR decode skip:", e); }
+      } else if (hashNama) {
+        childObj = {
+          id: childIdParam || '',
+          nama_anak: hashNama,
+          tgl_lahir: hashTgl || '',
+          jk: hashJk,
+          nama_ibu: hashIbu || '-',
+          desa: hashDesa || '-'
+        };
       }
 
       if (childObj) {
+        currentQrChildData = childObj;
         renderPublicQrFeedModal(childObj);
       }
 
@@ -2261,6 +2313,7 @@
         }
         if (liveDoc) {
           childObj = liveDoc;
+          currentQrChildData = liveDoc;
           renderPublicQrFeedModal(childObj);
         } else if (!childObj) {
           document.getElementById('feed_nama_anak').textContent = "Data Sasaran Tidak Ditemukan";
@@ -2271,6 +2324,12 @@
         if (!childObj) {
           document.getElementById('feed_next_vaccine_content').innerHTML = `<span style="color:var(--danger); font-weight:700;">Gagal memuat data server: ${err.message}</span>`;
         }
+      }
+
+      // Jika petugas sudah menekan tombol Lakukan Imunisasi saat module masih dimuat, lanjutkan otomatis
+      if (window.__PENDING_QUICK_IMUN_CLICK__) {
+        window.__PENDING_QUICK_IMUN_CLICK__ = false;
+        startQuickImmunizationFromQr();
       }
 
       return true;
@@ -2307,8 +2366,8 @@
         const childDocId = data.id || `${data.desa}_${data.nama_anak}_${data.tgl_lahir}`.replace(/[\s\/]/g, '_').toLowerCase();
         const baseUrl = getPublicQrBaseUrl();
         const separator = baseUrl.includes('?') ? '&' : '?';
-        // Tautan super ringkas (?id=...#id=...) agar grafik QR renggang, tajam, dan tahan kualitas cetak rendah
-        const qrUrl = `${baseUrl}${separator}id=${encodeURIComponent(childDocId)}#id=${encodeURIComponent(childDocId)}`;
+        // Tautan ringkas membawa ID + identitas dasar agar ringan dicetak & langsung siap untuk input cepat
+        const qrUrl = `${baseUrl}${separator}id=${encodeURIComponent(childDocId)}#id=${encodeURIComponent(childDocId)}&n=${encodeURIComponent(data.nama_anak || '')}&t=${encodeURIComponent(data.tgl_lahir || '')}&g=${encodeURIComponent(data.jk || 'L')}&o=${encodeURIComponent(data.nama_ibu || '')}&d=${encodeURIComponent(data.desa || '')}`;
 
         const clickableLinkEl = document.getElementById('qr_url_clickable_link');
         if (clickableLinkEl) {
@@ -2324,11 +2383,11 @@
         qrContainer.innerHTML = '';
         new QRCode(qrContainer, {
           text: qrUrl,
-          width: 170,
-          height: 170,
+          width: 175,
+          height: 175,
           colorDark: "#000000",
           colorLight: "#FFFFFF",
-          correctLevel: QRCode.CorrectLevel.H
+          correctLevel: QRCode.CorrectLevel.M
         });
 
         document.getElementById('qrPrintModal').style.display = 'flex';
@@ -2634,6 +2693,8 @@ window.goToEdit = function(encodedJson) {
         const labelParent = cb.closest('.checkbox-item');
         if (labelParent) labelParent.classList.remove('already-given');
       });
+      const quickBanner = document.getElementById('quickQrActiveFormBanner');
+      if (quickBanner) quickBanner.remove();
       currentQrChildData = null;
       const btnQrForm = document.getElementById('btnCetakQrFromForm');
       if (btnQrForm) btnQrForm.style.display = 'none';
@@ -2799,17 +2860,14 @@ window.goToEdit = function(encodedJson) {
         if (hintEl) hintEl.innerHTML = `<i class="fas fa-mobile-alt"></i> Akun tersimpan: <strong>${savedUser}</strong>`;
       }
 
-      // Pulihkan sesi aktif secara otomatis jika belum melewati batas timeout 30 menit
       if (isPetugasSessionValid()) {
         savePetugasSession(savedUser);
       }
 
-      // Pantau aktivitas petugas agar timer timeout selalu ter-reset saat bekerja
       ['click', 'keydown', 'touchstart', 'scroll'].forEach(evtName => {
         document.addEventListener(evtName, touchPetugasActivity, { passive: true });
       });
 
-      // Pemeriksaan berkala setiap 30 detik untuk auto-logout jika idle >= 30 menit
       setInterval(() => {
         if (activePetugasName && !isPublicQrMode && !isPetugasSessionValid()) {
           clearPetugasSession();
@@ -2933,7 +2991,6 @@ window.goToEdit = function(encodedJson) {
       initUserAuthCheck();
       const isQrMode = await checkIncomingQrUrlAndOpenFeed();
 
-      // Hanya tampilkan modal login jika BUKAN mode scan QR dan belum ada sesi valid
       if (!isQrMode && !window.__IS_PUBLIC_QR_MODE__ && !activePetugasName) {
         document.getElementById('loginModal').style.display = 'flex';
       }

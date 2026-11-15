@@ -1385,7 +1385,7 @@
     <section id="admin" class="tab-panel" style="display:none">
       <div class="card" style="border-top: 4px solid var(--danger);">
         <h2><i class="fas fa-user-gear" style="color:var(--danger)"></i> Panel Admin &amp; Kontrol Pusat</h2>
-        <p class="lead">Kelola akun pengguna/kader beserta batasan wilayah desa, atur urutan prioritas tampilan vaksin pada Pop-up QR orang tua, cetak sertifikat IDL, dan sinkronisasi database.</p>
+        <p class="lead">Kelola akun pengguna/kader beserta batasan wilayah desa, atur urutan prioritas tampilan vaksin pada Pop-up QR orang tua, cetak sertifikat IDL per desa/nama, dan sinkronisasi database.</p>
 
         <!-- SUB-MENU TRIGGER PANEL ADMIN -->
         <div class="preview-submenu-bar" id="submenuBarAdmin">
@@ -1400,7 +1400,7 @@
             <i class="fas fa-certificate"></i> Cetak Sertifikat IDL (A4) <i class="fas fa-chevron-down chevron-indicator"></i>
           </button>
           <button type="button" class="btn-subtab-table" data-group="admin" data-target="adminSyncResetBox" onclick="togglePreviewTablePanel(this, 'admin')">
-            <i class="fas fa-database"></i> Sinkronisasi &amp; Reset Data <i class="fas fa-chevron-down chevron-indicator"></i>
+            <i class="fas fa-database"></i> Sinkronisasi &amp; Pemulihan Data <i class="fas fa-chevron-down chevron-indicator"></i>
           </button>
         </div>
 
@@ -1511,12 +1511,35 @@
           </div>
         </div>
 
-        <!-- 3. CETAK SERTIFIKAT IDL A4 LANDSCAPE -->
+        <!-- 3. CETAK SERTIFIKAT IDL A4 LANDSCAPE (DENGAN FILTER DESA & CARI NAMA) -->
         <div id="adminCertPrintBox" class="collapsible-table-panel" style="background:#FFFDF5; border:1.5px solid #FDE68A; border-radius:12px; padding:16px; margin-bottom:16px;">
           <h3 style="margin:0 0 8px 0; font-size:1.02rem; color:#92400E;"><i class="fas fa-award"></i> Cetak Sertifikat Imunisasi Dasar Lengkap (A4 Landscape)</h3>
           <div class="grid">
             <div class="form-group">
-              <label>Pilih Sasaran Penerima Sertifikat</label>
+              <label>Filter Desa Sasaran</label>
+              <select id="cert_filter_desa" onchange="populateCertificateSasaranDropdown()">
+                <option value="ALL">-- Semua Desa --</option>
+                <option value="Melata">Melata</option>
+                <option value="Nanuah">Nanuah</option>
+                <option value="Topalan">Topalan</option>
+                <option value="Batu Ampar">Batu Ampar</option>
+                <option value="Lubuk Hiju">Lubuk Hiju</option>
+                <option value="Bukit Makmur">Bukit Makmur</option>
+                <option value="Bukit Raya">Bukit Raya</option>
+                <option value="Modang Mas">Modang Mas</option>
+                <option value="Mukti Manunggal">Mukti Manunggal</option>
+                <option value="Sumber Jaya">Sumber Jaya</option>
+                <option value="Bukit Harum">Bukit Harum</option>
+                <option value="PT. TSA">PT. TSA</option>
+                <option value="PT. SHS">PT. SHS</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Cari Nama Anak / Nama Ibu / NIK</label>
+              <input type="text" id="cert_search_nama" placeholder="Ketik nama anak untuk menyaring..." oninput="populateCertificateSasaranDropdown()">
+            </div>
+            <div class="form-group">
+              <label>Pilih Sasaran Penerima Sertifikat <span class="req">*</span></label>
               <select id="select_cert_sasaran">
                 <option value="">-- Pilih Nama Sasaran --</option>
               </select>
@@ -1533,11 +1556,20 @@
           <div id="certificatePrintArea" class="cert-preview-wrapper" style="display:none;"></div>
         </div>
 
-        <!-- 4. SINKRONISASI CLOUD & RESET DATABASE -->
+        <!-- 4. SINKRONISASI CLOUD & PEMULIHAN DATA -->
         <div id="adminSyncResetBox" class="collapsible-table-panel" style="background:#F8FAFC; border:1.5px solid var(--border-color); border-radius:12px; padding:16px;">
-          <h3 style="margin:0 0 8px 0; font-size:1.02rem; color:var(--accent);"><i class="fas fa-database"></i> Status Sinkronisasi Cloud &amp; Cadangan Data</h3>
+          <h3 style="margin:0 0 8px 0; font-size:1.02rem; color:var(--accent);"><i class="fas fa-database"></i> Status Sinkronisasi Cloud &amp; Pemulihan Riwayat Lama</h3>
           <div id="cloudSyncStatusInfo" style="font-size:0.84rem; color:#334155; background:#FFFFFF; padding:12px; border-radius:9px; border:1px solid var(--border-color); margin-bottom:12px;">
             Memeriksa status penyimpanan lokal &amp; koneksi Firebase...
+          </div>
+          <div class="form-row" style="margin-bottom:12px; align-items:flex-end;">
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="font-size:0.78rem;">Tarik Riwayat dari Nama Koleksi Firestore Custom (Opsional):</label>
+              <input type="text" id="custom_firestore_col_input" placeholder="Contoh: transaksi_imunisasi atau imunisasi_log">
+            </div>
+            <button type="button" class="btn btn-info" onclick="pullFromCustomFirestoreCollection()" style="height:40px;">
+              <i class="fas fa-cloud-download-alt"></i> Tarik Koleksi Ini
+            </button>
           </div>
           <div class="actions" style="justify-content:flex-start;">
             <button type="button" class="btn btn-success" onclick="forceSyncAllLocalToCloud()"><i class="fas fa-cloud-upload-alt"></i> Paksa Sinkronisasi Ke Cloud Sekarang</button>
@@ -1656,17 +1688,39 @@
 
     const LEGACY_SASARAN_KEYS = [
       "imunisasi_records", "kohort_imunisasi_data", "pkm_melata_sasaran_v2",
-      "pkm_melata_sasaran_v1", "register_imunisasi_data", "local_imunisasi_cache"
+      "pkm_melata_sasaran_v1", "register_imunisasi_data", "local_imunisasi_cache",
+      "transaksi_imunisasi", "riwayat_imunisasi", "pelayanan_imunisasi"
     ];
 
+    // KOLEKSI MASTER SASARAN & KOLEKSI TRANSAKSI TERPISAH DI FIRESTORE
     const FIRESTORE_COLLECTIONS_SASARAN = [
       "imunisasi_sasaran",
       "register_imunisasi",
       "kohort_imunisasi",
       "imunisasi",
       "sasaran_imunisasi",
-      "data_imunisasi"
+      "data_imunisasi",
+      "master_sasaran",
+      "data_sasaran",
+      "sasaran",
+      "bayi",
+      "anak"
     ];
+
+    const FIRESTORE_COLLECTIONS_TRANSAKSI = [
+      "transaksi_imunisasi",
+      "imunisasi_transaksi",
+      "riwayat_imunisasi",
+      "pelayanan_imunisasi",
+      "kunjungan_imunisasi",
+      "laporan_imunisasi",
+      "catat_imunisasi",
+      "log_imunisasi",
+      "transaksi",
+      "riwayat",
+      "pelayanan"
+    ];
+
     const FIRESTORE_COLLECTIONS_BIAS = [
       "imunisasi_bias",
       "bias_reports",
@@ -1687,7 +1741,7 @@
       seqOver2: ["Campak Rubela-2", "DPT-HB-Hib4", "PCV3", ...VAX_BAYI_LIST]
     };
 // =========================================================================
-    // 1. UTILITAS DASAR, NORMALISASI RIWAYAT LAMA & SINKRONISASI CLOUD
+    // 1. UTILITAS DASAR, PEMULIHAN RIWAYAT IMUNISASI LAMA & SINKRONISASI CLOUD
     // =========================================================================
     function generateId(prefix = "rec") {
       return `${prefix}_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
@@ -1730,30 +1784,30 @@
       return remMonths > 0 ? `${years} Thn ${remMonths} Bln` : `${years} Tahun`;
     }
 
-    // KAMUS NORMALISASI NAMA ANTIGEN LAMA MAUPUN BARU AGAR 100% RIWAYAT TERBACA
+    // KAMUS NORMALISASI SELURUH NAMA ANTIGEN LAMA MAUPUN BARU
     const VAX_ALIAS_MAP = {
-      "hbo0": "HBO (<24 Jam)", "hbo<24jam": "HBO (<24 Jam)", "hb0<24jam": "HBO (<24 Jam)", "hbo1": "HBO (<24 Jam)", "hb0": "HBO (<24 Jam)",
-      "hbo17hari": "HBO (1-7 Hari)", "hb017hari": "HBO (1-7 Hari)", "hbo2": "HBO (1-7 Hari)",
+      "hbo0": "HBO (<24 Jam)", "hbo<24jam": "HBO (<24 Jam)", "hb0<24jam": "HBO (<24 Jam)", "hbo1": "HBO (<24 Jam)", "hb0": "HBO (<24 Jam)", "hepatitisb0": "HBO (<24 Jam)",
+      "hbo17hari": "HBO (1-7 Hari)", "hb017hari": "HBO (1-7 Hari)", "hbo2": "HBO (1-7 Hari)", "hb017": "HBO (1-7 Hari)",
       "bcg": "BCG",
-      "opv1": "OPV1", "polio1": "OPV1",
-      "dpthbhib1": "DPT-HB-Hib1", "dpt1": "DPT-HB-Hib1", "pentabio1": "DPT-HB-Hib1",
-      "opv2": "OPV2", "polio2": "OPV2",
+      "opv1": "OPV1", "polio1": "OPV1", "poliotetes1": "OPV1",
+      "dpthbhib1": "DPT-HB-Hib1", "dpt1": "DPT-HB-Hib1", "pentabio1": "DPT-HB-Hib1", "dpthb1": "DPT-HB-Hib1",
+      "opv2": "OPV2", "polio2": "OPV2", "poliotetes2": "OPV2",
       "pcv1": "PCV1",
       "rotavirus1": "Rotavirus1", "rv1": "Rotavirus1", "rota1": "Rotavirus1",
-      "dpthbhib2": "DPT-HB-Hib2", "dpt2": "DPT-HB-Hib2", "pentabio2": "DPT-HB-Hib2",
-      "opv3": "OPV3", "polio3": "OPV3",
+      "dpthbhib2": "DPT-HB-Hib2", "dpt2": "DPT-HB-Hib2", "pentabio2": "DPT-HB-Hib2", "dpthb2": "DPT-HB-Hib2",
+      "opv3": "OPV3", "polio3": "OPV3", "poliotetes3": "OPV3",
       "pcv2": "PCV2",
       "rotavirus2": "Rotavirus2", "rv2": "Rotavirus2", "rota2": "Rotavirus2",
-      "dpthbhib3": "DPT-HB-Hib3", "dpt3": "DPT-HB-Hib3", "pentabio3": "DPT-HB-Hib3",
-      "opv4": "OPV4", "polio4": "OPV4",
-      "ipv1": "IPV1", "ipv": "IPV1",
+      "dpthbhib3": "DPT-HB-Hib3", "dpt3": "DPT-HB-Hib3", "pentabio3": "DPT-HB-Hib3", "dpthb3": "DPT-HB-Hib3",
+      "opv4": "OPV4", "polio4": "OPV4", "poliotetes4": "OPV4",
+      "ipv1": "IPV1", "ipv": "IPV1", "poliosuntik1": "IPV1",
       "rotavirus3": "Rotavirus3", "rv3": "Rotavirus3", "rota3": "Rotavirus3",
-      "campakrubela1": "Campak Rubela-1", "mr1": "Campak Rubela-1", "campak1": "Campak Rubela-1",
-      "ipv2": "IPV2",
+      "campakrubela1": "Campak Rubela-1", "mr1": "Campak Rubela-1", "campak1": "Campak Rubela-1", "mr": "Campak Rubela-1",
+      "ipv2": "IPV2", "poliosuntik2": "IPV2",
       "je": "JE",
       "pcv3": "PCV3",
-      "dpthbhib4": "DPT-HB-Hib4", "dpt4": "DPT-HB-Hib4", "dptlanjutan": "DPT-HB-Hib4",
-      "campakrubela2": "Campak Rubela-2", "mr2": "Campak Rubela-2", "campak2": "Campak Rubela-2",
+      "dpthbhib4": "DPT-HB-Hib4", "dpt4": "DPT-HB-Hib4", "dptlanjutan": "DPT-HB-Hib4", "pentabiolanjutan": "DPT-HB-Hib4",
+      "campakrubela2": "Campak Rubela-2", "mr2": "Campak Rubela-2", "campak2": "Campak Rubela-2", "mrlanjutan": "Campak Rubela-2",
       "tt1catin": "TT1 Catin", "td1catin": "TT1 Catin",
       "tt2catin": "TT2 Catin", "td2catin": "TT2 Catin",
       "tt1bumil": "TT1 Bumil", "td1bumil": "TT1 Bumil",
@@ -1784,48 +1838,101 @@
       return s;
     }
 
-    function normalizeSasaranRecord(raw, fallbackId = "") {
-      if (!raw || typeof raw !== "object") return null;
-      const nama = raw.nama || raw.nama_anak || raw.namaSasaran || raw.nama_sasaran || raw.name || "";
-      if (!nama) return null;
+    // EKSTRAKTOR UNIVERSAL: MEMBACA VAKSIN DARI OBJEK, STRING TUNGGAL, ARRAY, MAUPUN KOLOM FLAT
+    function extractVaccinesFromRaw(raw) {
+      const vaksinMap = {};
+      if (!raw || typeof raw !== "object") return vaksinMap;
 
-      let vaksinMap = {};
+      const defaultTgl = normalizeDateString(
+        raw.tglPelayanan || raw.tgl_pelayanan || raw.tanggalPelayanan ||
+        raw.tanggal_imunisasi || raw.tglImunisasi || raw.tgl_imunisasi ||
+        raw.tgl_vaksin || raw.tanggal_vaksin || raw.tglVaksin ||
+        raw.tgl_suntik || raw.tanggal_suntik || raw.tgl_pemberian ||
+        raw.tanggal || raw.tgl || raw.date || raw.createdAt || ""
+      );
+
       const absorbVaxObject = (obj, fallbackDate = "") => {
-        if (!obj || typeof obj !== "object") return;
+        if (!obj || typeof obj !== "object" || Array.isArray(obj)) return;
         Object.entries(obj).forEach(([k, val]) => {
           const canon = canonicalizeVaxName(k);
           if (canon && val) {
-            const dt = val === true ? (fallbackDate || getTodayIso()) : normalizeDateString(val);
-            if (dt) vaksinMap[canon] = dt;
+            if (typeof val === "object" && !val.seconds) {
+              const nestedDate = normalizeDateString(val.tanggal || val.tgl || val.tglPelayanan || val.date || fallbackDate);
+              if (nestedDate) vaksinMap[canon] = nestedDate;
+            } else {
+              const dt = (val === true || val === "Sudah" || val === "Ya" || val === 1)
+                ? (fallbackDate || getTodayIso())
+                : normalizeDateString(val);
+              if (dt && dt !== "-" && dt !== "false") vaksinMap[canon] = dt;
+            }
           }
         });
       };
 
-      const defaultTgl = normalizeDateString(raw.tglPelayanan || raw.tgl_pelayanan || raw.tanggal || "");
+      // 1. Cek jika vaksin disimpan sebagai STRING tunggal (format dokumen transaksi terpisah)
+      const strFields = [
+        raw.vaksin, raw.imunisasi, raw.antigen, raw.jenis, raw.vaksinasi,
+        raw.jenisVaksin, raw.jenis_vaksin, raw.jenisImunisasi, raw.jenis_imunisasi,
+        raw.namaVaksin, raw.nama_vaksin, raw.namaImunisasi, raw.nama_imunisasi
+      ];
+      strFields.forEach(strVal => {
+        if (typeof strVal === "string" && strVal.trim() !== "") {
+          strVal.split(/[,;|+]+/).forEach(part => {
+            const canon = canonicalizeVaxName(part.trim());
+            if (canon) {
+              vaksinMap[canon] = defaultTgl || getTodayIso();
+            }
+          });
+        }
+      });
 
+      // 2. Cek jika vaksin disimpan sebagai OBJEK map { "BCG": "2026-05-10", ... }
       absorbVaxObject(raw.vaksin, defaultTgl);
       absorbVaxObject(raw.imunisasi, defaultTgl);
+      absorbVaxObject(raw.riwayat, defaultTgl);
       absorbVaxObject(raw.riwayatVaksin, defaultTgl);
+      absorbVaxObject(raw.riwayat_vaksin, defaultTgl);
+      absorbVaxObject(raw.riwayatImunisasi, defaultTgl);
+      absorbVaxObject(raw.riwayat_imunisasi, defaultTgl);
       absorbVaxObject(raw.dosis, defaultTgl);
+      absorbVaxObject(raw.dataVaksin, defaultTgl);
+      absorbVaxObject(raw.data_vaksin, defaultTgl);
 
-      const arrCandidates = raw.vaksinDiberikan || raw.jenis_imunisasi || raw.vaksin_list || [];
-      if (Array.isArray(arrCandidates)) {
-        arrCandidates.forEach(item => {
-          if (typeof item === "string") {
-            const canon = canonicalizeVaxName(item);
-            if (canon) vaksinMap[canon] = vaksinMap[canon] || defaultTgl || getTodayIso();
-          } else if (item && typeof item === "object") {
-            const canon = canonicalizeVaxName(item.nama || item.jenis || item.antigen || item.vaksin);
-            const dt = normalizeDateString(item.tanggal || item.tgl || item.date || defaultTgl);
-            if (canon && dt) vaksinMap[canon] = dt;
-          }
-        });
-      }
+      // 3. Cek jika vaksin disimpan sebagai ARRAY (string atau object)
+      const arrFields = [
+        raw.vaksinDiberikan, raw.vaksin_diberikan, raw.jenis_imunisasi,
+        raw.vaksin_list, raw.riwayat, raw.pelayanan, raw.transaksi, raw.items
+      ];
+      arrFields.forEach(arr => {
+        if (Array.isArray(arr)) {
+          arr.forEach(item => {
+            if (typeof item === "string") {
+              const canon = canonicalizeVaxName(item);
+              if (canon) vaksinMap[canon] = vaksinMap[canon] || defaultTgl || getTodayIso();
+            } else if (item && typeof item === "object") {
+              const canon = canonicalizeVaxName(item.nama || item.jenis || item.antigen || item.vaksin || item.imunisasi || item.namaVaksin);
+              const dt = normalizeDateString(item.tanggal || item.tgl || item.tglPelayanan || item.tgl_vaksin || item.date || defaultTgl);
+              if (canon) vaksinMap[canon] = dt || getTodayIso();
+            }
+          });
+        }
+      });
 
+      // 4. Cek apabila nama antigen disimpan sejajar (flat) di root dokumen
       absorbVaxObject(raw, defaultTgl);
 
+      return vaksinMap;
+    }
+
+    function normalizeSasaranRecord(raw, fallbackId = "") {
+      if (!raw || typeof raw !== "object") return null;
+      const nama = raw.nama || raw.nama_anak || raw.namaAnak || raw.nama_bayi || raw.namaSasaran || raw.nama_sasaran || raw.nama_pasien || raw.name || "";
+      if (!nama) return null;
+
+      const vaksinMap = extractVaccinesFromRaw(raw);
+
       return {
-        id: raw.id || fallbackId || generateId("rec"),
+        id: raw.sasaranId || raw.sasaran_id || raw.id_sasaran || raw.id || fallbackId || generateId("rec"),
         desa: raw.desa || raw.kelurahan || "Melata",
         posyandu: raw.posyandu || raw.kegiatan || raw.nama_posyandu || "-",
         peran: raw.peran || raw.kategori || raw.sasaran || "Bayi/Baduta",
@@ -1845,31 +1952,70 @@
       };
     }
 
+    // PENGGABUNGAN 2 TAHAP: MASTER SASARAN + TRANSAKSI TERPISAH (BY ID / NIK / NAMA)
     function mergeSasaranRecords(incomingList) {
       let changed = false;
+      const orphanTransactions = [];
+
+      // Tahap 1: Gabungkan dokumen yang memiliki Nama Sasaran
       incomingList.forEach(rawItem => {
+        if (!rawItem || typeof rawItem !== "object") return;
         const norm = normalizeSasaranRecord(rawItem, rawItem?.id);
-        if (!norm) return;
+        if (!norm) {
+          orphanTransactions.push(rawItem);
+          return;
+        }
 
         const existingIdx = allSasaranRecords.findIndex(r =>
           r.id === norm.id ||
-          (normalizeText(r.nama) === normalizeText(norm.nama) && r.tglLahir === norm.tglLahir && norm.tglLahir !== "")
+          (norm.nik && r.nik && norm.nik === r.nik) ||
+          (normalizeText(r.nama) === normalizeText(norm.nama) &&
+           (r.tglLahir === norm.tglLahir || !r.tglLahir || !norm.tglLahir) &&
+           normalizeText(r.desa) === normalizeText(norm.desa))
         );
 
         if (existingIdx === -1) {
           allSasaranRecords.push(norm);
           changed = true;
         } else {
-          const mergedVax = { ...(allSasaranRecords[existingIdx].vaksin || {}), ...(norm.vaksin || {}) };
+          const existing = allSasaranRecords[existingIdx];
+          const mergedVax = { ...(existing.vaksin || {}), ...(norm.vaksin || {}) };
           allSasaranRecords[existingIdx] = {
-            ...allSasaranRecords[existingIdx],
+            ...existing,
             ...norm,
-            id: allSasaranRecords[existingIdx].id,
+            id: existing.id,
+            tglLahir: norm.tglLahir || existing.tglLahir,
+            namaIbu: (norm.namaIbu && norm.namaIbu !== "-") ? norm.namaIbu : existing.namaIbu,
+            nik: norm.nik || existing.nik,
+            wa: norm.wa || existing.wa,
+            alamat: (norm.alamat && norm.alamat !== "-") ? norm.alamat : existing.alamat,
             vaksin: mergedVax
           };
           changed = true;
         }
       });
+
+      // Tahap 2: Gabungkan transaksi yang tidak punya kolom 'nama' (cocokkan via sasaranId / id_sasaran / id_anak / nik)
+      orphanTransactions.forEach(tx => {
+        const refId = tx.sasaranId || tx.sasaran_id || tx.id_sasaran || tx.id_anak || tx.childId || tx.patientId || "";
+        const refNik = tx.nik || tx.nik_anak || tx.nik_sasaran || "";
+        if (!refId && !refNik) return;
+
+        const targetIdx = allSasaranRecords.findIndex(r =>
+          (refId && r.id === refId) || (refNik && r.nik === refNik)
+        );
+        if (targetIdx !== -1) {
+          const extractedVax = extractVaccinesFromRaw(tx);
+          if (Object.keys(extractedVax).length > 0) {
+            allSasaranRecords[targetIdx].vaksin = {
+              ...(allSasaranRecords[targetIdx].vaksin || {}),
+              ...extractedVax
+            };
+            changed = true;
+          }
+        }
+      });
+
       return changed;
     }
 
@@ -1878,22 +2024,26 @@
         const rawSas = localStorage.getItem(STORAGE_KEYS.SASARAN);
         allSasaranRecords = rawSas ? JSON.parse(rawSas).map(r => normalizeSasaranRecord(r)).filter(Boolean) : [];
 
+        // Pindai seluruh key di localStorage (baik daftar sasaran maupun daftar transaksi/pelayanan lama)
+        const pendingLocalBatches = [];
         for (let i = 0; i < localStorage.length; i++) {
           const key = localStorage.key(i);
-          if (!key || key === STORAGE_KEYS.SASARAN) continue;
-          if (LEGACY_SASARAN_KEYS.includes(key) || /imun|kohort|sasaran|melata/i.test(key)) {
-            try {
-              const parsed = JSON.parse(localStorage.getItem(key));
-              if (Array.isArray(parsed) && parsed.length > 0) {
-                mergeSasaranRecords(parsed);
-              } else if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
-                const vals = Object.values(parsed);
-                if (vals.length > 0 && typeof vals[0] === "object") {
-                  mergeSasaranRecords(vals);
-                }
+          if (!key || key === STORAGE_KEYS.SASARAN || key === STORAGE_KEYS.USERS || key === STORAGE_KEYS.SESSION || key === STORAGE_KEYS.CONFIG) continue;
+          try {
+            const parsed = JSON.parse(localStorage.getItem(key));
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              pendingLocalBatches.push(...parsed);
+            } else if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+              const vals = Object.values(parsed);
+              if (vals.length > 0 && typeof vals[0] === "object") {
+                pendingLocalBatches.push(...vals);
               }
-            } catch (e) {}
-          }
+            }
+          } catch (e) {}
+        }
+
+        if (pendingLocalBatches.length > 0) {
+          mergeSasaranRecords(pendingLocalBatches);
         }
 
         if (allSasaranRecords.length > 0) {
@@ -1974,20 +2124,21 @@
     async function initRealtimeCloudListeners() {
       if (!isFirebaseReady || !db) return;
 
-      for (const colName of FIRESTORE_COLLECTIONS_SASARAN) {
+      const allCloudDocs = [];
+      const allColsToScan = [...new Set([...FIRESTORE_COLLECTIONS_SASARAN, ...FIRESTORE_COLLECTIONS_TRANSAKSI])];
+
+      for (const colName of allColsToScan) {
         try {
           const snap = await getDocs(collection(db, colName));
           if (!snap.empty) {
-            const fetched = [];
-            snap.forEach(d => fetched.push({ id: d.id, ...d.data(), synced: true }));
-            if (mergeSasaranRecords(fetched)) {
-              saveSasaranToLocal();
-              refreshAllDropdownsAndPreviews();
-            }
+            snap.forEach(d => allCloudDocs.push({ id: d.id, ...d.data(), synced: true }));
           }
-        } catch (err) {
-          console.warn(`Koleksi ${colName} melewati fallback lokal:`, err.message);
-        }
+        } catch (err) {}
+      }
+
+      if (allCloudDocs.length > 0 && mergeSasaranRecords(allCloudDocs)) {
+        saveSasaranToLocal();
+        refreshAllDropdownsAndPreviews();
       }
 
       for (const colBias of FIRESTORE_COLLECTIONS_BIAS) {
@@ -2017,6 +2168,33 @@
       } catch (e) {}
     }
 
+    window.pullFromCustomFirestoreCollection = async function() {
+      const colName = document.getElementById("custom_firestore_col_input").value.trim();
+      if (!colName) {
+        alert("Masukkan nama koleksi Firestore terlebih dahulu.");
+        return;
+      }
+      if (!isFirebaseReady || !db) {
+        alert("Koneksi Firebase belum siap.");
+        return;
+      }
+      try {
+        const snap = await getDocs(collection(db, colName));
+        if (snap.empty) {
+          alert(`Koleksi "${colName}" kosong atau tidak ditemukan di project imunisasi-puskesmas.`);
+          return;
+        }
+        const docs = [];
+        snap.forEach(d => docs.push({ id: d.id, ...d.data(), synced: true }));
+        mergeSasaranRecords(docs);
+        saveSasaranToLocal();
+        refreshAllDropdownsAndPreviews();
+        alert(`Berhasil menarik & menggabungkan ${docs.length} dokumen dari koleksi "${colName}"!`);
+      } catch (err) {
+        alert("Gagal membaca koleksi: " + err.message);
+      }
+    };
+
     window.forceSyncAllLocalToCloud = async function() {
       if (!isFirebaseReady || !db) {
         alert("Koneksi Cloud tidak tersedia. Data tetap tersimpan aman di penyimpanan lokal browser.");
@@ -2038,10 +2216,12 @@
       const el = document.getElementById("cloudSyncStatusInfo");
       if (!el) return;
       const unsynced = allSasaranRecords.filter(r => !r.synced).length;
+      const totalVaxCount = allSasaranRecords.reduce((acc, r) => acc + Object.keys(r.vaksin || {}).length, 0);
       el.innerHTML = `
         <div style="display:flex; flex-wrap:wrap; gap:12px; justify-content:space-between; align-items:center;">
           <div>
-            <strong>Total Sasaran Tersimpan:</strong> <span style="color:var(--accent); font-weight:800;">${allSasaranRecords.length}</span> data |
+            <strong>Total Sasaran:</strong> <span style="color:var(--accent); font-weight:800;">${allSasaranRecords.length}</span> anak/sasaran |
+            <strong>Total Dosis Imunisasi Terbaca:</strong> <span style="color:var(--success); font-weight:800;">${totalVaxCount}</span> suntikan |
             <strong>Laporan BIAS:</strong> <span style="color:var(--info); font-weight:800;">${allBiasRecords.length}</span> laporan
           </div>
           <div>
@@ -2072,7 +2252,7 @@
 
     function applyUserDesaRestrictionsUI() {
       const allowed = getAllowedDesaForCurrentUser();
-      const desaSelectIds = ["search_desa_anak", "reg_desa", "catchup_filter_desa", "filter_desa"];
+      const desaSelectIds = ["search_desa_anak", "reg_desa", "catchup_filter_desa", "filter_desa", "cert_filter_desa"];
 
       desaSelectIds.forEach(selId => {
         const sel = document.getElementById(selId);
@@ -3657,7 +3837,6 @@
       certPill.style.background = isIdlComplete ? "#D1FAE5" : "#FEF3C7";
       certPill.style.color = isIdlComplete ? "#065F46" : "#92400E";
 
-      // Menampilkan ke-22 jenis antigen (termasuk PCV1, PCV2, Rotavirus 1-3, IPV2, & Baduta) di Preview Sertifikat QR
       document.getElementById("feed_cert_antigen_rows").innerHTML = VAX_ALL_ANAK.map(a => {
         const dt = vMap[a];
         return `
@@ -3705,17 +3884,34 @@
     }
 
     // =========================================================================
-    // 10. CETAK SERTIFIKAT A4 LANDSCAPE & BACKUP DATA
+    // 10. CETAK SERTIFIKAT A4 LANDSCAPE (DENGAN FILTER DESA & CARI NAMA)
     // =========================================================================
-    function populateCertificateSasaranDropdown() {
+    window.populateCertificateSasaranDropdown = function() {
       const sel = document.getElementById("select_cert_sasaran");
       if (!sel) return;
+
+      const filterDesa = document.getElementById("cert_filter_desa")?.value || "ALL";
+      const searchKeyword = normalizeText(document.getElementById("cert_search_nama")?.value || "");
+
       const anakList = allSasaranRecords
         .filter(r => isRecordAllowedForCurrentUser(r) && r.peran === "Bayi/Baduta")
+        .filter(r => filterDesa === "ALL" || r.desa === filterDesa)
+        .filter(r => {
+          if (!searchKeyword) return true;
+          return (
+            normalizeText(r.nama).includes(searchKeyword) ||
+            normalizeText(r.namaIbu).includes(searchKeyword) ||
+            normalizeText(r.nik).includes(searchKeyword)
+          );
+        })
         .sort((a, b) => (a.nama || "").localeCompare(b.nama || ""));
-      sel.innerHTML = '<option value="">-- Pilih Nama Sasaran --</option>' +
-        anakList.map(r => `<option value="${r.id}">${r.nama} — Desa ${r.desa} (${formatDateIndo(r.tglLahir)})</option>`).join("");
-    }
+
+      sel.innerHTML = `<option value="">-- Pilih Nama Sasaran (${anakList.length} anak ditemukan) --</option>` +
+        anakList.map(r => {
+          const jmlVaksin = Object.keys(r.vaksin || {}).length;
+          return `<option value="${r.id}">${r.nama} — Desa ${r.desa} (${formatDateIndo(r.tglLahir)}) • [${jmlVaksin} Vaksin]</option>`;
+        }).join("");
+    };
 
     window.renderCertificatePreview = function() {
       const sasId = document.getElementById("select_cert_sasaran").value;

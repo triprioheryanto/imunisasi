@@ -1574,6 +1574,10 @@
           <div class="actions" style="justify-content:flex-start;">
             <button type="button" class="btn btn-success" onclick="forceSyncAllLocalToCloud()"><i class="fas fa-cloud-upload-alt"></i> Paksa Sinkronisasi Ke Cloud Sekarang</button>
             <button type="button" class="btn btn-info" onclick="exportBackupJson()"><i class="fas fa-download"></i> Unduh Backup JSON</button>
+            <label class="btn btn-warning" style="cursor:pointer; margin:0;">
+              <i class="fas fa-file-import"></i> Impor / Pulihkan File JSON
+              <input type="file" accept=".json" style="display:none;" onchange="importBackupJsonFile(event)">
+            </label>
             <button type="button" class="btn btn-danger" onclick="clearLocalCacheConfirm()"><i class="fas fa-trash-alt"></i> Bersihkan Cache Lokal</button>
           </div>
         </div>
@@ -1606,6 +1610,7 @@
   <!-- JAVASCRIPT UTAMA & INTEGRASI FIREBASE -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import {
       getFirestore, collection, doc, setDoc, getDoc, getDocs, deleteDoc,
       query, where, onSnapshot, serverTimestamp
@@ -1622,13 +1627,16 @@
     };
 
     let db = null;
+    let auth = null;
     let isFirebaseReady = false;
+    let lastCloudDiagnosticMsg = "Menghubungkan ke server Firebase...";
     try {
       const app = initializeApp(firebaseConfig);
       db = getFirestore(app);
+      auth = getAuth(app);
       isFirebaseReady = true;
     } catch (e) {
-      console.warn("Firebase berjalan dalam mode fallback lokal:", e);
+      lastCloudDiagnosticMsg = "Gagal inisialisasi Firebase: " + e.message;
     }
 
     // DAFTAR ANTIGEN MASTER
@@ -1686,46 +1694,20 @@
       QR_DOMAIN: "pkm_melata_qr_domain_v3"
     };
 
-    const LEGACY_SASARAN_KEYS = [
-      "imunisasi_records", "kohort_imunisasi_data", "pkm_melata_sasaran_v2",
-      "pkm_melata_sasaran_v1", "register_imunisasi_data", "local_imunisasi_cache",
-      "transaksi_imunisasi", "riwayat_imunisasi", "pelayanan_imunisasi"
-    ];
-
-    // KOLEKSI MASTER SASARAN & KOLEKSI TRANSAKSI TERPISAH DI FIRESTORE
     const FIRESTORE_COLLECTIONS_SASARAN = [
-      "imunisasi_sasaran",
-      "register_imunisasi",
-      "kohort_imunisasi",
-      "imunisasi",
-      "sasaran_imunisasi",
-      "data_imunisasi",
-      "master_sasaran",
-      "data_sasaran",
-      "sasaran",
-      "bayi",
-      "anak"
+      "imunisasi_sasaran", "register_imunisasi", "kohort_imunisasi",
+      "imunisasi", "sasaran_imunisasi", "data_imunisasi",
+      "master_sasaran", "data_sasaran", "sasaran", "bayi", "anak"
     ];
 
     const FIRESTORE_COLLECTIONS_TRANSAKSI = [
-      "transaksi_imunisasi",
-      "imunisasi_transaksi",
-      "riwayat_imunisasi",
-      "pelayanan_imunisasi",
-      "kunjungan_imunisasi",
-      "laporan_imunisasi",
-      "catat_imunisasi",
-      "log_imunisasi",
-      "transaksi",
-      "riwayat",
-      "pelayanan"
+      "transaksi_imunisasi", "imunisasi_transaksi", "riwayat_imunisasi",
+      "pelayanan_imunisasi", "kunjungan_imunisasi", "laporan_imunisasi",
+      "catat_imunisasi", "log_imunisasi", "transaksi", "riwayat", "pelayanan"
     ];
 
     const FIRESTORE_COLLECTIONS_BIAS = [
-      "imunisasi_bias",
-      "bias_reports",
-      "laporan_bias",
-      "bias"
+      "imunisasi_bias", "bias_reports", "laporan_bias", "bias"
     ];
 
     let allSasaranRecords = [];
@@ -1784,7 +1766,6 @@
       return remMonths > 0 ? `${years} Thn ${remMonths} Bln` : `${years} Tahun`;
     }
 
-    // KAMUS NORMALISASI SELURUH NAMA ANTIGEN LAMA MAUPUN BARU
     const VAX_ALIAS_MAP = {
       "hbo0": "HBO (<24 Jam)", "hbo<24jam": "HBO (<24 Jam)", "hb0<24jam": "HBO (<24 Jam)", "hbo1": "HBO (<24 Jam)", "hb0": "HBO (<24 Jam)", "hepatitisb0": "HBO (<24 Jam)",
       "hbo17hari": "HBO (1-7 Hari)", "hb017hari": "HBO (1-7 Hari)", "hbo2": "HBO (1-7 Hari)", "hb017": "HBO (1-7 Hari)",
@@ -1838,7 +1819,6 @@
       return s;
     }
 
-    // EKSTRAKTOR UNIVERSAL: MEMBACA VAKSIN DARI OBJEK, STRING TUNGGAL, ARRAY, MAUPUN KOLOM FLAT
     function extractVaccinesFromRaw(raw) {
       const vaksinMap = {};
       if (!raw || typeof raw !== "object") return vaksinMap;
@@ -1869,7 +1849,6 @@
         });
       };
 
-      // 1. Cek jika vaksin disimpan sebagai STRING tunggal (format dokumen transaksi terpisah)
       const strFields = [
         raw.vaksin, raw.imunisasi, raw.antigen, raw.jenis, raw.vaksinasi,
         raw.jenisVaksin, raw.jenis_vaksin, raw.jenisImunisasi, raw.jenis_imunisasi,
@@ -1879,14 +1858,11 @@
         if (typeof strVal === "string" && strVal.trim() !== "") {
           strVal.split(/[,;|+]+/).forEach(part => {
             const canon = canonicalizeVaxName(part.trim());
-            if (canon) {
-              vaksinMap[canon] = defaultTgl || getTodayIso();
-            }
+            if (canon) vaksinMap[canon] = defaultTgl || getTodayIso();
           });
         }
       });
 
-      // 2. Cek jika vaksin disimpan sebagai OBJEK map { "BCG": "2026-05-10", ... }
       absorbVaxObject(raw.vaksin, defaultTgl);
       absorbVaxObject(raw.imunisasi, defaultTgl);
       absorbVaxObject(raw.riwayat, defaultTgl);
@@ -1898,7 +1874,6 @@
       absorbVaxObject(raw.dataVaksin, defaultTgl);
       absorbVaxObject(raw.data_vaksin, defaultTgl);
 
-      // 3. Cek jika vaksin disimpan sebagai ARRAY (string atau object)
       const arrFields = [
         raw.vaksinDiberikan, raw.vaksin_diberikan, raw.jenis_imunisasi,
         raw.vaksin_list, raw.riwayat, raw.pelayanan, raw.transaksi, raw.items
@@ -1918,9 +1893,7 @@
         }
       });
 
-      // 4. Cek apabila nama antigen disimpan sejajar (flat) di root dokumen
       absorbVaxObject(raw, defaultTgl);
-
       return vaksinMap;
     }
 
@@ -1952,12 +1925,10 @@
       };
     }
 
-    // PENGGABUNGAN 2 TAHAP: MASTER SASARAN + TRANSAKSI TERPISAH (BY ID / NIK / NAMA)
     function mergeSasaranRecords(incomingList) {
       let changed = false;
       const orphanTransactions = [];
 
-      // Tahap 1: Gabungkan dokumen yang memiliki Nama Sasaran
       incomingList.forEach(rawItem => {
         if (!rawItem || typeof rawItem !== "object") return;
         const norm = normalizeSasaranRecord(rawItem, rawItem?.id);
@@ -1995,7 +1966,6 @@
         }
       });
 
-      // Tahap 2: Gabungkan transaksi yang tidak punya kolom 'nama' (cocokkan via sasaranId / id_sasaran / id_anak / nik)
       orphanTransactions.forEach(tx => {
         const refId = tx.sasaranId || tx.sasaran_id || tx.id_sasaran || tx.id_anak || tx.childId || tx.patientId || "";
         const refNik = tx.nik || tx.nik_anak || tx.nik_sasaran || "";
@@ -2019,26 +1989,31 @@
       return changed;
     }
 
+    function collectRecordsRecursively(node, bucket, depth = 0) {
+      if (!node || depth > 4) return;
+      if (Array.isArray(node)) {
+        node.forEach(item => collectRecordsRecursively(item, bucket, depth + 1));
+      } else if (typeof node === "object") {
+        if (node.nama || node.nama_anak || node.namaAnak || node.namaSasaran || node.sasaranId || node.id_sasaran) {
+          bucket.push(node);
+        } else {
+          Object.values(node).forEach(val => collectRecordsRecursively(val, bucket, depth + 1));
+        }
+      }
+    }
+
     function loadAllFromLocalStorage() {
       try {
         const rawSas = localStorage.getItem(STORAGE_KEYS.SASARAN);
         allSasaranRecords = rawSas ? JSON.parse(rawSas).map(r => normalizeSasaranRecord(r)).filter(Boolean) : [];
 
-        // Pindai seluruh key di localStorage (baik daftar sasaran maupun daftar transaksi/pelayanan lama)
         const pendingLocalBatches = [];
         for (let i = 0; i < localStorage.length; i++) {
           const key = localStorage.key(i);
           if (!key || key === STORAGE_KEYS.SASARAN || key === STORAGE_KEYS.USERS || key === STORAGE_KEYS.SESSION || key === STORAGE_KEYS.CONFIG) continue;
           try {
             const parsed = JSON.parse(localStorage.getItem(key));
-            if (Array.isArray(parsed) && parsed.length > 0) {
-              pendingLocalBatches.push(...parsed);
-            } else if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
-              const vals = Object.values(parsed);
-              if (vals.length > 0 && typeof vals[0] === "object") {
-                pendingLocalBatches.push(...vals);
-              }
-            }
+            collectRecordsRecursively(parsed, pendingLocalBatches, 0);
           } catch (e) {}
         }
 
@@ -2101,7 +2076,6 @@
         saveSasaranToLocal();
         return true;
       } catch (err) {
-        console.warn("Mode offline / izin Firestore terbatas, data aman di lokal:", err.message);
         return false;
       }
     }
@@ -2124,22 +2098,44 @@
     async function initRealtimeCloudListeners() {
       if (!isFirebaseReady || !db) return;
 
+      if (auth) {
+        try {
+          await signInAnonymously(auth);
+        } catch (authErr) {}
+      }
+
       const allCloudDocs = [];
+      const foundCollections = [];
+      let permissionErrorMsg = "";
       const allColsToScan = [...new Set([...FIRESTORE_COLLECTIONS_SASARAN, ...FIRESTORE_COLLECTIONS_TRANSAKSI])];
 
       for (const colName of allColsToScan) {
         try {
           const snap = await getDocs(collection(db, colName));
           if (!snap.empty) {
+            foundCollections.push(`${colName} (${snap.size})`);
             snap.forEach(d => allCloudDocs.push({ id: d.id, ...d.data(), synced: true }));
           }
-        } catch (err) {}
+        } catch (err) {
+          if (err.code === "permission-denied" || /permission/i.test(err.message)) {
+            permissionErrorMsg = `Akses Firestore Ditolak (${err.message}). Pastikan Tahap 1 di Firebase Console sudah dilakukan.`;
+          }
+        }
       }
 
       if (allCloudDocs.length > 0 && mergeSasaranRecords(allCloudDocs)) {
         saveSasaranToLocal();
         refreshAllDropdownsAndPreviews();
       }
+
+      if (foundCollections.length > 0) {
+        lastCloudDiagnosticMsg = `Terhubung ke Cloud • Koleksi ditemukan: ${foundCollections.join(", ")}`;
+      } else if (permissionErrorMsg) {
+        lastCloudDiagnosticMsg = permissionErrorMsg;
+      } else {
+        lastCloudDiagnosticMsg = "Terhubung ke project imunisasi-puskesmas, tetapi koleksi standar masih 0 dokumen. Masukkan nama koleksi lama Anda di kotak 'Tarik Riwayat' di bawah jika berbeda.";
+      }
+      updateCloudSyncStatusDisplay();
 
       for (const colBias of FIRESTORE_COLLECTIONS_BIAS) {
         try {
@@ -2195,6 +2191,30 @@
       }
     };
 
+    window.importBackupJsonFile = function(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          const extracted = [];
+          collectRecordsRecursively(parsed, extracted, 0);
+          if (extracted.length === 0) {
+            alert("File JSON tidak berisi data sasaran/imunisasi yang dikenali.");
+            return;
+          }
+          mergeSasaranRecords(extracted);
+          saveSasaranToLocal();
+          refreshAllDropdownsAndPreviews();
+          alert(`Berhasil memulihkan ${extracted.length} catatan dari file backup!`);
+        } catch (err) {
+          alert("File JSON tidak valid: " + err.message);
+        }
+      };
+      reader.readAsText(file);
+    };
+
     window.forceSyncAllLocalToCloud = async function() {
       if (!isFirebaseReady || !db) {
         alert("Koneksi Cloud tidak tersedia. Data tetap tersimpan aman di penyimpanan lokal browser.");
@@ -2218,7 +2238,7 @@
       const unsynced = allSasaranRecords.filter(r => !r.synced).length;
       const totalVaxCount = allSasaranRecords.reduce((acc, r) => acc + Object.keys(r.vaksin || {}).length, 0);
       el.innerHTML = `
-        <div style="display:flex; flex-wrap:wrap; gap:12px; justify-content:space-between; align-items:center;">
+        <div style="display:flex; flex-wrap:wrap; gap:12px; justify-content:space-between; align-items:center; margin-bottom:6px;">
           <div>
             <strong>Total Sasaran:</strong> <span style="color:var(--accent); font-weight:800;">${allSasaranRecords.length}</span> anak/sasaran |
             <strong>Total Dosis Imunisasi Terbaca:</strong> <span style="color:var(--success); font-weight:800;">${totalVaxCount}</span> suntikan |
@@ -2227,9 +2247,12 @@
           <div>
             ${unsynced === 0
               ? '<span style="color:var(--success); font-weight:800;"><i class="fas fa-check-circle"></i> Semua Data Tersinkronisasi</span>'
-              : `<span style="color:var(--warning); font-weight:800;"><i class="fas fa-clock"></i> ${unsynced} data menunggu sinkronisasi Cloud (Tersimpan Lokal)</span>`
+              : `<span style="color:var(--warning); font-weight:800;"><i class="fas fa-clock"></i> ${unsynced} data lokal belum diunggah ke Cloud</span>`
             }
           </div>
+        </div>
+        <div style="font-size:0.78rem; padding:6px 10px; border-radius:6px; background:#F1F5F9; color:#334155;">
+          <i class="fas fa-info-circle"></i> <strong>Diagnostik Server:</strong> ${lastCloudDiagnosticMsg}
         </div>
       `;
     }

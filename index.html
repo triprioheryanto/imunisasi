@@ -1205,11 +1205,11 @@
         </form>
       </div>
 
-      <!-- TABEL PREVIEW DATA KOHORT -->
-      <div class="card" id="cardPreviewKohort">
+     <!-- TABEL PREVIEW DATA KOHORT -->
+      <div class="card" id="cardPreviewKohort" style="display:none;">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
           <div>
-            <h3 style="margin:0;"><i class="fas fa-list-check" style="color:var(--success);"></i> Preview Data (<span id="preview_desa_title">Semua Desa</span>)</h3>
+            <h3 style="margin:0;"><i class="fas fa-list-check" style="color:var(--success);"></i> Preview Data (<span id="preview_desa_title">Belum Ada Desa Dipilih</span>)</h3>
           </div>
           <div style="display:flex; gap:6px; flex-wrap:wrap;">
             <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('tblRecentDewasaSection')" style="padding:5px 10px; font-size:0.78rem;">
@@ -3821,18 +3821,22 @@ window.selectFromLiveSearch = function(encodedJson) {
     // TABEL PREVIEW DATA KOHORT (DILENGKAPI TOMBOL CETAK QR & EDIT)
     // =========================================================================
     async function loadRecentTransactions() {
+      const cardPreview = document.getElementById('cardPreviewKohort');
       const tbodyAnak = document.querySelector('#tblRecentAnak tbody');
       const tbodyDewasa = document.querySelector('#tblRecentDewasa tbody');
       const titleSpan = document.getElementById('preview_desa_title');
+      const selectedDesa = (currentInputDesa || '').trim();
 
-      if (!currentInputDesa) {
-        titleSpan.textContent = "Belum Ada Desa Dipilih";
-        tbodyAnak.innerHTML = '<tr><td colspan="32" style="text-align:center; color:var(--muted);"><i class="fas fa-arrow-up"></i> Pilih desa pada kolom filter di atas untuk melihat preview.</td></tr>';
-        tbodyDewasa.innerHTML = '<tr><td colspan="17" style="text-align:center; color:var(--muted);"><i class="fas fa-arrow-up"></i> Pilih desa pada kolom filter di atas untuk melihat preview.</td></tr>';
+      if (!selectedDesa) {
+        if (cardPreview) cardPreview.style.display = 'none';
+        if (titleSpan) titleSpan.textContent = "Belum Ada Desa Dipilih";
+        if (tbodyAnak) tbodyAnak.innerHTML = '<tr><td colspan="32" style="text-align:center; color:var(--muted);"><i class="fas fa-arrow-up"></i> Pilih desa pada kolom filter di atas untuk melihat preview.</td></tr>';
+        if (tbodyDewasa) tbodyDewasa.innerHTML = '<tr><td colspan="17" style="text-align:center; color:var(--muted);"><i class="fas fa-arrow-up"></i> Pilih desa pada kolom filter di atas untuk melihat preview.</td></tr>';
         return;
       }
 
-      titleSpan.textContent = `Desa ${currentInputDesa}`;
+      if (cardPreview) cardPreview.style.display = 'block';
+      titleSpan.textContent = `Desa ${selectedDesa}`;
       tbodyAnak.innerHTML = '<tr><td colspan="32" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Memuat data...</td></tr>';
       tbodyDewasa.innerHTML = '<tr><td colspan="17" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Memuat data...</td></tr>';
 

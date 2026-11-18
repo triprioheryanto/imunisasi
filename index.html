@@ -2071,6 +2071,29 @@
         const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
         window.scrollTo({ top: y, behavior: 'smooth' });
       }
+      function setToggleButtonState(btnEl, isVisible, labelText) {
+      if (!btnEl) return;
+      if (isVisible) {
+        btnEl.classList.add('btn-toggle-active');
+        btnEl.innerHTML = `<i class="fas fa-eye-slash"></i> Sembunyikan ${labelText}`;
+      } else {
+        btnEl.classList.remove('btn-toggle-active');
+        btnEl.innerHTML = `<i class="fas fa-eye"></i> Tampilkan ${labelText}`;
+      }
+    }
+
+    window.toggleTableSection = function(targetId, btnEl, labelText) {
+      const el = document.getElementById(targetId);
+      if (!el) return;
+      const isCurrentlyHidden = window.getComputedStyle(el).display === 'none';
+      if (isCurrentlyHidden) {
+        el.style.display = targetId === 'cardAdminExportImport' ? 'grid' : 'block';
+        setToggleButtonState(btnEl, true, labelText);
+        setTimeout(() => smoothScrollToId(targetId), 70);
+      } else {
+        el.style.display = 'none';
+        setToggleButtonState(btnEl, false, labelText);
+      }
     };
 
     window.openNewSasaranFormSmooth = function() {
@@ -3624,15 +3647,26 @@ window.goToEdit = function(encodedJson) {
         currentInputDesa = e.target.value;
         document.getElementById('notFoundAddContainer').style.display = 'none';
         populateAnakByDesa();
-        loadRecentTransactions();
-      });
-      bindEvent('cert_filter_desa', 'change', (e) => {
-        populateCertSasaranByDesa(e.target.value);
-      });
-      bindEvent('reg_desa', 'change', (e) => {
-        currentInputDesa = e.target.value;
-        loadRecentTransactions();
-      });
+        async function loadRecentTransactions() {
+      const tbodyAnak = document.querySelector('#tblRecentAnak tbody');
+      const tbodyDewasa = document.querySelector('#tblRecentDewasa tbody');
+      const titleSpan = document.getElementById('preview_desa_title');
+      const previewCard = document.getElementById('cardPreviewKohort');
+      const togglePreviewBtn = document.getElementById('btnTogglePreviewKohort');
+
+      renderInputInteractiveDashboard();
+
+      if (!currentInputDesa) {
+        if (previewCard) previewCard.style.display = 'none';
+        setToggleButtonState(togglePreviewBtn, false, 'Tabel Preview');
+        titleSpan.textContent = "Belum Ada Desa Dipilih";
+        tbodyAnak.innerHTML = '<tr><td colspan="32" style="text-align:center; color:var(--muted);"><i class="fas fa-arrow-up"></i> Pilih desa pada kolom filter di atas untuk melihat preview.</td></tr>';
+        tbodyDewasa.innerHTML = '<tr><td colspan="17" style="text-align:center; color:var(--muted);"><i class="fas fa-arrow-up"></i> Pilih desa pada kolom filter di atas untuk melihat preview.</td></tr>';
+        return;
+      }
+
+      if (previewCard) previewCard.style.display = 'block';
+      setToggleButtonState(togglePreviewBtn, true, 'Tabel Preview');
       bindEvent('select_anak_registered', 'change', fillFormWithSelectedAnak);
 
       setupLiveSearchAndDuplicateDetection();

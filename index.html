@@ -3331,10 +3331,9 @@ function initUserAuthCheck() {
           const passwordInput = (document.getElementById('login_password').value || '').trim();
           const errDiv = document.getElementById('loginError');
 
-          if (!usernameInput) {
-            errDiv.textContent = "❌ Nama petugas / username wajib diisi!";
+         } else {
+            errDiv.textContent = "❌ Username tidak terdaftar atau password salah!";
             errDiv.style.display = 'block';
-            return;
           }
 
           const matchedUser = (SYSTEM_USERS_CONFIG.users || []).find(
@@ -3480,9 +3479,9 @@ function initUserAuthCheck() {
     // INISIALISASI HALAMAN (DOMContentLoaded)
     // =========================================================================
     document.addEventListener('DOMContentLoaded', async () => {
+      await loadSystemUsersConfig();
       initUserAuthCheck();
-      const isQrMode = await checkIncomingQrUrlAndOpenFeed();
-
+      
       if (!isQrMode && !window.__IS_PUBLIC_QR_MODE__ && !activePetugasName) {
         document.getElementById('loginModal').style.display = 'flex';
       }

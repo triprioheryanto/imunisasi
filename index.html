@@ -33,6 +33,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 
   <style>
     :root {
@@ -154,6 +155,63 @@
     .input-with-btn input { flex: 1; }
     .btn-ocr-cam { background: #F1F5F9; border: 1.5px solid var(--border-color); color: var(--accent); border-radius: 9px; padding: 0 12px; height: 42px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all 0.2s ease; flex-shrink: 0; }
     .btn-ocr-cam:hover { background: #E2E8F0; color: var(--primary); border-color: var(--primary); }
+    /* TOMBOL SCAN QR CATCHY DI SEBELAH TOMBOL OCR */
+    .btn-qr-scan-catchy {
+      background: linear-gradient(135deg, #06B6D4 0%, #0D9488 100%);
+      border: 1.5px solid #0891B2;
+      color: #FFFFFF;
+      border-radius: 11px;
+      padding: 0 16px;
+      height: 46px;
+      min-width: 118px;
+      font-family: inherit;
+      font-weight: 800;
+      font-size: 0.86rem;
+      letter-spacing: 0.2px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(6, 182, 212, 0.30);
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+    .btn-qr-scan-catchy i { font-size: 1.15rem; }
+    .btn-qr-scan-catchy:hover {
+      background: linear-gradient(135deg, #0891B2 0%, #0F766E 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(13, 148, 136, 0.38);
+    }
+    .btn-qr-scan-catchy:active { transform: scale(0.97); }
+    @media (max-width: 480px) {
+      .btn-qr-scan-catchy { padding: 0 12px; min-width: 102px; font-size: 0.82rem; }
+    }
+
+    /* VIEWFINDER SCANNER QR */
+    .qr-scan-box {
+      position: relative;
+      width: 250px;
+      height: 250px;
+      border: 3px solid #06B6D4;
+      border-radius: 18px;
+      box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.58), 0 0 24px rgba(6, 182, 212, 0.5);
+      z-index: 10;
+      overflow: hidden;
+    }
+    .qr-scan-laser {
+      position: absolute;
+      left: 8px;
+      right: 8px;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #22D3EE, #FFFFFF, #22D3EE, transparent);
+      box-shadow: 0 0 10px #22D3EE;
+      animation: qrLaserSweep 2s ease-in-out infinite;
+    }
+    @keyframes qrLaserSweep {
+      0%, 100% { top: 12px; }
+      50% { top: 232px; }
+    }
 
     input[type="text"], input[type="password"], input[type="number"], input[type="date"], input[type="month"], select, textarea, input[type="file"], input[type="tel"], input[type="url"] {
       width: 100%; padding: 10px 12px; border-radius: 9px; border: 1.5px solid var(--border-color);
@@ -582,6 +640,39 @@
 
     <canvas id="cropCanvas" style="display:none;"></canvas>
   </div>
+  
+  <!-- MODAL QR CODE SCANNER REAL-TIME -->
+  <div id="qrScannerModal" class="camera-scanner-modal" style="display:none;">
+    <div class="camera-container">
+      <video id="qrScannerVideo" class="camera-video" autoplay playsinline></video>
+      <div class="scanner-overlay">
+        <div id="qrScannerStatusText" class="scanner-hint-text" style="top:14%; border:1px solid rgba(6,182,212,0.5);">
+          <i class="fas fa-qrcode" style="color:#22D3EE;"></i> Arahkan Kamera ke Kartu QR Imunisasi
+        </div>
+        <div class="qr-scan-box">
+          <div class="qr-scan-laser"></div>
+        </div>
+        <div style="margin-top:16px; color:#E2E8F0; font-size:0.78rem; background:rgba(0,0,0,0.65); padding:6px 14px; border-radius:20px; z-index:12;">
+          Otomatis terbaca tanpa perlu menekan tombol potret
+        </div>
+      </div>
+    </div>
+
+    <div class="camera-controls">
+      <button type="button" class="btn btn-ghost" onclick="closeQrScanner()" style="color:#FFF; border-color:#FFF; padding:10px 16px;">
+        <i class="fas fa-arrow-left"></i> Batal
+      </button>
+      <label class="btn" style="background:linear-gradient(135deg,#06B6D4,#0D9488); color:#FFF; padding:11px 16px; cursor:pointer; margin:0;">
+        <i class="fas fa-image"></i> Dari Galeri
+        <input type="file" id="qrImageFileInput" accept="image/*" style="display:none;" onchange="handleQrImageFileUpload(event)">
+      </label>
+      <button type="button" class="btn btn-ghost" onclick="toggleQrCameraFacing()" style="color:#FFF; border-color:#FFF; padding:10px 16px;">
+        <i class="fas fa-sync"></i> Putar
+      </button>
+    </div>
+
+    <canvas id="qrScanCanvas" style="display:none;"></canvas>
+  </div>
 
   <!-- MODAL LOGIN PETUGAS -->
   <div id="loginModal" class="modal-overlay" style="display:none; z-index:4000;">
@@ -900,10 +991,16 @@
         <div class="grid">
           <div class="form-group full-width" style="margin-bottom: 8px;">
             <label><i class="fas fa-search-location" style="color:var(--primary);"></i> Cari Nama Sasaran (Ketik Minimal 2 Huruf)</label>
+           <div class="form-group full-width" style="margin-bottom: 8px;">
+            <label><i class="fas fa-search-location" style="color:var(--primary);"></i> Cari Nama Sasaran (Ketik Minimal 2 Huruf) atau Scan Kartu QR</label>
             <div class="input-with-btn">
               <input type="text" id="input_search_sasaran" placeholder="Ketik nama bayi / anak / catin / bumil..." autocomplete="off">
-              <button type="button" class="btn-ocr-cam" onclick="triggerCameraOCR('input_search_sasaran', 'single')" title="Scan Nama via Kamera 📷">
+              <button type="button" class="btn-ocr-cam" onclick="triggerCameraOCR('input_search_sasaran', 'single')" title="Scan Nama via Kamera OCR 📷">
                 <i class="fas fa-camera"></i>
+              </button>
+              <button type="button" class="btn-qr-scan-catchy" onclick="openQrScannerModal()" title="Scan Kartu QR Imunisasi Sasaran">
+                <i class="fas fa-qrcode"></i>
+                <span>Scan QR</span>
               </button>
             </div>
             <div id="liveSearchResults" class="search-results-dropdown"></div>
@@ -2681,6 +2778,242 @@ window.goToEdit = function(encodedJson) {
       }
       document.getElementById('ocrModal').style.display = 'none';
     };
+  // =========================================================================
+    // SCANNER QR CODE REAL-TIME DI TAB INPUT KOHORT
+    // =========================================================================
+    let qrCameraStream = null;
+    let qrFacingMode = "environment";
+    let qrScanAnimFrame = null;
+    let isQrScanningActive = false;
+
+    window.openQrScannerModal = async function() {
+      const modal = document.getElementById('qrScannerModal');
+      const statusEl = document.getElementById('qrScannerStatusText');
+      if (statusEl) {
+        statusEl.innerHTML = '<i class="fas fa-qrcode" style="color:#22D3EE;"></i> Arahkan Kamera ke Kartu QR Imunisasi';
+      }
+      modal.style.display = 'flex';
+      await startQrCameraStream();
+    };
+
+    async function startQrCameraStream() {
+      try {
+        if (qrCameraStream) {
+          qrCameraStream.getTracks().forEach(track => track.stop());
+          qrCameraStream = null;
+        }
+        const constraints = {
+          video: {
+            facingMode: { ideal: qrFacingMode },
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          }
+        };
+        try {
+          qrCameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+        } catch (e) {
+          qrCameraStream = await navigator.mediaDevices.getUserMedia({ video: true });
+        }
+
+        const videoEl = document.getElementById('qrScannerVideo');
+        videoEl.srcObject = qrCameraStream;
+        await videoEl.play();
+        isQrScanningActive = true;
+        qrScanAnimFrame = requestAnimationFrame(scanQrVideoFrameLoop);
+      } catch (err) {
+        alert("Gagal mengakses kamera untuk Scan QR: " + err.message);
+        closeQrScanner();
+      }
+    }
+
+    function scanQrVideoFrameLoop() {
+      if (!isQrScanningActive) return;
+      const videoEl = document.getElementById('qrScannerVideo');
+      const canvasEl = document.getElementById('qrScanCanvas');
+
+      if (videoEl && canvasEl && videoEl.readyState === videoEl.HAVE_ENOUGH_DATA && typeof jsQR === 'function') {
+        const ctx = canvasEl.getContext('2d', { willReadFrequently: true });
+        const maxWidth = 640;
+        const scale = Math.min(1, maxWidth / (videoEl.videoWidth || maxWidth));
+        canvasEl.width = Math.floor(videoEl.videoWidth * scale);
+        canvasEl.height = Math.floor(videoEl.videoHeight * scale);
+
+        ctx.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
+        const imgData = ctx.getImageData(0, 0, canvasEl.width, canvasEl.height);
+        const qrResult = jsQR(imgData.data, imgData.width, imgData.height, {
+          inversionAttempts: "dontInvert"
+        });
+
+        if (qrResult && qrResult.data) {
+          if (navigator.vibrate) {
+            try { navigator.vibrate(100); } catch (e) {}
+          }
+          const scannedText = qrResult.data.trim();
+          closeQrScanner();
+          processScannedQrPayload(scannedText);
+          return;
+        }
+      }
+      qrScanAnimFrame = requestAnimationFrame(scanQrVideoFrameLoop);
+    }
+
+    window.toggleQrCameraFacing = async function() {
+      qrFacingMode = qrFacingMode === "environment" ? "user" : "environment";
+      await startQrCameraStream();
+    };
+
+    window.closeQrScanner = function() {
+      isQrScanningActive = false;
+      if (qrScanAnimFrame) {
+        cancelAnimationFrame(qrScanAnimFrame);
+        qrScanAnimFrame = null;
+      }
+      if (qrCameraStream) {
+        qrCameraStream.getTracks().forEach(track => track.stop());
+        qrCameraStream = null;
+      }
+      const modal = document.getElementById('qrScannerModal');
+      if (modal) modal.style.display = 'none';
+    };
+
+    window.handleQrImageFileUpload = function(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvasEl = document.getElementById('qrScanCanvas');
+          const ctx = canvasEl.getContext('2d');
+          canvasEl.width = img.width;
+          canvasEl.height = img.height;
+          ctx.drawImage(img, 0, 0);
+          const imgData = ctx.getImageData(0, 0, canvasEl.width, canvasEl.height);
+          const qrResult = typeof jsQR === 'function'
+            ? jsQR(imgData.data, imgData.width, imgData.height)
+            : null;
+
+          event.target.value = '';
+          if (qrResult && qrResult.data) {
+            closeQrScanner();
+            processScannedQrPayload(qrResult.data.trim());
+          } else {
+            alert("❌ QR Code tidak terdeteksi pada gambar tersebut. Pastikan gambar jelas dan tidak terpotong.");
+          }
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    };
+
+    async function processScannedQrPayload(rawQrText) {
+      try {
+        let childIdParam = "";
+        let fallbackObj = null;
+
+        // 1. Parse format URL dari Kartu QR Puskesmas Melata
+        try {
+          const parsedUrl = new URL(rawQrText);
+          const qParams = parsedUrl.searchParams;
+          const hashStr = parsedUrl.hash ? parsedUrl.hash.substring(1) : "";
+          const hParams = new URLSearchParams(hashStr);
+
+          childIdParam = qParams.get('id') || hParams.get('id') || "";
+          const compactParam = hParams.get('kia') || hParams.get('p') || qParams.get('p');
+          const legacyQrParam = qParams.get('qr') || hParams.get('qr');
+          const hashNama = hParams.get('n') || qParams.get('n');
+
+          if (compactParam) {
+            fallbackObj = decodeCompactQrPayload(compactParam);
+          } else if (legacyQrParam) {
+            const dec = decodeLegacyQrPayload(legacyQrParam);
+            fallbackObj = {
+              id: dec.i || childIdParam,
+              nama_anak: dec.n || '',
+              tgl_lahir: dec.t || '',
+              jk: dec.g || 'L',
+              nama_ibu: dec.o || '',
+              desa: dec.d || ''
+            };
+          } else if (hashNama) {
+            fallbackObj = {
+              id: childIdParam,
+              nama_anak: hashNama,
+              tgl_lahir: hParams.get('t') || qParams.get('t') || '',
+              jk: hParams.get('g') || qParams.get('g') || 'L',
+              nama_ibu: hParams.get('o') || qParams.get('o') || '',
+              desa: hParams.get('d') || qParams.get('d') || ''
+            };
+          }
+        } catch (urlErr) {
+          // Jika QR berisi ID dokumen mentah atau format pipa ringkas
+          if (rawQrText.includes('|')) {
+            fallbackObj = decodeCompactQrPayload(rawQrText);
+          } else {
+            childIdParam = rawQrText;
+          }
+        }
+
+        // 2. Cari data lengkap dari Cache Lokal & Firestore (agar riwayat vaksin terbaru ikut tercentang)
+        let matchedRecord = null;
+        const normTargetId = childIdParam.toLowerCase();
+
+        if (cachedGlobalKohortData.length > 0) {
+          matchedRecord = cachedGlobalKohortData.find(item => {
+            const genId = `${item.desa}_${item.nama_anak}_${item.tgl_lahir}`.replace(/[\s\/]/g, '_').toLowerCase();
+            return (item.id && item.id.toLowerCase() === normTargetId) || genId === normTargetId;
+          });
+        }
+
+        if (navigator.onLine && childIdParam) {
+          try {
+            const snapDoc = await getDoc(doc(db, COL_KOHORT, childIdParam));
+            if (snapDoc.exists()) {
+              matchedRecord = { id: snapDoc.id, ...snapDoc.data() };
+            } else if (!matchedRecord) {
+              const allSnap = await getDocs(collection(db, COL_KOHORT));
+              allSnap.forEach(d => {
+                const dt = d.data();
+                const genId = `${dt.desa}_${dt.nama_anak}_${dt.tgl_lahir}`.replace(/[\s\/]/g, '_').toLowerCase();
+                if (d.id.toLowerCase() === normTargetId || genId === normTargetId) {
+                  matchedRecord = { id: d.id, ...dt };
+                }
+              });
+            }
+          } catch (netErr) {
+            console.warn("Mode offline/lambat saat ambil data QR:", netErr.message);
+          }
+        }
+
+        const finalData = matchedRecord || fallbackObj;
+        if (!finalData || !finalData.nama_anak) {
+          alert("⚠️ QR Code terbaca, tetapi tidak cocok dengan data Kartu Imunisasi Puskesmas Melata.");
+          return;
+        }
+
+        // 3. Isi kolom pencarian, buka Form Register Imunisasi, dan tandai hasil scan
+        const searchInput = document.getElementById('input_search_sasaran');
+        if (searchInput) searchInput.value = finalData.nama_anak;
+        const notFoundBox = document.getElementById('notFoundAddContainer');
+        if (notFoundBox) notFoundBox.style.display = 'none';
+
+        editDataSasaran(encodeURIComponent(JSON.stringify(finalData)));
+
+        const cardForm = document.getElementById('cardFormUtama');
+        if (cardForm) {
+          let scanBanner = document.getElementById('quickQrActiveFormBanner');
+          if (!scanBanner) {
+            scanBanner = document.createElement('div');
+            scanBanner.id = 'quickQrActiveFormBanner';
+            scanBanner.style.cssText = 'background:linear-gradient(135deg,#ECFEFF,#CCFBF1); border:1.5px solid #06B6D4; color:#0F766E; padding:10px 14px; border-radius:10px; font-size:0.82rem; font-weight:700; margin-bottom:14px;';
+            cardForm.insertBefore(scanBanner, cardForm.firstChild);
+          }
+          scanBanner.innerHTML = `<i class="fas fa-qrcode"></i> Berhasil Scan Kartu QR: <strong>${(finalData.nama_anak || '-').toUpperCase()}</strong> (Desa ${finalData.desa || '-'}). Riwayat vaksin sudah tercentang—silakan centang imunisasi baru hari ini lalu klik <strong>Simpan Ke Kohort</strong>.`;
+        }
+      } catch (err) {
+        alert("Terjadi kesalahan saat memproses QR Code: " + err.message);
+      }
+    }
 
     window.resetFormRegisterIndividu = function() {
       const form = document.getElementById('formRegisterIndividu');

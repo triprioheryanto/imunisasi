@@ -547,6 +547,154 @@
       .app-nav-tabs .tab { padding: 8px 10px; font-size: 0.78rem; }
       .certificate-page-a4-landscape { transform: scale(0.38); transform-origin: top center; margin-bottom: -130mm; }
     }
+    /* STATUS AKTIF TOMBOL TOGGLE TABEL */
+    .btn-toggle-active {
+      background: #EFF6FF !important;
+      border-color: var(--info) !important;
+      color: var(--info) !important;
+      font-weight: 800 !important;
+    }
+
+    /* PANEL STATISTIK INTERAKTIF TAB INPUT */
+    .interactive-stats-wrapper {
+      background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%);
+      border: 1.5px solid #CBD5E1;
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow-card);
+      position: relative;
+      overflow: hidden;
+    }
+    .interactive-stats-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .scope-pill {
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
+      color: #FFF;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .stat-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    .stat-kpi-card {
+      background: #FFFFFF;
+      border: 1.5px solid var(--border-color);
+      border-radius: 12px;
+      padding: 14px;
+      cursor: pointer;
+      transition: all 0.22s ease;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .stat-kpi-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(0, 43, 91, 0.09);
+      border-color: var(--primary);
+    }
+    .stat-kpi-card.active-kpi {
+      border-color: var(--primary);
+      background: #FFFDFB;
+      box-shadow: 0 0 0 3px rgba(255, 87, 34, 0.14);
+    }
+    .kpi-top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .kpi-label {
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--muted);
+      line-height: 1.3;
+    }
+    .kpi-value {
+      font-size: 1.55rem;
+      font-weight: 900;
+      color: var(--accent);
+      margin: 4px 0 2px 0;
+      line-height: 1.1;
+    }
+    .kpi-sub {
+      font-size: 0.72rem;
+      color: #475569;
+      font-weight: 600;
+    }
+    .kpi-progress-track {
+      width: 100%;
+      height: 7px;
+      background: #E2E8F0;
+      border-radius: 99px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+    .kpi-progress-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .stat-detail-drawer {
+      margin-top: 14px;
+      background: #F8FAFC;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 12px;
+      padding: 14px 16px;
+      animation: fadeIn 0.25s ease-out;
+    }
+    .mini-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+      font-size: 0.78rem;
+    }
+    .mini-bar-label {
+      width: 135px;
+      font-weight: 700;
+      color: #334155;
+      flex-shrink: 0;
+    }
+    .mini-bar-track {
+      flex: 1;
+      height: 10px;
+      background: #E2E8F0;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .mini-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 0.45s ease;
+    }
+    .mini-bar-val {
+      width: 72px;
+      text-align: right;
+      font-weight: 800;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+    @media (max-width: 900px) {
+      .stat-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 480px) {
+      .stat-kpi-grid { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -976,10 +1124,109 @@
         <div><strong>INFORMASI SISTEM:</strong> Data tersimpan lokal saat offline dan otomatis sinkron ke Cloud saat terhubung internet.</div>
       </div>
 
+      <!-- PANEL INFORMASI INTERAKTIF (TEPAT SEBELUM FUNGSI PENCARIAN) -->
+      <div class="interactive-stats-wrapper" id="inputInteractiveDashboard">
+        <div class="interactive-stats-header">
+          <div>
+            <h2 style="margin:0; font-size:1.08rem;"><i class="fas fa-chart-pie" style="color:var(--primary);"></i> Ringkasan &amp; Capaian Imunisasi</h2>
+            <span style="font-size:0.75rem; color:var(--muted);">Klik salah satu kartu di bawah untuk melihat grafik rincian indikator</span>
+          </div>
+          <span class="scope-pill" id="statsScopeBadge"><i class="fas fa-globe-asia"></i> Semua Desa (Puskesmas Melata)</span>
+        </div>
+
+        <div class="stat-kpi-grid">
+          <!-- KARTU 1: TOTAL SASARAN TERDAFTAR -->
+          <div class="stat-kpi-card" id="kpiCard_total" onclick="selectStatDetailTab('total')">
+            <div class="kpi-top-row">
+              <div>
+                <div class="kpi-label">Total Sasaran Terdaftar</div>
+                <div class="kpi-value" id="stat_total_sasaran">0</div>
+              </div>
+              <div style="width:38px; height:38px; border-radius:10px; background:#EFF6FF; color:#2563EB; display:flex; align-items:center; justify-content:center; font-size:1.1rem;">
+                <i class="fas fa-users"></i>
+              </div>
+            </div>
+            <div class="kpi-sub" id="stat_total_sub">0 Bayi/Anak &bull; 0 Catin &bull; 0 Bumil</div>
+            <div class="kpi-progress-track">
+              <div class="kpi-progress-fill" id="bar_total_sasaran" style="width:100%; background:linear-gradient(90deg, #2563EB, #38BDF8);"></div>
+            </div>
+          </div>
+
+          <!-- KARTU 2: CAPAIAN IDL (DASAR LENGKAP) -->
+          <div class="stat-kpi-card" id="kpiCard_idl" onclick="selectStatDetailTab('idl')">
+            <div class="kpi-top-row">
+              <div>
+                <div class="kpi-label">Capaian IDL (Dasar Lengkap)</div>
+                <div class="kpi-value" style="color:#059669;" id="stat_idl_count">0</div>
+              </div>
+              <svg width="42" height="42" viewBox="0 0 36 36">
+                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#E2E8F0" stroke-width="3.6"/>
+                <path id="ring_idl_path" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#10B981" stroke-width="3.6" stroke-linecap="round"/>
+                <text x="18" y="20.5" text-anchor="middle" font-size="8.5" font-weight="800" fill="#065F46" id="ring_idl_text">0%</text>
+              </svg>
+            </div>
+            <div class="kpi-sub" id="stat_idl_sub">0% dari total sasaran bayi/anak</div>
+            <div class="kpi-progress-track">
+              <div class="kpi-progress-fill" id="bar_idl_fill" style="width:0%; background:linear-gradient(90deg, #10B981, #34D399);"></div>
+            </div>
+          </div>
+
+          <!-- KARTU 3: CAPAIAN IBL (BADUTA LENGKAP) -->
+          <div class="stat-kpi-card" id="kpiCard_ibl" onclick="selectStatDetailTab('ibl')">
+            <div class="kpi-top-row">
+              <div>
+                <div class="kpi-label">Capaian IBL (Baduta Lengkap)</div>
+                <div class="kpi-value" style="color:#D97706;" id="stat_ibl_count">0</div>
+              </div>
+              <svg width="42" height="42" viewBox="0 0 36 36">
+                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#E2E8F0" stroke-width="3.6"/>
+                <path id="ring_ibl_path" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#F59E0B" stroke-width="3.6" stroke-linecap="round"/>
+                <text x="18" y="20.5" text-anchor="middle" font-size="8.5" font-weight="800" fill="#92400E" id="ring_ibl_text">0%</text>
+              </svg>
+            </div>
+            <div class="kpi-sub" id="stat_ibl_sub">DPT-HB-Hib 4 &amp; MR 2 Lengkap</div>
+            <div class="kpi-progress-track">
+              <div class="kpi-progress-fill" id="bar_ibl_fill" style="width:0%; background:linear-gradient(90deg, #F59E0B, #FBBF24);"></div>
+            </div>
+          </div>
+
+          <!-- KARTU 4: PELAYANAN BULAN INI -->
+          <div class="stat-kpi-card" id="kpiCard_bulan" onclick="selectStatDetailTab('bulan')">
+            <div class="kpi-top-row">
+              <div>
+                <div class="kpi-label">Pelayanan Bulan Ini</div>
+                <div class="kpi-value" style="color:var(--primary);" id="stat_bulan_dosis">0</div>
+              </div>
+              <div style="width:38px; height:38px; border-radius:10px; background:#FFF7ED; color:var(--primary); display:flex; align-items:center; justify-content:center; font-size:1.1rem;">
+                <i class="fas fa-syringe"></i>
+              </div>
+            </div>
+            <div class="kpi-sub" id="stat_bulan_sub">0 dosis pada 0 sasaran bulan ini</div>
+            <div class="kpi-progress-track">
+              <div class="kpi-progress-fill" id="bar_bulan_fill" style="width:0%; background:linear-gradient(90deg, var(--primary), #FB923C);"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LACI GRAFIK RINCIAN INTERAKTIF (MUNCUL SAAT KARTU DIKLIK) -->
+        <div id="statDetailDrawer" class="stat-detail-drawer" style="display:none;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <strong id="statDetailTitle" style="color:var(--accent); font-size:0.86rem;">Detail Indikator</strong>
+            <button type="button" class="btn btn-ghost" onclick="closeStatDetailDrawer()" style="padding:3px 9px; font-size:0.74rem;">
+              <i class="fas fa-times"></i> Tutup Grafik
+            </button>
+          </div>
+          <div id="statDetailBody"></div>
+        </div>
+      </div>
+
       <!-- MENU AWAL: HANYA CARI / UPDATE SASARAN REGISTERED -->
       <div class="card" id="cardSearchSasaran" style="background: linear-gradient(135deg, #F0F7FF 0%, #E0F2FE 100%); border: 1.5px solid #7DD3FC;">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:6px;">
           <h2 style="margin:0;"><i class="fas fa-search" style="color:var(--info)"></i> Cari / Update Sasaran Registered</h2>
+          <button type="button" class="btn btn-ghost" id="btnTogglePreviewKohort" onclick="toggleTableSection('cardPreviewKohort', this, 'Tabel Preview')" style="padding:6px 12px; font-size:0.78rem; background:#FFF;">
+            <i class="fas fa-eye" style="color:var(--primary);"></i> Tampilkan Tabel Preview
+          </button>
         </div>
         <p class="lead" style="font-size:0.83rem; margin-bottom:12px;">
           Ketik nama sasaran atau pilih desa terlebih dahulu untuk mengecek riwayat imunisasi. Jika sasaran belum terdaftar, tombol <strong>Tambah Sasaran</strong> akan muncul otomatis.
@@ -1205,15 +1452,15 @@
         </form>
       </div>
 
-      <!-- TABEL PREVIEW DATA KOHORT -->
-      <div class="card" id="cardPreviewKohort">
+      <!-- TABEL PREVIEW DATA KOHORT (TERSEMBUNYI JIKA TIDAK ADA DESA DIPILIH) -->
+      <div class="card" id="cardPreviewKohort" style="display:none;">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
           <div>
             <h3 style="margin:0;"><i class="fas fa-list-check" style="color:var(--success);"></i> Preview Data (<span id="preview_desa_title">Semua Desa</span>)</h3>
           </div>
           <div style="display:flex; gap:6px; flex-wrap:wrap;">
-            <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('tblRecentDewasaSection')" style="padding:5px 10px; font-size:0.78rem;">
-              <i class="fas fa-arrow-down"></i> Tabel Catin/Bumil
+            <button type="button" class="btn btn-ghost" id="btnToggleDewasaTable" onclick="toggleTableSection('dewasaPreviewWrapper', this, 'Tabel Catin/Bumil')" style="padding:5px 10px; font-size:0.78rem;">
+              <i class="fas fa-eye"></i> Tampilkan Tabel Catin/Bumil
             </button>
             <button type="button" class="btn btn-ghost" onclick="loadRecentTransactions()" style="padding:5px 10px; font-size:0.78rem;">
               <i class="fas fa-sync-alt"></i> Refresh
@@ -1239,19 +1486,21 @@
           </table>
         </div>
 
-        <h4 id="tblRecentDewasaSection" style="color:#065F46; margin-top:20px; font-size:0.92rem;"><i class="fas fa-female"></i> Matriks Td Catin & Ibu Hamil</h4>
-        <div class="table-container">
-          <table class="kohort-table" id="tblRecentDewasa">
-            <thead>
-              <tr>
-                <th class="sticky-col-0" rowspan="2">No</th><th class="sticky-col-1" rowspan="2">Nama Sasaran</th><th class="sticky-col-2" rowspan="2">Tgl Lahir</th>
-                <th rowspan="2">L/P</th><th rowspan="2">Suami/Pasangan</th><th rowspan="2">WhatsApp</th><th rowspan="2">Desa</th><th rowspan="2">Alamat</th>
-                <th colspan="2">TT Catin</th><th colspan="5">TT Ibu Hamil</th><th rowspan="2">Petugas</th><th rowspan="2">Aksi</th>
-              </tr>
-              <tr><th>TT1</th><th>TT2</th><th>TT1</th><th>TT2</th><th>TT3</th><th>TT4</th><th>TT5</th></tr>
-            </thead>
-            <tbody><tr><td colspan="17" style="text-align:center;"><i class="fas fa-info-circle"></i> Pilih desa untuk melihat preview data.</td></tr></tbody>
-          </table>
+        <div id="dewasaPreviewWrapper" style="display:none;">
+          <h4 id="tblRecentDewasaSection" style="color:#065F46; margin-top:20px; font-size:0.92rem;"><i class="fas fa-female"></i> Matriks Td Catin & Ibu Hamil</h4>
+          <div class="table-container">
+            <table class="kohort-table" id="tblRecentDewasa">
+              <thead>
+                <tr>
+                  <th class="sticky-col-0" rowspan="2">No</th><th class="sticky-col-1" rowspan="2">Nama Sasaran</th><th class="sticky-col-2" rowspan="2">Tgl Lahir</th>
+                  <th rowspan="2">L/P</th><th rowspan="2">Suami/Pasangan</th><th rowspan="2">WhatsApp</th><th rowspan="2">Desa</th><th rowspan="2">Alamat</th>
+                  <th colspan="2">TT Catin</th><th colspan="5">TT Ibu Hamil</th><th rowspan="2">Petugas</th><th rowspan="2">Aksi</th>
+                </tr>
+                <tr><th>TT1</th><th>TT2</th><th>TT1</th><th>TT2</th><th>TT3</th><th>TT4</th><th>TT5</th></tr>
+              </thead>
+              <tbody><tr><td colspan="17" style="text-align:center;"><i class="fas fa-info-circle"></i> Pilih desa untuk melihat preview data.</td></tr></tbody>
+            </table>
+          </div>
         </div>
       </div>
     </section>

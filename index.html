@@ -1205,11 +1205,11 @@
         </form>
       </div>
 
-     <!-- TABEL PREVIEW DATA KOHORT -->
-      <div class="card" id="cardPreviewKohort" style="display:none;">
+      <!-- TABEL PREVIEW DATA KOHORT -->
+      <div class="card" id="cardPreviewKohort">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
           <div>
-            <h3 style="margin:0;"><i class="fas fa-list-check" style="color:var(--success);"></i> Preview Data (<span id="preview_desa_title">Belum Ada Desa Dipilih</span>)</h3>
+            <h3 style="margin:0;"><i class="fas fa-list-check" style="color:var(--success);"></i> Preview Data (<span id="preview_desa_title">Semua Desa</span>)</h3>
           </div>
           <div style="display:flex; gap:6px; flex-wrap:wrap;">
             <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('tblRecentDewasaSection')" style="padding:5px 10px; font-size:0.78rem;">
@@ -1399,90 +1399,8 @@
             <p class="lead" style="margin:4px 0 0 0;">Pusat kendali pengguna, cetak sertifikat &amp; kartu QR, ekspor-impor terfilter, target sasaran, serta logika urutan prioritas pop-up QR.</p>
           </div>
           <div style="display:flex; gap:6px; flex-wrap:wrap;">
-            <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardAdminUsers')" style="padding:5px 10px; font-size:0.75rem; background:#FFF;"><i class="fas fa-users-cog"></i> Manajemen Pengguna</button>
             <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardAdminExportImport')" style="padding:5px 10px; font-size:0.75rem; background:#FFF;"><i class="fas fa-arrow-down"></i> Ekspor/Impor</button>
             <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardAdminSettings')" style="padding:5px 10px; font-size:0.75rem; background:#FFF;"><i class="fas fa-arrow-down"></i> Pengaturan Prioritas QR</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- MANAJEMEN PENGGUNA (KHUSUS ADMIN) -->
-      <div class="card" id="cardAdminUsers" style="background:linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%); border:1.5px solid #38BDF8;">
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-          <div>
-            <h3 style="margin:0; color:var(--accent); font-size:1.02rem;"><i class="fas fa-users-cog" style="color:var(--info);"></i> Manajemen Pengguna (Petugas, Kader &amp; Admin)</h3>
-            <span style="font-size:0.76rem; color:#0369A1;">Kelola username, password, hak akses (Role), dan status aktif akun penginput.</span>
-          </div>
-          <button type="button" class="btn btn-info" onclick="togglePanelManajemenUser()" style="padding:6px 12px; font-size:0.8rem;">
-            <i class="fas fa-user-lock"></i> Buka / Tutup Kelola Pengguna
-          </button>
-        </div>
-
-        <div id="panelManajemenUser" style="display:none; margin-top:14px; border-top:1px dashed #7DD3FC; padding-top:14px;">
-          <form id="formManajemenUser">
-            <input type="hidden" id="usr_edit_index" value="-1">
-            <div class="grid">
-              <div class="form-group">
-                <label>Username Login <span class="req">*</span></label>
-                <input type="text" id="usr_username" placeholder="Contoh: bidan_siti (tanpa spasi)" required autocomplete="off">
-              </div>
-              <div class="form-group">
-                <label>Nama Lengkap / Tampilan Audit <span class="req">*</span></label>
-                <input type="text" id="usr_nama_lengkap" placeholder="Contoh: Bd. Siti Aminah, A.Md.Keb" required>
-              </div>
-              <div class="form-group">
-                <label>Password Akun <span class="req">*</span></label>
-                <input type="text" id="usr_password" placeholder="Masukkan password akun" required autocomplete="off">
-              </div>
-              <div class="form-group">
-                <label>Hak Akses (Role) <span class="req">*</span></label>
-                <select id="usr_role" required>
-                  <option value="petugas">Petugas / Kader (Input &amp; Laporan)</option>
-                  <option value="admin">Admin (Akses Penuh &amp; Pengaturan)</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Wilayah / Desa Tugas</label>
-                <select id="usr_desa">
-                  <option value="Semua Desa">Semua Desa / Puskesmas</option>
-                  <option value="Melata">Melata</option><option value="Nanuah">Nanuah</option><option value="Topalan">Topalan</option>
-                  <option value="Batu Ampar">Batu Ampar</option><option value="Lubuk Hiju">Lubuk Hiju</option><option value="Bukit Makmur">Bukit Makmur</option>
-                  <option value="Bukit Raya">Bukit Raya</option><option value="Modang Mas">Modang Mas</option><option value="Mukti Manunggal">Mukti Manunggal</option>
-                  <option value="Sumber Jaya">Sumber Jaya</option><option value="Bukit Harum">Bukit Harum</option><option value="PT. TSA">PT. TSA</option><option value="PT. SHS">PT. SHS</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label>Status Akun</label>
-                <select id="usr_status">
-                  <option value="aktif">Aktif (Dapat Login)</option>
-                  <option value="nonaktif">Nonaktif (Diblokir Sementara)</option>
-                </select>
-              </div>
-            </div>
-
-            <div style="background:#FFF; border:1px solid #BAE6FD; border-radius:9px; padding:10px 12px; margin-top:6px;">
-              <label style="margin:0; font-size:0.8rem; cursor:pointer; display:flex; align-items:center; gap:8px; color:#0F172A;">
-                <input type="checkbox" id="usr_allow_global_fallback" checked style="width:16px; height:16px; accent-color:var(--info);">
-                <span>Izinkan username baru yang belum terdaftar login menggunakan password global cadangan (<code>sri26</code>)</span>
-              </label>
-            </div>
-
-            <div class="actions" style="justify-content:flex-start; margin-bottom:16px;">
-              <button type="submit" id="btnSubmitManajemenUser" class="btn btn-primary"><i class="fas fa-user-plus"></i> Simpan Pengguna</button>
-              <button type="button" id="btnCancelEditUser" class="btn btn-ghost" onclick="resetFormManajemenUser()" style="display:none;"><i class="fas fa-times"></i> Batal Edit</button>
-            </div>
-          </form>
-
-          <h4 style="color:var(--accent); margin:10px 0 6px 0; font-size:0.9rem;"><i class="fas fa-list"></i> Daftar Pengguna Terdaftar</h4>
-          <div class="table-container">
-            <table class="kohort-table" id="tblManajemenUser">
-              <thead>
-                <tr>
-                  <th>No</th><th>Username</th><th>Nama Lengkap</th><th>Role</th><th>Wilayah</th><th>Password</th><th>Status</th><th>Aksi</th>
-                </tr>
-              </thead>
-              <tbody><tr><td colspan="8" style="text-align:center;">Memuat daftar pengguna...</td></tr></tbody>
-            </table>
           </div>
         </div>
       </div>
@@ -1832,8 +1750,7 @@
     const CLASS_MAP = { 'SD': [1, 2, 3, 4, 5, 6], 'SMP': [7, 8, 9], 'SMA': [10, 11, 12] };
     let classInputCounter = 0;
     let currentInputDesa = "";
-let activePetugasName = "";
-    let activePetugasRole = "petugas";
+    let activePetugasName = "";
     let cachedGlobalKohortData = [];
     let currentQrChildData = null;
     let isPublicQrMode = Boolean(window.__IS_PUBLIC_QR_MODE__);
@@ -1844,17 +1761,6 @@ let activePetugasName = "";
     const AUTH_ADMIN_PASS = "adminsri26";
     const SESSION_TIMEOUT_MS = 30 * 60 * 1000; // Timeout sesi 30 menit tanpa aktivitas
 
-    let SYSTEM_USERS_CONFIG = {
-      users: [
-        { username: "admin", nama_lengkap: "Administrator Puskesmas", password: AUTH_ADMIN_PASS, role: "admin", desa: "Semua Desa", status: "aktif" }
-      ],
-      allow_global_fallback: true
-    };
-
-    function isCurrentUserAdmin() {
-      if (!activePetugasName) return false;
-      return activePetugasRole === 'admin' || activePetugasName.toLowerCase() === AUTH_ADMIN_USER;
-    }
     let currentOcrTargetId = "";
     let currentOcrMode = "single"; 
     let cameraStream = null;
@@ -1865,26 +1771,19 @@ let activePetugasName = "";
     // =========================================================================
     // MANAJEMEN SESI PETUGAS / KADER + AUTO TIMEOUT INAKTIVITAS
     // =========================================================================
-    function savePetugasSession(displayName, role = 'petugas', loginId = '') {
-      activePetugasName = displayName;
-      activePetugasRole = role || 'petugas';
-      localStorage.setItem('pkm_app_username', displayName);
-      if (loginId) localStorage.setItem('pkm_login_id', loginId);
-      localStorage.setItem('pkm_app_role', activePetugasRole);
+    function savePetugasSession(username) {
+      activePetugasName = username;
+      localStorage.setItem('pkm_app_username', username);
       localStorage.setItem('pkm_session_active', '1');
       localStorage.setItem('pkm_last_activity', String(Date.now()));
       const badgeSpan = document.querySelector('#currentUserDisplay span');
-      if (badgeSpan) {
-        badgeSpan.textContent = activePetugasRole === 'admin' ? `${displayName} (Admin)` : displayName;
-      }
+      if (badgeSpan) badgeSpan.textContent = username;
     }
 
     function clearPetugasSession() {
       activePetugasName = "";
-      activePetugasRole = "petugas";
       localStorage.removeItem('pkm_session_active');
       localStorage.removeItem('pkm_last_activity');
-      localStorage.removeItem('pkm_app_role');
     }
 
     function isPetugasSessionValid() {
@@ -1940,8 +1839,6 @@ let activePetugasName = "";
     window.hideFormRegisterSmooth = function() {
       const cardForm = document.getElementById('cardFormUtama');
       cardForm.style.display = 'none';
-      currentInputDesa = document.getElementById('search_desa_anak')?.value || "";
-      loadRecentTransactions();
       smoothScrollToId('cardSearchSasaran');
     };
 
@@ -3129,8 +3026,6 @@ window.goToEdit = function(encodedJson) {
       currentQrChildData = null;
       const btnQrForm = document.getElementById('btnCetakQrFromForm');
       if (btnQrForm) btnQrForm.style.display = 'none';
-      currentInputDesa = document.getElementById('search_desa_anak')?.value || "";
-      loadRecentTransactions();
       applyPeranUIFilter();
     };
 
@@ -3282,29 +3177,19 @@ window.goToEdit = function(encodedJson) {
     // =========================================================================
     // SISTEM LOGIN PETUGAS & ADMIN + SESSION PERSISTENCE & IDLE TIMEOUT
     // =========================================================================
-function initUserAuthCheck() {
-      try {
-        const cachedUsersStr = localStorage.getItem('pkm_system_users_cfg');
-        if (cachedUsersStr) {
-          const parsed = JSON.parse(cachedUsersStr);
-          if (parsed && Array.isArray(parsed.users)) SYSTEM_USERS_CONFIG = parsed;
-        }
-      } catch (e) {}
-
-      const savedLoginId = localStorage.getItem('pkm_login_id') || localStorage.getItem('pkm_app_username');
-      const savedDisplayName = localStorage.getItem('pkm_app_username');
+    function initUserAuthCheck() {
+      const savedUser = localStorage.getItem('pkm_app_username');
       const userInputEl = document.getElementById('login_username');
       const hintEl = document.getElementById('login_device_hint');
       const formLogin = document.getElementById('formLoginPetugas');
 
-      if (savedLoginId && userInputEl) {
-        userInputEl.value = savedLoginId;
-        if (hintEl) hintEl.innerHTML = `<i class="fas fa-mobile-alt"></i> Akun tersimpan: <strong>${savedLoginId}</strong>`;
+      if (savedUser && userInputEl) {
+        userInputEl.value = savedUser;
+        if (hintEl) hintEl.innerHTML = `<i class="fas fa-mobile-alt"></i> Akun tersimpan: <strong>${savedUser}</strong>`;
       }
 
       if (isPetugasSessionValid()) {
-        const savedRole = localStorage.getItem('pkm_app_role') || (savedDisplayName.toLowerCase() === AUTH_ADMIN_USER ? 'admin' : 'petugas');
-        savePetugasSession(savedDisplayName, savedRole, savedLoginId);
+        savePetugasSession(savedUser);
       }
 
       ['click', 'keydown', 'touchstart', 'scroll'].forEach(evtName => {
@@ -3331,42 +3216,21 @@ function initUserAuthCheck() {
           const passwordInput = (document.getElementById('login_password').value || '').trim();
           const errDiv = document.getElementById('loginError');
 
-         } else {
-            errDiv.textContent = "❌ Username tidak terdaftar atau password salah!";
+          if (!usernameInput) {
+            errDiv.textContent = "❌ Nama petugas / username wajib diisi!";
             errDiv.style.display = 'block';
+            return;
           }
 
-          const matchedUser = (SYSTEM_USERS_CONFIG.users || []).find(
-            u => u.username && u.username.toLowerCase() === usernameInput.toLowerCase()
-          );
+          const isAdminMatch = usernameInput.toLowerCase() === AUTH_ADMIN_USER &&
+            (passwordInput === AUTH_ADMIN_PASS || passwordInput === AUTH_PASSWORD_PETUGAS);
+          const isPetugasMatch = usernameInput.toLowerCase() !== AUTH_ADMIN_USER &&
+            passwordInput === AUTH_PASSWORD_PETUGAS;
 
-          let loginSuccess = false;
-          let finalDisplayName = usernameInput;
-          let finalRole = 'petugas';
+          if (isAdminMatch || isPetugasMatch) {
+            const finalUser = usernameInput.toLowerCase() === AUTH_ADMIN_USER ? AUTH_ADMIN_USER : usernameInput;
+            savePetugasSession(finalUser);
 
-          if (matchedUser) {
-            if (matchedUser.status === 'nonaktif') {
-              errDiv.textContent = `❌ Akun "${matchedUser.username}" sedang dinonaktifkan oleh Admin.`;
-              errDiv.style.display = 'block';
-              return;
-            }
-            if (passwordInput === matchedUser.password) {
-              loginSuccess = true;
-              finalDisplayName = matchedUser.nama_lengkap || matchedUser.username;
-              finalRole = matchedUser.role || 'petugas';
-            }
-          } else if (usernameInput.toLowerCase() === AUTH_ADMIN_USER && passwordInput === AUTH_ADMIN_PASS) {
-            loginSuccess = true;
-            finalDisplayName = AUTH_ADMIN_USER;
-            finalRole = 'admin';
-          } else if (SYSTEM_USERS_CONFIG.allow_global_fallback !== false && usernameInput.toLowerCase() !== AUTH_ADMIN_USER && passwordInput === AUTH_PASSWORD_PETUGAS) {
-            loginSuccess = true;
-            finalDisplayName = usernameInput;
-            finalRole = 'petugas';
-          }
-
-          if (loginSuccess) {
-            savePetugasSession(finalDisplayName, finalRole, usernameInput);
             document.getElementById('loginModal').style.display = 'none';
             errDiv.style.display = 'none';
             const banner = document.getElementById('loginQuickImunisasiBanner');
@@ -3383,37 +3247,10 @@ function initUserAuthCheck() {
               refreshCacheGlobalData();
               loadRecentTransactions();
             }
-          const matchedUser = (SYSTEM_USERS_CONFIG.users || []).find(
-            u => u.username && u.username.toLowerCase() === usernameInput.toLowerCase()
-          );
-
-          let loginSuccess = false;
-          let finalDisplayName = usernameInput;
-          let finalRole = 'petugas';
-
-          if (matchedUser) {
-            if (matchedUser.status === 'nonaktif') {
-              errDiv.textContent = `❌ Akun "${matchedUser.username}" sedang dinonaktifkan oleh Admin.`;
-              errDiv.style.display = 'block';
-              return;
-            }
-            if (passwordInput === matchedUser.password) {
-              loginSuccess = true;
-              finalDisplayName = matchedUser.nama_lengkap || matchedUser.username;
-              finalRole = matchedUser.role || 'petugas';
-            }
-          } else if (usernameInput.toLowerCase() === AUTH_ADMIN_USER && passwordInput === AUTH_ADMIN_PASS) {
-            loginSuccess = true;
-            finalDisplayName = AUTH_ADMIN_USER;
-            finalRole = 'admin';
-          } else if (SYSTEM_USERS_CONFIG.allow_global_fallback !== false && usernameInput.toLowerCase() !== AUTH_ADMIN_USER && passwordInput === AUTH_PASSWORD_PETUGAS) {
-            loginSuccess = true;
-            finalDisplayName = usernameInput;
-            finalRole = 'petugas';
+          } else {
+            errDiv.textContent = "❌ Password salah! Silakan periksa kembali password akun Anda.";
+            errDiv.style.display = 'block';
           }
-
-          if (loginSuccess) {
-            savePetugasSession(finalDisplayName, finalRole, usernameInput);
         });
       }
     }
@@ -3472,7 +3309,6 @@ function initUserAuthCheck() {
       if (target === 'imunisasi') loadRecentTransactions();
       if (target === 'catchup') loadCatchUpAnalysis();
       if (target === 'capaian') loadCapanTabContent();
-      if (target === 'admin' && isCurrentUserAdmin()) renderManajemenUserAdmin();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -3480,9 +3316,9 @@ function initUserAuthCheck() {
     // INISIALISASI HALAMAN (DOMContentLoaded)
     // =========================================================================
     document.addEventListener('DOMContentLoaded', async () => {
-      await loadSystemUsersConfig();
       initUserAuthCheck();
-      
+      const isQrMode = await checkIncomingQrUrlAndOpenFeed();
+
       if (!isQrMode && !window.__IS_PUBLIC_QR_MODE__ && !activePetugasName) {
         document.getElementById('loginModal').style.display = 'flex';
       }
@@ -3532,7 +3368,6 @@ function initUserAuthCheck() {
       bindEvent('btnDownloadCatchUpExcel', 'click', downloadCatchUpExcel);
       bindEvent('btnHitungCapaian', 'click', loadCapanTabContent);
       bindEvent('formTargetSasaran', 'submit', handleSaveTargetSasaran);
-      bindEvent('formManajemenUser', 'submit', handleSaveManajemenUser);
       bindEvent('formPrioritasQrAdmin', 'submit', handleSavePrioritasQrAdmin);
       bindEvent('formLogikaVaksinAdmin', 'submit', handleSaveLogikaVaksinAdmin);
 
@@ -3546,7 +3381,7 @@ function initUserAuthCheck() {
         populateCertSasaranByDesa(e.target.value);
       });
       bindEvent('reg_desa', 'change', (e) => {
-        currentInputDesa = e.target.value || document.getElementById('search_desa_anak')?.value || "";
+        currentInputDesa = e.target.value;
         loadRecentTransactions();
       });
       bindEvent('select_anak_registered', 'change', fillFormWithSelectedAnak);
@@ -3986,22 +3821,18 @@ window.selectFromLiveSearch = function(encodedJson) {
     // TABEL PREVIEW DATA KOHORT (DILENGKAPI TOMBOL CETAK QR & EDIT)
     // =========================================================================
     async function loadRecentTransactions() {
-      const cardPreview = document.getElementById('cardPreviewKohort');
       const tbodyAnak = document.querySelector('#tblRecentAnak tbody');
       const tbodyDewasa = document.querySelector('#tblRecentDewasa tbody');
       const titleSpan = document.getElementById('preview_desa_title');
-      const selectedDesa = (currentInputDesa || '').trim();
 
-      if (!selectedDesa) {
-        if (cardPreview) cardPreview.style.display = 'none';
-        if (titleSpan) titleSpan.textContent = "Belum Ada Desa Dipilih";
-        if (tbodyAnak) tbodyAnak.innerHTML = '<tr><td colspan="32" style="text-align:center; color:var(--muted);"><i class="fas fa-arrow-up"></i> Pilih desa pada kolom filter di atas untuk melihat preview.</td></tr>';
-        if (tbodyDewasa) tbodyDewasa.innerHTML = '<tr><td colspan="17" style="text-align:center; color:var(--muted);"><i class="fas fa-arrow-up"></i> Pilih desa pada kolom filter di atas untuk melihat preview.</td></tr>';
+      if (!currentInputDesa) {
+        titleSpan.textContent = "Belum Ada Desa Dipilih";
+        tbodyAnak.innerHTML = '<tr><td colspan="32" style="text-align:center; color:var(--muted);"><i class="fas fa-arrow-up"></i> Pilih desa pada kolom filter di atas untuk melihat preview.</td></tr>';
+        tbodyDewasa.innerHTML = '<tr><td colspan="17" style="text-align:center; color:var(--muted);"><i class="fas fa-arrow-up"></i> Pilih desa pada kolom filter di atas untuk melihat preview.</td></tr>';
         return;
       }
 
-      if (cardPreview) cardPreview.style.display = 'block';
-      titleSpan.textContent = `Desa ${selectedDesa}`;
+      titleSpan.textContent = `Desa ${currentInputDesa}`;
       tbodyAnak.innerHTML = '<tr><td colspan="32" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Memuat data...</td></tr>';
       tbodyDewasa.innerHTML = '<tr><td colspan="17" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> Memuat data...</td></tr>';
 
@@ -4079,187 +3910,7 @@ window.selectFromLiveSearch = function(encodedJson) {
     // =========================================================================
     // PENGATURAN ADMIN: TARGET SASARAN & PRIORITAS POP-UP IMUNISASI QR
     // =========================================================================
-  async function loadSystemUsersConfig() {
-      try {
-        if (navigator.onLine) {
-          const snap = await getDoc(doc(db, COL_TARGET, 'CONFIG_MANAJEMEN_PENGGUNA'));
-          if (snap.exists()) {
-            const data = snap.data();
-            if (Array.isArray(data.users) && data.users.length > 0) {
-              SYSTEM_USERS_CONFIG = {
-                users: data.users,
-                allow_global_fallback: data.allow_global_fallback !== false
-              };
-              localStorage.setItem('pkm_system_users_cfg', JSON.stringify(SYSTEM_USERS_CONFIG));
-            }
-          }
-        }
-      } catch (e) {
-        console.warn("Menggunakan cache daftar pengguna lokal:", e.message);
-      }
-      const chkFallback = document.getElementById('usr_allow_global_fallback');
-      if (chkFallback) chkFallback.checked = SYSTEM_USERS_CONFIG.allow_global_fallback !== false;
-    }
-
-    async function persistSystemUsersConfig() {
-      await setDoc(doc(db, COL_TARGET, 'CONFIG_MANAJEMEN_PENGGUNA'), {
-        users: SYSTEM_USERS_CONFIG.users,
-        allow_global_fallback: SYSTEM_USERS_CONFIG.allow_global_fallback,
-        updated_by: activePetugasName,
-        updated_at: new Date().toISOString()
-      }, { merge: true });
-      localStorage.setItem('pkm_system_users_cfg', JSON.stringify(SYSTEM_USERS_CONFIG));
-    }
-
-    window.togglePanelManajemenUser = function() {
-      if (!isCurrentUserAdmin()) {
-        return alert("🔒 Fitur Manajemen Pengguna hanya dapat diakses oleh Admin!");
-      }
-      const panel = document.getElementById('panelManajemenUser');
-      const willOpen = panel.style.display === 'none';
-      panel.style.display = willOpen ? 'block' : 'none';
-      if (willOpen) renderManajemenUserAdmin();
-    };
-
-    window.renderManajemenUserAdmin = function() {
-      const tbody = document.querySelector('#tblManajemenUser tbody');
-      const chkFallback = document.getElementById('usr_allow_global_fallback');
-      if (chkFallback) chkFallback.checked = SYSTEM_USERS_CONFIG.allow_global_fallback !== false;
-      if (!tbody) return;
-
-      const users = SYSTEM_USERS_CONFIG.users || [];
-      if (users.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Belum ada pengguna terdaftar.</td></tr>';
-        return;
-      }
-
-      tbody.innerHTML = users.map((u, idx) => {
-        const isMasterAdmin = u.username.toLowerCase() === AUTH_ADMIN_USER;
-        const roleBadge = u.role === 'admin'
-          ? '<span style="background:#FEE2E2; color:#991B1B; padding:3px 8px; border-radius:6px; font-weight:800; font-size:0.74rem;">ADMIN</span>'
-          : '<span style="background:#DBEAFE; color:#1E40AF; padding:3px 8px; border-radius:6px; font-weight:700; font-size:0.74rem;">PETUGAS / KADER</span>';
-        const statusBadge = u.status === 'nonaktif'
-          ? '<span style="background:#F1F5F9; color:#64748B; padding:3px 8px; border-radius:6px; font-weight:700; font-size:0.74rem;">Nonaktif</span>'
-          : '<span class="v-given">Aktif</span>';
-
-        return `
-          <tr>
-            <td>${idx + 1}</td>
-            <td style="font-weight:800; color:var(--accent); text-align:left;">${u.username}</td>
-            <td style="text-align:left; font-weight:600;">${u.nama_lengkap || '-'}</td>
-            <td>${roleBadge}</td>
-            <td>${u.desa || 'Semua Desa'}</td>
-            <td>
-              <span id="pwd_mask_${idx}" style="font-family:monospace;">••••••</span>
-              <button type="button" class="btn btn-ghost" onclick="toggleShowUserPwd(${idx}, '${encodeURIComponent(u.password)}')" style="padding:2px 6px; font-size:0.7rem; margin-left:4px;" title="Lihat/Sembunyikan Password">
-                <i class="fas fa-eye"></i>
-              </button>
-            </td>
-            <td>${statusBadge}</td>
-            <td style="display:flex; gap:4px; justify-content:center;">
-              <button type="button" class="btn btn-warning" onclick="editManajemenUser(${idx})" style="padding:4px 7px; font-size:0.72rem;"><i class="fas fa-edit"></i> Edit</button>
-              ${isMasterAdmin ? '' : `<button type="button" class="btn btn-danger" onclick="deleteManajemenUser(${idx})" style="padding:4px 7px; font-size:0.72rem;"><i class="fas fa-trash"></i></button>`}
-            </td>
-          </tr>
-        `;
-      }).join('');
-    };
-
-    window.toggleShowUserPwd = function(idx, encodedPwd) {
-      const span = document.getElementById(`pwd_mask_${idx}`);
-      if (!span) return;
-      if (span.dataset.shown === '1') {
-        span.textContent = '••••••';
-        span.dataset.shown = '0';
-      } else {
-        span.textContent = decodeURIComponent(encodedPwd);
-        span.dataset.shown = '1';
-      }
-    };
-
-    window.editManajemenUser = function(idx) {
-      const u = SYSTEM_USERS_CONFIG.users[idx];
-      if (!u) return;
-      document.getElementById('usr_edit_index').value = String(idx);
-      document.getElementById('usr_username').value = u.username;
-      document.getElementById('usr_username').readOnly = u.username.toLowerCase() === AUTH_ADMIN_USER;
-      document.getElementById('usr_nama_lengkap').value = u.nama_lengkap || '';
-      document.getElementById('usr_password').value = u.password || '';
-      document.getElementById('usr_role').value = u.role || 'petugas';
-      document.getElementById('usr_role').disabled = u.username.toLowerCase() === AUTH_ADMIN_USER;
-      document.getElementById('usr_desa').value = u.desa || 'Semua Desa';
-      document.getElementById('usr_status').value = u.status || 'aktif';
-      document.getElementById('usr_status').disabled = u.username.toLowerCase() === AUTH_ADMIN_USER;
-      document.getElementById('btnSubmitManajemenUser').innerHTML = '<i class="fas fa-save"></i> Simpan Perubahan';
-      document.getElementById('btnCancelEditUser').style.display = 'inline-flex';
-      smoothScrollToId('cardAdminUsers');
-    };
-
-    window.resetFormManajemenUser = function() {
-      document.getElementById('formManajemenUser').reset();
-      document.getElementById('usr_edit_index').value = '-1';
-      document.getElementById('usr_username').readOnly = false;
-      document.getElementById('usr_role').disabled = false;
-      document.getElementById('usr_status').disabled = false;
-      document.getElementById('usr_allow_global_fallback').checked = SYSTEM_USERS_CONFIG.allow_global_fallback !== false;
-      document.getElementById('btnSubmitManajemenUser').innerHTML = '<i class="fas fa-user-plus"></i> Simpan Pengguna';
-      document.getElementById('btnCancelEditUser').style.display = 'none';
-    };
-
-    window.deleteManajemenUser = async function(idx) {
-      if (!isCurrentUserAdmin()) return alert("🔒 Hanya Admin yang berhak menghapus pengguna!");
-      const target = SYSTEM_USERS_CONFIG.users[idx];
-      if (!target || target.username.toLowerCase() === AUTH_ADMIN_USER) return;
-      if (!confirm(`Hapus akun pengguna "${target.username}" (${target.nama_lengkap})?`)) return;
-      SYSTEM_USERS_CONFIG.users.splice(idx, 1);
-      try {
-        await persistSystemUsersConfig();
-        renderManajemenUserAdmin();
-        alert(`✅ Pengguna "${target.username}" berhasil dihapus.`);
-      } catch (err) {
-        alert("Gagal menghapus pengguna: " + err.message);
-      }
-    };
-
-    async function handleSaveManajemenUser(e) {
-      e.preventDefault();
-      if (!isCurrentUserAdmin()) return alert("🔒 Hanya Admin yang berhak mengelola pengguna!");
-
-      const editIdx = parseInt(document.getElementById('usr_edit_index').value, 10);
-      const username = document.getElementById('usr_username').value.trim();
-      const namaLengkap = document.getElementById('usr_nama_lengkap').value.trim();
-      const password = document.getElementById('usr_password').value.trim();
-      const role = document.getElementById('usr_role').value;
-      const desa = document.getElementById('usr_desa').value;
-      const status = document.getElementById('usr_status').value;
-      const allowFallback = document.getElementById('usr_allow_global_fallback').checked;
-
-      if (!username || !namaLengkap || !password) return alert("⚠️ Username, Nama Lengkap, dan Password wajib diisi!");
-
-      const dupIdx = SYSTEM_USERS_CONFIG.users.findIndex(u => u.username.toLowerCase() === username.toLowerCase());
-      if (dupIdx !== -1 && dupIdx !== editIdx) {
-        return alert(`⚠️ Username "${username}" sudah digunakan! Gunakan username lain.`);
-      }
-
-      const userPayload = { username, nama_lengkap: namaLengkap, password, role, desa, status };
-      if (editIdx >= 0 && SYSTEM_USERS_CONFIG.users[editIdx]) {
-        SYSTEM_USERS_CONFIG.users[editIdx] = userPayload;
-      } else {
-        SYSTEM_USERS_CONFIG.users.push(userPayload);
-      }
-      SYSTEM_USERS_CONFIG.allow_global_fallback = allowFallback;
-
-      try {
-        await persistSystemUsersConfig();
-        resetFormManajemenUser();
-        renderManajemenUserAdmin();
-        alert(`✅ Data pengguna "${username}" berhasil disimpan & disinkronkan ke Cloud!`);
-      } catch (err) {
-        alert("Gagal menyimpan pengguna: " + err.message);
-      }
-    }  
-  
-  window.toggleFormAdminSasaran = function() {
+    window.toggleFormAdminSasaran = function() {
       if (activePetugasName.toLowerCase() !== AUTH_ADMIN_USER) {
         return alert("🔒 Fitur ini hanya dapat diakses oleh Admin (login dengan username: admin)!");
       }

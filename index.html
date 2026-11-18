@@ -3472,6 +3472,7 @@ function initUserAuthCheck() {
       if (target === 'imunisasi') loadRecentTransactions();
       if (target === 'catchup') loadCatchUpAnalysis();
       if (target === 'capaian') loadCapanTabContent();
+      if (target === 'admin' && isCurrentUserAdmin()) renderManajemenUserAdmin();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -3531,6 +3532,7 @@ function initUserAuthCheck() {
       bindEvent('btnDownloadCatchUpExcel', 'click', downloadCatchUpExcel);
       bindEvent('btnHitungCapaian', 'click', loadCapanTabContent);
       bindEvent('formTargetSasaran', 'submit', handleSaveTargetSasaran);
+      bindEvent('formManajemenUser', 'submit', handleSaveManajemenUser);
       bindEvent('formPrioritasQrAdmin', 'submit', handleSavePrioritasQrAdmin);
       bindEvent('formLogikaVaksinAdmin', 'submit', handleSaveLogikaVaksinAdmin);
 
@@ -4077,7 +4079,187 @@ window.selectFromLiveSearch = function(encodedJson) {
     // =========================================================================
     // PENGATURAN ADMIN: TARGET SASARAN & PRIORITAS POP-UP IMUNISASI QR
     // =========================================================================
-    window.toggleFormAdminSasaran = function() {
+  async function loadSystemUsersConfig() {
+      try {
+        if (navigator.onLine) {
+          const snap = await getDoc(doc(db, COL_TARGET, 'CONFIG_MANAJEMEN_PENGGUNA'));
+          if (snap.exists()) {
+            const data = snap.data();
+            if (Array.isArray(data.users) && data.users.length > 0) {
+              SYSTEM_USERS_CONFIG = {
+                users: data.users,
+                allow_global_fallback: data.allow_global_fallback !== false
+              };
+              localStorage.setItem('pkm_system_users_cfg', JSON.stringify(SYSTEM_USERS_CONFIG));
+            }
+          }
+        }
+      } catch (e) {
+        console.warn("Menggunakan cache daftar pengguna lokal:", e.message);
+      }
+      const chkFallback = document.getElementById('usr_allow_global_fallback');
+      if (chkFallback) chkFallback.checked = SYSTEM_USERS_CONFIG.allow_global_fallback !== false;
+    }
+
+    async function persistSystemUsersConfig() {
+      await setDoc(doc(db, COL_TARGET, 'CONFIG_MANAJEMEN_PENGGUNA'), {
+        users: SYSTEM_USERS_CONFIG.users,
+        allow_global_fallback: SYSTEM_USERS_CONFIG.allow_global_fallback,
+        updated_by: activePetugasName,
+        updated_at: new Date().toISOString()
+      }, { merge: true });
+      localStorage.setItem('pkm_system_users_cfg', JSON.stringify(SYSTEM_USERS_CONFIG));
+    }
+
+    window.togglePanelManajemenUser = function() {
+      if (!isCurrentUserAdmin()) {
+        return alert("🔒 Fitur Manajemen Pengguna hanya dapat diakses oleh Admin!");
+      }
+      const panel = document.getElementById('panelManajemenUser');
+      const willOpen = panel.style.display === 'none';
+      panel.style.display = willOpen ? 'block' : 'none';
+      if (willOpen) renderManajemenUserAdmin();
+    };
+
+    window.renderManajemenUserAdmin = function() {
+      const tbody = document.querySelector('#tblManajemenUser tbody');
+      const chkFallback = document.getElementById('usr_allow_global_fallback');
+      if (chkFallback) chkFallback.checked = SYSTEM_USERS_CONFIG.allow_global_fallback !== false;
+      if (!tbody) return;
+
+      const users = SYSTEM_USERS_CONFIG.users || [];
+      if (users.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Belum ada pengguna terdaftar.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = users.map((u, idx) => {
+        const isMasterAdmin = u.username.toLowerCase() === AUTH_ADMIN_USER;
+        const roleBadge = u.role === 'admin'
+          ? '<span style="background:#FEE2E2; color:#991B1B; padding:3px 8px; border-radius:6px; font-weight:800; font-size:0.74rem;">ADMIN</span>'
+          : '<span style="background:#DBEAFE; color:#1E40AF; padding:3px 8px; border-radius:6px; font-weight:700; font-size:0.74rem;">PETUGAS / KADER</span>';
+        const statusBadge = u.status === 'nonaktif'
+          ? '<span style="background:#F1F5F9; color:#64748B; padding:3px 8px; border-radius:6px; font-weight:700; font-size:0.74rem;">Nonaktif</span>'
+          : '<span class="v-given">Aktif</span>';
+
+        return `
+          <tr>
+            <td>${idx + 1}</td>
+            <td style="font-weight:800; color:var(--accent); text-align:left;">${u.username}</td>
+            <td style="text-align:left; font-weight:600;">${u.nama_lengkap || '-'}</td>
+            <td>${roleBadge}</td>
+            <td>${u.desa || 'Semua Desa'}</td>
+            <td>
+              <span id="pwd_mask_${idx}" style="font-family:monospace;">••••••</span>
+              <button type="button" class="btn btn-ghost" onclick="toggleShowUserPwd(${idx}, '${encodeURIComponent(u.password)}')" style="padding:2px 6px; font-size:0.7rem; margin-left:4px;" title="Lihat/Sembunyikan Password">
+                <i class="fas fa-eye"></i>
+              </button>
+            </td>
+            <td>${statusBadge}</td>
+            <td style="display:flex; gap:4px; justify-content:center;">
+              <button type="button" class="btn btn-warning" onclick="editManajemenUser(${idx})" style="padding:4px 7px; font-size:0.72rem;"><i class="fas fa-edit"></i> Edit</button>
+              ${isMasterAdmin ? '' : `<button type="button" class="btn btn-danger" onclick="deleteManajemenUser(${idx})" style="padding:4px 7px; font-size:0.72rem;"><i class="fas fa-trash"></i></button>`}
+            </td>
+          </tr>
+        `;
+      }).join('');
+    };
+
+    window.toggleShowUserPwd = function(idx, encodedPwd) {
+      const span = document.getElementById(`pwd_mask_${idx}`);
+      if (!span) return;
+      if (span.dataset.shown === '1') {
+        span.textContent = '••••••';
+        span.dataset.shown = '0';
+      } else {
+        span.textContent = decodeURIComponent(encodedPwd);
+        span.dataset.shown = '1';
+      }
+    };
+
+    window.editManajemenUser = function(idx) {
+      const u = SYSTEM_USERS_CONFIG.users[idx];
+      if (!u) return;
+      document.getElementById('usr_edit_index').value = String(idx);
+      document.getElementById('usr_username').value = u.username;
+      document.getElementById('usr_username').readOnly = u.username.toLowerCase() === AUTH_ADMIN_USER;
+      document.getElementById('usr_nama_lengkap').value = u.nama_lengkap || '';
+      document.getElementById('usr_password').value = u.password || '';
+      document.getElementById('usr_role').value = u.role || 'petugas';
+      document.getElementById('usr_role').disabled = u.username.toLowerCase() === AUTH_ADMIN_USER;
+      document.getElementById('usr_desa').value = u.desa || 'Semua Desa';
+      document.getElementById('usr_status').value = u.status || 'aktif';
+      document.getElementById('usr_status').disabled = u.username.toLowerCase() === AUTH_ADMIN_USER;
+      document.getElementById('btnSubmitManajemenUser').innerHTML = '<i class="fas fa-save"></i> Simpan Perubahan';
+      document.getElementById('btnCancelEditUser').style.display = 'inline-flex';
+      smoothScrollToId('cardAdminUsers');
+    };
+
+    window.resetFormManajemenUser = function() {
+      document.getElementById('formManajemenUser').reset();
+      document.getElementById('usr_edit_index').value = '-1';
+      document.getElementById('usr_username').readOnly = false;
+      document.getElementById('usr_role').disabled = false;
+      document.getElementById('usr_status').disabled = false;
+      document.getElementById('usr_allow_global_fallback').checked = SYSTEM_USERS_CONFIG.allow_global_fallback !== false;
+      document.getElementById('btnSubmitManajemenUser').innerHTML = '<i class="fas fa-user-plus"></i> Simpan Pengguna';
+      document.getElementById('btnCancelEditUser').style.display = 'none';
+    };
+
+    window.deleteManajemenUser = async function(idx) {
+      if (!isCurrentUserAdmin()) return alert("🔒 Hanya Admin yang berhak menghapus pengguna!");
+      const target = SYSTEM_USERS_CONFIG.users[idx];
+      if (!target || target.username.toLowerCase() === AUTH_ADMIN_USER) return;
+      if (!confirm(`Hapus akun pengguna "${target.username}" (${target.nama_lengkap})?`)) return;
+      SYSTEM_USERS_CONFIG.users.splice(idx, 1);
+      try {
+        await persistSystemUsersConfig();
+        renderManajemenUserAdmin();
+        alert(`✅ Pengguna "${target.username}" berhasil dihapus.`);
+      } catch (err) {
+        alert("Gagal menghapus pengguna: " + err.message);
+      }
+    };
+
+    async function handleSaveManajemenUser(e) {
+      e.preventDefault();
+      if (!isCurrentUserAdmin()) return alert("🔒 Hanya Admin yang berhak mengelola pengguna!");
+
+      const editIdx = parseInt(document.getElementById('usr_edit_index').value, 10);
+      const username = document.getElementById('usr_username').value.trim();
+      const namaLengkap = document.getElementById('usr_nama_lengkap').value.trim();
+      const password = document.getElementById('usr_password').value.trim();
+      const role = document.getElementById('usr_role').value;
+      const desa = document.getElementById('usr_desa').value;
+      const status = document.getElementById('usr_status').value;
+      const allowFallback = document.getElementById('usr_allow_global_fallback').checked;
+
+      if (!username || !namaLengkap || !password) return alert("⚠️ Username, Nama Lengkap, dan Password wajib diisi!");
+
+      const dupIdx = SYSTEM_USERS_CONFIG.users.findIndex(u => u.username.toLowerCase() === username.toLowerCase());
+      if (dupIdx !== -1 && dupIdx !== editIdx) {
+        return alert(`⚠️ Username "${username}" sudah digunakan! Gunakan username lain.`);
+      }
+
+      const userPayload = { username, nama_lengkap: namaLengkap, password, role, desa, status };
+      if (editIdx >= 0 && SYSTEM_USERS_CONFIG.users[editIdx]) {
+        SYSTEM_USERS_CONFIG.users[editIdx] = userPayload;
+      } else {
+        SYSTEM_USERS_CONFIG.users.push(userPayload);
+      }
+      SYSTEM_USERS_CONFIG.allow_global_fallback = allowFallback;
+
+      try {
+        await persistSystemUsersConfig();
+        resetFormManajemenUser();
+        renderManajemenUserAdmin();
+        alert(`✅ Data pengguna "${username}" berhasil disimpan & disinkronkan ke Cloud!`);
+      } catch (err) {
+        alert("Gagal menyimpan pengguna: " + err.message);
+      }
+    }  
+  
+  window.toggleFormAdminSasaran = function() {
       if (activePetugasName.toLowerCase() !== AUTH_ADMIN_USER) {
         return alert("🔒 Fitur ini hanya dapat diakses oleh Admin (login dengan username: admin)!");
       }

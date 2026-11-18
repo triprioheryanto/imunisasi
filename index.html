@@ -547,154 +547,6 @@
       .app-nav-tabs .tab { padding: 8px 10px; font-size: 0.78rem; }
       .certificate-page-a4-landscape { transform: scale(0.38); transform-origin: top center; margin-bottom: -130mm; }
     }
-    /* STATUS AKTIF TOMBOL TOGGLE TABEL */
-    .btn-toggle-active {
-      background: #EFF6FF !important;
-      border-color: var(--info) !important;
-      color: var(--info) !important;
-      font-weight: 800 !important;
-    }
-
-    /* PANEL STATISTIK INTERAKTIF TAB INPUT */
-    .interactive-stats-wrapper {
-      background: linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%);
-      border: 1.5px solid #CBD5E1;
-      border-radius: var(--radius);
-      padding: 18px 20px;
-      margin-bottom: 18px;
-      box-shadow: var(--shadow-card);
-      position: relative;
-      overflow: hidden;
-    }
-    .interactive-stats-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 14px;
-    }
-    .scope-pill {
-      background: linear-gradient(135deg, var(--accent), var(--accent-light));
-      color: #FFF;
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 0.74rem;
-      font-weight: 700;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .stat-kpi-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-    }
-    .stat-kpi-card {
-      background: #FFFFFF;
-      border: 1.5px solid var(--border-color);
-      border-radius: 12px;
-      padding: 14px;
-      cursor: pointer;
-      transition: all 0.22s ease;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-    .stat-kpi-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 20px rgba(0, 43, 91, 0.09);
-      border-color: var(--primary);
-    }
-    .stat-kpi-card.active-kpi {
-      border-color: var(--primary);
-      background: #FFFDFB;
-      box-shadow: 0 0 0 3px rgba(255, 87, 34, 0.14);
-    }
-    .kpi-top-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 8px;
-    }
-    .kpi-label {
-      font-size: 0.76rem;
-      font-weight: 700;
-      color: var(--muted);
-      line-height: 1.3;
-    }
-    .kpi-value {
-      font-size: 1.55rem;
-      font-weight: 900;
-      color: var(--accent);
-      margin: 4px 0 2px 0;
-      line-height: 1.1;
-    }
-    .kpi-sub {
-      font-size: 0.72rem;
-      color: #475569;
-      font-weight: 600;
-    }
-    .kpi-progress-track {
-      width: 100%;
-      height: 7px;
-      background: #E2E8F0;
-      border-radius: 99px;
-      overflow: hidden;
-      margin-top: 10px;
-    }
-    .kpi-progress-fill {
-      height: 100%;
-      border-radius: 99px;
-      transition: width 0.55s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .stat-detail-drawer {
-      margin-top: 14px;
-      background: #F8FAFC;
-      border: 1.5px solid #E2E8F0;
-      border-radius: 12px;
-      padding: 14px 16px;
-      animation: fadeIn 0.25s ease-out;
-    }
-    .mini-bar-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 8px;
-      font-size: 0.78rem;
-    }
-    .mini-bar-label {
-      width: 135px;
-      font-weight: 700;
-      color: #334155;
-      flex-shrink: 0;
-    }
-    .mini-bar-track {
-      flex: 1;
-      height: 10px;
-      background: #E2E8F0;
-      border-radius: 99px;
-      overflow: hidden;
-    }
-    .mini-bar-fill {
-      height: 100%;
-      border-radius: 99px;
-      transition: width 0.45s ease;
-    }
-    .mini-bar-val {
-      width: 72px;
-      text-align: right;
-      font-weight: 800;
-      color: var(--accent);
-      flex-shrink: 0;
-    }
-    @media (max-width: 900px) {
-      .stat-kpi-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (max-width: 480px) {
-      .stat-kpi-grid { grid-template-columns: 1fr; }
-    }
   </style>
 </head>
 <body>
@@ -1124,109 +976,10 @@
         <div><strong>INFORMASI SISTEM:</strong> Data tersimpan lokal saat offline dan otomatis sinkron ke Cloud saat terhubung internet.</div>
       </div>
 
-      <!-- PANEL INFORMASI INTERAKTIF (TEPAT SEBELUM FUNGSI PENCARIAN) -->
-      <div class="interactive-stats-wrapper" id="inputInteractiveDashboard">
-        <div class="interactive-stats-header">
-          <div>
-            <h2 style="margin:0; font-size:1.08rem;"><i class="fas fa-chart-pie" style="color:var(--primary);"></i> Ringkasan &amp; Capaian Imunisasi</h2>
-            <span style="font-size:0.75rem; color:var(--muted);">Klik salah satu kartu di bawah untuk melihat grafik rincian indikator</span>
-          </div>
-          <span class="scope-pill" id="statsScopeBadge"><i class="fas fa-globe-asia"></i> Semua Desa (Puskesmas Melata)</span>
-        </div>
-
-        <div class="stat-kpi-grid">
-          <!-- KARTU 1: TOTAL SASARAN TERDAFTAR -->
-          <div class="stat-kpi-card" id="kpiCard_total" onclick="selectStatDetailTab('total')">
-            <div class="kpi-top-row">
-              <div>
-                <div class="kpi-label">Total Sasaran Terdaftar</div>
-                <div class="kpi-value" id="stat_total_sasaran">0</div>
-              </div>
-              <div style="width:38px; height:38px; border-radius:10px; background:#EFF6FF; color:#2563EB; display:flex; align-items:center; justify-content:center; font-size:1.1rem;">
-                <i class="fas fa-users"></i>
-              </div>
-            </div>
-            <div class="kpi-sub" id="stat_total_sub">0 Bayi/Anak &bull; 0 Catin &bull; 0 Bumil</div>
-            <div class="kpi-progress-track">
-              <div class="kpi-progress-fill" id="bar_total_sasaran" style="width:100%; background:linear-gradient(90deg, #2563EB, #38BDF8);"></div>
-            </div>
-          </div>
-
-          <!-- KARTU 2: CAPAIAN IDL (DASAR LENGKAP) -->
-          <div class="stat-kpi-card" id="kpiCard_idl" onclick="selectStatDetailTab('idl')">
-            <div class="kpi-top-row">
-              <div>
-                <div class="kpi-label">Capaian IDL (Dasar Lengkap)</div>
-                <div class="kpi-value" style="color:#059669;" id="stat_idl_count">0</div>
-              </div>
-              <svg width="42" height="42" viewBox="0 0 36 36">
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#E2E8F0" stroke-width="3.6"/>
-                <path id="ring_idl_path" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#10B981" stroke-width="3.6" stroke-linecap="round"/>
-                <text x="18" y="20.5" text-anchor="middle" font-size="8.5" font-weight="800" fill="#065F46" id="ring_idl_text">0%</text>
-              </svg>
-            </div>
-            <div class="kpi-sub" id="stat_idl_sub">0% dari total sasaran bayi/anak</div>
-            <div class="kpi-progress-track">
-              <div class="kpi-progress-fill" id="bar_idl_fill" style="width:0%; background:linear-gradient(90deg, #10B981, #34D399);"></div>
-            </div>
-          </div>
-
-          <!-- KARTU 3: CAPAIAN IBL (BADUTA LENGKAP) -->
-          <div class="stat-kpi-card" id="kpiCard_ibl" onclick="selectStatDetailTab('ibl')">
-            <div class="kpi-top-row">
-              <div>
-                <div class="kpi-label">Capaian IBL (Baduta Lengkap)</div>
-                <div class="kpi-value" style="color:#D97706;" id="stat_ibl_count">0</div>
-              </div>
-              <svg width="42" height="42" viewBox="0 0 36 36">
-                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#E2E8F0" stroke-width="3.6"/>
-                <path id="ring_ibl_path" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#F59E0B" stroke-width="3.6" stroke-linecap="round"/>
-                <text x="18" y="20.5" text-anchor="middle" font-size="8.5" font-weight="800" fill="#92400E" id="ring_ibl_text">0%</text>
-              </svg>
-            </div>
-            <div class="kpi-sub" id="stat_ibl_sub">DPT-HB-Hib 4 &amp; MR 2 Lengkap</div>
-            <div class="kpi-progress-track">
-              <div class="kpi-progress-fill" id="bar_ibl_fill" style="width:0%; background:linear-gradient(90deg, #F59E0B, #FBBF24);"></div>
-            </div>
-          </div>
-
-          <!-- KARTU 4: PELAYANAN BULAN INI -->
-          <div class="stat-kpi-card" id="kpiCard_bulan" onclick="selectStatDetailTab('bulan')">
-            <div class="kpi-top-row">
-              <div>
-                <div class="kpi-label">Pelayanan Bulan Ini</div>
-                <div class="kpi-value" style="color:var(--primary);" id="stat_bulan_dosis">0</div>
-              </div>
-              <div style="width:38px; height:38px; border-radius:10px; background:#FFF7ED; color:var(--primary); display:flex; align-items:center; justify-content:center; font-size:1.1rem;">
-                <i class="fas fa-syringe"></i>
-              </div>
-            </div>
-            <div class="kpi-sub" id="stat_bulan_sub">0 dosis pada 0 sasaran bulan ini</div>
-            <div class="kpi-progress-track">
-              <div class="kpi-progress-fill" id="bar_bulan_fill" style="width:0%; background:linear-gradient(90deg, var(--primary), #FB923C);"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- LACI GRAFIK RINCIAN INTERAKTIF (MUNCUL SAAT KARTU DIKLIK) -->
-        <div id="statDetailDrawer" class="stat-detail-drawer" style="display:none;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <strong id="statDetailTitle" style="color:var(--accent); font-size:0.86rem;">Detail Indikator</strong>
-            <button type="button" class="btn btn-ghost" onclick="closeStatDetailDrawer()" style="padding:3px 9px; font-size:0.74rem;">
-              <i class="fas fa-times"></i> Tutup Grafik
-            </button>
-          </div>
-          <div id="statDetailBody"></div>
-        </div>
-      </div>
-
       <!-- MENU AWAL: HANYA CARI / UPDATE SASARAN REGISTERED -->
       <div class="card" id="cardSearchSasaran" style="background: linear-gradient(135deg, #F0F7FF 0%, #E0F2FE 100%); border: 1.5px solid #7DD3FC;">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:6px;">
           <h2 style="margin:0;"><i class="fas fa-search" style="color:var(--info)"></i> Cari / Update Sasaran Registered</h2>
-          <button type="button" class="btn btn-ghost" id="btnTogglePreviewKohort" onclick="toggleTableSection('cardPreviewKohort', this, 'Tabel Preview')" style="padding:6px 12px; font-size:0.78rem; background:#FFF;">
-            <i class="fas fa-eye" style="color:var(--primary);"></i> Tampilkan Tabel Preview
-          </button>
         </div>
         <p class="lead" style="font-size:0.83rem; margin-bottom:12px;">
           Ketik nama sasaran atau pilih desa terlebih dahulu untuk mengecek riwayat imunisasi. Jika sasaran belum terdaftar, tombol <strong>Tambah Sasaran</strong> akan muncul otomatis.
@@ -1452,15 +1205,15 @@
         </form>
       </div>
 
-      <!-- TABEL PREVIEW DATA KOHORT (TERSEMBUNYI JIKA TIDAK ADA DESA DIPILIH) -->
-      <div class="card" id="cardPreviewKohort" style="display:none;">
+      <!-- TABEL PREVIEW DATA KOHORT -->
+      <div class="card" id="cardPreviewKohort">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
           <div>
             <h3 style="margin:0;"><i class="fas fa-list-check" style="color:var(--success);"></i> Preview Data (<span id="preview_desa_title">Semua Desa</span>)</h3>
           </div>
           <div style="display:flex; gap:6px; flex-wrap:wrap;">
-            <button type="button" class="btn btn-ghost" id="btnToggleDewasaTable" onclick="toggleTableSection('dewasaPreviewWrapper', this, 'Tabel Catin/Bumil')" style="padding:5px 10px; font-size:0.78rem;">
-              <i class="fas fa-eye"></i> Tampilkan Tabel Catin/Bumil
+            <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('tblRecentDewasaSection')" style="padding:5px 10px; font-size:0.78rem;">
+              <i class="fas fa-arrow-down"></i> Tabel Catin/Bumil
             </button>
             <button type="button" class="btn btn-ghost" onclick="loadRecentTransactions()" style="padding:5px 10px; font-size:0.78rem;">
               <i class="fas fa-sync-alt"></i> Refresh
@@ -1486,21 +1239,19 @@
           </table>
         </div>
 
-        <div id="dewasaPreviewWrapper" style="display:none;">
-          <h4 id="tblRecentDewasaSection" style="color:#065F46; margin-top:20px; font-size:0.92rem;"><i class="fas fa-female"></i> Matriks Td Catin & Ibu Hamil</h4>
-          <div class="table-container">
-            <table class="kohort-table" id="tblRecentDewasa">
-              <thead>
-                <tr>
-                  <th class="sticky-col-0" rowspan="2">No</th><th class="sticky-col-1" rowspan="2">Nama Sasaran</th><th class="sticky-col-2" rowspan="2">Tgl Lahir</th>
-                  <th rowspan="2">L/P</th><th rowspan="2">Suami/Pasangan</th><th rowspan="2">WhatsApp</th><th rowspan="2">Desa</th><th rowspan="2">Alamat</th>
-                  <th colspan="2">TT Catin</th><th colspan="5">TT Ibu Hamil</th><th rowspan="2">Petugas</th><th rowspan="2">Aksi</th>
-                </tr>
-                <tr><th>TT1</th><th>TT2</th><th>TT1</th><th>TT2</th><th>TT3</th><th>TT4</th><th>TT5</th></tr>
-              </thead>
-              <tbody><tr><td colspan="17" style="text-align:center;"><i class="fas fa-info-circle"></i> Pilih desa untuk melihat preview data.</td></tr></tbody>
-            </table>
-          </div>
+        <h4 id="tblRecentDewasaSection" style="color:#065F46; margin-top:20px; font-size:0.92rem;"><i class="fas fa-female"></i> Matriks Td Catin & Ibu Hamil</h4>
+        <div class="table-container">
+          <table class="kohort-table" id="tblRecentDewasa">
+            <thead>
+              <tr>
+                <th class="sticky-col-0" rowspan="2">No</th><th class="sticky-col-1" rowspan="2">Nama Sasaran</th><th class="sticky-col-2" rowspan="2">Tgl Lahir</th>
+                <th rowspan="2">L/P</th><th rowspan="2">Suami/Pasangan</th><th rowspan="2">WhatsApp</th><th rowspan="2">Desa</th><th rowspan="2">Alamat</th>
+                <th colspan="2">TT Catin</th><th colspan="5">TT Ibu Hamil</th><th rowspan="2">Petugas</th><th rowspan="2">Aksi</th>
+              </tr>
+              <tr><th>TT1</th><th>TT2</th><th>TT1</th><th>TT2</th><th>TT3</th><th>TT4</th><th>TT5</th></tr>
+            </thead>
+            <tbody><tr><td colspan="17" style="text-align:center;"><i class="fas fa-info-circle"></i> Pilih desa untuk melihat preview data.</td></tr></tbody>
+          </table>
         </div>
       </div>
     </section>
@@ -2070,29 +1821,6 @@
         const yOffset = -80;
         const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
         window.scrollTo({ top: y, behavior: 'smooth' });
-      }
-      function setToggleButtonState(btnEl, isVisible, labelText) {
-      if (!btnEl) return;
-      if (isVisible) {
-        btnEl.classList.add('btn-toggle-active');
-        btnEl.innerHTML = `<i class="fas fa-eye-slash"></i> Sembunyikan ${labelText}`;
-      } else {
-        btnEl.classList.remove('btn-toggle-active');
-        btnEl.innerHTML = `<i class="fas fa-eye"></i> Tampilkan ${labelText}`;
-      }
-    }
-
-    window.toggleTableSection = function(targetId, btnEl, labelText) {
-      const el = document.getElementById(targetId);
-      if (!el) return;
-      const isCurrentlyHidden = window.getComputedStyle(el).display === 'none';
-      if (isCurrentlyHidden) {
-        el.style.display = targetId === 'cardAdminExportImport' ? 'grid' : 'block';
-        setToggleButtonState(btnEl, true, labelText);
-        setTimeout(() => smoothScrollToId(targetId), 70);
-      } else {
-        el.style.display = 'none';
-        setToggleButtonState(btnEl, false, labelText);
       }
     };
 
@@ -3647,204 +3375,15 @@ window.goToEdit = function(encodedJson) {
         currentInputDesa = e.target.value;
         document.getElementById('notFoundAddContainer').style.display = 'none';
         populateAnakByDesa();
-        async function loadRecentTransactions() {
-      const tbodyAnak = document.querySelector('#tblRecentAnak tbody');
-      const tbodyDewasa = document.querySelector('#tblRecentDewasa tbody');
-      const titleSpan = document.getElementById('preview_desa_title');
-      const previewCard = document.getElementById('cardPreviewKohort');
-      const togglePreviewBtn = document.getElementById('btnTogglePreviewKohort');
-
-      renderInputInteractiveDashboard();
-
-      if (!currentInputDesa) {
-        if (previewCard) previewCard.style.display = 'none';
-        setToggleButtonState(togglePreviewBtn, false, 'Tabel Preview');
-        let activeStatDetailKey = null;
-    let latestStatsSnapshot = null;
-
-    function renderInputInteractiveDashboard() {
-      const scopeBadge = document.getElementById('statsScopeBadge');
-      if (!scopeBadge) return;
-
-      const offlineQueue = JSON.parse(localStorage.getItem('pkm_offline_queue') || '[]');
-      const mergedMap = new Map();
-      cachedGlobalKohortData.forEach(item => {
-        const key = item.id || `${item.desa}_${item.nama_anak}_${item.tgl_lahir}`.toLowerCase();
-        mergedMap.set(key, item);
+        loadRecentTransactions();
       });
-      offlineQueue.forEach(item => {
-        const key = item.id || `${item.desa}_${item.nama_anak}_${item.tgl_lahir}`.toLowerCase();
-        mergedMap.set(key, { ...mergedMap.get(key), ...item });
+      bindEvent('cert_filter_desa', 'change', (e) => {
+        populateCertSasaranByDesa(e.target.value);
       });
-
-      const allRecords = Array.from(mergedMap.values());
-      const filteredRecords = currentInputDesa
-        ? allRecords.filter(d => d.desa && d.desa.toLowerCase() === currentInputDesa.toLowerCase())
-        : allRecords;
-
-      scopeBadge.innerHTML = currentInputDesa
-        ? `<i class="fas fa-map-marker-alt"></i> Filter: Desa ${currentInputDesa}`
-        : `<i class="fas fa-globe-asia"></i> Semua Desa (Puskesmas Melata)`;
-
-      let countBayiAnak = 0, countCatin = 0, countBumil = 0;
-      let countIDL = 0, countIBL = 0;
-      let dosesThisMonth = 0;
-      const sasaranServedThisMonth = new Set();
-      const currentYM = new Date().toISOString().slice(0, 7); // YYYY-MM
-
-      const idlBreakdown = { "HB-0": 0, "BCG": 0, "DPT-HB-Hib 3": 0, "OPV 4": 0, "IPV 1": 0, "Campak Rubela 1": 0 };
-      const iblBreakdown = { "DPT-HB-Hib 4": 0, "Campak Rubela 2 (MR2)": 0, "PCV 3": 0 };
-      const monthAntigenBreakdown = {};
-
-      filteredRecords.forEach(d => {
-        if (d.peran === 'Catin') countCatin++;
-        else if (d.peran === 'Bumil') countBumil++;
-        else countBayiAnak++;
-
-        const getVal = (vk) => d[`vaksin_${vk.replace(/[\s\(\)<>-]/g, '_')}`] || (d.jenis_imunisasi === vk ? d.tanggal_pelayanan : null);
-
-        if (d.peran !== 'Catin' && d.peran !== 'Bumil') {
-          const hasHb0 = Boolean(getVal("HBO (<24 Jam)") || getVal("HBO (1-7 Hari)"));
-          const hasBcg = Boolean(getVal("BCG"));
-          const hasDpt3 = Boolean(getVal("DPT-HB-Hib3"));
-          const hasOpv4 = Boolean(getVal("OPV4"));
-          const hasIpv1 = Boolean(getVal("IPV1"));
-          const hasMr1 = Boolean(getVal("Campak Rubela-1"));
-
-          if (hasHb0) idlBreakdown["HB-0"]++;
-          if (hasBcg) idlBreakdown["BCG"]++;
-          if (hasDpt3) idlBreakdown["DPT-HB-Hib 3"]++;
-          if (hasOpv4) idlBreakdown["OPV 4"]++;
-          if (hasIpv1) idlBreakdown["IPV 1"]++;
-          if (hasMr1) idlBreakdown["Campak Rubela 1"]++;
-
-          if (hasHb0 && hasBcg && hasDpt3 && hasOpv4 && hasIpv1 && hasMr1) {
-            countIDL++;
-          }
-
-          const hasDpt4 = Boolean(getVal("DPT-HB-Hib4"));
-          const hasMr2 = Boolean(getVal("Campak Rubela-2"));
-          const hasPcv3 = Boolean(getVal("PCV3"));
-          if (hasDpt4) iblBreakdown["DPT-HB-Hib 4"]++;
-          if (hasMr2) iblBreakdown["Campak Rubela 2 (MR2)"]++;
-          if (hasPcv3) iblBreakdown["PCV 3"]++;
-
-          if (hasDpt4 && hasMr2) {
-            countIBL++;
-          }
-        }
-
-        ALL_VAKSIN_KEYS.forEach(vk => {
-          const dt = getVal(vk);
-          if (dt && String(dt).startsWith(currentYM)) {
-            dosesThisMonth++;
-            sasaranServedThisMonth.add(`${d.nama_anak}_${d.tgl_lahir}`);
-            monthAntigenBreakdown[vk] = (monthAntigenBreakdown[vk] || 0) + 1;
-          }
-        });
+      bindEvent('reg_desa', 'change', (e) => {
+        currentInputDesa = e.target.value;
+        loadRecentTransactions();
       });
-
-      const totalSasaran = filteredRecords.length;
-      const pctIDL = countBayiAnak > 0 ? Math.min(100, Math.round((countIDL / countBayiAnak) * 100)) : 0;
-      const pctIBL = countBayiAnak > 0 ? Math.min(100, Math.round((countIBL / countBayiAnak) * 100)) : 0;
-      const pctBulan = totalSasaran > 0 ? Math.min(100, Math.round((sasaranServedThisMonth.size / totalSasaran) * 100)) : 0;
-
-      document.getElementById('stat_total_sasaran').textContent = totalSasaran;
-      document.getElementById('stat_total_sub').textContent = `${countBayiAnak} Bayi/Anak • ${countCatin} Catin • ${countBumil} Bumil`;
-
-      document.getElementById('stat_idl_count').textContent = countIDL;
-      document.getElementById('stat_idl_sub').textContent = `${pctIDL}% dari ${countBayiAnak} bayi/anak terdaftar`;
-      document.getElementById('ring_idl_path').setAttribute('stroke-dasharray', `${pctIDL}, 100`);
-      document.getElementById('ring_idl_text').textContent = `${pctIDL}%`;
-      document.getElementById('bar_idl_fill').style.width = `${pctIDL}%`;
-
-      document.getElementById('stat_ibl_count').textContent = countIBL;
-      document.getElementById('stat_ibl_sub').textContent = `${pctIBL}% lengkap DPT-HB-Hib 4 & MR 2`;
-      document.getElementById('ring_ibl_path').setAttribute('stroke-dasharray', `${pctIBL}, 100`);
-      document.getElementById('ring_ibl_text').textContent = `${pctIBL}%`;
-      document.getElementById('bar_ibl_fill').style.width = `${pctIBL}%`;
-
-      document.getElementById('stat_bulan_dosis').textContent = `${dosesThisMonth} Dosis`;
-      document.getElementById('stat_bulan_sub').textContent = `${sasaranServedThisMonth.size} sasaran dilayani (${currentYM})`;
-      document.getElementById('bar_bulan_fill').style.width = `${pctBulan}%`;
-
-      latestStatsSnapshot = {
-        totalSasaran, countBayiAnak, countCatin, countBumil,
-        countIDL, pctIDL, idlBreakdown,
-        countIBL, pctIBL, iblBreakdown,
-        dosesThisMonth, servedCount: sasaranServedThisMonth.size, monthAntigenBreakdown, currentYM
-      };
-
-      if (activeStatDetailKey) renderStatDetailDrawer(activeStatDetailKey);
-    }
-
-    window.selectStatDetailTab = function(metricKey) {
-      const drawer = document.getElementById('statDetailDrawer');
-      if (activeStatDetailKey === metricKey && drawer.style.display === 'block') {
-        closeStatDetailDrawer();
-        return;
-      }
-      activeStatDetailKey = metricKey;
-      document.querySelectorAll('.stat-kpi-card').forEach(c => c.classList.remove('active-kpi'));
-      const activeCard = document.getElementById(`kpiCard_${metricKey}`);
-      if (activeCard) activeCard.classList.add('active-kpi');
-      renderStatDetailDrawer(metricKey);
-    };
-
-    window.closeStatDetailDrawer = function() {
-      activeStatDetailKey = null;
-      document.querySelectorAll('.stat-kpi-card').forEach(c => c.classList.remove('active-kpi'));
-      const drawer = document.getElementById('statDetailDrawer');
-      if (drawer) drawer.style.display = 'none';
-    };
-
-    function renderStatDetailDrawer(metricKey) {
-      if (!latestStatsSnapshot) return;
-      const drawer = document.getElementById('statDetailDrawer');
-      const titleEl = document.getElementById('statDetailTitle');
-      const bodyEl = document.getElementById('statDetailBody');
-      const s = latestStatsSnapshot;
-
-      const buildBars = (entries, maxBase, colorHex) => entries.map(([label, val]) => {
-        const pct = maxBase > 0 ? Math.min(100, Math.round((val / maxBase) * 100)) : 0;
-        return `
-          <div class="mini-bar-row">
-            <div class="mini-bar-label">${label}</div>
-            <div class="mini-bar-track"><div class="mini-bar-fill" style="width:${pct}%; background:${colorHex};"></div></div>
-            <div class="mini-bar-val">${val} (${pct}%)</div>
-          </div>`;
-      }).join('');
-
-      if (metricKey === 'total') {
-        titleEl.innerHTML = `<i class="fas fa-users" style="color:#2563EB;"></i> Distribusi Kategori Sasaran Terdaftar (${s.totalSasaran} Jiwa)`;
-        bodyEl.innerHTML = buildBars([
-          ['Bayi / Baduta / Anak', s.countBayiAnak],
-          ['Calon Pengantin (Catin)', s.countCatin],
-          ['Ibu Hamil (Bumil)', s.countBumil]
-        ], Math.max(1, s.totalSasaran), '#2563EB');
-      } else if (metricKey === 'idl') {
-        titleEl.innerHTML = `<i class="fas fa-certificate" style="color:#10B981;"></i> Grafik Kelengkapan Antigen Kunci IDL (Basis: ${s.countBayiAnak} Anak)`;
-        bodyEl.innerHTML = buildBars(Object.entries(s.idlBreakdown), Math.max(1, s.countBayiAnak), '#10B981');
-      } else if (metricKey === 'ibl') {
-        titleEl.innerHTML = `<i class="fas fa-child" style="color:#F59E0B;"></i> Grafik Imunisasi Lanjutan Baduta / IBL (Basis: ${s.countBayiAnak} Anak)`;
-        bodyEl.innerHTML = buildBars(Object.entries(s.iblBreakdown), Math.max(1, s.countBayiAnak), '#F59E0B');
-      } else if (metricKey === 'bulan') {
-        titleEl.innerHTML = `<i class="fas fa-syringe" style="color:var(--primary);"></i> Rincian Dosis Diberikan Bulan ${s.currentYM} (${s.dosesThisMonth} Dosis)`;
-        const sortedMonth = Object.entries(s.monthAntigenBreakdown).sort((a, b) => b[1] - a[1]);
-        bodyEl.innerHTML = sortedMonth.length > 0
-          ? buildBars(sortedMonth, Math.max(1, s.dosesThisMonth), 'var(--primary)')
-          : `<p style="font-size:0.78rem; color:var(--muted); margin:0;">Belum ada pelayanan imunisasi tercatat pada bulan ${s.currentYM}.</p>`;
-      }
-      drawer.style.display = 'block';
-    }
-        titleSpan.textContent = "Belum Ada Desa Dipilih";
-        tbodyAnak.innerHTML = '<tr><td colspan="32" style="text-align:center; color:var(--muted);"><i class="fas fa-arrow-up"></i> Pilih desa pada kolom filter di atas untuk melihat preview.</td></tr>';
-        tbodyDewasa.innerHTML = '<tr><td colspan="17" style="text-align:center; color:var(--muted);"><i class="fas fa-arrow-up"></i> Pilih desa pada kolom filter di atas untuk melihat preview.</td></tr>';
-        return;
-      }
-
-      if (previewCard) previewCard.style.display = 'block';
-      setToggleButtonState(togglePreviewBtn, true, 'Tabel Preview');
       bindEvent('select_anak_registered', 'change', fillFormWithSelectedAnak);
 
       setupLiveSearchAndDuplicateDetection();

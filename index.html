@@ -1399,8 +1399,90 @@
             <p class="lead" style="margin:4px 0 0 0;">Pusat kendali pengguna, cetak sertifikat &amp; kartu QR, ekspor-impor terfilter, target sasaran, serta logika urutan prioritas pop-up QR.</p>
           </div>
           <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardAdminUsers')" style="padding:5px 10px; font-size:0.75rem; background:#FFF;"><i class="fas fa-users-cog"></i> Manajemen Pengguna</button>
             <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardAdminExportImport')" style="padding:5px 10px; font-size:0.75rem; background:#FFF;"><i class="fas fa-arrow-down"></i> Ekspor/Impor</button>
             <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardAdminSettings')" style="padding:5px 10px; font-size:0.75rem; background:#FFF;"><i class="fas fa-arrow-down"></i> Pengaturan Prioritas QR</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MANAJEMEN PENGGUNA (KHUSUS ADMIN) -->
+      <div class="card" id="cardAdminUsers" style="background:linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%); border:1.5px solid #38BDF8;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+          <div>
+            <h3 style="margin:0; color:var(--accent); font-size:1.02rem;"><i class="fas fa-users-cog" style="color:var(--info);"></i> Manajemen Pengguna (Petugas, Kader &amp; Admin)</h3>
+            <span style="font-size:0.76rem; color:#0369A1;">Kelola username, password, hak akses (Role), dan status aktif akun penginput.</span>
+          </div>
+          <button type="button" class="btn btn-info" onclick="togglePanelManajemenUser()" style="padding:6px 12px; font-size:0.8rem;">
+            <i class="fas fa-user-lock"></i> Buka / Tutup Kelola Pengguna
+          </button>
+        </div>
+
+        <div id="panelManajemenUser" style="display:none; margin-top:14px; border-top:1px dashed #7DD3FC; padding-top:14px;">
+          <form id="formManajemenUser">
+            <input type="hidden" id="usr_edit_index" value="-1">
+            <div class="grid">
+              <div class="form-group">
+                <label>Username Login <span class="req">*</span></label>
+                <input type="text" id="usr_username" placeholder="Contoh: bidan_siti (tanpa spasi)" required autocomplete="off">
+              </div>
+              <div class="form-group">
+                <label>Nama Lengkap / Tampilan Audit <span class="req">*</span></label>
+                <input type="text" id="usr_nama_lengkap" placeholder="Contoh: Bd. Siti Aminah, A.Md.Keb" required>
+              </div>
+              <div class="form-group">
+                <label>Password Akun <span class="req">*</span></label>
+                <input type="text" id="usr_password" placeholder="Masukkan password akun" required autocomplete="off">
+              </div>
+              <div class="form-group">
+                <label>Hak Akses (Role) <span class="req">*</span></label>
+                <select id="usr_role" required>
+                  <option value="petugas">Petugas / Kader (Input &amp; Laporan)</option>
+                  <option value="admin">Admin (Akses Penuh &amp; Pengaturan)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Wilayah / Desa Tugas</label>
+                <select id="usr_desa">
+                  <option value="Semua Desa">Semua Desa / Puskesmas</option>
+                  <option value="Melata">Melata</option><option value="Nanuah">Nanuah</option><option value="Topalan">Topalan</option>
+                  <option value="Batu Ampar">Batu Ampar</option><option value="Lubuk Hiju">Lubuk Hiju</option><option value="Bukit Makmur">Bukit Makmur</option>
+                  <option value="Bukit Raya">Bukit Raya</option><option value="Modang Mas">Modang Mas</option><option value="Mukti Manunggal">Mukti Manunggal</option>
+                  <option value="Sumber Jaya">Sumber Jaya</option><option value="Bukit Harum">Bukit Harum</option><option value="PT. TSA">PT. TSA</option><option value="PT. SHS">PT. SHS</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Status Akun</label>
+                <select id="usr_status">
+                  <option value="aktif">Aktif (Dapat Login)</option>
+                  <option value="nonaktif">Nonaktif (Diblokir Sementara)</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="background:#FFF; border:1px solid #BAE6FD; border-radius:9px; padding:10px 12px; margin-top:6px;">
+              <label style="margin:0; font-size:0.8rem; cursor:pointer; display:flex; align-items:center; gap:8px; color:#0F172A;">
+                <input type="checkbox" id="usr_allow_global_fallback" checked style="width:16px; height:16px; accent-color:var(--info);">
+                <span>Izinkan username baru yang belum terdaftar login menggunakan password global cadangan (<code>sri26</code>)</span>
+              </label>
+            </div>
+
+            <div class="actions" style="justify-content:flex-start; margin-bottom:16px;">
+              <button type="submit" id="btnSubmitManajemenUser" class="btn btn-primary"><i class="fas fa-user-plus"></i> Simpan Pengguna</button>
+              <button type="button" id="btnCancelEditUser" class="btn btn-ghost" onclick="resetFormManajemenUser()" style="display:none;"><i class="fas fa-times"></i> Batal Edit</button>
+            </div>
+          </form>
+
+          <h4 style="color:var(--accent); margin:10px 0 6px 0; font-size:0.9rem;"><i class="fas fa-list"></i> Daftar Pengguna Terdaftar</h4>
+          <div class="table-container">
+            <table class="kohort-table" id="tblManajemenUser">
+              <thead>
+                <tr>
+                  <th>No</th><th>Username</th><th>Nama Lengkap</th><th>Role</th><th>Wilayah</th><th>Password</th><th>Status</th><th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody><tr><td colspan="8" style="text-align:center;">Memuat daftar pengguna...</td></tr></tbody>
+            </table>
           </div>
         </div>
       </div>
@@ -1750,7 +1832,8 @@
     const CLASS_MAP = { 'SD': [1, 2, 3, 4, 5, 6], 'SMP': [7, 8, 9], 'SMA': [10, 11, 12] };
     let classInputCounter = 0;
     let currentInputDesa = "";
-    let activePetugasName = "";
+let activePetugasName = "";
+    let activePetugasRole = "petugas";
     let cachedGlobalKohortData = [];
     let currentQrChildData = null;
     let isPublicQrMode = Boolean(window.__IS_PUBLIC_QR_MODE__);
@@ -1761,6 +1844,17 @@
     const AUTH_ADMIN_PASS = "adminsri26";
     const SESSION_TIMEOUT_MS = 30 * 60 * 1000; // Timeout sesi 30 menit tanpa aktivitas
 
+    let SYSTEM_USERS_CONFIG = {
+      users: [
+        { username: "admin", nama_lengkap: "Administrator Puskesmas", password: AUTH_ADMIN_PASS, role: "admin", desa: "Semua Desa", status: "aktif" }
+      ],
+      allow_global_fallback: true
+    };
+
+    function isCurrentUserAdmin() {
+      if (!activePetugasName) return false;
+      return activePetugasRole === 'admin' || activePetugasName.toLowerCase() === AUTH_ADMIN_USER;
+    }
     let currentOcrTargetId = "";
     let currentOcrMode = "single"; 
     let cameraStream = null;
@@ -1771,19 +1865,26 @@
     // =========================================================================
     // MANAJEMEN SESI PETUGAS / KADER + AUTO TIMEOUT INAKTIVITAS
     // =========================================================================
-    function savePetugasSession(username) {
-      activePetugasName = username;
-      localStorage.setItem('pkm_app_username', username);
+    function savePetugasSession(displayName, role = 'petugas', loginId = '') {
+      activePetugasName = displayName;
+      activePetugasRole = role || 'petugas';
+      localStorage.setItem('pkm_app_username', displayName);
+      if (loginId) localStorage.setItem('pkm_login_id', loginId);
+      localStorage.setItem('pkm_app_role', activePetugasRole);
       localStorage.setItem('pkm_session_active', '1');
       localStorage.setItem('pkm_last_activity', String(Date.now()));
       const badgeSpan = document.querySelector('#currentUserDisplay span');
-      if (badgeSpan) badgeSpan.textContent = username;
+      if (badgeSpan) {
+        badgeSpan.textContent = activePetugasRole === 'admin' ? `${displayName} (Admin)` : displayName;
+      }
     }
 
     function clearPetugasSession() {
       activePetugasName = "";
+      activePetugasRole = "petugas";
       localStorage.removeItem('pkm_session_active');
       localStorage.removeItem('pkm_last_activity');
+      localStorage.removeItem('pkm_app_role');
     }
 
     function isPetugasSessionValid() {
@@ -3181,19 +3282,29 @@ window.goToEdit = function(encodedJson) {
     // =========================================================================
     // SISTEM LOGIN PETUGAS & ADMIN + SESSION PERSISTENCE & IDLE TIMEOUT
     // =========================================================================
-    function initUserAuthCheck() {
-      const savedUser = localStorage.getItem('pkm_app_username');
+function initUserAuthCheck() {
+      try {
+        const cachedUsersStr = localStorage.getItem('pkm_system_users_cfg');
+        if (cachedUsersStr) {
+          const parsed = JSON.parse(cachedUsersStr);
+          if (parsed && Array.isArray(parsed.users)) SYSTEM_USERS_CONFIG = parsed;
+        }
+      } catch (e) {}
+
+      const savedLoginId = localStorage.getItem('pkm_login_id') || localStorage.getItem('pkm_app_username');
+      const savedDisplayName = localStorage.getItem('pkm_app_username');
       const userInputEl = document.getElementById('login_username');
       const hintEl = document.getElementById('login_device_hint');
       const formLogin = document.getElementById('formLoginPetugas');
 
-      if (savedUser && userInputEl) {
-        userInputEl.value = savedUser;
-        if (hintEl) hintEl.innerHTML = `<i class="fas fa-mobile-alt"></i> Akun tersimpan: <strong>${savedUser}</strong>`;
+      if (savedLoginId && userInputEl) {
+        userInputEl.value = savedLoginId;
+        if (hintEl) hintEl.innerHTML = `<i class="fas fa-mobile-alt"></i> Akun tersimpan: <strong>${savedLoginId}</strong>`;
       }
 
       if (isPetugasSessionValid()) {
-        savePetugasSession(savedUser);
+        const savedRole = localStorage.getItem('pkm_app_role') || (savedDisplayName.toLowerCase() === AUTH_ADMIN_USER ? 'admin' : 'petugas');
+        savePetugasSession(savedDisplayName, savedRole, savedLoginId);
       }
 
       ['click', 'keydown', 'touchstart', 'scroll'].forEach(evtName => {
@@ -3226,15 +3337,37 @@ window.goToEdit = function(encodedJson) {
             return;
           }
 
-          const isAdminMatch = usernameInput.toLowerCase() === AUTH_ADMIN_USER &&
-            (passwordInput === AUTH_ADMIN_PASS || passwordInput === AUTH_PASSWORD_PETUGAS);
-          const isPetugasMatch = usernameInput.toLowerCase() !== AUTH_ADMIN_USER &&
-            passwordInput === AUTH_PASSWORD_PETUGAS;
+          const matchedUser = (SYSTEM_USERS_CONFIG.users || []).find(
+            u => u.username && u.username.toLowerCase() === usernameInput.toLowerCase()
+          );
 
-          if (isAdminMatch || isPetugasMatch) {
-            const finalUser = usernameInput.toLowerCase() === AUTH_ADMIN_USER ? AUTH_ADMIN_USER : usernameInput;
-            savePetugasSession(finalUser);
+          let loginSuccess = false;
+          let finalDisplayName = usernameInput;
+          let finalRole = 'petugas';
 
+          if (matchedUser) {
+            if (matchedUser.status === 'nonaktif') {
+              errDiv.textContent = `❌ Akun "${matchedUser.username}" sedang dinonaktifkan oleh Admin.`;
+              errDiv.style.display = 'block';
+              return;
+            }
+            if (passwordInput === matchedUser.password) {
+              loginSuccess = true;
+              finalDisplayName = matchedUser.nama_lengkap || matchedUser.username;
+              finalRole = matchedUser.role || 'petugas';
+            }
+          } else if (usernameInput.toLowerCase() === AUTH_ADMIN_USER && passwordInput === AUTH_ADMIN_PASS) {
+            loginSuccess = true;
+            finalDisplayName = AUTH_ADMIN_USER;
+            finalRole = 'admin';
+          } else if (SYSTEM_USERS_CONFIG.allow_global_fallback !== false && usernameInput.toLowerCase() !== AUTH_ADMIN_USER && passwordInput === AUTH_PASSWORD_PETUGAS) {
+            loginSuccess = true;
+            finalDisplayName = usernameInput;
+            finalRole = 'petugas';
+          }
+
+          if (loginSuccess) {
+            savePetugasSession(finalDisplayName, finalRole, usernameInput);
             document.getElementById('loginModal').style.display = 'none';
             errDiv.style.display = 'none';
             const banner = document.getElementById('loginQuickImunisasiBanner');
@@ -3251,10 +3384,37 @@ window.goToEdit = function(encodedJson) {
               refreshCacheGlobalData();
               loadRecentTransactions();
             }
-          } else {
-            errDiv.textContent = "❌ Password salah! Silakan periksa kembali password akun Anda.";
-            errDiv.style.display = 'block';
+          const matchedUser = (SYSTEM_USERS_CONFIG.users || []).find(
+            u => u.username && u.username.toLowerCase() === usernameInput.toLowerCase()
+          );
+
+          let loginSuccess = false;
+          let finalDisplayName = usernameInput;
+          let finalRole = 'petugas';
+
+          if (matchedUser) {
+            if (matchedUser.status === 'nonaktif') {
+              errDiv.textContent = `❌ Akun "${matchedUser.username}" sedang dinonaktifkan oleh Admin.`;
+              errDiv.style.display = 'block';
+              return;
+            }
+            if (passwordInput === matchedUser.password) {
+              loginSuccess = true;
+              finalDisplayName = matchedUser.nama_lengkap || matchedUser.username;
+              finalRole = matchedUser.role || 'petugas';
+            }
+          } else if (usernameInput.toLowerCase() === AUTH_ADMIN_USER && passwordInput === AUTH_ADMIN_PASS) {
+            loginSuccess = true;
+            finalDisplayName = AUTH_ADMIN_USER;
+            finalRole = 'admin';
+          } else if (SYSTEM_USERS_CONFIG.allow_global_fallback !== false && usernameInput.toLowerCase() !== AUTH_ADMIN_USER && passwordInput === AUTH_PASSWORD_PETUGAS) {
+            loginSuccess = true;
+            finalDisplayName = usernameInput;
+            finalRole = 'petugas';
           }
+
+          if (loginSuccess) {
+            savePetugasSession(finalDisplayName, finalRole, usernameInput);
         });
       }
     }

@@ -1839,6 +1839,8 @@
     window.hideFormRegisterSmooth = function() {
       const cardForm = document.getElementById('cardFormUtama');
       cardForm.style.display = 'none';
+      currentInputDesa = document.getElementById('search_desa_anak')?.value || "";
+      loadRecentTransactions();
       smoothScrollToId('cardSearchSasaran');
     };
 
@@ -2224,11 +2226,10 @@
       // Set Peran ke Bayi/Anak agar form imunisasi anak terbuka sesuai sasaran
       const peranEl = document.getElementById('reg_peran');
       if (peranEl) {
-        peranEl.value = childData.peran || 'Bayi/Anak';
+        peranEl.value = childData.peran || 'Bayi/Baduta';
         applyPeranUIFilter();
       }
 
-      // Isi seluruh identitas anak dari data QR/Firestore
       const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
       setVal('reg_nama_anak', childData.nama_anak);
       setVal('reg_nik_anak', childData.nik_anak);
@@ -2236,16 +2237,14 @@
       setVal('reg_jk', childData.jk || 'L');
       setVal('reg_nama_ibu', childData.nama_ibu);
       setVal('reg_nik_ibu', childData.nik_ibu);
-      setVal('reg_no_hp', childData.no_hp);
+      setVal('reg_wa_anak', childData.wa_anak || childData.no_hp);
       setVal('reg_desa', childData.desa);
-      setVal('reg_alamat_rt', childData.alamat_rt);
+      setVal('reg_alamat', childData.alamat_rt);
       setVal('reg_tgl_pelayanan', new Date().toISOString().split('T')[0]);
 
-      if (childData.desa) {
-        currentInputDesa = childData.desa;
-        const searchDesaEl = document.getElementById('search_desa_anak');
-        if (searchDesaEl) searchDesaEl.value = childData.desa;
-      }
+      currentInputDesa = childData.desa || "";
+      const searchDesaEl = document.getElementById('search_desa_anak');
+      if (searchDesaEl) searchDesaEl.value = currentInputDesa;
 
       // Centang riwayat vaksin yang sudah diterima sebelumnya
       document.querySelectorAll('input[name="chk_vaksin"]').forEach(cb => {
@@ -2262,10 +2261,13 @@
         }
       });
 
-      currentQrChildData = childData;
+      currentQrChildData = null;
       const btnQrForm = document.getElementById('btnCetakQrFromForm');
-      if (btnQrForm) btnQrForm.style.display = 'inline-flex';
-
+      if (btnQrForm) btnQrForm.style.display = 'none';
+      currentInputDesa = document.getElementById('search_desa_anak')?.value || "";
+      loadRecentTransactions();
+      applyPeranUIFilter();
+    };
       const cardForm = document.getElementById('cardFormUtama');
       if (cardForm) {
         let quickBanner = document.getElementById('quickQrActiveFormBanner');
@@ -3381,7 +3383,7 @@ window.goToEdit = function(encodedJson) {
         populateCertSasaranByDesa(e.target.value);
       });
       bindEvent('reg_desa', 'change', (e) => {
-        currentInputDesa = e.target.value;
+        currentInputDesa = e.target.value || document.getElementById('search_desa_anak')?.value || "";
         loadRecentTransactions();
       });
       bindEvent('select_anak_registered', 'change', fillFormWithSelectedAnak);

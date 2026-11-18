@@ -1839,6 +1839,8 @@
     window.hideFormRegisterSmooth = function() {
       const cardForm = document.getElementById('cardFormUtama');
       cardForm.style.display = 'none';
+      currentInputDesa = document.getElementById('search_desa_anak')?.value || "";
+      loadRecentTransactions();
       smoothScrollToId('cardSearchSasaran');
     };
 
@@ -3026,6 +3028,8 @@ window.goToEdit = function(encodedJson) {
       currentQrChildData = null;
       const btnQrForm = document.getElementById('btnCetakQrFromForm');
       if (btnQrForm) btnQrForm.style.display = 'none';
+      currentInputDesa = document.getElementById('search_desa_anak')?.value || "";
+      loadRecentTransactions();
       applyPeranUIFilter();
     };
 
@@ -3381,7 +3385,7 @@ window.goToEdit = function(encodedJson) {
         populateCertSasaranByDesa(e.target.value);
       });
       bindEvent('reg_desa', 'change', (e) => {
-        currentInputDesa = e.target.value;
+        currentInputDesa = e.target.value || document.getElementById('search_desa_anak')?.value || "";
         loadRecentTransactions();
       });
       bindEvent('select_anak_registered', 'change', fillFormWithSelectedAnak);

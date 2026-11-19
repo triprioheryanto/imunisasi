@@ -4110,6 +4110,179 @@ window.selectFromLiveSearch = function(encodedJson) {
       }
     }
 
+   // =========================================================================
+    // STATE PERAN, WILAYAH KERJA & LOG PENGGUNA
+    // =========================================================================
+    let activeUserRole = localStorage.getItem('pkm_active_role') || 'admin';
+    let activeUserWilayah = localStorage.getItem('pkm_active_wilayah') || 'SEMUA';
+    let USER_ACTIVITY_LOGS = [];
+
+    window.getAllowedVillagesList = function() {
+      if (!activeUserWilayah || activeUserWilayah.trim().toUpperCase() === 'SEMUA') {
+        return ['SEMUA'];
+      }
+      return activeUserWilayah
+        .split(',')
+        .map(v => v.trim().toUpperCase())
+        .filter(Boolean);
+    };
+
+    window.isWilayahDiizinkan = function(namaDesa) {
+      const allowed = getAllowedVillagesList();
+      if (allowed.includes('SEMUA') || !namaDesa) return true;
+      const target = String(namaDesa).trim().toUpperCase();
+      return allowed.some(w => target.includes(w) || w.includes(target));
+    };
+
+    window.terapkanBatasanAksesUser = function() {
+      const isKader = activeUserRole === 'kader';
+      const allowed = getAllowedVillagesList();
+      const isRestrictedWilayah = !allowed.includes('SEMUA');
+
+      // 1. Terapkan pembatasan tampilan khusus Kader melalui CSS dinamis
+      let styleKader = document.getElementById('styleBatasanKader');
+      if (isKader) {
+        if (!styleKader) {
+          styleKader = document.createElement('style');
+          styleKader.id = 'styleBatasanKader';
+          document.head.appendChild(styleKader);
+        }
+        styleKader.textContent = `
+          /* Sembunyikan tab Admin & tombol hapus data master untuk Kader */
+          [data-tab="admin"], [onclick*="openTab('admin')"], [onclick*='openTab("admin")'],
+          #panelManajemenUser, .btn-hapus-sasaran, .admin-only {
+            display: none !important;
+          }
+        `;
+      } else if (styleKader) {
+        styleKader.remove();
+      }
+
+      // 2. Filter otomatis semua dropdown pilihan Desa sesuai wilayah kerja user
+      if (isRestrictedWilayah) {
+        document.querySelectorAll('select').forEach(sel => {
+          const idName = `${sel.id} ${sel.name}`.toLowerCase();
+          if (!idName.includes('desa') && !idName.includes('wilayah')) return;
+
+          const options = Array.from(sel.options);
+          if (options.length <= 1) return;
+
+          options.forEach(opt => {
+            if (!opt.value) {
+              // Sembunyikan opsi "Semua Desa / Pilih Desa" jika kader hanya punya 1 desa
+              opt.hidden = allowed.length === 1;
+              opt.disabled = allowed.length === 1;
+              return;
+            }
+            const cocok = isWilayahDiizinkan(opt.value) || isWilayahDiizinkan(opt.textContent);
+            opt.hidden = !cocok;
+            opt.disabled = !cocok;
+          });
+
+          // Jika hanya 1 desa yang diizinkan, pilih otomatis & picu event change
+          const validOpts = options.filter(o => o.value && !o.disabled);
+          if (validOpts.length === 1 && sel.value !== validOpts[0].value) {
+            sel.value = validOpts[0].value;
+            sel.dispatchEvent(new Event('change'));
+          }
+        });
+      }
+    };
+
+    // =========================================================================
+    // LOG AKTIVITAS PENGGUNA (CLOUD + CACHE LOKAL)
+    // =========================================================================
+    window.catatLogAktivitas = async function(aksi, detail = '') {
+      try {
+        const now = new Date();
+        const waktuStr = now.toLocaleString('id-ID', {
+          day: '2-digit', month: '2-digit', year: 'numeric',
+          hour: '2-digit', minute: '2-digit', second: '2-digit'
+        });
+        const entry = {
+          waktu: waktuStr,
+          iso: now.toISOString(),
+          user: activePetugasName || 'Anonim',
+          role: activeUserRole || 'petugas',
+          wilayah: activeUserWilayah || 'SEMUA',
+          aksi: String(aksi || 'AKSI').toUpperCase(),
+          detail: String(detail || '-')
+        };
+
+        USER_ACTIVITY_LOGS.unshift(entry);
+        if (USER_ACTIVITY_LOGS.length > 150) {
+          USER_ACTIVITY_LOGS = USER_ACTIVITY_LOGS.slice(0, 150);
+        }
+        localStorage.setItem('pkm_cached_user_logs', JSON.stringify(USER_ACTIVITY_LOGS));
+        renderLogAktivitasTable();
+
+        if (navigator.onLine) {
+          await setDoc(doc(db, COL_TARGET, 'CONFIG_LOG_PENGGUNA'), {
+            logs: USER_ACTIVITY_LOGS,
+            updated_at: entry.iso
+          }, { merge: true });
+        }
+      } catch (err) {
+        console.warn('Log aktivitas tertunda:', err.message);
+      }
+    };
+
+    window.loadLogAktivitasFromCloud = async function() {
+      try {
+        const cached = localStorage.getItem('pkm_cached_user_logs');
+        if (cached) USER_ACTIVITY_LOGS = JSON.parse(cached) || [];
+        if (navigator.onLine) {
+          const snap = await getDoc(doc(db, COL_TARGET, 'CONFIG_LOG_PENGGUNA'));
+          if (snap.exists() && Array.isArray(snap.data().logs)) {
+            USER_ACTIVITY_LOGS = snap.data().logs;
+            localStorage.setItem('pkm_cached_user_logs', JSON.stringify(USER_ACTIVITY_LOGS));
+          }
+        }
+      } catch (err) {
+        console.warn('Gagal memuat log cloud:', err.message);
+      }
+      renderLogAktivitasTable();
+    };
+
+    window.renderLogAktivitasTable = function() {
+      const tbody = document.querySelector('#tblLogAktivitas tbody');
+      if (!tbody) return;
+      const keyword = (document.getElementById('filterLogUser')?.value || '').trim().toLowerCase();
+      const filtered = USER_ACTIVITY_LOGS.filter(item => {
+        if (!keyword) return true;
+        return `${item.user} ${item.role} ${item.wilayah} ${item.aksi} ${item.detail}`
+          .toLowerCase()
+          .includes(keyword);
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--muted);">Belum ada riwayat log aktivitas.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = filtered.slice(0, 100).map(l => `
+        <tr>
+          <td style="white-space:nowrap;">${l.waktu || '-'}</td>
+          <td style="font-weight:700;">${l.user || '-'}</td>
+          <td>
+            <span style="background:${l.role === 'kader' ? '#FEF3C7' : '#DBEAFE'}; color:${l.role === 'kader' ? '#92400E' : '#1E40AF'}; padding:2px 6px; border-radius:4px; font-weight:700; font-size:0.68rem;">
+              ${(l.role || 'petugas').toUpperCase()}
+            </span>
+            <div style="font-size:0.68rem; color:var(--muted); margin-top:2px;">${l.wilayah || 'SEMUA'}</div>
+          </td>
+          <td style="font-weight:700; color:var(--primary);">${l.aksi || '-'}</td>
+          <td style="text-align:left;">${l.detail || '-'}</td>
+        </tr>
+      `).join('');
+    };
+
+    // Perekam otomatis untuk setiap submit form & tombol hapus
+    document.addEventListener('submit', (ev) => {
+      const formId = ev.target?.id || 'form_aplikasi';
+      if (formId === 'formManajemenUser') return;
+      catatLogAktivitas('SIMPAN_DATA', `Mengirim form: ${formId}`);
+    }, true);
+
     // =========================================================================
     // MANAJEMEN PENGGUNA (TAMBAH, EDIT, HAPUS PETUGAS / KADER)
     // =========================================================================
@@ -4139,6 +4312,8 @@ window.selectFromLiveSearch = function(encodedJson) {
       const chkStrict = document.getElementById('chkStrictUserLogin');
       if (chkStrict) chkStrict.checked = STRICT_USER_LOGIN_ONLY;
       renderUserManagementTable();
+      await loadLogAktivitasFromCloud();
+      terapkanBatasanAksesUser();
     }
 
     window.togglePanelManajemenUser = function() {
@@ -4148,29 +4323,38 @@ window.selectFromLiveSearch = function(encodedJson) {
       const panel = document.getElementById('panelManajemenUser');
       if (!panel) return;
       panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-      if (panel.style.display === 'block') renderUserManagementTable();
+      if (panel.style.display === 'block') {
+        renderUserManagementTable();
+        loadLogAktivitasFromCloud();
+      }
     };
 
     function renderUserManagementTable() {
       const tbody = document.querySelector('#tblManajemenUser tbody');
       if (!tbody) return;
       if (REGISTERED_USERS_LIST.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--muted);">Belum ada akun petugas/kader tambahan. Silakan isi form di atas untuk menambahkan.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--muted);">Belum ada akun petugas/kader tambahan.</td></tr>';
         return;
       }
-      tbody.innerHTML = REGISTERED_USERS_LIST.map((u, idx) => `
-        <tr>
-          <td>${idx + 1}</td>
-          <td style="font-weight:800; color:var(--accent);">${u.username}</td>
-          <td style="text-align:left; font-weight:700;">${u.nama || u.username}</td>
-          <td style="text-align:left;">${u.jabatan || '-'}</td>
-          <td><code style="background:#F1F5F9; padding:2px 6px; border-radius:4px;">${u.password}</code></td>
-          <td style="display:flex; gap:4px; justify-content:center;">
-            <button type="button" class="btn btn-warning" onclick="editRegisteredUser(${idx})" style="padding:4px 8px; font-size:0.72rem;"><i class="fas fa-edit"></i> Edit</button>
-            <button type="button" class="btn btn-danger" onclick="deleteRegisteredUser(${idx})" style="padding:4px 8px; font-size:0.72rem;"><i class="fas fa-trash"></i> Hapus</button>
-          </td>
-        </tr>
-      `).join('');
+      tbody.innerHTML = REGISTERED_USERS_LIST.map((u, idx) => {
+        const roleLabel = (u.role === 'kader')
+          ? '<span style="background:#FEF3C7; color:#92400E; padding:2px 6px; border-radius:4px; font-size:0.68rem; font-weight:700;">KADER</span>'
+          : '<span style="background:#DBEAFE; color:#1E40AF; padding:2px 6px; border-radius:4px; font-size:0.68rem; font-weight:700;">PETUGAS</span>';
+        return `
+          <tr>
+            <td>${idx + 1}</td>
+            <td style="font-weight:800; color:var(--accent);">${u.username}</td>
+            <td style="text-align:left; font-weight:700;">${u.nama || u.username}</td>
+            <td style="text-align:left;">${u.jabatan || '-'}<br>${roleLabel}</td>
+            <td style="font-weight:700; color:var(--primary);">${u.wilayah || 'SEMUA'}</td>
+            <td><code style="background:#F1F5F9; padding:2px 6px; border-radius:4px;">${u.password}</code></td>
+            <td style="display:flex; gap:4px; justify-content:center;">
+              <button type="button" class="btn btn-warning" onclick="editRegisteredUser(${idx})" style="padding:4px 8px; font-size:0.72rem;"><i class="fas fa-edit"></i> Edit</button>
+              <button type="button" class="btn btn-danger" onclick="deleteRegisteredUser(${idx})" style="padding:4px 8px; font-size:0.72rem;"><i class="fas fa-trash"></i> Hapus</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
     }
 
     window.resetFormManajemenUser = function() {
@@ -4179,6 +4363,8 @@ window.selectFromLiveSearch = function(encodedJson) {
       document.getElementById('usr_password').value = "";
       document.getElementById('usr_nama_lengkap').value = "";
       document.getElementById('usr_jabatan').value = "";
+      if (document.getElementById('usr_role')) document.getElementById('usr_role').value = "petugas";
+      if (document.getElementById('usr_wilayah')) document.getElementById('usr_wilayah').value = "";
       document.getElementById('usr_form_title').innerHTML = '<i class="fas fa-user-plus" style="color:var(--primary);"></i> Tambah Akun Petugas / Kader Baru';
       document.getElementById('btnSimpanUser').innerHTML = '<i class="fas fa-save"></i> Simpan Pengguna';
     };
@@ -4191,6 +4377,8 @@ window.selectFromLiveSearch = function(encodedJson) {
       document.getElementById('usr_password').value = u.password || '';
       document.getElementById('usr_nama_lengkap').value = u.nama || '';
       document.getElementById('usr_jabatan').value = u.jabatan || '';
+      if (document.getElementById('usr_role')) document.getElementById('usr_role').value = u.role || 'petugas';
+      if (document.getElementById('usr_wilayah')) document.getElementById('usr_wilayah').value = u.wilayah || 'SEMUA';
       document.getElementById('usr_form_title').innerHTML = `<i class="fas fa-user-edit" style="color:var(--warning);"></i> Edit Akun: ${u.username}`;
       document.getElementById('btnSimpanUser').innerHTML = '<i class="fas fa-check"></i> Perbarui Akun';
     };
@@ -4218,6 +4406,9 @@ window.selectFromLiveSearch = function(encodedJson) {
       const password = document.getElementById('usr_password').value.trim();
       const nama = document.getElementById('usr_nama_lengkap').value.trim();
       const jabatan = document.getElementById('usr_jabatan').value.trim();
+      const role = document.getElementById('usr_role')?.value || 'petugas';
+      const wilayahRaw = (document.getElementById('usr_wilayah')?.value || '').trim();
+      const wilayah = wilayahRaw ? wilayahRaw : 'SEMUA';
 
       if (!username || !password || !nama) {
         return alert("⚠️ Username, Password, dan Nama Lengkap wajib diisi!");
@@ -4233,7 +4424,7 @@ window.selectFromLiveSearch = function(encodedJson) {
         return alert(`⚠️ Username "${username}" sudah digunakan oleh akun lain!`);
       }
 
-      const userObj = { username, password, nama, jabatan };
+      const userObj = { username, password, nama, jabatan, role, wilayah };
       if (editIdx >= 0 && REGISTERED_USERS_LIST[editIdx]) {
         REGISTERED_USERS_LIST[editIdx] = userObj;
       } else {
@@ -4244,7 +4435,8 @@ window.selectFromLiveSearch = function(encodedJson) {
         await saveUserListToCloud();
         renderUserManagementTable();
         resetFormManajemenUser();
-        alert(`✅ Akun petugas "${nama}" (${username}) berhasil disimpan ke Cloud!`);
+        await catatLogAktivitas('KELOLA_USER', `${editIdx >= 0 ? 'Edit' : 'Tambah'} akun ${username} (${role.toUpperCase()} - Wilayah: ${wilayah})`);
+        alert(`✅ Akun "${nama}" (${role.toUpperCase()} | Wilayah: ${wilayah}) berhasil disimpan!`);
       } catch (err) {
         alert("Gagal menyimpan akun pengguna: " + err.message);
       }
@@ -4262,6 +4454,7 @@ window.selectFromLiveSearch = function(encodedJson) {
         await saveUserListToCloud();
         renderUserManagementTable();
         resetFormManajemenUser();
+        await catatLogAktivitas('HAPUS_USER', `Menghapus akun ${u.username} (${u.nama})`);
         alert(`🗑️ Akun "${u.username}" berhasil dihapus.`);
       } catch (err) {
         alert("Gagal menghapus akun: " + err.message);
@@ -4276,6 +4469,7 @@ window.selectFromLiveSearch = function(encodedJson) {
       STRICT_USER_LOGIN_ONLY = Boolean(isChecked);
       try {
         await saveUserListToCloud();
+        await catatLogAktivitas('UBAH_MODE_LOGIN', STRICT_USER_LOGIN_ONLY ? 'Aktifkan Mode Login Ketat' : 'Aktifkan Mode Login Bebas');
         alert(STRICT_USER_LOGIN_ONLY
           ? "🔒 Mode Login Ketat AKTIF: Hanya akun terdaftar di daftar ini dan akun 'admin' yang dapat masuk."
           : "🔓 Mode Login Bebas AKTIF: Petugas lain tetap bisa masuk menggunakan password umum.");

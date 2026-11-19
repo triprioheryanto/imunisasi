@@ -1390,6 +1390,80 @@
         </div>
       </div>
 
+      <!-- KARTU MANAJEMEN PENGGUNA (KHUSUS ADMIN) -->
+      <div class="card" id="cardAdminUsers" style="background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%); border: 1.5px solid #93C5FD;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+          <div>
+            <h2 style="margin:0; color:var(--accent);"><i class="fas fa-users-cog" style="color:var(--info);"></i> Manajemen Pengguna (Petugas &amp; Kader)</h2>
+            <p class="lead" style="font-size:0.82rem; margin:4px 0 0 0;">Tambah, ubah password, atau hapus akun petugas/kader yang berhak menginput data imunisasi.</p>
+          </div>
+          <button type="button" class="btn btn-info" onclick="togglePanelManajemenUser()" style="padding:7px 13px; font-size:0.8rem;">
+            <i class="fas fa-user-plus"></i> Buka / Tutup Kelola Pengguna
+          </button>
+        </div>
+
+        <div id="panelManajemenUser" style="display:none; margin-top:14px; border-top:1px dashed #93C5FD; padding-top:14px;">
+          <!-- FORM TAMBAH / EDIT PENGGUNA -->
+          <form id="formManajemenUser" style="background:#FFFFFF; padding:14px; border-radius:12px; border:1px solid #BFDBFE; margin-bottom:14px;">
+            <input type="hidden" id="usr_edit_index" value="-1">
+            <div style="font-weight:800; color:var(--accent); font-size:0.9rem; margin-bottom:10px;" id="usr_form_title">
+              <i class="fas fa-user-plus" style="color:var(--primary);"></i> Tambah Akun Petugas / Kader Baru
+            </div>
+            <div class="grid">
+              <div class="form-group">
+                <label>Username Login <span class="req">*</span></label>
+                <input type="text" id="usr_username" placeholder="Contoh: bidan_melata (tanpa spasi)" required>
+              </div>
+              <div class="form-group">
+                <label>Password Akun <span class="req">*</span></label>
+                <input type="text" id="usr_password" placeholder="Buat password login" required>
+              </div>
+              <div class="form-group">
+                <label>Nama Lengkap &amp; Gelar <span class="req">*</span></label>
+                <input type="text" id="usr_nama_lengkap" placeholder="Contoh: Bd. Siti Aminah, A.Md.Keb" required>
+              </div>
+              <div class="form-group">
+                <label>Peran / Wilayah Tugas</label>
+                <input type="text" id="usr_jabatan" placeholder="Contoh: Bidan Desa Melata / Kader Posyandu">
+              </div>
+            </div>
+            <div class="actions" style="justify-content:flex-start; margin-top:8px;">
+              <button type="submit" class="btn btn-primary" id="btnSimpanUser"><i class="fas fa-save"></i> Simpan Pengguna</button>
+              <button type="button" class="btn btn-ghost" onclick="resetFormManajemenUser()"><i class="fas fa-times"></i> Batal / Bersihkan</button>
+            </div>
+          </form>
+
+          <!-- PENGATURAN MODE LOGIN -->
+          <div style="background:#FFFBEB; border:1px solid #FCD34D; border-radius:10px; padding:10px 12px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+            <div style="font-size:0.8rem; color:#78350F;">
+              <strong><i class="fas fa-lock"></i> Mode Login Ketat:</strong> Jika dicentang, hanya akun di daftar bawah (dan <code>admin</code>) yang bisa masuk. Password umum (<code>sri26</code>) dinonaktifkan untuk nama lain.
+            </div>
+            <label style="margin:0; cursor:pointer; font-size:0.82rem; color:#92400E;">
+              <input type="checkbox" id="chkStrictUserLogin" onchange="toggleStrictLoginMode(this.checked)" style="width:16px; height:16px; accent-color:var(--primary);"> Wajib Akun Terdaftar
+            </label>
+          </div>
+
+          <!-- TABEL DAFTAR PENGGUNA -->
+          <div class="table-container" style="margin-top:0;">
+            <table class="kohort-table" id="tblManajemenUser">
+              <thead>
+                <tr>
+                  <th style="width:45px;">No</th>
+                  <th>Username</th>
+                  <th>Nama Lengkap (Tampil di Log)</th>
+                  <th>Peran / Wilayah</th>
+                  <th>Password</th>
+                  <th style="width:140px;">Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td colspan="6" style="text-align:center;">Belum ada pengguna tambahan terdaftar.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      
       <!-- KARTU CETAK SERTIFIKAT A4 LANDSCAPE & KARTU QR -->
       <div class="card" style="background: linear-gradient(135deg, #FFFDF5 0%, #FEFCE8 100%); border:1.5px solid #FDE047;">
         <h2><i class="fas fa-award" style="color:var(--warning)"></i> View / Cetak Sertifikat Imunisasi &amp; Kartu QR</h2>
@@ -1745,6 +1819,8 @@
     const AUTH_ADMIN_USER = "admin";
     const AUTH_ADMIN_PASS = "adminsri26";
     const SESSION_TIMEOUT_MS = 30 * 60 * 1000; // Timeout sesi 30 menit tanpa aktivitas
+    let REGISTERED_USERS_LIST = [];
+    let STRICT_USER_LOGIN_ONLY = false;
 
     let currentOcrTargetId = "";
     let currentOcrMode = "single"; 
@@ -3211,13 +3287,22 @@ window.goToEdit = function(encodedJson) {
             return;
           }
 
+          const matchedRegistered = REGISTERED_USERS_LIST.find(u =>
+            (u.username && u.username.toLowerCase() === usernameInput.toLowerCase()) ||
+            (u.nama && u.nama.toLowerCase() === usernameInput.toLowerCase())
+          );
+
           const isAdminMatch = usernameInput.toLowerCase() === AUTH_ADMIN_USER &&
             (passwordInput === AUTH_ADMIN_PASS || passwordInput === AUTH_PASSWORD_PETUGAS);
-          const isPetugasMatch = usernameInput.toLowerCase() !== AUTH_ADMIN_USER &&
+          const isRegisteredMatch = matchedRegistered && passwordInput === matchedRegistered.password;
+          const isFallbackPetugasMatch = !STRICT_USER_LOGIN_ONLY && !matchedRegistered &&
+            usernameInput.toLowerCase() !== AUTH_ADMIN_USER &&
             passwordInput === AUTH_PASSWORD_PETUGAS;
 
-          if (isAdminMatch || isPetugasMatch) {
-            const finalUser = usernameInput.toLowerCase() === AUTH_ADMIN_USER ? AUTH_ADMIN_USER : usernameInput;
+          if (isAdminMatch || isRegisteredMatch || isFallbackPetugasMatch) {
+            const finalUser = isAdminMatch
+              ? AUTH_ADMIN_USER
+              : (isRegisteredMatch ? (matchedRegistered.nama || matchedRegistered.username) : usernameInput);
             savePetugasSession(finalUser);
 
             document.getElementById('loginModal').style.display = 'none';
@@ -3298,6 +3383,7 @@ window.goToEdit = function(encodedJson) {
       if (target === 'imunisasi') loadRecentTransactions();
       if (target === 'catchup') loadCatchUpAnalysis();
       if (target === 'capaian') loadCapanTabContent();
+      if (target === 'admin') renderUserManagementTable();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -3311,7 +3397,7 @@ window.goToEdit = function(encodedJson) {
       if (!isQrMode && !window.__IS_PUBLIC_QR_MODE__ && !activePetugasName) {
         document.getElementById('loginModal').style.display = 'flex';
       }
-
+      await loadRegisteredUsersFromCloud();
       loadLogikaVaksinSettings();
       if (!isQrMode && !window.__IS_PUBLIC_QR_MODE__) loadQrPrioritySettings();
 
@@ -3359,6 +3445,7 @@ window.goToEdit = function(encodedJson) {
       bindEvent('formTargetSasaran', 'submit', handleSaveTargetSasaran);
       bindEvent('formPrioritasQrAdmin', 'submit', handleSavePrioritasQrAdmin);
       bindEvent('formLogikaVaksinAdmin', 'submit', handleSaveLogikaVaksinAdmin);
+      bindEvent('formManajemenUser', 'submit', handleSaveNewOrEditUser);
 
       bindEvent('search_desa_anak', 'change', (e) => {
         currentInputDesa = e.target.value;
@@ -3940,6 +4027,179 @@ window.selectFromLiveSearch = function(encodedJson) {
     }
 
     async function handleSavePrioritasQrAdmin(e) {
+      // =========================================================================
+    // MANAJEMEN PENGGUNA (TAMBAH, EDIT, HAPUS PETUGAS / KADER)
+    // =========================================================================
+    async function loadRegisteredUsersFromCloud() {
+      try {
+        const cached = localStorage.getItem('pkm_cached_users_list');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          REGISTERED_USERS_LIST = parsed.users || [];
+          STRICT_USER_LOGIN_ONLY = Boolean(parsed.strict_only);
+        }
+        if (navigator.onLine) {
+          const snap = await getDoc(doc(db, COL_TARGET, 'CONFIG_MANAJEMEN_PENGGUNA'));
+          if (snap.exists()) {
+            const data = snap.data();
+            REGISTERED_USERS_LIST = Array.isArray(data.users) ? data.users : [];
+            STRICT_USER_LOGIN_ONLY = Boolean(data.strict_only);
+            localStorage.setItem('pkm_cached_users_list', JSON.stringify({
+              users: REGISTERED_USERS_LIST,
+              strict_only: STRICT_USER_LOGIN_ONLY
+            }));
+          }
+        }
+      } catch (e) {
+        console.warn("Memuat pengguna dari cache lokal:", e.message);
+      }
+      const chkStrict = document.getElementById('chkStrictUserLogin');
+      if (chkStrict) chkStrict.checked = STRICT_USER_LOGIN_ONLY;
+      renderUserManagementTable();
+    }
+
+    window.togglePanelManajemenUser = function() {
+      if (activePetugasName.toLowerCase() !== AUTH_ADMIN_USER) {
+        return alert("🔒 Fitur Manajemen Pengguna hanya dapat diakses oleh Admin (login dengan username: admin)!");
+      }
+      const panel = document.getElementById('panelManajemenUser');
+      if (!panel) return;
+      panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+      if (panel.style.display === 'block') renderUserManagementTable();
+    };
+
+    function renderUserManagementTable() {
+      const tbody = document.querySelector('#tblManajemenUser tbody');
+      if (!tbody) return;
+      if (REGISTERED_USERS_LIST.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--muted);">Belum ada akun petugas/kader tambahan. Silakan isi form di atas untuk menambahkan.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = REGISTERED_USERS_LIST.map((u, idx) => `
+        <tr>
+          <td>${idx + 1}</td>
+          <td style="font-weight:800; color:var(--accent);">${u.username}</td>
+          <td style="text-align:left; font-weight:700;">${u.nama || u.username}</td>
+          <td style="text-align:left;">${u.jabatan || '-'}</td>
+          <td><code style="background:#F1F5F9; padding:2px 6px; border-radius:4px;">${u.password}</code></td>
+          <td style="display:flex; gap:4px; justify-content:center;">
+            <button type="button" class="btn btn-warning" onclick="editRegisteredUser(${idx})" style="padding:4px 8px; font-size:0.72rem;"><i class="fas fa-edit"></i> Edit</button>
+            <button type="button" class="btn btn-danger" onclick="deleteRegisteredUser(${idx})" style="padding:4px 8px; font-size:0.72rem;"><i class="fas fa-trash"></i> Hapus</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    window.resetFormManajemenUser = function() {
+      document.getElementById('usr_edit_index').value = "-1";
+      document.getElementById('usr_username').value = "";
+      document.getElementById('usr_password').value = "";
+      document.getElementById('usr_nama_lengkap').value = "";
+      document.getElementById('usr_jabatan').value = "";
+      document.getElementById('usr_form_title').innerHTML = '<i class="fas fa-user-plus" style="color:var(--primary);"></i> Tambah Akun Petugas / Kader Baru';
+      document.getElementById('btnSimpanUser').innerHTML = '<i class="fas fa-save"></i> Simpan Pengguna';
+    };
+
+    window.editRegisteredUser = function(idx) {
+      const u = REGISTERED_USERS_LIST[idx];
+      if (!u) return;
+      document.getElementById('usr_edit_index').value = String(idx);
+      document.getElementById('usr_username').value = u.username || '';
+      document.getElementById('usr_password').value = u.password || '';
+      document.getElementById('usr_nama_lengkap').value = u.nama || '';
+      document.getElementById('usr_jabatan').value = u.jabatan || '';
+      document.getElementById('usr_form_title').innerHTML = `<i class="fas fa-user-edit" style="color:var(--warning);"></i> Edit Akun: ${u.username}`;
+      document.getElementById('btnSimpanUser').innerHTML = '<i class="fas fa-check"></i> Perbarui Akun';
+    };
+
+    async function saveUserListToCloud() {
+      localStorage.setItem('pkm_cached_users_list', JSON.stringify({
+        users: REGISTERED_USERS_LIST,
+        strict_only: STRICT_USER_LOGIN_ONLY
+      }));
+      await setDoc(doc(db, COL_TARGET, 'CONFIG_MANAJEMEN_PENGGUNA'), {
+        users: REGISTERED_USERS_LIST,
+        strict_only: STRICT_USER_LOGIN_ONLY,
+        updated_by: activePetugasName,
+        updated_at: new Date().toISOString()
+      }, { merge: true });
+    }
+
+    async function handleSaveNewOrEditUser(e) {
+      e.preventDefault();
+      if (activePetugasName.toLowerCase() !== AUTH_ADMIN_USER) {
+        return alert("🔒 Hanya Admin yang berhak mengelola akun pengguna!");
+      }
+      const editIdx = parseInt(document.getElementById('usr_edit_index').value, 10);
+      const username = document.getElementById('usr_username').value.trim();
+      const password = document.getElementById('usr_password').value.trim();
+      const nama = document.getElementById('usr_nama_lengkap').value.trim();
+      const jabatan = document.getElementById('usr_jabatan').value.trim();
+
+      if (!username || !password || !nama) {
+        return alert("⚠️ Username, Password, dan Nama Lengkap wajib diisi!");
+      }
+      if (username.toLowerCase() === AUTH_ADMIN_USER) {
+        return alert("⚠️ Username 'admin' adalah akun utama sistem dan tidak boleh diduplikasi.");
+      }
+
+      const duplicateIdx = REGISTERED_USERS_LIST.findIndex((u, i) =>
+        i !== editIdx && u.username.toLowerCase() === username.toLowerCase()
+      );
+      if (duplicateIdx !== -1) {
+        return alert(`⚠️ Username "${username}" sudah digunakan oleh akun lain!`);
+      }
+
+      const userObj = { username, password, nama, jabatan };
+      if (editIdx >= 0 && REGISTERED_USERS_LIST[editIdx]) {
+        REGISTERED_USERS_LIST[editIdx] = userObj;
+      } else {
+        REGISTERED_USERS_LIST.push(userObj);
+      }
+
+      try {
+        await saveUserListToCloud();
+        renderUserManagementTable();
+        resetFormManajemenUser();
+        alert(`✅ Akun petugas "${nama}" (${username}) berhasil disimpan ke Cloud!`);
+      } catch (err) {
+        alert("Gagal menyimpan akun pengguna: " + err.message);
+      }
+    }
+
+    window.deleteRegisteredUser = async function(idx) {
+      if (activePetugasName.toLowerCase() !== AUTH_ADMIN_USER) {
+        return alert("🔒 Hanya Admin yang berhak menghapus akun pengguna!");
+      }
+      const u = REGISTERED_USERS_LIST[idx];
+      if (!u) return;
+      if (!confirm(`Yakin ingin menghapus akun "${u.nama}" (${u.username})?`)) return;
+      REGISTERED_USERS_LIST.splice(idx, 1);
+      try {
+        await saveUserListToCloud();
+        renderUserManagementTable();
+        resetFormManajemenUser();
+        alert(`🗑️ Akun "${u.username}" berhasil dihapus.`);
+      } catch (err) {
+        alert("Gagal menghapus akun: " + err.message);
+      }
+    };
+
+    window.toggleStrictLoginMode = async function(isChecked) {
+      if (activePetugasName.toLowerCase() !== AUTH_ADMIN_USER) {
+        document.getElementById('chkStrictUserLogin').checked = STRICT_USER_LOGIN_ONLY;
+        return alert("🔒 Hanya Admin yang berhak mengubah pengaturan login!");
+      }
+      STRICT_USER_LOGIN_ONLY = Boolean(isChecked);
+      try {
+        await saveUserListToCloud();
+        alert(STRICT_USER_LOGIN_ONLY
+          ? "🔒 Mode Login Ketat AKTIF: Hanya akun terdaftar di daftar ini dan akun 'admin' yang dapat masuk."
+          : "🔓 Mode Login Bebas AKTIF: Petugas lain tetap bisa masuk menggunakan password umum.");
+      } catch (err) {
+        alert("Gagal menyimpan pengaturan mode login: " + err.message);
+      }
+    };
       e.preventDefault();
       if (activePetugasName.toLowerCase() !== AUTH_ADMIN_USER) {
         return alert("🔒 Hanya Admin yang berhak mengatur logika urutan prioritas pop-up QR!");

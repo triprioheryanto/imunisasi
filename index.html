@@ -1402,8 +1402,8 @@
           </button>
         </div>
 
-        <div id="panelManajemenUser" style="display:none; margin-top:14px; border-top:1px dashed #93C5FD; padding-top:14px;">
-          <!-- FORM TAMBAH / EDIT PENGGUNA -->
+      <div id="panelManajemenUser" style="display:none; margin-top:14px; border-top:1px dashed #93C5FD; padding-top:14px;">
+          <!-- BAGIAN 1: FORM TAMBAH / EDIT PENGGUNA -->
           <form id="formManajemenUser" style="background:#FFFFFF; padding:14px; border-radius:12px; border:1px solid #BFDBFE; margin-bottom:14px;">
             <input type="hidden" id="usr_edit_index" value="-1">
             <div style="font-weight:800; color:var(--accent); font-size:0.9rem; margin-bottom:10px;" id="usr_form_title">
@@ -1423,67 +1423,21 @@
                 <input type="text" id="usr_nama_lengkap" placeholder="Contoh: Bd. Siti Aminah, A.Md.Keb" required>
               </div>
               <div class="form-group">
-                <label>Peran / Wilayah Tugas</label>
+                <label>Jabatan / Keterangan Tugas</label>
                 <input type="text" id="usr_jabatan" placeholder="Contoh: Bidan Desa Melata / Kader Posyandu">
               </div>
-              <!-- 1A. Tambahkan 2 kolom ini di dalam form #formManajemenUser (setelah input usr_jabatan) -->
-<div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:8px;">
-  <div>
-    <label style="font-size:0.78rem; font-weight:700;">Peran / Level Akses</label>
-    <select id="usr_role" class="form-control">
-      <option value="petugas">Petugas Puskesmas / Bidan (Akses Penuh)</option>
-      <option value="kader">Kader Posyandu (Terbatas Input & Desa)</option>
-    </select>
-  </div>
-  <div>
-    <label style="font-size:0.78rem; font-weight:700;">Wilayah Kerja (Desa)</label>
-    <input type="text" id="usr_wilayah" class="form-control" placeholder="Ketik SEMUA atau nama desa, misal: Melata">
-    <small style="color:var(--muted); font-size:0.7rem;">Pisahkan dengan koma jika lebih dari 1 desa (contoh: Melata, Batu Hambawang)</small>
-  </div>
-</div>
-
-<!-- 1B. Perbarui header <thead> pada #tblManajemenUser agar menampilkan Peran & Wilayah -->
-<thead>
-  <tr>
-    <th>No</th>
-    <th>Username</th>
-    <th>Nama Lengkap</th>
-    <th>Jabatan & Peran</th>
-    <th>Wilayah Kerja</th>
-    <th>Password</th>
-    <th>Aksi</th>
-  </tr>
-</thead>
-
-<!-- 1C. Tambahkan panel Log Pengguna tepat sebelum penutup </div> milik #panelManajemenUser -->
-<div style="margin-top:18px; padding-top:14px; border-top:2px dashed #CBD5E1;">
-  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
-    <h4 style="margin:0; font-size:0.95rem; color:var(--dark);">
-      <i class="fas fa-history" style="color:var(--primary);"></i> Log Aktivitas Pengguna (100 Terakhir)
-    </h4>
-    <div style="display:flex; gap:6px; align-items:center;">
-      <input type="text" id="filterLogUser" oninput="renderLogAktivitasTable()" placeholder="Cari nama / aksi / desa..." style="padding:5px 10px; border:1px solid #CBD5E1; border-radius:6px; font-size:0.78rem;">
-      <button type="button" class="btn btn-primary" onclick="loadLogAktivitasFromCloud()" style="padding:5px 10px; font-size:0.75rem;">
-        <i class="fas fa-sync-alt"></i> Muat Ulang
-      </button>
-    </div>
-  </div>
-  <div style="max-height:280px; overflow:auto; border:1px solid #E2E8F0; border-radius:8px;">
-    <table class="table" id="tblLogAktivitas" style="font-size:0.76rem; margin:0;">
-      <thead>
-        <tr>
-          <th>Waktu</th>
-          <th>Pengguna</th>
-          <th>Peran & Wilayah</th>
-          <th>Aktivitas</th>
-          <th>Keterangan</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td colspan="5" style="text-align:center; color:var(--muted);">Memuat log aktivitas...</td></tr>
-      </tbody>
-    </table>
-  </div>
+              <div class="form-group">
+                <label>Peran / Level Akses <span class="req">*</span></label>
+                <select id="usr_role">
+                  <option value="petugas">Petugas Puskesmas / Bidan (Akses Penuh)</option>
+                  <option value="kader">Kader Posyandu (Terbatas Input &amp; Desa)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Wilayah Kerja (Desa)</label>
+                <input type="text" id="usr_wilayah" placeholder="Ketik SEMUA atau nama desa, misal: Melata">
+                <small style="color:var(--muted); font-size:0.7rem;">Pisahkan koma jika lebih dari 1 desa (contoh: Melata, Nanuah)</small>
+              </div>
             </div>
             <div class="actions" style="justify-content:flex-start; margin-top:8px;">
               <button type="submit" class="btn btn-primary" id="btnSimpanUser"><i class="fas fa-save"></i> Simpan Pengguna</button>
@@ -1501,23 +1455,55 @@
             </label>
           </div>
 
-          <!-- TABEL DAFTAR PENGGUNA -->
+          <!-- BAGIAN 2: TABEL DAFTAR PENGGUNA (7 KOLOM) -->
           <div class="table-container" style="margin-top:0;">
             <table class="kohort-table" id="tblManajemenUser">
               <thead>
                 <tr>
                   <th style="width:45px;">No</th>
                   <th>Username</th>
-                  <th>Nama Lengkap (Tampil di Log)</th>
-                  <th>Peran / Wilayah</th>
+                  <th>Nama Lengkap</th>
+                  <th>Jabatan &amp; Peran</th>
+                  <th>Wilayah Kerja</th>
                   <th>Password</th>
                   <th style="width:140px;">Aksi</th>
                 </tr>
               </thead>
               <tbody>
-                <tr><td colspan="6" style="text-align:center;">Belum ada pengguna tambahan terdaftar.</td></tr>
+                <tr><td colspan="7" style="text-align:center;">Belum ada pengguna tambahan terdaftar.</td></tr>
               </tbody>
             </table>
+          </div>
+
+          <!-- BAGIAN 3: PANEL LOG AKTIVITAS PENGGUNA -->
+          <div style="margin-top:18px; padding-top:14px; border-top:2px dashed #93C5FD;">
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+              <h4 style="margin:0; font-size:0.95rem; color:var(--accent);">
+                <i class="fas fa-history" style="color:var(--primary);"></i> Log Aktivitas Pengguna (100 Terakhir)
+              </h4>
+              <div style="display:flex; gap:6px; align-items:center;">
+                <input type="text" id="filterLogUser" oninput="renderLogAktivitasTable()" placeholder="Cari nama / aksi / desa..." style="padding:5px 10px; border:1px solid #CBD5E1; border-radius:6px; font-size:0.78rem; height:34px;">
+                <button type="button" class="btn btn-primary" onclick="loadLogAktivitasFromCloud()" style="padding:6px 12px; font-size:0.75rem;">
+                  <i class="fas fa-sync-alt"></i> Muat Ulang
+                </button>
+              </div>
+            </div>
+            <div class="table-container" style="max-height:280px; overflow:auto; margin-top:0;">
+              <table class="kohort-table" id="tblLogAktivitas" style="font-size:0.76rem;">
+                <thead>
+                  <tr>
+                    <th>Waktu</th>
+                    <th>Pengguna</th>
+                    <th>Peran &amp; Wilayah</th>
+                    <th>Aktivitas</th>
+                    <th>Keterangan</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td colspan="5" style="text-align:center; color:var(--muted);">Memuat log aktivitas...</td></tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -3357,28 +3343,45 @@ window.goToEdit = function(encodedJson) {
             usernameInput.toLowerCase() !== AUTH_ADMIN_USER &&
             passwordInput === AUTH_PASSWORD_PETUGAS;
 
-          if (isAdminMatch || isRegisteredMatch || isFallbackPetugasMatch) {
-            const finalUser = isAdminMatch
-              ? AUTH_ADMIN_USER
-              : (isRegisteredMatch ? (matchedRegistered.nama || matchedRegistered.username) : usernameInput);
-            savePetugasSession(finalUser);
+         if (isAdminMatch || isRegisteredMatch || isFallbackPetugasMatch) {
+         const finalUser = isAdminMatch
+           ? AUTH_ADMIN_USER
+           : (isRegisteredMatch ? (matchedRegistered.nama || matchedRegistered.username) : usernameInput);
+         savePetugasSession(finalUser);
 
-            document.getElementById('loginModal').style.display = 'none';
-            errDiv.style.display = 'none';
-            const banner = document.getElementById('loginQuickImunisasiBanner');
-            if (banner) banner.style.display = 'none';
-            const btnBackQr = document.getElementById('btnCancelLoginToQr');
-            if (btnBackQr) btnBackQr.style.display = 'none';
+         // ✅ PATCH 3: Simpan Peran & Wilayah Kerja lalu terapkan pembatasan akses
+         if (isAdminMatch) {
+           activeUserRole = 'admin';
+           activeUserWilayah = 'SEMUA';
+         } else if (isRegisteredMatch) {
+           activeUserRole = matchedRegistered.role || 'petugas';
+           activeUserWilayah = matchedRegistered.wilayah || 'SEMUA';
+         } else {
+           activeUserRole = 'petugas';
+           activeUserWilayah = 'SEMUA';
+         }
+         localStorage.setItem('pkm_active_role', activeUserRole);
+         localStorage.setItem('pkm_active_wilayah', activeUserWilayah);
+         terapkanBatasanAksesUser();
+         catatLogAktivitas('LOGIN', `Masuk ke sistem sebagai ${activeUserRole.toUpperCase()} (Wilayah: ${activeUserWilayah})`);
 
-            // Jika login dipicu dari tombol "Lakukan Imunisasi" pada scan QR, langsung buka form anak tsb
-            if (pendingQuickImunisasiChild) {
-              const targetChild = pendingQuickImunisasiChild;
-              pendingQuickImunisasiChild = null;
-              openChildImmunizationFormDirect(targetChild);
-            } else {
-              refreshCacheGlobalData();
-              loadRecentTransactions();
-            }
+         document.getElementById('loginModal').style.display = 'none';
+         errDiv.style.display = 'none';
+         const banner = document.getElementById('loginQuickImunisasiBanner');
+         if (banner) banner.style.display = 'none';
+         const btnBackQr = document.getElementById('btnCancelLoginToQr');
+         if (btnBackQr) btnBackQr.style.display = 'none';
+
+         // Jika login dipicu dari tombol "Lakukan Imunisasi" pada scan QR, langsung buka form anak tsb
+         if (pendingQuickImunisasiChild) {
+           const targetChild = pendingQuickImunisasiChild;
+           pendingQuickImunisasiChild = null;
+           openChildImmunizationFormDirect(targetChild);
+         } else {
+           refreshCacheGlobalData();
+           loadRecentTransactions();
+         }
+       }
           } else {
             errDiv.textContent = "❌ Password salah! Silakan periksa kembali password akun Anda.";
             errDiv.style.display = 'block';
@@ -3423,13 +3426,20 @@ window.goToEdit = function(encodedJson) {
     }
 
     window.logoutPetugas = function() {
-      if (confirm("Keluar dari sesi petugas saat ini?")) {
-        clearPetugasSession();
-        document.getElementById('login_password').value = "";
-        document.getElementById('loginError').style.display = 'none';
-        document.getElementById('loginModal').style.display = 'flex';
-      }
-    };
+   if (confirm("Keluar dari sesi petugas saat ini?")) {
+     // ✅ PATCH 3: Catat log logout & bersihkan peran/wilayah sebelumnya
+     catatLogAktivitas('LOGOUT', `Keluar dari sistem (${activeUserRole.toUpperCase()})`);
+     localStorage.removeItem('pkm_active_role');
+     localStorage.removeItem('pkm_active_wilayah');
+     activeUserRole = 'petugas';
+     activeUserWilayah = 'SEMUA';
+
+     clearPetugasSession();
+     document.getElementById('login_password').value = "";
+     document.getElementById('loginError').style.display = 'none';
+     document.getElementById('loginModal').style.display = 'flex';
+   }
+ };
 
     window.switchTab = function(e) {
       const target = e.currentTarget.getAttribute('data-tab');

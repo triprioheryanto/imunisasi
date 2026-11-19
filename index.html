@@ -4027,7 +4027,32 @@ window.selectFromLiveSearch = function(encodedJson) {
     }
 
     async function handleSavePrioritasQrAdmin(e) {
-      // =========================================================================
+      e.preventDefault();
+      if (activePetugasName.toLowerCase() !== AUTH_ADMIN_USER) {
+        return alert("🔒 Hanya Admin yang berhak mengatur logika urutan prioritas pop-up QR!");
+      }
+      const parseList = (str) => str.split(',').map(s => s.trim()).filter(Boolean);
+      const updatedCfg = {
+        under1: parseList(document.getElementById('prio_qr_under1').value),
+        age2: parseList(document.getElementById('prio_qr_age2').value),
+        over2: parseList(document.getElementById('prio_qr_over2').value),
+        stok_kosong: parseList(document.getElementById('prio_qr_stok_kosong').value),
+        catatan: document.getElementById('prio_qr_catatan').value.trim()
+      };
+      try {
+        await setDoc(doc(db, COL_TARGET, 'CONFIG_QR_PRIORITAS'), {
+          ...updatedCfg,
+          updated_by: activePetugasName,
+          updated_at: new Date().toISOString()
+        }, { merge: true });
+        QR_PRIORITY_CONFIG = updatedCfg;
+        alert("✅ Urutan prioritas pop-up QR (<1 Thn, 2 Thn, >2 Thn) & status stok lapangan berhasil disimpan!");
+      } catch (err) {
+        alert("Gagal menyimpan prioritas QR: " + err.message);
+      }
+    }
+
+    // =========================================================================
     // MANAJEMEN PENGGUNA (TAMBAH, EDIT, HAPUS PETUGAS / KADER)
     // =========================================================================
     async function loadRegisteredUsersFromCloud() {
@@ -4200,30 +4225,6 @@ window.selectFromLiveSearch = function(encodedJson) {
         alert("Gagal menyimpan pengaturan mode login: " + err.message);
       }
     };
-      e.preventDefault();
-      if (activePetugasName.toLowerCase() !== AUTH_ADMIN_USER) {
-        return alert("🔒 Hanya Admin yang berhak mengatur logika urutan prioritas pop-up QR!");
-      }
-      const parseList = (str) => str.split(',').map(s => s.trim()).filter(Boolean);
-      const updatedCfg = {
-        under1: parseList(document.getElementById('prio_qr_under1').value),
-        age2: parseList(document.getElementById('prio_qr_age2').value),
-        over2: parseList(document.getElementById('prio_qr_over2').value),
-        stok_kosong: parseList(document.getElementById('prio_qr_stok_kosong').value),
-        catatan: document.getElementById('prio_qr_catatan').value.trim()
-      };
-      try {
-        await setDoc(doc(db, COL_TARGET, 'CONFIG_QR_PRIORITAS'), {
-          ...updatedCfg,
-          updated_by: activePetugasName,
-          updated_at: new Date().toISOString()
-        }, { merge: true });
-        QR_PRIORITY_CONFIG = updatedCfg;
-        alert("✅ Urutan prioritas pop-up QR (<1 Thn, 2 Thn, >2 Thn) & status stok lapangan berhasil disimpan!");
-      } catch (err) {
-        alert("Gagal menyimpan prioritas QR: " + err.message);
-      }
-    }
 // =========================================================================
     // TAB 5: PERHITUNGAN CAPAIAN & IMUNISASI DASAR LENGKAP (IDL)
     // =========================================================================

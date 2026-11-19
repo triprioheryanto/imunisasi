@@ -3855,7 +3855,29 @@ window.goToEdit = function(encodedJson) {
         return Boolean(val && val !== '-');
       };
 
+     const now = new Date();
+      const curYear = now.getFullYear();
+      const curMonth = now.getMonth() + 1;
+      const namaBulanId = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+      const labelBulanIni = `${namaBulanId[curMonth - 1]} ${curYear}`;
+
+      const isBulanIni = (val) => {
+        if (!val || val === '-') return false;
+        if (typeof val === 'object' && typeof val.toDate === 'function') {
+          const dt = val.toDate();
+          return dt.getFullYear() === curYear && (dt.getMonth() + 1) === curMonth;
+        }
+        const str = String(val).trim();
+        let m = str.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+        if (m) return Number(m[1]) === curYear && Number(m[2]) === curMonth;
+        m = str.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})/);
+        if (m) return Number(m[3]) === curYear && Number(m[2]) === curMonth;
+        return false;
+      };
+
       const totalAnak = anakList.length;
+      let countAnakBulanIni = 0;
+      let countDosisBulanIni = 0;
       let countIdl = 0;
       let countIbl = 0;
       let countDpt1 = 0;
@@ -3863,6 +3885,21 @@ window.goToEdit = function(encodedJson) {
       let countMr1 = 0;
 
       anakList.forEach(d => {
+        // Hitung apakah anak mendapat vaksin pada bulan & tahun berjalan
+        let dosisAnakBulanIni = 0;
+        Object.keys(d).forEach(k => {
+          if (k.startsWith('vaksin_') && isBulanIni(d[k])) {
+            dosisAnakBulanIni++;
+          }
+        });
+        if (dosisAnakBulanIni === 0 && isBulanIni(d.tanggal_pelayanan)) {
+          dosisAnakBulanIni = 1;
+        }
+        if (dosisAnakBulanIni > 0) {
+          countAnakBulanIni++;
+          countDosisBulanIni += dosisAnakBulanIni;
+        }
+
         const hasHb0 = hasVax(d, "HBO (<24 Jam)") || hasVax(d, "HBO (1-7 Hari)");
         const hasBcg = hasVax(d, "BCG");
         const hasDpt1 = hasVax(d, "DPT-HB-Hib1");
@@ -3902,6 +3939,14 @@ window.goToEdit = function(encodedJson) {
           ? `Sasaran bayi/anak di Desa ${selectedDesa}`
           : 'Total bayi & anak terdaftar';
       }
+
+      // Render Kartu Tambahan: Divaksin Bulan Ini
+      const elBulanLabel = document.getElementById('kpiBulanIniLabel');
+      const elBulanVal = document.getElementById('kpiBulanIniVal');
+      const elBulanSub = document.getElementById('kpiBulanIniSub');
+      if (elBulanLabel) elBulanLabel.textContent = `(${labelBulanIni})`;
+      if (elBulanVal) elBulanVal.textContent = countAnakBulanIni.toLocaleString('id-ID');
+      if (elBulanSub) elBulanSub.textContent = `Total ${countDosisBulanIni.toLocaleString('id-ID')} dosis diberikan`;
 
       // Render Kartu 2: Capaian IDL
       const elIdl = document.getElementById('kpiIdlVal');

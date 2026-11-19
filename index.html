@@ -31,6 +31,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
@@ -5426,7 +5427,22 @@ window.selectFromLiveSearch = function(encodedJson) {
     }
 
     // =========================================================================
-    // EKSPOR EXCEL 4 SHEET STRICT TERFILTER (DENGAN SHEET 2 DAFTAR PENERIMA)
+    // HELPER PEMUAT EXCELJS OTOMATIS (CADANGAN JIKA CDN LAMBAT)
+    // =========================================================================
+    async function ensureExcelJSReady() {
+      if (window.ExcelJS) return window.ExcelJS;
+      await new Promise((resolve, reject) => {
+        const sc = document.createElement('script');
+        sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js';
+        sc.onload = resolve;
+        sc.onerror = () => reject(new Error('Gagal memuat library ExcelJS. Periksa koneksi internet.'));
+        document.head.appendChild(sc);
+      });
+      return window.ExcelJS;
+    }
+
+    // =========================================================================
+    // EKSPOR EXCEL 4 SHEET TERFORMAT LENGKAP (SESUAI TEMPLATE XLS & FREEZE PANES)
     // =========================================================================
     async function downloadExcelFiltered(sourceTab = 'kumulatif') {
       const thn = sourceTab === 'admin'
@@ -5452,11 +5468,23 @@ window.selectFromLiveSearch = function(encodedJson) {
         : (katSel !== 'ALL' && katSel !== 'BIAS' ? getActiveVaccineKeysByCategory(katSel) : ALL_VAKSIN_KEYS);
 
       try {
+        const ExcelJSLib = await ensureExcelJSReady();
+        const workbook = new ExcelJSLib.Workbook();
+        workbook.creator = 'Sistem Register Imunisasi Puskesmas Melata';
+        workbook.created = new Date();
+
         const snap = await getDocs(collection(db, COL_KOHORT));
         const allDocsInDb = [];
         snap.forEach(docSnap => allDocsInDb.push(docSnap.data()));
 
-        // Ambil target sasaran riil dari Firestore jika ada
+        // Urutkan data berdasarkan Desa lalu Nama Sasaran agar rapi
+        allDocsInDb.sort((a, b) => {
+          const dComp = String(a.desa || '').localeCompare(String(b.desa || ''));
+          if (dComp !== 0) return dComp;
+          return String(a.nama_anak || '').localeCompare(String(b.nama_anak || ''));
+        });
+
+        // Ambil target sasaran riil dari Firestore
         const snapTarget = await getDocs(collection(db, COL_TARGET));
         const targetMap = new Map();
         snapTarget.forEach(d => {
@@ -5466,24 +5494,65 @@ window.selectFromLiveSearch = function(encodedJson) {
           }
         });
 
-        // ---------------------------------------------------------------------
-        // SHEET 1: REGISTER KOHORT MATRIKS (STRICT SESUAI FILTER)
-        // ---------------------------------------------------------------------
-        const sheet1Data = [];
-        sheet1Data.push([`LAPORAN REGISTER KOHORT MATRIKS TERFILTER - PUSKESMAS MELATA`]);
-        sheet1Data.push([`Periode: ${monthNameStr} ${yearLabelStr} | Wilayah: ${desaSel === 'ALL' ? 'Semua Desa' : desaSel} | Antigen: ${antigenSel === 'ALL' ? 'Semua' : antigenSel}`]);
-        sheet1Data.push([]);
+        // Gaya standar sel Excel
+        const thinBorder = {
+          top: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+          left: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+          bottom: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+          right: { style: 'thin', color: { argb: 'FFCBD5E1' } }
+        };
+        const styleTitleRow = (ws, titleText, subTitleText, mergeEndColLetter = 'O') => {
+          ws.getRow(1).height = 22;
+          ws.getRow(2).height = 17;
+          ws.getRow(3).height = 8;
+          ws.mergeCells(`A1:${mergeEndColLetter}1`);
+          ws.mergeCells(`A2:${mergeEndColLetter}2`);
 
-        const headerRow1 = ["No", "Desa", "Nama Sasaran", "Posyandu/Pustu", "Tanggal Lahir", "L/P", "Orang Tua / Suami", "WhatsApp", "Alamat / RT"];
+          const c1 = ws.getCell('A1');
+          c1.value = titleText;
+          c1.font = { name: 'Calibri', size: 13, bold: true, color: { argb: 'FF002B5B' } };
+          c1.alignment = { horizontal: 'left', vertical: 'middle' };
+
+          const c2 = ws.getCell('A2');
+          c2.value = subTitleText;
+          c2.font = { name: 'Calibri', size: 10, bold: false, color: { argb: 'FF475569' } };
+          c2.alignment = { horizontal: 'left', vertical: 'middle' };
+        };
+
+        // =====================================================================
+        // SHEET 1: REGISTER KOHORT MATRIKS
+        // Freeze Panes: No (Kolom 1) s/d Alamat / RT (Kolom 9) + Baris 1-4
+        // =====================================================================
+        const ws1 = workbook.addWorksheet('Register Kohort Matriks', {
+          views: [{ state: 'frozen', xSplit: 9, ySplit: 4 }]
+        });
+        styleTitleRow(
+          ws1,
+          'LAPORAN REGISTER KOHORT MATRIKS TERFILTER - PUSKESMAS MELATA',
+          `Periode: ${monthNameStr} ${yearLabelStr} | Wilayah: ${desaSel === 'ALL' ? 'Semua Desa' : desaSel} | Antigen: ${antigenSel === 'ALL' ? 'Semua' : antigenSel}`,
+          'O'
+        );
+
+        const headerRow1 = ['No', 'Desa', 'Nama Sasaran', 'Posyandu/Pustu', 'Tanggal Lahir', 'L/P', 'Orang Tua / Suami', 'WhatsApp', 'Alamat / RT'];
         activeAntigenList.forEach(v => headerRow1.push(v));
-        headerRow1.push("Penginput Terakhir");
-        sheet1Data.push(headerRow1);
+        headerRow1.push('Penginput Terakhir');
 
+        const r4s1 = ws1.getRow(4);
+        r4s1.height = 26;
+        headerRow1.forEach((hText, i) => {
+          const cell = r4s1.getCell(i + 1);
+          cell.value = hText;
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF002B5B' } };
+          cell.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
+          cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+          cell.border = thinBorder;
+        });
+
+        let rowIdxS1 = 5;
         let rowNumS1 = 1;
         allDocsInDb.forEach(d => {
           if (desaSel !== 'ALL' && (!d.desa || d.desa.toLowerCase() !== desaSel.toLowerCase())) return;
 
-          // Cek apakah sasaran memiliki minimal 1 vaksin yang sesuai filter bulan/tahun/antigen
           let hasAnyMatch = false;
           const vCells = [];
           activeAntigenList.forEach(vKey => {
@@ -5491,15 +5560,14 @@ window.selectFromLiveSearch = function(encodedJson) {
             const val = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
             if (val && isVaccineGivenExactMonth(val, thn, bln)) {
               hasAnyMatch = true;
-              vCells.push(val);
+              vCells.push(String(val).trim().substring(0, 10));
             } else {
-              vCells.push("-");
+              vCells.push('-');
             }
           });
-
           if (!hasAnyMatch) return;
 
-          const row = [
+          const rowVals = [
             rowNumS1++,
             d.desa || '',
             d.nama_anak || '',
@@ -5512,69 +5580,259 @@ window.selectFromLiveSearch = function(encodedJson) {
             ...vCells,
             d.last_updated_by || '-'
           ];
-          sheet1Data.push(row);
+
+          const excelRow = ws1.getRow(rowIdxS1);
+          excelRow.height = 21;
+          const zebraArgb = (rowIdxS1 % 2 === 1) ? 'FFFFFFFF' : 'FFF8FAFC';
+
+          rowVals.forEach((val, cIdx) => {
+            const colNumber = cIdx + 1;
+            const cell = excelRow.getCell(colNumber);
+            cell.value = val;
+            cell.border = thinBorder;
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: zebraArgb } };
+            cell.font = {
+              name: 'Calibri',
+              size: 10,
+              bold: colNumber === 3,
+              color: { argb: 'FF1E293B' }
+            };
+
+            const isCenterCol = [1, 5, 6, 8, 9].includes(colNumber) || colNumber >= 10;
+            cell.alignment = { horizontal: isCenterCol ? 'center' : 'left', vertical: 'middle' };
+
+            // Sorot hijau untuk kolom vaksin yang sudah terisi tanggal
+            if (colNumber >= 10 && colNumber < rowVals.length && val !== '-') {
+              cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFECFDF5' } };
+              cell.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FF065F46' } };
+            }
+          });
+          rowIdxS1++;
         });
 
-        // ---------------------------------------------------------------------
-        // SHEET 2 (URUTAN KEDUA): DATA BAYI/ANAK PENERIMA VAKSIN SPESIFIK TERFILTER
-        // ---------------------------------------------------------------------
-        const sheet2Data = [];
-        sheet2Data.push([`DAFTAR BAYI / ANAK PENERIMA VAKSIN SPESIFIK TERFILTER - PUSKESMAS MELATA`]);
-        sheet2Data.push([`Filter: Bulan ${monthNameStr} ${yearLabelStr} | Desa: ${desaSel === 'ALL' ? 'Semua Desa' : desaSel} | Antigen: ${antigenSel === 'ALL' ? 'Semua Antigen Terpilih' : antigenSel}`]);
-        sheet2Data.push([]);
-        sheet2Data.push([
-          "No", "Desa / Kelurahan", "Nama Bayi / Anak", "Tanggal Lahir", "L/P",
-          "Nama Orang Tua / Ibu", "No. HP / WA", "Alamat / RT",
-          "Jenis Antigen Diterima", "Tanggal Imunisasi", "Posyandu / Pustu", "Petugas Penginput"
-        ]);
+        // Atur lebar kolom Sheet 1
+        ws1.getColumn(1).width = 5;
+        ws1.getColumn(2).width = 16;
+        ws1.getColumn(3).width = 27;
+        ws1.getColumn(4).width = 17;
+        ws1.getColumn(5).width = 13;
+        ws1.getColumn(6).width = 6;
+        ws1.getColumn(7).width = 22;
+        ws1.getColumn(8).width = 15;
+        ws1.getColumn(9).width = 16;
+        activeAntigenList.forEach((vk, i) => {
+          ws1.getColumn(10 + i).width = Math.max(12, vk.length + 2);
+        });
+        ws1.getColumn(10 + activeAntigenList.length).width = 18;
 
-        let rowNumS2 = 1;
+        // =====================================================================
+        // SHEET 2: PENERIMA VAKSIN TERFILTER (MEMANJANG KE SAMPING PER TANGGAL)
+        // Freeze Panes: No (Kolom 1) s/d Alamat/RT (Kolom 8) + Baris 1-4
+        // =====================================================================
+        const ws2 = workbook.addWorksheet('Penerima Vaksin Terfilter', {
+          views: [{ state: 'frozen', xSplit: 8, ySplit: 4 }]
+        });
+
+        const s2Records = [];
+        let maxVisits = 1;
+
         allDocsInDb.forEach(d => {
           if (desaSel !== 'ALL' && (!d.desa || d.desa.toLowerCase() !== desaSel.toLowerCase())) return;
+
+          const byDateMap = new Map();
           activeAntigenList.forEach(vKey => {
             const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
             const val = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
             if (val && isVaccineGivenExactMonth(val, thn, bln)) {
-              sheet2Data.push([
-                rowNumS2++,
-                d.desa || '-',
-                d.nama_anak || '-',
-                d.tgl_lahir || '-',
-                d.jk || '-',
-                d.nama_ibu || '-',
-                d.wa_anak || '-',
-                d.alamat_rt || '-',
-                vKey,
-                val,
-                d.kegiatan || '-',
-                d.last_updated_by || '-'
-              ]);
+              const tglStr = String(val).trim().substring(0, 10);
+              if (!byDateMap.has(tglStr)) byDateMap.set(tglStr, []);
+              byDateMap.get(tglStr).push(vKey);
             }
+          });
+
+          if (byDateMap.size === 0) return;
+
+          const visits = Array.from(byDateMap.entries())
+            .sort((a, b) => a[0].localeCompare(b[0]))
+            .map(([tanggal, vList]) => ({
+              tanggal,
+              vaksinStr: vList.join(', ')
+            }));
+
+          if (visits.length > maxVisits) maxVisits = visits.length;
+
+          s2Records.push({
+            desa: d.desa || '-',
+            nama_anak: d.nama_anak || '-',
+            tgl_lahir: d.tgl_lahir || '-',
+            jk: d.jk || '-',
+            nama_ibu: d.nama_ibu || '-',
+            wa_anak: d.wa_anak || '-',
+            alamat_rt: d.alamat_rt || '-',
+            visits
           });
         });
 
-        if (rowNumS2 === 1) {
-          sheet2Data.push(["-", "-", "Tidak ada data bayi/anak penerima vaksin pada filter bulan/tahun/antigen ini.", "", "", "", "", "", "", "", "", ""]);
+        const totalColsS2 = 8 + (maxVisits * 2);
+        const lastColLetterS2 = ws2.getColumn(totalColsS2).letter;
+        styleTitleRow(
+          ws2,
+          'DAFTAR ANAK PENERIMA VAKSIN TERFILTER (MEMANJANG KE SAMPING) - PUSKESMAS MELATA',
+          `Filter: Bulan ${monthNameStr} ${yearLabelStr} | Desa: ${desaSel === 'ALL' ? 'Semua Desa' : desaSel} | Antigen: ${antigenSel === 'ALL' ? 'Semua Antigen Terpilih' : antigenSel}`,
+          lastColLetterS2
+        );
+
+        const s2Headers = ['No', 'Desa', 'Nama Anak', 'Tgl Lahir', 'L/P', 'Orang Tua', 'No. HP/WA', 'Alamat/RT'];
+        for (let v = 1; v <= maxVisits; v++) {
+          s2Headers.push(`Tgl Vaksin ${v}`);
+          s2Headers.push(maxVisits === 1 ? 'Vaksin diberikan' : `Vaksin diberikan ${v}`);
         }
 
-        // ---------------------------------------------------------------------
-        // SHEET 3: REKAPAN TOTAL PENERIMA PER ANTIGEN (STRICT BULAN/TAHUN TERFILTER)
-        // ---------------------------------------------------------------------
-        const sheet3Data = [];
-        sheet3Data.push([`REKAPITULASI JUMLAH PENERIMA VAKSIN TERFILTER - PUSKESMAS MELATA`]);
-        sheet3Data.push([`Periode: ${monthNameStr} ${yearLabelStr} | Wilayah: ${desaSel === 'ALL' ? 'Semua Desa (13 Desa)' : desaSel}`]);
-        sheet3Data.push([]);
-
-        const s3_h1 = ["No", "Desa / Kelurahan", "Kategori Wilayah", "Target Bayi"];
-        const s3_h2 = ["", "", "", ""];
-        activeAntigenList.forEach(vk => {
-          s3_h1.push(vk, "", "");
-          s3_h2.push("(L)", "(P)", "Total");
+        const r4s2 = ws2.getRow(4);
+        r4s2.height = 26;
+        s2Headers.forEach((hText, idx) => {
+          const colNum = idx + 1;
+          const cell = r4s2.getCell(colNum);
+          cell.value = hText;
+          const isVaxCol = colNum >= 9;
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: isVaxCol ? 'FF0D9488' : 'FF002B5B' } };
+          cell.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
+          cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+          cell.border = thinBorder;
         });
-        s3_h1.push("Bayi IDL (s/d Periode)", "Capaian IDL (%)");
-        s3_h2.push("", "");
-        sheet3Data.push(s3_h1);
-        sheet3Data.push(s3_h2);
+
+        if (s2Records.length === 0) {
+          const rEmpty = ws2.getRow(5);
+          rEmpty.height = 24;
+          rEmpty.getCell(1).value = '-';
+          rEmpty.getCell(3).value = 'Tidak ada data anak penerima vaksin pada filter bulan/tahun/antigen ini.';
+        } else {
+          s2Records.forEach((rec, idx) => {
+            const rNum = 5 + idx;
+            const excelRow = ws2.getRow(rNum);
+            const zebraArgb = (rNum % 2 === 1) ? 'FFFFFFFF' : 'FFF8FAFC';
+            let needsTallRow = false;
+
+            const baseVals = [idx + 1, rec.desa, rec.nama_anak, rec.tgl_lahir, rec.jk, rec.nama_ibu, rec.wa_anak, rec.alamat_rt];
+            baseVals.forEach((val, bIdx) => {
+              const colNum = bIdx + 1;
+              const cell = excelRow.getCell(colNum);
+              cell.value = val;
+              cell.border = thinBorder;
+              cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: zebraArgb } };
+              cell.font = { name: 'Calibri', size: 10, bold: colNum === 3, color: { argb: 'FF1E293B' } };
+              cell.alignment = { horizontal: [1, 4, 5, 7].includes(colNum) ? 'center' : 'left', vertical: 'middle' };
+            });
+
+            for (let v = 0; v < maxVisits; v++) {
+              const colTgl = 9 + (v * 2);
+              const colVax = colTgl + 1;
+              const visitObj = rec.visits[v];
+
+              const cTgl = excelRow.getCell(colTgl);
+              cTgl.value = visitObj ? visitObj.tanggal : '-';
+              cTgl.border = thinBorder;
+              cTgl.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF5F3FF' } };
+              cTgl.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FF002B5B' } };
+              cTgl.alignment = { horizontal: 'center', vertical: 'middle' };
+
+              const cVax = excelRow.getCell(colVax);
+              cVax.value = visitObj ? visitObj.vaksinStr : '-';
+              cVax.border = thinBorder;
+              cVax.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFECFDF5' } };
+              cVax.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FF065F46' } };
+              cVax.alignment = { horizontal: 'left', vertical: 'middle', wrapText: true };
+
+              if (visitObj && visitObj.vaksinStr.length > 42) needsTallRow = true;
+            }
+            excelRow.height = needsTallRow ? 32 : 21;
+          });
+        }
+
+        ws2.getColumn(1).width = 5;
+        ws2.getColumn(2).width = 14;
+        ws2.getColumn(3).width = 26;
+        ws2.getColumn(4).width = 12;
+        ws2.getColumn(5).width = 5;
+        ws2.getColumn(6).width = 21;
+        ws2.getColumn(7).width = 14;
+        ws2.getColumn(8).width = 16;
+        for (let v = 0; v < maxVisits; v++) {
+          ws2.getColumn(9 + (v * 2)).width = 12;
+          ws2.getColumn(10 + (v * 2)).width = 45;
+        }
+
+        // =====================================================================
+        // SHEET 3: REKAPAN TOTAL PENERIMA PER ANTIGEN
+        // Freeze Panes: No (Kolom 1) s/d Target Bayi (Kolom 4) + Baris 1-5
+        // Lebar Kolom Vaksin: Rapat menyesuaikan konten (L), (P), Total
+        // =====================================================================
+        const ws3 = workbook.addWorksheet('Rekapan Total Penerima', {
+          views: [{ state: 'frozen', xSplit: 4, ySplit: 5 }]
+        });
+        styleTitleRow(
+          ws3,
+          'REKAPITULASI JUMLAH PENERIMA VAKSIN TERFILTER - PUSKESMAS MELATA',
+          `Periode: ${monthNameStr} ${yearLabelStr} | Wilayah: ${desaSel === 'ALL' ? 'Semua Desa (13 Desa)' : desaSel}`,
+          'O'
+        );
+
+        const r4s3 = ws3.getRow(4);
+        const r5s3 = ws3.getRow(5);
+        r4s3.height = 26;
+        r5s3.height = 22;
+
+        const fixedHeadersS3 = ['No', 'Desa / Kelurahan', 'Kategori Wilayah', 'Target Bayi'];
+        fixedHeadersS3.forEach((hText, idx) => {
+          const colNum = idx + 1;
+          const colLetter = ws3.getColumn(colNum).letter;
+          ws3.mergeCells(`${colLetter}4:${colLetter}5`);
+          const cell = r4s3.getCell(colNum);
+          cell.value = hText;
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF002B5B' } };
+          cell.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
+          cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+          cell.border = thinBorder;
+          r5s3.getCell(colNum).border = thinBorder;
+        });
+
+        let colPtrS3 = 5;
+        activeAntigenList.forEach(vk => {
+          const startLtr = ws3.getColumn(colPtrS3).letter;
+          const endLtr = ws3.getColumn(colPtrS3 + 2).letter;
+          ws3.mergeCells(`${startLtr}4:${endLtr}4`);
+
+          const topCell = r4s3.getCell(colPtrS3);
+          topCell.value = vk;
+          topCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF002B5B' } };
+          topCell.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
+          topCell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+          for (let k = 0; k < 3; k++) r4s3.getCell(colPtrS3 + k).border = thinBorder;
+
+          ['(L)', '(P)', 'Total'].forEach((subLbl, sIdx) => {
+            const subCell = r5s3.getCell(colPtrS3 + sIdx);
+            subCell.value = subLbl;
+            subCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0F4C81' } };
+            subCell.font = { name: 'Calibri', size: 9, bold: true, color: { argb: 'FFFFFFFF' } };
+            subCell.alignment = { horizontal: 'center', vertical: 'middle' };
+            subCell.border = thinBorder;
+          });
+          colPtrS3 += 3;
+        });
+
+        const endHeadersS3 = ['Bayi IDL (s/d Periode)', 'Capaian IDL (%)'];
+        endHeadersS3.forEach((hText, idx) => {
+          const colNum = colPtrS3 + idx;
+          const colLetter = ws3.getColumn(colNum).letter;
+          ws3.mergeCells(`${colLetter}4:${colLetter}5`);
+          const cell = r4s3.getCell(colNum);
+          cell.value = hText;
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF002B5B' } };
+          cell.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
+          cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+          cell.border = thinBorder;
+          r5s3.getCell(colNum).border = thinBorder;
+        });
 
         const desaToLoop = desaSel === 'ALL'
           ? ALL_DESA_LIST
@@ -5583,6 +5841,7 @@ window.selectFromLiveSearch = function(encodedJson) {
         const grandTotalsS3 = new Array(activeAntigenList.length * 3).fill(0);
         let grandTargetS3 = 0;
         let grandIdlS3 = 0;
+        const maxLensS3 = new Array(colPtrS3 + 1).fill(0);
 
         desaToLoop.forEach((dName, idx) => {
           const desaDocs = allDocsInDb.filter(d => d.desa && d.desa.toLowerCase() === dName.toLowerCase());
@@ -5590,7 +5849,7 @@ window.selectFromLiveSearch = function(encodedJson) {
           const targetBayi = targetObj ? (targetObj.target_bayi || 0) : 0;
           grandTargetS3 += targetBayi;
 
-          const row_data = [
+          const rowVals = [
             idx + 1,
             dName,
             DESA_DALAM_WILAYAH.includes(dName) ? 'Dalam Wilayah' : 'Luar Wilayah',
@@ -5603,7 +5862,6 @@ window.selectFromLiveSearch = function(encodedJson) {
             desaDocs.forEach(d => {
               const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
               const val = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
-              // STRICT: Hanya hitung bulan & tahun yang difilter
               if (val && isVaccineGivenExactMonth(val, thn, bln)) {
                 if (d.jk === 'L') lCount++;
                 else pCount++;
@@ -5613,7 +5871,7 @@ window.selectFromLiveSearch = function(encodedJson) {
             grandTotalsS3[vIdx * 3] += lCount;
             grandTotalsS3[vIdx * 3 + 1] += pCount;
             grandTotalsS3[vIdx * 3 + 2] += totLP;
-            row_data.push(lCount, pCount, totLP);
+            rowVals.push(lCount, pCount, totLP);
           });
 
           desaDocs.forEach(d => {
@@ -5622,42 +5880,145 @@ window.selectFromLiveSearch = function(encodedJson) {
               const dt = d[fKey] || (d.jenis_imunisasi === vk ? d.tanggal_pelayanan : null);
               return isVaccineGivenUpToMonth(dt, thn, bln) ? dt : null;
             };
-            const hasHb0 = Boolean(getV("HBO (<24 Jam)") || getV("HBO (1-7 Hari)"));
-            if (hasHb0 && getV("BCG") && getV("DPT-HB-Hib3") && getV("OPV4") && getV("IPV1") && getV("Campak Rubela-1")) {
+            const hasHb0 = Boolean(getV('HBO (<24 Jam)') || getV('HBO (1-7 Hari)'));
+            if (hasHb0 && getV('BCG') && getV('DPT-HB-Hib3') && getV('OPV4') && getV('IPV1') && getV('Campak Rubela-1')) {
               idlCount++;
             }
           });
           grandIdlS3 += idlCount;
-          const persen = targetBayi > 0 ? ((idlCount / targetBayi) * 100).toFixed(1) : "0.0";
-          row_data.push(idlCount, `${persen}%`);
-          sheet3Data.push(row_data);
+          const persen = targetBayi > 0 ? ((idlCount / targetBayi) * 100).toFixed(1) : '0.0';
+          rowVals.push(idlCount, `${persen}%`);
+
+          const rNum = 6 + idx;
+          const excelRow = ws3.getRow(rNum);
+          excelRow.height = 20;
+          const zebraArgb = (rNum % 2 === 0) ? 'FFFFFFFF' : 'FFF8FAFC';
+
+          rowVals.forEach((val, cIdx) => {
+            const colNum = cIdx + 1;
+            const cell = excelRow.getCell(colNum);
+            cell.value = val;
+            cell.border = thinBorder;
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: zebraArgb } };
+            cell.font = { name: 'Calibri', size: 10, bold: colNum === 2, color: { argb: 'FF1E293B' } };
+            cell.alignment = { horizontal: colNum === 2 ? 'left' : 'center', vertical: 'middle' };
+
+            const len = String(val).length;
+            if (len > maxLensS3[colNum]) maxLensS3[colNum] = len;
+          });
         });
 
-        const grandPersenS3 = grandTargetS3 > 0 ? ((grandIdlS3 / grandTargetS3) * 100).toFixed(1) : "0.0";
-        sheet3Data.push(["", "TOTAL TERFILTER", "-", grandTargetS3, ...grandTotalsS3, grandIdlS3, `${grandPersenS3}%`]);
+        // Baris Total Sheet 3
+        const grandPersenS3 = grandTargetS3 > 0 ? ((grandIdlS3 / grandTargetS3) * 100).toFixed(1) : '0.0';
+        const totalRowValsS3 = ['', 'TOTAL TERFILTER', '-', grandTargetS3, ...grandTotalsS3, grandIdlS3, `${grandPersenS3}%`];
+        const rTotalS3 = ws3.getRow(6 + desaToLoop.length);
+        rTotalS3.height = 22;
+        totalRowValsS3.forEach((val, cIdx) => {
+          const colNum = cIdx + 1;
+          const cell = rTotalS3.getCell(colNum);
+          cell.value = val;
+          cell.border = thinBorder;
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE2E8F0' } };
+          cell.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FF1E293B' } };
+          cell.alignment = { horizontal: colNum === 2 ? 'left' : 'center', vertical: 'middle' };
 
-        // ---------------------------------------------------------------------
+          const len = String(val).length;
+          if (len > maxLensS3[colNum]) maxLensS3[colNum] = len;
+        });
+
+        // Lebar kolom Sheet 3 sesuai konten/isi (tidak terlalu lebar)
+        ws3.getColumn(1).width = 5;
+        ws3.getColumn(2).width = 19;
+        ws3.getColumn(3).width = 16;
+        ws3.getColumn(4).width = 11;
+        for (let i = 0; i < activeAntigenList.length; i++) {
+          const cL = 5 + (i * 3);
+          const cP = cL + 1;
+          const cT = cL + 2;
+          ws3.getColumn(cL).width = Math.max(5.5, (maxLensS3[cL] || 1) + 3);
+          ws3.getColumn(cP).width = Math.max(5.5, (maxLensS3[cP] || 1) + 3);
+          ws3.getColumn(cT).width = Math.max(6.5, (maxLensS3[cT] || 1) + 3.5);
+        }
+        ws3.getColumn(colPtrS3).width = 13;
+        ws3.getColumn(colPtrS3 + 1).width = 13;
+
+        // =====================================================================
         // SHEET 4: REKAPAN LOGISTIK VAKSIN
-        // ---------------------------------------------------------------------
-        const sheet4Data = [];
-        sheet4Data.push([`REKAPITULASI PEMAKAIAN LOGISTIK VAKSIN PER DESA - PUSKESMAS MELATA`]);
-        sheet4Data.push([`Periode: ${monthNameStr} ${yearLabelStr} | Wilayah: ${desaSel === 'ALL' ? 'Semua Desa' : desaSel}`]);
-        sheet4Data.push([]);
-
-        const s4_h1 = ["No", "Nama Desa / Kelurahan", "Kategori Wilayah"];
-        const s4_h2 = ["", "", ""];
-        ANTIGEN_GROUPS.forEach(g => {
-          s4_h1.push(`${g.name} (${g.unit})`, "");
-          s4_h2.push("Pemakaian Bulan Filter", "Kumulatif s/d Bulan");
+        // Freeze Panes: No (Kolom 1) s/d Kategori Wilayah (Kolom 3) + Baris 1-5
+        // Lebar Kolom Vaksin: Proporsional & sesuai isi (header dibungkus 2 baris)
+        // =====================================================================
+        const ws4 = workbook.addWorksheet('Rekapan Logistik Vaksin', {
+          views: [{ state: 'frozen', xSplit: 3, ySplit: 5 }]
         });
-        s4_h1.push("Total Dosis Bulan Filter", "Total Pemakaian Kemasan");
-        s4_h2.push("", "");
-        sheet4Data.push(s4_h1);
-        sheet4Data.push(s4_h2);
+        styleTitleRow(
+          ws4,
+          'REKAPITULASI PEMAKAIAN LOGISTIK VAKSIN PER DESA - PUSKESMAS MELATA',
+          `Periode: ${monthNameStr} ${yearLabelStr} | Wilayah: ${desaSel === 'ALL' ? 'Semua Desa' : desaSel}`,
+          'O'
+        );
 
+        const r4s4 = ws4.getRow(4);
+        const r5s4 = ws4.getRow(5);
+        r4s4.height = 28;
+        r5s4.height = 28;
+
+        const fixedHeadersS4 = ['No', 'Nama Desa / Kelurahan', 'Kategori Wilayah'];
+        fixedHeadersS4.forEach((hText, idx) => {
+          const colNum = idx + 1;
+          const colLetter = ws4.getColumn(colNum).letter;
+          ws4.mergeCells(`${colLetter}4:${colLetter}5`);
+          const cell = r4s4.getCell(colNum);
+          cell.value = hText;
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF002B5B' } };
+          cell.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
+          cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+          cell.border = thinBorder;
+          r5s4.getCell(colNum).border = thinBorder;
+        });
+
+        let colPtrS4 = 4;
+        ANTIGEN_GROUPS.forEach(g => {
+          const startLtr = ws4.getColumn(colPtrS4).letter;
+          const endLtr = ws4.getColumn(colPtrS4 + 1).letter;
+          ws4.mergeCells(`${startLtr}4:${endLtr}4`);
+
+          const topCell = r4s4.getCell(colPtrS4);
+          topCell.value = `${g.name} (${g.unit})`;
+          topCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF002B5B' } };
+          topCell.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
+          topCell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+          r4s4.getCell(colPtrS4).border = thinBorder;
+          r4s4.getCell(colPtrS4 + 1).border = thinBorder;
+
+          ['Pemakaian Bulan Filter', 'Kumulatif s/d Bulan'].forEach((subLbl, sIdx) => {
+            const subCell = r5s4.getCell(colPtrS4 + sIdx);
+            subCell.value = subLbl;
+            subCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0F4C81' } };
+            subCell.font = { name: 'Calibri', size: 9, bold: true, color: { argb: 'FFFFFFFF' } };
+            subCell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+            subCell.border = thinBorder;
+          });
+          colPtrS4 += 2;
+        });
+
+        const endHeadersS4 = ['Total Dosis Bulan Filter', 'Total Pemakaian Kemasan'];
+        endHeadersS4.forEach((hText, idx) => {
+          const colNum = colPtrS4 + idx;
+          const colLetter = ws4.getColumn(colNum).letter;
+          ws4.mergeCells(`${colLetter}4:${colLetter}5`);
+          const cell = r4s4.getCell(colNum);
+          cell.value = hText;
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF002B5B' } };
+          cell.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
+          cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+          cell.border = thinBorder;
+          r5s4.getCell(colNum).border = thinBorder;
+        });
+
+        const maxLensS4 = new Array(colPtrS4 + 1).fill(0);
         desaToLoop.forEach((dName, idx) => {
           const desaDocs = allDocsInDb.filter(d => d.desa && d.desa.toLowerCase() === dName.toLowerCase());
-          const row = [idx + 1, dName, DESA_DALAM_WILAYAH.includes(dName) ? 'Dalam Wilayah' : 'Luar Wilayah'];
+          const rowVals = [idx + 1, dName, DESA_DALAM_WILAYAH.includes(dName) ? 'Dalam Wilayah' : 'Luar Wilayah'];
           let totDosisDesa = 0;
           let totVialDesa = 0;
 
@@ -5678,74 +6039,55 @@ window.selectFromLiveSearch = function(encodedJson) {
             const vialKum = Math.ceil(dosisKum / (g.doses_per_vial || 1));
             totDosisDesa += dosisBln;
             totVialDesa += vialBln;
-            row.push(vialBln, vialKum);
+            rowVals.push(vialBln, vialKum);
           });
-          row.push(totDosisDesa, totVialDesa);
-          sheet4Data.push(row);
-        });
+          rowVals.push(totDosisDesa, totVialDesa);
 
-        const wb = XLSX.utils.book_new();
-        const ws1 = XLSX.utils.aoa_to_sheet(sheet1Data);
-        const ws2 = XLSX.utils.aoa_to_sheet(sheet2Data);
-        const ws3 = XLSX.utils.aoa_to_sheet(sheet3Data);
-        const ws4 = XLSX.utils.aoa_to_sheet(sheet4Data);
+          const rNum = 6 + idx;
+          const excelRow = ws4.getRow(rNum);
+          excelRow.height = 20;
+          const zebraArgb = (rNum % 2 === 0) ? 'FFFFFFFF' : 'FFF8FAFC';
 
-        const autoFitCols = (sheet, aoa, startRow = 3) => {
-          if (!aoa[startRow]) return;
-          sheet['!cols'] = aoa[startRow].map((_, colIdx) => {
-            let maxLen = 10;
-            aoa.forEach((row, rIdx) => {
-              if (rIdx >= startRow) {
-                const val = row[colIdx] !== undefined && row[colIdx] !== null ? String(row[colIdx]) : '';
-                if (val.length > maxLen) maxLen = val.length;
-              }
-            });
-            return { wch: Math.min(maxLen + 3, 36) };
+          rowVals.forEach((val, cIdx) => {
+            const colNum = cIdx + 1;
+            const cell = excelRow.getCell(colNum);
+            cell.value = val;
+            cell.border = thinBorder;
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: zebraArgb } };
+            cell.font = { name: 'Calibri', size: 10, bold: colNum === 2, color: { argb: 'FF1E293B' } };
+            cell.alignment = { horizontal: colNum === 2 ? 'left' : 'center', vertical: 'middle' };
+
+            const len = String(val).length;
+            if (len > maxLensS4[colNum]) maxLensS4[colNum] = len;
           });
-        };
-
-        autoFitCols(ws1, sheet1Data, 3);
-        autoFitCols(ws2, sheet2Data, 3);
-        autoFitCols(ws3, sheet3Data, 4);
-        autoFitCols(ws4, sheet4Data, 4);
-
-        ws1['!views'] = [{ state: 'frozen', xSplit: 3, ySplit: 4 }];
-        ws2['!views'] = [{ state: 'frozen', xSplit: 3, ySplit: 4 }];
-        ws3['!views'] = [{ state: 'frozen', xSplit: 2, ySplit: 5 }];
-        ws4['!views'] = [{ state: 'frozen', xSplit: 2, ySplit: 5 }];
-
-        ws3['!merges'] = [
-          { s: { r: 3, c: 0 }, e: { r: 4, c: 0 } },
-          { s: { r: 3, c: 1 }, e: { r: 4, c: 1 } },
-          { s: { r: 3, c: 2 }, e: { r: 4, c: 2 } },
-          { s: { r: 3, c: 3 }, e: { r: 4, c: 3 } }
-        ];
-        let colIndexS3 = 4;
-        activeAntigenList.forEach(() => {
-          ws3['!merges'].push({ s: { r: 3, c: colIndexS3 }, e: { r: 3, c: colIndexS3 + 2 } });
-          colIndexS3 += 3;
         });
 
-        ws4['!merges'] = [
-          { s: { r: 3, c: 0 }, e: { r: 4, c: 0 } },
-          { s: { r: 3, c: 1 }, e: { r: 4, c: 1 } },
-          { s: { r: 3, c: 2 }, e: { r: 4, c: 2 } }
-        ];
-        let colIndexS4 = 3;
-        ANTIGEN_GROUPS.forEach(() => {
-          ws4['!merges'].push({ s: { r: 3, c: colIndexS4 }, e: { r: 3, c: colIndexS4 + 1 } });
-          colIndexS4 += 2;
-        });
+        // Lebar kolom Sheet 4 ramping sesuai isi angka & header 2 baris
+        ws4.getColumn(1).width = 5;
+        ws4.getColumn(2).width = 19;
+        ws4.getColumn(3).width = 16;
+        for (let c = 4; c < colPtrS4; c++) {
+          ws4.getColumn(c).width = Math.max(11.5, (maxLensS4[c] || 1) + 3);
+        }
+        ws4.getColumn(colPtrS4).width = 13;
+        ws4.getColumn(colPtrS4 + 1).width = 13;
 
-        XLSX.utils.book_append_sheet(wb, ws1, "Register Kohort Matriks");
-        XLSX.utils.book_append_sheet(wb, ws2, "Penerima Vaksin Terfilter");
-        XLSX.utils.book_append_sheet(wb, ws3, "Rekapan Total Penerima");
-        XLSX.utils.book_append_sheet(wb, ws4, "Rekapan Logistik Vaksin");
-
+        // Unduh file Excel (.xlsx)
         const safeAntigenTag = antigenSel === 'ALL' ? 'SemuaAntigen' : antigenSel.replace(/[^a-zA-Z0-9]/g, '');
-        XLSX.writeFile(wb, `Laporan_Imunisasi_Melata_${desaSel}_${safeAntigenTag}_${bln}_${thn}.xlsx`);
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], {
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        });
+        const downloadUrl = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.download = `Laporan_Imunisasi_Melata_${desaSel}_${safeAntigenTag}_${bln}_${thn}.xlsx`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(downloadUrl);
       } catch (err) {
-        alert("Gagal download Excel: " + err.message);
+        alert('Gagal download Excel: ' + err.message);
       }
     }
 

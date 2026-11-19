@@ -1128,7 +1128,88 @@
         <i class="fas fa-shield-alt" style="font-size: 1.15rem; color: #D97706;"></i>
         <div><strong>INFORMASI SISTEM:</strong> Data tersimpan lokal saat offline dan otomatis sinkron ke Cloud saat terhubung internet.</div>
       </div>
+      
+<!-- RINGKASAN CAPAIAN & DROP OUT IMUNISASI (SEBELUM PENCARIAN ANAK) -->
+      <div id="inputAchievementSection" class="input-kpi-wrapper">
+        <div class="input-kpi-header">
+          <div class="input-kpi-title">
+            <i class="fas fa-chart-pie" style="color: var(--primary);"></i>
+            <span>Ringkasan Capaian &amp; Drop Out Imunisasi</span>
+          </div>
+          <span id="kpiScopeBadge" class="input-kpi-scope">Wilayah Puskesmas Melata (Semua Desa)</span>
+        </div>
 
+        <div class="input-kpi-grid">
+          <!-- 1. JUMLAH BAYI/ANAK TERDAFTAR -->
+          <div class="kpi-card-item kpi-blue">
+            <div class="kpi-top-row">
+              <span class="kpi-label">Bayi / Anak Terdaftar</span>
+              <span class="kpi-icon-box"><i class="fas fa-children"></i></span>
+            </div>
+            <div>
+              <div id="kpiTotalAnakVal" class="kpi-main-value">0</div>
+              <div id="kpiTotalAnakSub" class="kpi-sub-info">Memuat data sasaran...</div>
+            </div>
+          </div>
+
+          <!-- 2. CAPAIAN IDL -->
+          <div class="kpi-card-item kpi-green">
+            <div class="kpi-top-row">
+              <span class="kpi-label">Capaian IDL<br><small style="font-weight:500;">(Dasar Lengkap)</small></span>
+              <span class="kpi-icon-box"><i class="fas fa-shield-heart"></i></span>
+            </div>
+            <div>
+              <div id="kpiIdlVal" class="kpi-main-value">0.0%</div>
+              <div id="kpiIdlSub" class="kpi-sub-info">0 dari 0 anak</div>
+              <div class="kpi-progress-track">
+                <div id="kpiIdlBar" class="kpi-progress-fill" style="width: 0%; background: #10B981;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. CAPAIAN IBL -->
+          <div class="kpi-card-item kpi-teal">
+            <div class="kpi-top-row">
+              <span class="kpi-label">Capaian IBL<br><small style="font-weight:500;">(Baduta Lengkap)</small></span>
+              <span class="kpi-icon-box"><i class="fas fa-award"></i></span>
+            </div>
+            <div>
+              <div id="kpiIblVal" class="kpi-main-value">0.0%</div>
+              <div id="kpiIblSub" class="kpi-sub-info">0 dari 0 anak</div>
+              <div class="kpi-progress-track">
+                <div id="kpiIblBar" class="kpi-progress-fill" style="width: 0%; background: #0D9488;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. DROP OUT DPT-HB-Hib (DPT 1 ke DPT 3) -->
+          <div class="kpi-card-item kpi-orange">
+            <div class="kpi-top-row">
+              <span class="kpi-label">Drop Out DPT-HB-Hib<br><small style="font-weight:500;">(DPT 1 &rarr; DPT 3)</small></span>
+              <span class="kpi-icon-box"><i class="fas fa-syringe"></i></span>
+            </div>
+            <div>
+              <div id="kpiDoDptVal" class="kpi-main-value">0.0%</div>
+              <div id="kpiDoDptSub" class="kpi-sub-info">DPT1: 0 | DPT3: 0 (Selisih: 0)</div>
+              <span id="kpiDoDptBadge" class="kpi-badge-status kpi-badge-neutral">Menunggu data</span>
+            </div>
+          </div>
+
+          <!-- 5. DROP OUT CAMPAK-RUBELA / MR (DPT 1 ke Campak/MR) -->
+          <div class="kpi-card-item kpi-purple">
+            <div class="kpi-top-row">
+              <span class="kpi-label">Drop Out Campak / MR<br><small style="font-weight:500;">(DPT 1 &rarr; Campak/MR)</small></span>
+              <span class="kpi-icon-box"><i class="fas fa-vial-circle-check"></i></span>
+            </div>
+            <div>
+              <div id="kpiDoMrVal" class="kpi-main-value">0.0%</div>
+              <div id="kpiDoMrSub" class="kpi-sub-info">DPT1: 0 | MR1: 0 (Selisih: 0)</div>
+              <span id="kpiDoMrBadge" class="kpi-badge-status kpi-badge-neutral">Menunggu data</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
       <!-- MENU AWAL: HANYA CARI / UPDATE SASARAN REGISTERED -->
       <div class="card" id="cardSearchSasaran" style="background: linear-gradient(135deg, #F0F7FF 0%, #E0F2FE 100%); border: 1.5px solid #7DD3FC;">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:6px;">
@@ -3687,6 +3768,7 @@ window.goToEdit = function(encodedJson) {
         document.getElementById('notFoundAddContainer').style.display = 'none';
         populateAnakByDesa();
         loadRecentTransactions();
+        updateInputAchievementCards();
       });
       bindEvent('cert_filter_desa', 'change', (e) => {
         populateCertSasaranByDesa(e.target.value);
@@ -3716,7 +3798,156 @@ window.goToEdit = function(encodedJson) {
           snap.forEach(d => cachedGlobalKohortData.push({ id: d.id, ...d.data() }));
         }
       } catch (e) { console.error("Error Caching Data:", e); }
+      updateInputAchievementCards();
     }
+
+    // =========================================================================
+    // HITUNG & TAMPILKAN 5 KARTU CAPAIAN PWS DI HALAMAN INPUT
+    // =========================================================================
+    function updateInputAchievementCards() {
+      // Gabungkan data cache Cloud + antrean offline (jika ada) tanpa duplikasi ID
+      const combinedMap = new Map();
+      cachedGlobalKohortData.forEach(item => {
+        const key = item.id || `${item.desa}_${item.nama_anak}_${item.tgl_lahir}`.toLowerCase();
+        combinedMap.set(key, item);
+      });
+      const offlineQueue = JSON.parse(localStorage.getItem('pkm_offline_queue') || '[]');
+      offlineQueue.forEach(item => {
+        const key = item.id || `${item.desa}_${item.nama_anak}_${item.tgl_lahir}`.toLowerCase();
+        combinedMap.set(key, { ...(combinedMap.get(key) || {}), ...item });
+      });
+
+      const selectedDesa = (document.getElementById('search_desa_anak')?.value || '').trim();
+
+      // Filter hanya sasaran Bayi/Anak (kecualikan Catin & Bumil) serta hormati wilayah kerja user
+      const anakList = Array.from(combinedMap.values()).filter(d => {
+        if (d.peran === 'Catin' || d.peran === 'Bumil') return false;
+        if (typeof isWilayahDiizinkan === 'function' && !isWilayahDiizinkan(d.desa)) return false;
+        if (selectedDesa && (!d.desa || d.desa.toLowerCase() !== selectedDesa.toLowerCase())) return false;
+        return true;
+      });
+
+      const scopeBadge = document.getElementById('kpiScopeBadge');
+      if (scopeBadge) {
+        if (selectedDesa) {
+          scopeBadge.textContent = `Desa ${selectedDesa}`;
+        } else if (typeof activeUserWilayah !== 'undefined' && activeUserWilayah && activeUserWilayah.toUpperCase() !== 'SEMUA') {
+          scopeBadge.textContent = `Wilayah Kerja: ${activeUserWilayah}`;
+        } else {
+          scopeBadge.textContent = 'Wilayah Puskesmas Melata (Semua Desa)';
+        }
+      }
+
+      // Helper pembaca status antigen sesuai format field Firestore di aplikasi ini
+      const hasVax = (d, vk) => {
+        const fieldKey = `vaksin_${vk.replace(/[\s\(\)<>-]/g, '_')}`;
+        const val = d[fieldKey] || (d.jenis_imunisasi === vk ? d.tanggal_pelayanan : null);
+        return Boolean(val && val !== '-');
+      };
+
+      const totalAnak = anakList.length;
+      let countIdl = 0;
+      let countIbl = 0;
+      let countDpt1 = 0;
+      let countDpt3 = 0;
+      let countMr1 = 0;
+
+      anakList.forEach(d => {
+        const hasHb0 = hasVax(d, "HBO (<24 Jam)") || hasVax(d, "HBO (1-7 Hari)");
+        const hasBcg = hasVax(d, "BCG");
+        const hasDpt1 = hasVax(d, "DPT-HB-Hib1");
+        const hasDpt3 = hasVax(d, "DPT-HB-Hib3");
+        const hasOpv4 = hasVax(d, "OPV4");
+        const hasIpv1 = hasVax(d, "IPV1");
+        const hasMr1 = hasVax(d, "Campak Rubela-1");
+        const hasDpt4 = hasVax(d, "DPT-HB-Hib4");
+        const hasMr2 = hasVax(d, "Campak Rubela-2");
+
+        // Kriteria IDL & IBL identik dengan Tab Capaian & Pop-up KIA Digital
+        const isIdl = hasHb0 && hasBcg && hasDpt3 && hasOpv4 && hasIpv1 && hasMr1;
+        const isIbl = isIdl && hasDpt4 && hasMr2;
+
+        if (hasDpt1) countDpt1++;
+        if (hasDpt3) countDpt3++;
+        if (hasMr1) countMr1++;
+        if (isIdl) countIdl++;
+        if (isIbl) countIbl++;
+      });
+
+      const pctIdl = totalAnak > 0 ? ((countIdl / totalAnak) * 100).toFixed(1) : '0.0';
+      const pctIbl = totalAnak > 0 ? ((countIbl / totalAnak) * 100).toFixed(1) : '0.0';
+
+      const gapDpt = countDpt1 - countDpt3;
+      const doDptPct = countDpt1 > 0 ? ((gapDpt / countDpt1) * 100).toFixed(1) : '0.0';
+
+      const gapMr = countDpt1 - countMr1;
+      const doMrPct = countDpt1 > 0 ? ((gapMr / countDpt1) * 100).toFixed(1) : '0.0';
+
+      // Render Kartu 1: Total Bayi/Anak Terdaftar
+      const elTotal = document.getElementById('kpiTotalAnakVal');
+      const elTotalSub = document.getElementById('kpiTotalAnakSub');
+      if (elTotal) elTotal.textContent = totalAnak.toLocaleString('id-ID');
+      if (elTotalSub) {
+        elTotalSub.textContent = selectedDesa
+          ? `Sasaran bayi/anak di Desa ${selectedDesa}`
+          : 'Total bayi & anak terdaftar';
+      }
+
+      // Render Kartu 2: Capaian IDL
+      const elIdl = document.getElementById('kpiIdlVal');
+      const elIdlSub = document.getElementById('kpiIdlSub');
+      const elIdlBar = document.getElementById('kpiIdlBar');
+      if (elIdl) elIdl.textContent = `${pctIdl}%`;
+      if (elIdlSub) elIdlSub.textContent = `${countIdl} dari ${totalAnak} anak`;
+      if (elIdlBar) elIdlBar.style.width = `${Math.min(100, Math.max(0, parseFloat(pctIdl)))}%`;
+
+      // Render Kartu 3: Capaian IBL
+      const elIbl = document.getElementById('kpiIblVal');
+      const elIblSub = document.getElementById('kpiIblSub');
+      const elIblBar = document.getElementById('kpiIblBar');
+      if (elIbl) elIbl.textContent = `${pctIbl}%`;
+      if (elIblSub) elIblSub.textContent = `${countIbl} dari ${totalAnak} anak`;
+      if (elIblBar) elIblBar.style.width = `${Math.min(100, Math.max(0, parseFloat(pctIbl)))}%`;
+
+      // Render Kartu 4: Drop Out DPT-HB-Hib (DPT 1 -> DPT 3)
+      const elDoDpt = document.getElementById('kpiDoDptVal');
+      const elDoDptSub = document.getElementById('kpiDoDptSub');
+      const elDoDptBadge = document.getElementById('kpiDoDptBadge');
+      if (elDoDpt) elDoDpt.textContent = `${doDptPct}%`;
+      if (elDoDptSub) elDoDptSub.textContent = `DPT1: ${countDpt1} | DPT3: ${countDpt3} (Selisih: ${gapDpt})`;
+      if (elDoDptBadge) {
+        if (countDpt1 === 0) {
+          elDoDptBadge.className = 'kpi-badge-status kpi-badge-neutral';
+          elDoDptBadge.textContent = 'Belum ada DPT 1';
+        } else if (parseFloat(doDptPct) <= 5) {
+          elDoDptBadge.className = 'kpi-badge-status kpi-badge-safe';
+          elDoDptBadge.innerHTML = '<i class="fas fa-circle-check"></i> Aman (&le; 5%)';
+        } else {
+          elDoDptBadge.className = 'kpi-badge-status kpi-badge-warn';
+          elDoDptBadge.innerHTML = '<i class="fas fa-triangle-exclamation"></i> Waspada (&gt; 5%)';
+        }
+      }
+
+      // Render Kartu 5: Drop Out Campak-Rubela / MR (DPT 1 -> MR 1)
+      const elDoMr = document.getElementById('kpiDoMrVal');
+      const elDoMrSub = document.getElementById('kpiDoMrSub');
+      const elDoMrBadge = document.getElementById('kpiDoMrBadge');
+      if (elDoMr) elDoMr.textContent = `${doMrPct}%`;
+      if (elDoMrSub) elDoMrSub.textContent = `DPT1: ${countDpt1} | MR1: ${countMr1} (Selisih: ${gapMr})`;
+      if (elDoMrBadge) {
+        if (countDpt1 === 0) {
+          elDoMrBadge.className = 'kpi-badge-status kpi-badge-neutral';
+          elDoMrBadge.textContent = 'Belum ada DPT 1';
+        } else if (parseFloat(doMrPct) <= 5) {
+          elDoMrBadge.className = 'kpi-badge-status kpi-badge-safe';
+          elDoMrBadge.innerHTML = '<i class="fas fa-circle-check"></i> Aman (&le; 5%)';
+        } else {
+          elDoMrBadge.className = 'kpi-badge-status kpi-badge-warn';
+          elDoMrBadge.innerHTML = '<i class="fas fa-triangle-exclamation"></i> Waspada (&gt; 5%)';
+        }
+      }
+    }
+    window.updateInputAchievementCards = updateInputAchievementCards;
 
     // =========================================================================
     // PENCARIAN SASARAN AWAL & TOMBOL TAMBAH SASARAN (SMOOTH SCROLL)

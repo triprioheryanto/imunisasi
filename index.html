@@ -3294,6 +3294,8 @@ window.goToEdit = function(encodedJson) {
 
       if (savedUser && userInputEl) {
         userInputEl.value = savedUser;
+        if (hintEl) hintEl.innerHTML = `<i class="fas fa-mobile-alt"></i> Akun tersimpan: <strong>${savedUser}</strong>`;
+      }
 
       if (isPetugasSessionValid()) {
         savePetugasSession(savedUser);

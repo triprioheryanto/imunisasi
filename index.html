@@ -702,6 +702,27 @@
 .kpi-badge-safe { background: #DCFCE7; color: #15803D; }
 .kpi-badge-warn { background: #FEE2E2; color: #B91C1C; }
 .kpi-badge-neutral { background: #F1F5F9; color: #475569; }
+    /* Perbaikan Layout 6 Kartu Ringkasan Capaian (1 Baris Penuh di Desktop) */
+#kpiGrid6 {
+  display: grid !important;
+  grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  margin-bottom: 12px !important;
+}
+#kpiGrid6 > div {
+  padding: 10px 12px !important;
+  min-width: 0 !important;
+}
+@media (max-width: 1150px) {
+  #kpiGrid6 {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+@media (max-width: 640px) {
+  #kpiGrid6 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
   </style>
 </head>
 <body>

@@ -7804,13 +7804,13 @@ function resetCatchUpTables() {
   document.querySelectorAll('.catchup-trigger').forEach(btn => btn.classList.remove('active'));
 }
   <script>
+    <script>
     function toggleCatchUpTable(boxId, triggerEl) {
       const targetBox = document.getElementById(boxId);
       if (!targetBox) return;
 
-      const isAlreadyOpen = targetBox.classList.contains('open');
+      const isCurrentlyOpen = targetBox.classList.contains('open');
 
-      // Tutup semua tabel & reset panah tombol
       document.querySelectorAll('.catchup-table-box').forEach(box => {
         box.classList.remove('open');
       });
@@ -7818,29 +7818,21 @@ function resetCatchUpTables() {
         btn.classList.remove('active');
       });
 
-      // Buka tabel yang dipilih & scroll halus tepat di bawah header
-      if (!isAlreadyOpen) {
+      if (!isCurrentlyOpen) {
         targetBox.classList.add('open');
         if (triggerEl) triggerEl.classList.add('active');
 
         setTimeout(() => {
-          const yOffset = -100;
-          const y = targetBox.getBoundingClientRect().top + window.pageYOffset + yOffset;
-          window.scrollTo({ top: y, behavior: 'smooth' });
+          targetBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }, 60);
       }
     }
 
-    // Pastikan semua tabel kembali tertutup saat tab CATCH UP pertama dibuka
-    document.addEventListener('DOMContentLoaded', () => {
-      const catchupTabBtn = document.querySelector('.tab[data-tab="catchup"]');
-      if (catchupTabBtn) {
-        catchupTabBtn.addEventListener('click', () => {
-          document.querySelectorAll('.catchup-table-box').forEach(box => box.classList.remove('open'));
-          document.querySelectorAll('.catchup-trigger').forEach(btn => btn.classList.remove('active'));
-        });
-      }
-    });
+    function resetCatchUpTables() {
+      document.querySelectorAll('.catchup-table-box').forEach(box => box.classList.remove('open'));
+      document.querySelectorAll('.catchup-trigger').forEach(btn => btn.classList.remove('active'));
+    }
   </script>
+</body>
 </body>
 </html>

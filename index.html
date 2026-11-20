@@ -2093,77 +2093,6 @@
           <button type="button" class="btn btn-ghost" onclick="document.getElementById('certificatePrintArea').style.display='none'"><i class="fas fa-times"></i> Sembunyikan Preview</button>
         </div>
       </div>
-          
-          <!-- HALAMAN DEPAN -->
-          <div class="certificate-page-a4-landscape">
-            <div class="cert-frame-outer">
-              <div class="cert-corner cert-corner-tl"></div><div class="cert-corner cert-corner-tr"></div><div class="cert-corner cert-corner-bl"></div><div class="cert-corner cert-corner-br"></div>
-              <div class="cert-frame-inner">
-                <div>
-                  <div class="cert-header-landscape">
-                    <div class="cert-header-text-box">
-                      <h3>PEMERINTAH KABUPATEN LAMANDAU</h3><h2>DINAS KESEHATAN — PUSKESMAS MELATA</h2>
-                      <p>Jln. Tri Setya No. 01 Ds. Melata Kec. Menthobi Raya Kab. Lamandau, Kalimantan Tengah</p>
-                    </div>
-                  </div>
-                  <div class="cert-title-box"><div class="cert-main-title">SERTIFIKAT IMUNISASI</div><div class="cert-no-text">Nomor Register: <span id="cert_no_reg">MM/IDL/415/2026</span></div></div>
-                  <div class="cert-body-content">
-                    <p style="margin-bottom:6px; font-weight:600; color:#334155; text-align:center;">Diberikan sebagai penghargaan atas ketuntasan imunisasi kepada:</p>
-                    <div style="display:flex; justify-content:space-between; align-items:center; gap:20px; background:rgba(255,255,255,0.85); padding:6px 16px; border-radius:8px; border:1px solid #E2E8F0;">
-                      <table class="cert-field-table">
-                        <tr><td class="cert-field-label">Nama Lengkap Anak</td><td>: <span class="cert-field-val" id="cert_nama_anak">-</span></td></tr>
-                        <tr><td class="cert-field-label">Tanggal Lahir / Gender</td><td>: <span class="cert-field-val" id="cert_ttl_jk">-</span></td></tr>
-                        <tr><td class="cert-field-label">Nama Orang Tua / Ibu</td><td>: <span class="cert-field-val" id="cert_nama_ibu">-</span></td></tr>
-                        <tr><td class="cert-field-label">Desa / Alamat</td><td>: <span class="cert-field-val" id="cert_desa_alamat">-</span></td></tr>
-                      </table>
-                      <div class="cert-photo-box-4x6"><i class="fas fa-camera" style="font-size:1.1rem; margin-bottom:2px; opacity:0.8;"></i>FOTO<br>ANAK/BAYI<br>4 x 6</div>
-                    </div>
-                    <p style="margin-top:6px; font-size:0.9rem; line-height:1.3; color:#1E293B; text-align:center;">Menyatakan bahwa anak tersebut di atas telah menyelesaikan seluruh rangkaian pelayanan imunisasi dan dinyatakan telah mendapatkan <strong>Imunisasi Dasar Lengkap (IDL)</strong> sesuai standar kesehatan nasional.</p>
-                  </div>
-                  <div class="cert-slogan" style="margin-top: 2px; margin-bottom: 6px;">"ANAK SEHAT GENERASI KUAT"</div>
-                  
-                  <!-- PENANDATANGAN RESMI SERTIFIKAT (KOORDINATOR DI KIRI LEBIH TINGGI, KEPALA DI KANAN LEBIH RENDAH) -->
-                  <div style="display:flex; justify-content:space-between; align-items:flex-start; padding: 0 36px; font-size:0.85rem; color:#002244; position:relative; z-index:2;">
-                    <div style="text-align:center; margin-top: 0px;">
-                      <div style="font-weight:600; margin-bottom: 42px;">Melata, <span id="cert_tanggal_cetak">...</span><br>Koordinator Imunisasi</div>
-                      <div style="font-weight:800; border-bottom: 1.5px solid #002244; display:inline-block; padding:0 12px;">Tri Prio Heryanto</div>
-                      <div style="font-weight:700; margin-top: 3px;">NIP. 19890313 201101 1 002</div>
-                    </div>
-                    <div style="text-align:center; margin-top: 16px;">
-                      <div style="font-weight:600; margin-bottom: 42px;">Mengetahui,<br>Kepala Puskesmas Melata</div>
-                      <div style="font-weight:800; border-bottom: 1.5px solid #002244; display:inline-block; padding:0 12px;">dr. Anang Argo Yuwono</div>
-                      <div style="font-weight:700; margin-top: 3px;">NIP. 19830521 201403 003</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- HALAMAN BELAKANG -->
-          <div class="certificate-page-a4-landscape">
-            <div class="cert-frame-outer">
-              <div class="cert-corner cert-corner-tl"></div><div class="cert-corner cert-corner-tr"></div><div class="cert-corner cert-corner-bl"></div><div class="cert-corner cert-corner-br"></div>
-              <div class="cert-frame-inner">
-                <div>
-                  <div style="text-align:center; font-family:'Cinzel', serif; font-weight:800; font-size:1.15rem; color:#003366; margin-bottom:2px; text-transform:uppercase; letter-spacing:1px; border-bottom:2px solid #D4AF37; padding-bottom:4px;">CATATAN RIWAYAT IMUNISASI DASAR LENGKAP</div>
-                  <div style="text-align:center; font-size:0.85rem; font-weight:700; color:#475569; margin-bottom:10px; margin-top:4px;">Lampiran Halaman Belakang Sertifikat An. <span id="cert_back_nama_anak" style="color:#002244; text-transform:uppercase;">-</span> (<span id="cert_back_desa" style="color:#002244;">-</span>)</div>
-                  <table class="cert-back-table">
-                    <thead><tr><th style="width:32%;">NAMA ANTIGEN</th><th style="width:18%;">TGL DIBERIKAN</th><th style="width:32%;">NAMA ANTIGEN</th><th style="width:18%;">TGL DIBERIKAN</th></tr></thead>
-                    <tbody id="cert_back_table_body"></tbody>
-                  </table>
-                </div>
-                <div style="text-align:center; font-size:0.75rem; font-weight:700; color:#64748B; border-top:1.5px dashed #DAA520; padding-top:6px;">Dokumen Rekam Imunisasi Resmi — Puskesmas Melata, Kabupaten Lamandau</div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-        <div class="actions no-print" style="justify-content:center; margin-top:16px;">
-          <button class="btn btn-primary" onclick="printCertificateNow()"><i class="fas fa-print"></i> Cetak / Download PDF Sertifikat</button>
-          <button class="btn btn-ghost" onclick="document.getElementById('certificatePrintArea').style.display='none'"><i class="fas fa-times"></i> Sembunyikan Preview</button>
-        </div>
-      </div>
 
       <!-- EKSPOR & IMPOR DATA -->
       <div class="grid" id="cardAdminExportImport">
@@ -2887,24 +2816,24 @@
       const panelImun = document.getElementById('imunisasi');
       if (panelImun) panelImun.style.display = 'block';
 
-      // Set Peran ke Bayi/Anak agar form imunisasi anak terbuka sesuai sasaran
+      // Set Peran ke Bayi/Baduta agar form imunisasi anak terbuka sesuai sasaran
       const peranEl = document.getElementById('reg_peran');
       if (peranEl) {
-        peranEl.value = childData.peran || 'Bayi/Anak';
+        peranEl.value = childData.peran || 'Bayi/Baduta';
         applyPeranUIFilter();
       }
 
       // Isi seluruh identitas anak dari data QR/Firestore
       const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
       setVal('reg_nama_anak', childData.nama_anak);
-      setVal('reg_nik_anak', childData.nik_anak);
+      setVal('reg_nik_anak', childData.nik_anak && childData.nik_anak !== '-' ? childData.nik_anak : '');
       setVal('reg_tgl_lahir', childData.tgl_lahir);
       setVal('reg_jk', childData.jk || 'L');
       setVal('reg_nama_ibu', childData.nama_ibu);
-      setVal('reg_nik_ibu', childData.nik_ibu);
-      setVal('reg_no_hp', childData.no_hp);
+      setVal('reg_nik_ibu', childData.nik_ibu && childData.nik_ibu !== '-' ? childData.nik_ibu : '');
+      setVal('reg_wa_anak', childData.wa_anak || childData.no_hp || '');
       setVal('reg_desa', childData.desa);
-      setVal('reg_alamat_rt', childData.alamat_rt);
+      setVal('reg_alamat', childData.alamat_rt);
       setVal('reg_tgl_pelayanan', new Date().toISOString().split('T')[0]);
 
       if (childData.desa) {
@@ -3147,6 +3076,14 @@
           colorLight: "#FFFFFF",
           correctLevel: QRCode.CorrectLevel.M
         });
+        setTimeout(() => {
+          const cvs = qrContainer.querySelector('canvas');
+          const img = qrContainer.querySelector('img');
+          if (cvs && img && (!img.src || img.src === '')) {
+            img.src = cvs.toDataURL('image/png');
+          }
+          if (img) img.style.display = 'block';
+        }, 30);
 
         document.getElementById('qrPrintModal').style.display = 'flex';
       } catch (e) {
@@ -3162,7 +3099,350 @@
       }
     };
 
-// =========================================================================
+    window.closeQrPrintModal = function() {
+      const modal = document.getElementById('qrPrintModal');
+      if (modal) modal.style.display = 'none';
+    };
+
+    window.printQrCardNow = function() {
+      if (!dynamicPagePrintStyleEl) {
+        dynamicPagePrintStyleEl = document.createElement('style');
+        dynamicPagePrintStyleEl.id = 'dynamic-batch-qr-page-style';
+        document.head.appendChild(dynamicPagePrintStyleEl);
+      }
+      dynamicPagePrintStyleEl.textContent = '@page { size: A4 portrait; margin: 10mm; }';
+
+      document.body.classList.remove('printing-batch-qr');
+      document.body.classList.add('printing-qr');
+      window.print();
+      setTimeout(() => {
+        document.body.classList.remove('printing-qr');
+        if (dynamicPagePrintStyleEl) dynamicPagePrintStyleEl.textContent = '';
+      }, 600);
+    };
+
+    window.previewPublicFeedFromCurrentQr = function() {
+      if (!currentQrChildData) return;
+      const modal = document.getElementById('qrPrintModal');
+      if (modal) modal.style.display = 'none';
+      renderPublicQrFeedModal(currentQrChildData);
+    };
+
+    // =========================================================================
+    // CETAK MASSAL & PILIHAN KARTU QR DOMPET / STIKER BUKU KIA (A4 & F4)
+    // =========================================================================
+    const selectedBatchQrMap = new Map();
+    let dynamicPagePrintStyleEl = null;
+
+    function getChildUniqueKey(d) {
+      return d.id || `${d.desa}_${d.nama_anak}_${d.tgl_lahir}`.replace(/[\s\/]/g, '_').toLowerCase();
+    }
+
+    function getBatchQrLayoutSpec() {
+      const paper = document.getElementById('batch_qr_paper_size')?.value || 'A4';
+      const format = document.getElementById('batch_qr_card_format')?.value || 'wallet';
+      if (format === 'kia') {
+        return {
+          paper,
+          format,
+          perSheet: paper === 'F4' ? 27 : 24,
+          labelFormat: 'Stiker Kecil Buku KIA',
+          pageSizeCss: paper === 'F4' ? '215mm 330mm' : '210mm 297mm'
+        };
+      }
+      return {
+        paper,
+        format,
+        perSheet: paper === 'F4' ? 12 : 10,
+        labelFormat: 'Kartu Dompet Proper',
+        pageSizeCss: paper === 'F4' ? '215mm 330mm' : '210mm 297mm'
+      };
+    }
+
+    function getEligibleBatchQrChildren() {
+      const uniqueMap = new Map();
+      cachedGlobalKohortData.forEach(d => {
+        if (d.peran === 'Catin' || d.peran === 'Bumil') return;
+        if (typeof isWilayahDiizinkan === 'function' && !isWilayahDiizinkan(d.desa)) return;
+        const key = getChildUniqueKey(d);
+        uniqueMap.set(key, d);
+      });
+      return Array.from(uniqueMap.values()).sort((a, b) => {
+        const dComp = String(a.desa || '').localeCompare(String(b.desa || ''));
+        if (dComp !== 0) return dComp;
+        return String(a.nama_anak || '').localeCompare(String(b.nama_anak || ''));
+      });
+    }
+
+    window.updateBatchQrPaperInfo = function() {
+      const spec = getBatchQrLayoutSpec();
+      const totalSelected = selectedBatchQrMap.size;
+      const totalSheets = totalSelected > 0 ? Math.ceil(totalSelected / spec.perSheet) : 0;
+      const unitLabel = spec.format === 'kia' ? 'Stiker' : 'Kartu';
+
+      const badge = document.getElementById('batchQrCapacityBadge');
+      if (badge) {
+        badge.textContent = `Kapasitas QR: ${spec.perSheet} ${unitLabel} / Lembar ${spec.paper}`;
+      }
+
+      const counterEl = document.getElementById('batchQrSelectionCounter');
+      if (counterEl) {
+        const sisaSlot = totalSelected > 0 ? (totalSheets * spec.perSheet) - totalSelected : spec.perSheet;
+        counterEl.textContent = `Terpilih: ${totalSelected} anak (${totalSheets} lembar QR ${spec.paper}${totalSelected > 0 ? `, sisa ${sisaSlot} slot kosong` : ''})`;
+      }
+
+      const chipsContainer = document.getElementById('batchQrSelectedChips');
+      if (chipsContainer) {
+        if (totalSelected === 0) {
+          chipsContainer.innerHTML = '';
+        } else {
+          chipsContainer.innerHTML = Array.from(selectedBatchQrMap.entries()).map(([key, item]) => `
+            <span style="display:inline-flex; align-items:center; gap:6px; background:#FFFFFF; border:1px solid #10B981; color:#065F46; padding:4px 9px; border-radius:20px; font-size:0.74rem; font-weight:700;">
+              <i class="fas fa-qrcode" style="color:#059669;"></i> ${item.nama_anak} (${item.desa || '-'})
+              <button type="button" onclick="removeBatchQrChild('${key}')" style="border:0; background:transparent; color:#DC2626; font-weight:900; cursor:pointer; padding:0 2px;" title="Hapus dari daftar cetak">&times;</button>
+            </span>
+          `).join('');
+        }
+      }
+    };
+
+    window.renderBatchQrCandidateList = async function() {
+      const tbody = document.querySelector('#tblBatchQrCandidates tbody');
+      if (!tbody) return;
+
+      if (cachedGlobalKohortData.length === 0) {
+        await refreshCacheGlobalData();
+      }
+
+      const desaFilter = (document.getElementById('batch_qr_filter_desa')?.value || 'ALL').trim().toLowerCase();
+      const searchQ = (document.getElementById('batch_qr_search_input')?.value || '').trim().toLowerCase();
+      const allChildren = getEligibleBatchQrChildren();
+
+      const filtered = allChildren.filter(d => {
+        const matchDesa = desaFilter === 'all' || (d.desa && d.desa.toLowerCase() === desaFilter);
+        const matchText = !searchQ || `${d.nama_anak || ''} ${d.nama_ibu || ''} ${d.alamat_rt || ''}`.toLowerCase().includes(searchQ);
+        return matchDesa && matchText;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:var(--muted);">Tidak ada data bayi/anak yang cocok dengan filter.</td></tr>';
+        updateBatchQrPaperInfo();
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(d => {
+        const key = getChildUniqueKey(d);
+        const isChecked = selectedBatchQrMap.has(key);
+        const encoded = encodeURIComponent(JSON.stringify(d));
+        return `
+          <tr style="${isChecked ? 'background:#ECFDF5;' : ''}">
+            <td>
+              <input type="checkbox" class="chk-batch-qr-item" data-key="${key}" data-json="${encoded}" ${isChecked ? 'checked' : ''} onchange="toggleSelectBatchChild(this)" style="width:17px; height:17px; accent-color:#059669; cursor:pointer;">
+            </td>
+            <td style="text-align:left; font-weight:800; color:var(--accent);">${d.nama_anak || '-'}</td>
+            <td>${d.tgl_lahir || '-'}</td>
+            <td>${d.jk || '-'}</td>
+            <td style="text-align:left;">${d.nama_ibu || '-'}</td>
+            <td>${d.desa || '-'}</td>
+            <td style="text-align:left;">${d.alamat_rt || '-'}</td>
+            <td>
+              <button type="button" class="btn btn-warning" onclick="previewSingleCertificateFromBatch('${encoded}')" style="padding:4px 8px; font-size:0.72rem;" title="Preview & Cetak Sertifikat A4">
+                <i class="fas fa-award"></i> Sertifikat
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      updateBatchQrPaperInfo();
+    };
+
+    window.toggleSelectBatchChild = function(checkboxEl) {
+      const key = checkboxEl.getAttribute('data-key');
+      const data = JSON.parse(decodeURIComponent(checkboxEl.getAttribute('data-json')));
+      if (checkboxEl.checked) {
+        selectedBatchQrMap.set(key, data);
+        checkboxEl.closest('tr').style.background = '#ECFDF5';
+      } else {
+        selectedBatchQrMap.delete(key);
+        checkboxEl.closest('tr').style.background = '';
+      }
+      updateBatchQrPaperInfo();
+    };
+
+    window.removeBatchQrChild = function(key) {
+      selectedBatchQrMap.delete(key);
+      renderBatchQrCandidateList();
+    };
+
+    window.selectAllVisibleBatchQr = function() {
+      document.querySelectorAll('.chk-batch-qr-item').forEach(cb => {
+        if (!cb.checked) {
+          cb.checked = true;
+          const key = cb.getAttribute('data-key');
+          const data = JSON.parse(decodeURIComponent(cb.getAttribute('data-json')));
+          selectedBatchQrMap.set(key, data);
+          cb.closest('tr').style.background = '#ECFDF5';
+        }
+      });
+      updateBatchQrPaperInfo();
+    };
+
+    window.fillOneSheetBatchQr = function() {
+      const spec = getBatchQrLayoutSpec();
+      const checkboxes = Array.from(document.querySelectorAll('.chk-batch-qr-item'));
+      for (const cb of checkboxes) {
+        if (selectedBatchQrMap.size >= spec.perSheet) break;
+        if (!cb.checked) {
+          cb.checked = true;
+          const key = cb.getAttribute('data-key');
+          const data = JSON.parse(decodeURIComponent(cb.getAttribute('data-json')));
+          selectedBatchQrMap.set(key, data);
+          cb.closest('tr').style.background = '#ECFDF5';
+        }
+      }
+      updateBatchQrPaperInfo();
+    };
+
+    window.clearBatchQrSelection = function() {
+      selectedBatchQrMap.clear();
+      renderBatchQrCandidateList();
+    };
+
+    window.addCurrentQrToBatchAndOpen = function() {
+      if (!currentQrChildData) return;
+      const key = getChildUniqueKey(currentQrChildData);
+      selectedBatchQrMap.set(key, currentQrChildData);
+      closeQrPrintModal();
+
+      const adminTabBtn = document.querySelector('.tab[data-tab="admin"]');
+      if (adminTabBtn) adminTabBtn.click();
+      setTimeout(() => {
+        renderBatchQrCandidateList();
+        smoothScrollToId('cardBatchQrPrinter');
+      }, 120);
+    };
+
+    window.openBatchQrPrintPreview = function() {
+      if (selectedBatchQrMap.size === 0) {
+        return alert("⚠️ Centang minimal 1 anak terlebih dahulu pada tabel di atas!");
+      }
+
+      const spec = getBatchQrLayoutSpec();
+      const selectedList = Array.from(selectedBatchQrMap.values());
+      const container = document.getElementById('batchQrSheetsContainer');
+      container.innerHTML = '';
+
+      const baseUrl = getPublicQrBaseUrl();
+      const separator = baseUrl.includes('?') ? '&' : '?';
+      const totalSheets = Math.ceil(selectedList.length / spec.perSheet);
+
+      document.getElementById('batchPreviewHeaderInfo').textContent =
+        `${selectedList.length} Anak • ${spec.labelFormat} • Kertas ${spec.paper} (${totalSheets} Lembar)`;
+
+      for (let sheetIdx = 0; sheetIdx < totalSheets; sheetIdx++) {
+        const sliceItems = selectedList.slice(sheetIdx * spec.perSheet, (sheetIdx + 1) * spec.perSheet);
+        const sheetEl = document.createElement('div');
+        sheetEl.className = `qr-print-sheet paper-${spec.paper.toLowerCase()} format-${spec.format}`;
+
+        sliceItems.forEach((data, itemIdx) => {
+          const childDocId = getChildUniqueKey(data);
+          const qrUrl = `${baseUrl}${separator}id=${encodeURIComponent(childDocId)}#id=${encodeURIComponent(childDocId)}&n=${encodeURIComponent(data.nama_anak || '')}&t=${encodeURIComponent(data.tgl_lahir || '')}&g=${encodeURIComponent(data.jk || 'L')}&o=${encodeURIComponent(data.nama_ibu || '')}&d=${encodeURIComponent(data.desa || '')}`;
+          const qrDomId = `batch_qr_code_${sheetIdx}_${itemIdx}`;
+
+          const cardEl = document.createElement('div');
+          if (spec.format === 'kia') {
+            cardEl.className = 'qr-kia-sticker';
+            cardEl.innerHTML = `
+              <div class="qr-kia-qr" id="${qrDomId}"></div>
+              <div style="flex:1; min-width:0; line-height:1.25; color:#0F172A;">
+                <div style="font-size:5.8pt; font-weight:800; color:#002B5B; letter-spacing:0.3px;">BUKU KIA • PKM MELATA</div>
+                <div style="font-size:7.6pt; font-weight:900; color:#000; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:1px 0;">${(data.nama_anak || '-').toUpperCase()}</div>
+                <div style="font-size:6.4pt; color:#334155;">TTL: <strong>${data.tgl_lahir || '-'}</strong> (${data.jk || '-'})</div>
+                <div style="font-size:6.3pt; color:#334155; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Ibu: <strong>${data.nama_ibu || '-'}</strong></div>
+                <div style="font-size:6.2pt; color:#065F46; font-weight:700;">Ds. ${data.desa || '-'}</div>
+              </div>
+            `;
+          } else {
+            cardEl.className = 'qr-wallet-card';
+            cardEl.innerHTML = `
+              <div class="qr-wallet-head">
+                <div>
+                  <div style="font-size:5.6pt; letter-spacing:0.6px; opacity:0.9; font-weight:700;">PUSKESMAS MELATA</div>
+                  <div style="font-size:7.4pt; font-weight:800;">KARTU IMUNISASI DIGITAL</div>
+                </div>
+                <i class="fas fa-shield-virus" style="font-size:10pt; color:#D4AF37;"></i>
+              </div>
+              <div class="qr-wallet-body">
+                <div class="qr-wallet-qr" id="${qrDomId}"></div>
+                <div style="flex:1; min-width:0; font-size:6.9pt; line-height:1.35; color:#1E293B;">
+                  <div style="font-weight:900; font-size:8.2pt; color:#002B5B; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${(data.nama_anak || '-').toUpperCase()}</div>
+                  <div>Lahir: <strong>${data.tgl_lahir || '-'}</strong> (${data.jk || '-'})</div>
+                  <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Ortu: <strong>${data.nama_ibu || '-'}</strong></div>
+                  <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Ds. <strong>${data.desa || '-'}</strong>${data.alamat_rt ? ' (' + data.alamat_rt + ')' : ''}</div>
+                </div>
+              </div>
+              <div class="qr-wallet-foot">
+                Scan QR dengan kamera HP untuk jadwal vaksin &amp; status imunisasi
+              </div>
+            `;
+          }
+
+          sheetEl.appendChild(cardEl);
+
+          setTimeout(() => {
+            const qrTarget = document.getElementById(qrDomId);
+            if (qrTarget) {
+              new QRCode(qrTarget, {
+                text: qrUrl,
+                width: 160,
+                height: 160,
+                colorDark: "#000000",
+                colorLight: "#FFFFFF",
+                correctLevel: QRCode.CorrectLevel.M
+              });
+              setTimeout(() => {
+                const cvs = qrTarget.querySelector('canvas');
+                const img = qrTarget.querySelector('img');
+                if (cvs && img && (!img.src || img.src === '')) {
+                  img.src = cvs.toDataURL('image/png');
+                }
+                if (img) img.style.display = 'block';
+              }, 25);
+            }
+          }, 20);
+        });
+
+        container.appendChild(sheetEl);
+      }
+
+      document.getElementById('batchQrPrintModal').style.display = 'flex';
+    };
+
+    window.printBatchQrSheetsNow = function() {
+      const spec = getBatchQrLayoutSpec();
+      if (!dynamicPagePrintStyleEl) {
+        dynamicPagePrintStyleEl = document.createElement('style');
+        dynamicPagePrintStyleEl.id = 'dynamic-batch-qr-page-style';
+        document.head.appendChild(dynamicPagePrintStyleEl);
+      }
+      dynamicPagePrintStyleEl.textContent = `@page { size: ${spec.pageSizeCss}; margin: 0; }`;
+
+      document.body.classList.remove('printing-qr');
+      document.body.classList.add('printing-batch-qr');
+      window.print();
+      setTimeout(() => {
+        document.body.classList.remove('printing-batch-qr');
+        if (dynamicPagePrintStyleEl) dynamicPagePrintStyleEl.textContent = '';
+      }, 600);
+    };
+
+    window.closeBatchQrPrintModal = function() {
+      const modal = document.getElementById('batchQrPrintModal');
+      if (modal) modal.style.display = 'none';
+    };
+
+    // =========================================================================
     // PREVIEW & CETAK SERTIFIKAT A4 LANDSCAPE (TUNGGAL MAUPUN MASSAL TERPILIH)
     // =========================================================================
     function buildSingleCertificatePagesHtml(data, seqOffset = 0) {
@@ -4069,7 +4349,10 @@ window.goToEdit = function(encodedJson) {
       if (target === 'imunisasi') loadRecentTransactions();
       if (target === 'catchup') loadCatchUpAnalysis();
       if (target === 'capaian') loadCapanTabContent();
-      if (target === 'admin') renderUserManagementTable();
+      if (target === 'admin') {
+        renderUserManagementTable();
+        renderBatchQrCandidateList();
+      }
       window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
@@ -4199,6 +4482,9 @@ window.goToEdit = function(encodedJson) {
         }
       } catch (e) { console.error("Error Caching Data:", e); }
       updateInputAchievementCards();
+      if (typeof renderBatchQrCandidateList === 'function') {
+        renderBatchQrCandidateList();
+      }
     }
 
     // =========================================================================

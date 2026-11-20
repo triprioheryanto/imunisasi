@@ -568,9 +568,9 @@
       flex: 1;
     }
     .qr-wallet-qr {
-      width: 26mm;
-      height: 26mm;
-      padding: 2px;
+      width: 27mm;
+      height: 27mm;
+      padding: 3.5px;
       border: 1.5px solid #0F172A;
       border-radius: 5px;
       background: #FFFFFF;
@@ -593,7 +593,7 @@
     .qr-kia-sticker {
       border: 1.2px dashed #64748B;
       border-radius: 6px;
-      padding: 3.5px 5px;
+      padding: 3px 5px;
       display: flex;
       align-items: center;
       gap: 6px;
@@ -602,9 +602,9 @@
       overflow: hidden;
     }
     .qr-kia-qr {
-      width: 22mm;
-      height: 22mm;
-      padding: 1.5px;
+      width: 24mm;
+      height: 24mm;
+      padding: 3px;
       border: 1px solid #0F172A;
       border-radius: 4px;
       background: #FFFFFF;
@@ -613,16 +613,14 @@
       align-items: center;
       justify-content: center;
     }
-    .qr-wallet-qr img, .qr-kia-qr img {
+    .qr-wallet-qr img, .qr-kia-qr img, #qrCanvasContainer img {
       width: 100% !important;
       height: 100% !important;
       display: block !important;
       object-fit: contain;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
     }
-    .qr-wallet-qr canvas, .qr-kia-qr canvas {
-      display: none !important;
-    }
-
     @media print {
       body:not(.printing-qr):not(.printing-batch-qr) * { visibility: hidden; }
       body:not(.printing-qr):not(.printing-batch-qr) #certificatePrintArea,
@@ -2933,7 +2931,25 @@
       const hashStr = window.location.hash || '';
       const hashParams = new URLSearchParams(hashStr.startsWith('#') ? hashStr.substring(1) : hashStr);
 
-      const childIdParam = urlParams.get('id') || hashParams.get('id');
+let childIdParam = qParams.get('id') || hParams.get('id');
+const scannedShortCode = qParams.get('q') || hParams.get('q');
+if (!childIdParam && scannedShortCode) {
+  const matchedShort = findChildOfflineOrMemory(scannedShortCode);
+  if (matchedShort && matchedShort.id) childIdParam = matchedShort.id;
+}
+      if (typeof openChildFeedModal === 'function') openChildFeedModal(matched);
+      else if (typeof showPublicChildCard === 'function') showPublicChildCard(matched);
+      return;
+    }
+    if (attempt < 8) {
+      setTimeout(() => tryOpenShortId(attempt + 1), 350);
+    } else {
+      alert(`Data QR "${shortIdParam.toUpperCase()}" belum tersimpan di perangkat ini. Nyalakan internet 1x untuk menyinkronkan data.`);
+    }
+  };
+  tryOpenShortId();
+  return;
+}
       const compactParam = hashParams.get('kia') || hashParams.get('p') || urlParams.get('p');
       const legacyQrParam = urlParams.get('qr') || hashParams.get('qr');
 
@@ -2964,16 +2980,18 @@
             desa: decoded.d || '-'
           };
         } catch (e) { console.warn("Legacy QR decode skip:", e); }
-      } else if (hashNama) {
-        childObj = {
-          id: childIdParam || '',
-          nama_anak: hashNama,
-          tgl_lahir: hashTgl || '',
-          jk: hashJk,
-          nama_ibu: hashIbu || '-',
-          desa: hashDesa || '-'
-        };
-      }
+} else if (hashNama) {
+  childObj = {
+    id: childIdParam || '',
+    nama_anak: hashNama,
+    tgl_lahir: hashTgl || '',
+    jk: hashJk,
+    nama_ibu: hashIbu || '-',
+    desa: hashDesa || '-'
+  };
+} else if (childIdParam) {
+  childObj = findChildOfflineOrMemory(childIdParam) || parseChildFallbackFromId(childIdParam);
+}
 
       if (childObj) {
         currentQrChildData = childObj;
@@ -3345,10 +3363,9 @@
         const sheetEl = document.createElement('div');
         sheetEl.className = `qr-print-sheet paper-${spec.paper.toLowerCase()} format-${spec.format}`;
 
-        sliceItems.forEach((data, itemIdx) => {
-          const childDocId = getChildUniqueKey(data);
-          const qrUrl = `${baseUrl}${separator}id=${encodeURIComponent(childDocId)}#id=${encodeURIComponent(childDocId)}&n=${encodeURIComponent(data.nama_anak || '')}&t=${encodeURIComponent(data.tgl_lahir || '')}&g=${encodeURIComponent(data.jk || 'L')}&o=${encodeURIComponent(data.nama_ibu || '')}&d=${encodeURIComponent(data.desa || '')}`;
-          const qrDomId = `batch_qr_code_${sheetIdx}_${itemIdx}`;
+       sliceItems.forEach((data, itemIdx) => {
+  const qrUrl = buildCompactChildQrUrl(data);
+  const qrDomId = `batch_qr_code_${sheetIdx}_${itemIdx}`;
 
           const cardEl = document.createElement('div');
           if (spec.format === 'kia') {
@@ -3399,7 +3416,7 @@
                 height: 160,
                 colorDark: "#000000",
                 colorLight: "#FFFFFF",
-                correctLevel: QRCode.CorrectLevel.M
+                correctLevel: QRCode.CorrectLevel.L
               });
               setTimeout(() => {
                 const cvs = qrTarget.querySelector('canvas');
@@ -3936,16 +3953,20 @@ window.goToEdit = function(encodedJson) {
               nama_ibu: dec.o || '',
               desa: dec.d || ''
             };
-          } else if (hashNama) {
-            fallbackObj = {
-              id: childIdParam,
-              nama_anak: hashNama,
-              tgl_lahir: hParams.get('t') || qParams.get('t') || '',
-              jk: hParams.get('g') || qParams.get('g') || 'L',
-              nama_ibu: hParams.get('o') || qParams.get('o') || '',
-              desa: hParams.get('d') || qParams.get('d') || ''
-            };
-          }
+         } else if (hashNama) {
+  fallbackObj = {
+    id: childIdParam,
+    nama_anak: hashNama,
+    tgl_lahir: hParams.get('t') || qParams.get('t') || '',
+    jk: hParams.get('g') || qParams.get('g') || 'L',
+    nama_ibu: hParams.get('o') || qParams.get('o') || '',
+    desa: hParams.get('d') || qParams.get('d') || ''
+  };
+} else if (qParams.get('q') || hParams.get('q')) {
+  fallbackObj = findChildOfflineOrMemory(qParams.get('q') || hParams.get('q'));
+} else if (childIdParam) {
+  fallbackObj = findChildOfflineOrMemory(childIdParam) || parseChildFallbackFromId(childIdParam);
+}
         } catch (urlErr) {
           // Jika QR berisi ID dokumen mentah atau format pipa ringkas
           if (rawQrText.includes('|')) {
@@ -7667,5 +7688,244 @@ window.selectFromLiveSearch = function(encodedJson) {
       }
     }
   </script>
+  <script>
+(function() {
+  const OFFLINE_CACHE_KEY = 'imunku_offline_children_v1';
+
+  // 1. Membuat kunci unik anak yang konsisten di semua perangkat
+  window.getChildDocKey = function(data) {
+    if (!data) return '';
+    if (data.id) return String(data.id).trim().toLowerCase();
+    const desa = String(data.desa || '').trim().toLowerCase();
+    const nama = String(data.nama_anak || '').trim().toLowerCase();
+    const tgl = String(data.tgl_lahir || '').trim().toLowerCase();
+    return `${desa}_${nama}_${tgl}`.replace(/[\s\/]+/g, '_');
+  };
+
+  // 2. Generator ID Pendek 6 Karakter (Contoh: M7K29P)
+  window.generateShortChildId = function(rawKey) {
+    const str = String(rawKey || '').trim().toLowerCase();
+    if (!str) return '';
+    let h1 = 0x811c9dc5;
+    let h2 = 0x01000193;
+    for (let i = 0; i < str.length; i++) {
+      const ch = str.charCodeAt(i);
+      h1 ^= ch;
+      h1 = Math.imul(h1, 0x01000193);
+      h2 ^= (ch + i);
+      h2 = Math.imul(h2, 0x85ebca6b);
+    }
+    const combined = ((h1 >>> 0) * 4096 + ((h2 >>> 0) & 0xfff));
+    const base36 = Math.abs(combined).toString(36).toUpperCase().padStart(5, '0').slice(-5);
+    return 'M' + base36;
+  };
+
+  window.getOrCreateShortId = function(data) {
+    if (!data) return '';
+    if (data.short_id) return String(data.short_id).trim().toUpperCase();
+    return window.generateShortChildId(window.getChildDocKey(data));
+  };
+
+  // 3. Simpan & Baca Cache Offline di Browser (localStorage)
+  window.saveChildrenToOfflineCache = function(items) {
+    try {
+      const list = Array.isArray(items) ? items : (items ? [items] : []);
+      if (list.length === 0) return;
+      const existing = JSON.parse(localStorage.getItem(OFFLINE_CACHE_KEY) || '{}');
+      list.forEach(item => {
+        if (!item || !item.nama_anak) return;
+        const shortId = window.getOrCreateShortId(item);
+        if (!shortId) return;
+        existing[shortId] = {
+          id: window.getChildDocKey(item),
+          short_id: shortId,
+          nama_anak: item.nama_anak || '',
+          tgl_lahir: item.tgl_lahir || '',
+          jk: item.jk || 'L',
+          nama_ibu: item.nama_ibu || '',
+          desa: item.desa || '',
+          alamat_rt: item.alamat_rt || ''
+        };
+      });
+      localStorage.setItem(OFFLINE_CACHE_KEY, JSON.stringify(existing));
+    } catch (e) {
+      console.warn('Gagal menyimpan cache offline:', e);
+    }
+  };
+
+  window.findChildOfflineOrMemory = function(queryCode) {
+    const target = String(queryCode || '').trim().toUpperCase();
+    if (!target) return null;
+
+    // Cek dari variabel data yang aktif di halaman
+    const candidateLists = [
+      typeof allChildrenData !== 'undefined' ? allChildrenData : null,
+      typeof childrenList !== 'undefined' ? childrenList : null,
+      typeof kohortData !== 'undefined' ? kohortData : null,
+      typeof window._cachedChildrenList !== 'undefined' ? window._cachedChildrenList : null
+    ].filter(Array.isArray);
+
+    for (const list of candidateLists) {
+      const found = list.find(item =>
+        window.getOrCreateShortId(item) === target ||
+        String(item.id || '').toUpperCase() === target
+      );
+      if (found) {
+        window.saveChildrenToOfflineCache(found);
+        return found;
+      }
+    }
+
+    // Jika sedang offline / belum termuat, ambil dari localStorage
+    try {
+      const cacheMap = JSON.parse(localStorage.getItem(OFFLINE_CACHE_KEY) || '{}');
+      if (cacheMap[target]) return cacheMap[target];
+      const allCached = Object.values(cacheMap);
+      return allCached.find(item => String(item.id || '').toUpperCase() === target) || null;
+    } catch (e) {
+      return null;
+    }
+  };
+
+  // Sinkronisasi otomatis data yang sudah dimuat ke cache offline setiap 3 detik
+  setInterval(function() {
+    const candidateLists = [
+      typeof allChildrenData !== 'undefined' ? allChildrenData : null,
+      typeof childrenList !== 'undefined' ? childrenList : null,
+      typeof kohortData !== 'undefined' ? kohortData : null
+    ].filter(Array.isArray);
+    candidateLists.forEach(list => {
+      if (list.length > 0) window.saveChildrenToOfflineCache(list);
+    });
+  }, 3000);
+
+  // 4. Pembuat URL QR Pendek (?q=M7K29P)
+  window.buildCompactChildQrUrl = function(data) {
+    window.saveChildrenToOfflineCache(data);
+    const shortId = window.getOrCreateShortId(data);
+    const baseUrl = (typeof getPublicQrBaseUrl === 'function')
+      ? getPublicQrBaseUrl()
+      : (window.location.origin + window.location.pathname);
+    const separator = baseUrl.includes('?') ? '&' : '?';
+    return `${baseUrl}${separator}q=${encodeURIComponent(shortId)}`;
+  };
+
+  // 5. Fallback ekstrak nama/desa dari format QR lama (?id=desa_nama_tgl) saat offline
+  window.parseChildFallbackFromId = function(childId) {
+    if (!childId) return null;
+    const cleanId = decodeURIComponent(String(childId)).trim();
+    const dateMatch = cleanId.match(/_(\d{4}-\d{2}-\d{2})$/);
+    const tglLahir = dateMatch ? dateMatch[1] : '';
+    const withoutDate = dateMatch ? cleanId.slice(0, -dateMatch[0].length) : cleanId;
+
+    let matchedDesa = '';
+    let namaPart = withoutDate;
+    if (typeof ALL_DESA_LIST !== 'undefined' && Array.isArray(ALL_DESA_LIST)) {
+      for (const d of ALL_DESA_LIST) {
+        const slug = d.toLowerCase().replace(/[\s\/]/g, '_');
+        if (withoutDate.toLowerCase().startsWith(slug + '_')) {
+          matchedDesa = d;
+          namaPart = withoutDate.slice(slug.length + 1);
+          break;
+        }
+      }
+    }
+    const namaAnak = namaPart.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()).trim();
+    if (!namaAnak) return null;
+    return {
+      id: cleanId,
+      short_id: window.generateShortChildId(cleanId),
+      nama_anak: namaAnak,
+      tgl_lahir: tglLahir,
+      jk: 'L',
+      nama_ibu: '-',
+      desa: matchedDesa || '-'
+    };
+  };
+
+  // 6. Tingkatkan Modal Cetak QR Tunggal (Gunakan URL pendek + CorrectLevel.L)
+  window.openQrPrintModal = function(encodedJson) {
+    try {
+      const data = typeof encodedJson === 'string' ? JSON.parse(decodeURIComponent(encodedJson)) : encodedJson;
+      window.currentQrChildData = data;
+      window.saveChildrenToOfflineCache(data);
+      const shortCode = window.getOrCreateShortId(data);
+
+      document.getElementById('qr_card_nama').textContent = (data.nama_anak || '-').toUpperCase();
+      document.getElementById('qr_card_ttl').textContent = data.tgl_lahir || '-';
+      document.getElementById('qr_card_ortu').textContent = data.nama_ibu || '-';
+      document.getElementById('qr_card_desa').textContent =
+        `Desa ${data.desa || '-'}${data.alamat_rt ? ' (' + data.alamat_rt + ')' : ''} • ID: ${shortCode}`;
+
+      const qrUrl = window.buildCompactChildQrUrl(data);
+
+      const clickableLinkEl = document.getElementById('qr_url_clickable_link');
+      if (clickableLinkEl) {
+        clickableLinkEl.href = qrUrl;
+        clickableLinkEl.textContent = qrUrl;
+      }
+      const canvasLinkEl = document.getElementById('qr_canvas_link');
+      if (canvasLinkEl) {
+        canvasLinkEl.href = qrUrl;
+      }
+
+      const qrContainer = document.getElementById('qrCanvasContainer');
+      qrContainer.innerHTML = '';
+      new QRCode(qrContainer, {
+        text: qrUrl,
+        width: 200,
+        height: 200,
+        colorDark: "#000000",
+        colorLight: "#FFFFFF",
+        correctLevel: QRCode.CorrectLevel.L
+      });
+      setTimeout(() => {
+        const cvs = qrContainer.querySelector('canvas');
+        const img = qrContainer.querySelector('img');
+        if (cvs && img && (!img.src || img.src === '')) {
+          img.src = cvs.toDataURL('image/png');
+        }
+        if (img) img.style.display = 'block';
+      }, 30);
+
+      document.getElementById('qrPrintModal').style.display = 'flex';
+    } catch (e) {
+      alert("Gagal membuat Kartu QR: " + e.message);
+    }
+  };
+
+  // 7. Pencarian Otomatis dengan Kode Pendek (Contoh: ketik M7K29P di kolom cari)
+  document.addEventListener('input', function(e) {
+    const el = e.target;
+    if (!el || el.tagName !== 'INPUT') return;
+    const val = (el.value || '').trim().toUpperCase();
+    let badge = document.getElementById('shortIdQuickResultBox');
+
+    if (/^M[0-9A-Z]{5}$/.test(val)) {
+      const found = window.findChildOfflineOrMemory(val);
+      if (found) {
+        if (!badge) {
+          badge = document.createElement('div');
+          badge.id = 'shortIdQuickResultBox';
+          badge.style.cssText = 'margin-top:6px;padding:8px 12px;background:#EFF6FF;border:1px solid #3B82F6;border-radius:8px;font-size:13px;color:#1E3A8A;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;';
+          el.parentNode.insertBefore(badge, el.nextSibling);
+        }
+        badge.innerHTML = `
+          <span><strong>Kode ${val}:</strong> ${found.nama_anak} (Desa ${found.desa || '-'}, Lahir: ${found.tgl_lahir || '-'})</span>
+          <button type="button" id="btnApplyShortIdSearch" style="background:#2563EB;color:#fff;border:none;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;">Tampilkan di Tabel</button>
+        `;
+        document.getElementById('btnApplyShortIdSearch').onclick = function() {
+          el.value = found.nama_anak;
+          el.dispatchEvent(new Event('input', { bubbles: true }));
+          el.dispatchEvent(new Event('keyup', { bubbles: true }));
+          badge.remove();
+        };
+        return;
+      }
+    }
+    if (badge) badge.remove();
+  });
+})();
+</script>
 </body>
 </html>

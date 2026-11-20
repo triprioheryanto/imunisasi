@@ -881,50 +881,6 @@
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 }
-    /* Tombol/Kartu Pemicu Catch Up */
-.catchup-trigger {
-  cursor: pointer;
-  transition: all 0.25s ease;
-  user-select: none;
-}
-.catchup-trigger:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
-}
-.catchup-trigger.active {
-  outline: 2px solid #0d6efd;
-  transform: translateY(-2px);
-}
-.catchup-arrow {
-  display: inline-block;
-  margin-left: 6px;
-  font-size: 0.8em;
-  transition: transform 0.3s ease;
-}
-.catchup-trigger.active .catchup-arrow {
-  transform: rotate(180deg);
-}
-
-/* Wadah Tabel Catch Up: Tersembunyi saat tab pertama dibuka */
-.catchup-table-box {
-  display: none;
-  scroll-margin-top: 20px; /* Jarak aman dari atas layar saat scroll */
-  animation: fadeSlideDown 0.3s ease-out;
-}
-.catchup-table-box.open {
-  display: block;
-}
-
-@keyframes fadeSlideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
   </style>
 </head>
 <body>
@@ -1780,7 +1736,7 @@
       </div>
     </section>
 
-   <!-- TAB 3: CATCH UP -->
+    <!-- TAB 3: CATCH UP -->
     <section id="catchup" class="tab-panel" style="display:none">
       <div class="card">
         <h3><i class="fas fa-filter"></i> Filter Catch Up Wilayah</h3>
@@ -1788,88 +1744,29 @@
           <div class="form-group full-width">
             <label>Pilih Desa / Kelurahan</label>
             <select id="catchup_filter_desa">
-              <option value="ALL">-- Semua Desa --</option>
-              <option value="Melata">Melata</option>
-              <option value="Nanuah">Nanuah</option>
-              <option value="Topalan">Topalan</option>
-              <option value="Batu Ampar">Batu Ampar</option>
-              <option value="Lubuk Hiju">Lubuk Hiju</option>
-              <option value="Bukit Makmur">Bukit Makmur</option>
-              <option value="Bukit Raya">Bukit Raya</option>
-              <option value="Modang Mas">Modang Mas</option>
-              <option value="Mukti Manunggal">Mukti Manunggal</option>
-              <option value="Sumber Jaya">Sumber Jaya</option>
-              <option value="Bukit Harum">Bukit Harum</option>
-              <option value="PT. TSA">PT. TSA</option>
-              <option value="PT. SHS">PT. SHS</option>
+              <option value="ALL">-- Semua Desa --</option><option value="Melata">Melata</option><option value="Nanuah">Nanuah</option><option value="Topalan">Topalan</option>
+              <option value="Batu Ampar">Batu Ampar</option><option value="Lubuk Hiju">Lubuk Hiju</option><option value="Bukit Makmur">Bukit Makmur</option>
+              <option value="Bukit Raya">Bukit Raya</option><option value="Modang Mas">Modang Mas</option><option value="Mukti Manunggal">Mukti Manunggal</option>
+              <option value="Sumber Jaya">Sumber Jaya</option><option value="Bukit Harum">Bukit Harum</option><option value="PT. TSA">PT. TSA</option><option value="PT. SHS">PT. SHS</option>
             </select>
           </div>
         </div>
-
-        <!-- 4 Tombol Pemicu Buka/Tutup Tabel Catch Up -->
-        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; padding-top:12px; border-top:1px dashed var(--border-color);">
-          <button type="button" class="btn btn-ghost catchup-trigger" onclick="toggleCatchUpTable('box-bayi', this)" style="font-size:0.8rem;">
-            <i class="fas fa-baby" style="color:var(--primary);"></i> Bayi &lt;1 Thn <span class="catchup-arrow">▼</span>
-          </button>
-
-          <button type="button" class="btn btn-ghost catchup-trigger" onclick="toggleCatchUpTable('box-do', this)" style="font-size:0.8rem;">
-            <i class="fas fa-exclamation-triangle" style="color:#D97706;"></i> Risiko DO <span class="catchup-arrow">▼</span>
-          </button>
-
-          <button type="button" class="btn btn-ghost catchup-trigger" onclick="toggleCatchUpTable('box-baduta', this)" style="font-size:0.8rem;">
-            <i class="fas fa-child" style="color:var(--info);"></i> Booster Baduta <span class="catchup-arrow">▼</span>
-          </button>
-
-          <button type="button" class="btn btn-ghost catchup-trigger" onclick="toggleCatchUpTable('box-catin', this)" style="font-size:0.8rem;">
-            <i class="fas fa-female" style="color:#059669;"></i> Catin &amp; Bumil <span class="catchup-arrow">▼</span>
-          </button>
+        <!-- Navigasi Cepat Smooth Scroll untuk Data Panjang Catch Up -->
+        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; padding-top:10px; border-top:1px dashed var(--border-color);">
+          <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardCatchup1')" style="padding:5px 10px; font-size:0.75rem;"><i class="fas fa-arrow-down"></i> 1. Bayi &lt;1 Thn</button>
+          <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardCatchup2')" style="padding:5px 10px; font-size:0.75rem;"><i class="fas fa-arrow-down"></i> 2. Risiko DO</button>
+          <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardCatchup3')" style="padding:5px 10px; font-size:0.75rem;"><i class="fas fa-arrow-down"></i> 3. Booster Baduta</button>
+          <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardCatchup4')" style="padding:5px 10px; font-size:0.75rem;"><i class="fas fa-arrow-down"></i> 4. Catin &amp; Bumil</button>
         </div>
-
         <div class="actions">
-          <button type="button" class="btn btn-primary" id="btnApplyCatchUp"><i class="fas fa-calculator"></i> Analisis Catch Up</button>
-          <button type="button" class="btn btn-success" id="btnDownloadCatchUpExcel"><i class="fas fa-file-excel"></i> Download Excel (.xlsx)</button>
+          <button class="btn btn-primary" id="btnApplyCatchUp"><i class="fas fa-calculator"></i> Analisis Catch Up</button>
+          <button class="btn btn-success" id="btnDownloadCatchUpExcel"><i class="fas fa-file-excel"></i> Download Excel (.xlsx)</button>
         </div>
       </div>
-
-      <!-- Tabel 1: Bayi <1 Thn -->
-      <div id="box-bayi" class="catchup-table-box">
-        <div class="card">
-          <h3><i class="fas fa-baby" style="color:var(--primary);"></i> 1. Catch Up Bayi (&lt; 1 Tahun)</h3>
-          <div id="panel_bayi_container" class="table-container">
-            <p class="muted" style="text-align:center; padding:15px;">Klik Analisis Catch Up untuk memuat data.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Tabel 2: Risiko DO -->
-      <div id="box-do" class="catchup-table-box">
-        <div class="card">
-          <h3><i class="fas fa-exclamation-triangle" style="color:#D97706;"></i> 2. Pelacakan Risiko Drop Out (Dosis Lanjutan)</h3>
-          <div id="panel_berkesinambungan_container" class="table-container">
-            <p class="muted" style="text-align:center; padding:15px;">Klik Analisis Catch Up untuk memuat data.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Tabel 3: Booster Baduta -->
-      <div id="box-baduta" class="catchup-table-box">
-        <div class="card">
-          <h3><i class="fas fa-child" style="color:var(--info);"></i> 3. Catch Up Booster Baduta (18 Bulan - 3 Tahun)</h3>
-          <div id="panel_baduta_container" class="table-container">
-            <p class="muted" style="text-align:center; padding:15px;">Klik Analisis Catch Up untuk memuat data.</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Tabel 4: Catin & Bumil -->
-      <div id="box-catin" class="catchup-table-box">
-        <div class="card">
-          <h3><i class="fas fa-female" style="color:#059669;"></i> 4. Catch Up Td Catin &amp; Ibu Hamil</h3>
-          <div id="panel_dewasa_container" class="table-container">
-            <p class="muted" style="text-align:center; padding:15px;">Klik Analisis Catch Up untuk memuat data.</p>
-          </div>
-        </div>
-      </div>
+      <div class="card" id="cardCatchup1"><h3><i class="fas fa-baby"></i> 1. Catch Up Usia &lt; 1 Tahun (Bayi)</h3><div id="panel_bayi_container" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Analisis Catch Up untuk memuat data.</p></div></div>
+      <div class="card" id="cardCatchup2"><h3><i class="fas fa-link"></i> 2. Risiko Drop Out Antigen Berkesinambungan</h3><div id="panel_berkesinambungan_container" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Analisis Catch Up untuk memuat data.</p></div></div>
+      <div class="card" id="cardCatchup3"><h3><i class="fas fa-child"></i> 3. Catch Up Usia 18 Bln - 3 Thn (Booster)</h3><div id="panel_baduta_container" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Analisis Catch Up untuk memuat data.</p></div></div>
+      <div class="card" id="cardCatchup4"><h3><i class="fas fa-female"></i> 4. Catch Up Td Catin &amp; Ibu Hamil</h3><div id="panel_dewasa_container" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Analisis Catch Up untuk memuat data.</p></div></div>
     </section>
     
     <!-- TAB 4: KUMULATIF -->
@@ -7770,69 +7667,5 @@ window.selectFromLiveSearch = function(encodedJson) {
       }
     }
   </script>
-  function toggleCatchUpTable(boxId, triggerEl) {
-  const targetBox = document.getElementById(boxId);
-  if (!targetBox) return;
-
-  const isCurrentlyOpen = targetBox.classList.contains('open');
-
-  // Tutup semua tabel Catch Up lain & reset warna tombol agar layar tetap ringkas
-  document.querySelectorAll('.catchup-table-box').forEach(box => {
-    box.classList.remove('open');
-  });
-  document.querySelectorAll('.catchup-trigger').forEach(btn => {
-    btn.classList.remove('active');
-  });
-
-  // Jika sebelumnya tertutup, buka tabel target lalu scroll halus ke bawah
-  if (!isCurrentlyOpen) {
-    targetBox.classList.add('open');
-    if (triggerEl) triggerEl.classList.add('active');
-
-    setTimeout(() => {
-      targetBox.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      });
-    }, 60);
-  }
-}
-
-// Panggil fungsi ini di tombol navigasi tab Catch Up agar setiap tab dibuka, semua tabel mulai dalam posisi tertutup
-function resetCatchUpTables() {
-  document.querySelectorAll('.catchup-table-box').forEach(box => box.classList.remove('open'));
-  document.querySelectorAll('.catchup-trigger').forEach(btn => btn.classList.remove('active'));
-}
-  <script>
-    <script>
-    function toggleCatchUpTable(boxId, triggerEl) {
-      const targetBox = document.getElementById(boxId);
-      if (!targetBox) return;
-
-      const isCurrentlyOpen = targetBox.classList.contains('open');
-
-      document.querySelectorAll('.catchup-table-box').forEach(box => {
-        box.classList.remove('open');
-      });
-      document.querySelectorAll('.catchup-trigger').forEach(btn => {
-        btn.classList.remove('active');
-      });
-
-      if (!isCurrentlyOpen) {
-        targetBox.classList.add('open');
-        if (triggerEl) triggerEl.classList.add('active');
-
-        setTimeout(() => {
-          targetBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 60);
-      }
-    }
-
-    function resetCatchUpTables() {
-      document.querySelectorAll('.catchup-table-box').forEach(box => box.classList.remove('open'));
-      document.querySelectorAll('.catchup-trigger').forEach(btn => btn.classList.remove('active'));
-    }
-  </script>
-</body>
 </body>
 </html>

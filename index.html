@@ -3749,15 +3749,45 @@ window.goToEdit = function(encodedJson) {
       loadLogikaVaksinSettings();
       if (!isQrMode && !window.__IS_PUBLIC_QR_MODE__) loadQrPrioritySettings();
 
-      const filterAntigenSelect = document.getElementById('filter_antigen_spesifik');
+     const filterAntigenSelect = document.getElementById('filter_antigen_spesifik');
       const expAntigenSelect = document.getElementById('exp_filter_antigen');
-      ALL_VAKSIN_KEYS.forEach(v => {
-        if (filterAntigenSelect) {
-          const opt1 = document.createElement('option');
-          opt1.value = v;
-          opt1.textContent = v;
-          filterAntigenSelect.appendChild(opt1);
+      const filterKategoriSelect = document.getElementById('filter_kategori');
+
+      function updateFilterAntigenDropdown() {
+        if (!filterAntigenSelect) return;
+        const katVal = filterKategoriSelect ? filterKategoriSelect.value : 'ALL';
+        filterAntigenSelect.innerHTML = '';
+
+        if (katVal === 'BIAS') {
+          filterAntigenSelect.innerHTML = `
+            <option value="ALL">-- Semua Antigen BIAS (MR, DT, Td, HPV) --</option>
+            <option value="MR">BIAS MR (Campak Rubela)</option>
+            <option value="DT">BIAS DT</option>
+            <option value="Td">BIAS Td</option>
+            <option value="HPV">BIAS HPV</option>
+          `;
+        } else {
+          const optAll = document.createElement('option');
+          optAll.value = 'ALL';
+          optAll.textContent = '-- Semua Antigen --';
+          filterAntigenSelect.appendChild(optAll);
+
+          const listAntigen = katVal === 'ALL' ? ALL_VAKSIN_KEYS : getActiveVaccineKeysByCategory(katVal);
+          listAntigen.forEach(v => {
+            const opt = document.createElement('option');
+            opt.value = v;
+            opt.textContent = v;
+            filterAntigenSelect.appendChild(opt);
+          });
         }
+      }
+
+      updateFilterAntigenDropdown();
+      if (filterKategoriSelect) {
+        filterKategoriSelect.addEventListener('change', updateFilterAntigenDropdown);
+      }
+
+      ALL_VAKSIN_KEYS.forEach(v => {
         if (expAntigenSelect) {
           const opt2 = document.createElement('option');
           opt2.value = v;
@@ -5349,7 +5379,8 @@ window.selectFromLiveSearch = function(encodedJson) {
             const d = docSnap.data();
             const schoolDesa = SCHOOL_DESA_MAP[d.sekolah] || 'Melata';
             const matchDesa = (desaSel === 'ALL' || schoolDesa.toLowerCase() === desaSel.toLowerCase());
-            if (matchDesa && isVaccineGivenExactMonth(d.tanggal, thn, bln)) {
+            const matchAntigen = (filterAntigen === 'ALL' || (d.jenis_vaksin && d.jenis_vaksin.toUpperCase() === filterAntigen.toUpperCase()));
+            if (matchDesa && matchAntigen && isVaccineGivenExactMonth(d.tanggal, thn, bln)) {
               biasRows.push({ ...d, desa: schoolDesa });
             }
           });
@@ -5441,6 +5472,753 @@ window.selectFromLiveSearch = function(encodedJson) {
       return window.ExcelJS;
     }
 
+   // =========================================================================
+    // EKSPOR EXCEL KHUSUS BIAS (SESUAI TEMPLATE XLS + RINCIAN L/P & 3 SHEET)
+    // =========================================================================
+    async function exportBiasKumulatifExcel({ thn, bln, desaSel, antigenSel }) {
+      const monthNameStr = BULAN_NAME_MAP[bln] || bln;
+      const yearLabelStr = thn === 'ALL' ? 'Semua Tahun' : thn;
+      const desaLabelStr = desaSel === 'ALL' ? 'Semua Desa (13 Wilayah)' : `Desa ${desaSel}`;
+      const antigenLabelStr = antigenSel === 'ALL' ? 'Semua Antigen BIAS (MR, DT, Td, HPV)' : `BIAS ${antigenSel}`;
+
+      try {
+        const ExcelJSLib = await ensureExcelJSReady();
+        const workbook = new ExcelJSLib.Workbook();
+        workbook.creator = 'Sistem Register Imunisasi Puskesmas Melata';
+        workbook.created = new Date();
+
+        const snapBias = await getDocs(collection(db, COL_BIAS));
+        const filteredBiasDocs = [];
+        snapBias.forEach(docSnap => {
+          const d = docSnap.data();
+          const schoolDesa = SCHOOL_DESA_MAP[d.sekolah] || 'Melata';
+          const matchDesa = (desaSel === 'ALL' || schoolDesa.toLowerCase() === desaSel.toLowerCase());
+          const matchAntigen = (antigenSel === 'ALL' || (d.jenis_vaksin && d.jenis_vaksin.toUpperCase() === antigenSel.toUpperCase()));
+          if (matchDesa && matchAntigen && isVaccineGivenExactMonth(d.tanggal, thn, bln)) {
+            filteredBiasDocs.push({ ...d, desa: schoolDesa });
+          }
+        });
+
+        const thinBorder = {
+          top: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+          left: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+          bottom: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+          right: { style: 'thin', color: { argb: 'FFCBD5E1' } }
+        };
+        const totalBorder = {
+          top: { style: 'medium', color: { argb: 'FF002B5B' } },
+          bottom: { style: 'double', color: { argb: 'FF002B5B' } },
+          left: { style: 'thin', color: { argb: 'FF94A3B8' } },
+          right: { style: 'thin', color: { argb: 'FF94A3B8' } }
+        };
+
+        // Tentukan urutan slot Kelas & Vaksin sesuai template IMUNISASI BIAS + data dinamis
+        const baseSlots = [
+          { kelas: '1', vaksin: 'MR', label: 'KELAS 1 — VAKSIN MR' },
+          { kelas: '5', vaksin: 'HPV', label: 'KELAS 5 — VAKSIN HPV' },
+          { kelas: '1', vaksin: 'DT', label: 'KELAS 1 — VAKSIN DT' },
+          { kelas: '2', vaksin: 'Td', label: 'KELAS 2 — VAKSIN Td' },
+          { kelas: '5', vaksin: 'Td', label: 'KELAS 5 — VAKSIN Td' }
+        ];
+
+        let activeSlots = antigenSel === 'ALL'
+          ? [...baseSlots]
+          : baseSlots.filter(s => s.vaksin.toUpperCase() === antigenSel.toUpperCase());
+
+        // Tambahkan otomatis jika ada input kelas/vaksin lain di database (mis. Kelas 6 HPV / Kelas 9)
+        filteredBiasDocs.forEach(d => {
+          const kStr = String(d.kelas || '').trim();
+          const vStr = String(d.jenis_vaksin || '').trim();
+          if (!kStr || !vStr) return;
+          const exists = activeSlots.some(s => s.kelas === kStr && s.vaksin.toUpperCase() === vStr.toUpperCase());
+          if (!exists) {
+            activeSlots.push({
+              kelas: kStr,
+              vaksin: vStr,
+              label: `KELAS ${kStr} — VAKSIN ${vStr}`
+            });
+          }
+        });
+
+        if (activeSlots.length === 0 && antigenSel !== 'ALL') {
+          activeSlots.push({ kelas: 'ALL', vaksin: antigenSel, label: `SEMUA KELAS — VAKSIN ${antigenSel}` });
+        }
+
+        // Susun daftar sekolah sesuai filter desa (mempertahankan daftar sekolah resmi Puskesmas)
+        const schoolSet = new Set();
+        Object.keys(SCHOOL_DATA).forEach(sch => {
+          const schDesa = SCHOOL_DESA_MAP[sch] || 'Melata';
+          if (desaSel === 'ALL' || schDesa.toLowerCase() === desaSel.toLowerCase()) {
+            schoolSet.add(sch);
+          }
+        });
+        filteredBiasDocs.forEach(d => {
+          if (d.sekolah) schoolSet.add(d.sekolah);
+        });
+        const schoolList = Array.from(schoolSet);
+
+        // =====================================================================
+        // SHEET 1: REKAP BIAS PER SEKOLAH (MODEL TEMPLATE BIAS + L/P)
+        // =====================================================================
+        const ws1 = workbook.addWorksheet('Rekap BIAS Per Sekolah', {
+          views: [{ state: 'frozen', xSplit: 4, ySplit: 6 }]
+        });
+
+        const totalColsS1 = 4 + (activeSlots.length * 8) + 8;
+        const endColLetterS1 = ws1.getColumn(Math.min(totalColsS1, 20)).letter;
+
+        ws1.mergeCells(`A1:${endColLetterS1}1`);
+        ws1.getCell('A1').value = 'LAPORAN HASIL BULAN IMUNISASI ANAK SEKOLAH (BIAS) — PUSKESMAS MELATA';
+        ws1.getCell('A1').font = { name: 'Calibri', size: 13, bold: true, color: { argb: 'FF002B5B' } };
+        ws1.getRow(1).height = 22;
+
+        ws1.mergeCells(`A2:${endColLetterS1}2`);
+        ws1.getCell('A2').value = `Periode: ${monthNameStr} ${yearLabelStr} | Wilayah: ${desaLabelStr} | Filter: ${antigenLabelStr}`;
+        ws1.getCell('A2').font = { name: 'Calibri', size: 10, italic: false, color: { argb: 'FF475569' } };
+        ws1.getRow(2).height = 17;
+        ws1.getRow(3).height = 8;
+
+        const r4 = ws1.getRow(4);
+        const r5 = ws1.getRow(5);
+        const r6 = ws1.getRow(6);
+        r4.height = 22;
+        r5.height = 20;
+        r6.height = 19;
+
+        // 4 Kolom Identitas Sekolah di kiri (merge vertikal baris 4 s/d 6)
+        const idHeadersS1 = ['No.', 'Nama Sekolah', 'Jenjang', 'Desa / Wilayah'];
+        idHeadersS1.forEach((hText, idx) => {
+          const colNum = idx + 1;
+          const colLtr = ws1.getColumn(colNum).letter;
+          ws1.mergeCells(`${colLtr}4:${colLtr}6`);
+          [4, 5, 6].forEach(rIdx => {
+            const c = ws1.getRow(rIdx).getCell(colNum);
+            c.value = hText;
+            c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF002B5B' } };
+            c.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
+            c.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+            c.border = thinBorder;
+          });
+        });
+
+        // Header Blok per Kelas & Jenis Vaksin (8 kolom per blok)
+        let colPtr = 5;
+        activeSlots.forEach(slot => {
+          const cStart = colPtr;
+          const cEnd = colPtr + 7;
+          ws1.mergeCells(`${ws1.getColumn(cStart).letter}4:${ws1.getColumn(cEnd).letter}4`);
+          for (let c = cStart; c <= cEnd; c++) {
+            const cell4 = r4.getCell(c);
+            cell4.value = slot.label;
+            cell4.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF002B5B' } };
+            cell4.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
+            cell4.alignment = { horizontal: 'center', vertical: 'middle' };
+            cell4.border = thinBorder;
+          }
+
+          // Sub-grup Sasaran Siswa (3 kolom)
+          ws1.mergeCells(`${ws1.getColumn(cStart).letter}5:${ws1.getColumn(cStart + 2).letter}5`);
+          for (let c = cStart; c <= cStart + 2; c++) {
+            const cell5 = r5.getCell(c);
+            cell5.value = 'Sasaran Siswa';
+            cell5.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0F4C81' } };
+            cell5.font = { name: 'Calibri', size: 9, bold: true, color: { argb: 'FFFFFFFF' } };
+            cell5.alignment = { horizontal: 'center', vertical: 'middle' };
+            cell5.border = thinBorder;
+          }
+
+          // Sub-grup Penerima Vaksin / Divaksin (3 kolom)
+          ws1.mergeCells(`${ws1.getColumn(cStart + 3).letter}5:${ws1.getColumn(cStart + 5).letter}5`);
+          for (let c = cStart + 3; c <= cStart + 5; c++) {
+            const cell5 = r5.getCell(c);
+            cell5.value = 'Penerima Vaksin (Divaksin)';
+            cell5.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0D9488' } };
+            cell5.font = { name: 'Calibri', size: 9, bold: true, color: { argb: 'FFFFFFFF' } };
+            cell5.alignment = { horizontal: 'center', vertical: 'middle' };
+            cell5.border = thinBorder;
+          }
+
+          // Capaian (%) & Drop Out (merge vertikal baris 5-6)
+          [
+            { col: cStart + 6, text: 'Capaian (%)' },
+            { col: cStart + 7, text: 'Drop Out' }
+          ].forEach(extra => {
+            const ltr = ws1.getColumn(extra.col).letter;
+            ws1.mergeCells(`${ltr}5:${ltr}6`);
+            [5, 6].forEach(rIdx => {
+              const cellE = ws1.getRow(rIdx).getCell(extra.col);
+              cellE.value = extra.text;
+              cellE.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1E3A8A' } };
+              cellE.font = { name: 'Calibri', size: 9, bold: true, color: { argb: 'FFFFFFFF' } };
+              cellE.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+              cellE.border = thinBorder;
+            });
+          });
+
+          // Baris 6: L, P, Jml / Total
+          ['L', 'P', 'Jml', 'L', 'P', 'Total'].forEach((subLbl, sIdx) => {
+            const cell6 = r6.getCell(cStart + sIdx);
+            cell6.value = subLbl;
+            cell6.fill = {
+              type: 'pattern',
+              pattern: 'solid',
+              fgColor: { argb: sIdx < 3 ? 'FF1D4ED8' : 'FF0F766E' }
+            };
+            cell6.font = { name: 'Calibri', size: 9, bold: true, color: { argb: 'FFFFFFFF' } };
+            cell6.alignment = { horizontal: 'center', vertical: 'middle' };
+            cell6.border = thinBorder;
+          });
+
+          colPtr += 8;
+        });
+
+        // Header Blok Rekap Total per Sekolah di ujung kanan (8 kolom)
+        const sumStartCol = colPtr;
+        const sumEndCol = colPtr + 7;
+        ws1.mergeCells(`${ws1.getColumn(sumStartCol).letter}4:${ws1.getColumn(sumEndCol).letter}4`);
+        for (let c = sumStartCol; c <= sumEndCol; c++) {
+          const cell4 = r4.getCell(c);
+          cell4.value = 'TOTAL KESELURUHAN PER SEKOLAH';
+          cell4.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF002B5B' } };
+          cell4.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
+          cell4.alignment = { horizontal: 'center', vertical: 'middle' };
+          cell4.border = thinBorder;
+        }
+
+        ws1.mergeCells(`${ws1.getColumn(sumStartCol).letter}5:${ws1.getColumn(sumStartCol + 2).letter}5`);
+        for (let c = sumStartCol; c <= sumStartCol + 2; c++) {
+          const cell5 = r5.getCell(c);
+          cell5.value = 'Total Sasaran';
+          cell5.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0F4C81' } };
+          cell5.font = { name: 'Calibri', size: 9, bold: true, color: { argb: 'FFFFFFFF' } };
+          cell5.alignment = { horizontal: 'center', vertical: 'middle' };
+          cell5.border = thinBorder;
+        }
+
+        ws1.mergeCells(`${ws1.getColumn(sumStartCol + 3).letter}5:${ws1.getColumn(sumStartCol + 5).letter}5`);
+        for (let c = sumStartCol + 3; c <= sumStartCol + 5; c++) {
+          const cell5 = r5.getCell(c);
+          cell5.value = 'Total Penerima Vaksin';
+          cell5.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0D9488' } };
+          cell5.font = { name: 'Calibri', size: 9, bold: true, color: { argb: 'FFFFFFFF' } };
+          cell5.alignment = { horizontal: 'center', vertical: 'middle' };
+          cell5.border = thinBorder;
+        }
+
+        [
+          { col: sumStartCol + 6, text: 'Capaian (%)' },
+          { col: sumStartCol + 7, text: 'Total DO' }
+        ].forEach(extra => {
+          const ltr = ws1.getColumn(extra.col).letter;
+          ws1.mergeCells(`${ltr}5:${ltr}6`);
+          [5, 6].forEach(rIdx => {
+            const cellE = ws1.getRow(rIdx).getCell(extra.col);
+            cellE.value = extra.text;
+            cellE.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1E3A8A' } };
+            cellE.font = { name: 'Calibri', size: 9, bold: true, color: { argb: 'FFFFFFFF' } };
+            cellE.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+            cellE.border = thinBorder;
+          });
+        });
+
+        ['L', 'P', 'Jml', 'L', 'P', 'Total'].forEach((subLbl, sIdx) => {
+          const cell6 = r6.getCell(sumStartCol + sIdx);
+          cell6.value = subLbl;
+          cell6.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: sIdx < 3 ? 'FF1D4ED8' : 'FF0F766E' }
+          };
+          cell6.font = { name: 'Calibri', size: 9, bold: true, color: { argb: 'FFFFFFFF' } };
+          cell6.alignment = { horizontal: 'center', vertical: 'middle' };
+          cell6.border = thinBorder;
+        });
+
+        // Isi Data Sekolah (Baris 7 ke bawah)
+        schoolList.forEach((schName, idx) => {
+          const rNum = 7 + idx;
+          const row = ws1.getRow(rNum);
+          row.height = 20;
+          const zebraArgb = (rNum % 2 === 0) ? 'FFF8FAFC' : 'FFFFFFFF';
+          const jenjang = SCHOOL_DATA[schName] || 'SD';
+          const desaSch = SCHOOL_DESA_MAP[schName] || 'Melata';
+
+          const baseCells = [idx + 1, schName, jenjang, desaSch];
+          baseCells.forEach((val, bIdx) => {
+            const cell = row.getCell(bIdx + 1);
+            cell.value = val;
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: zebraArgb } };
+            cell.font = { name: 'Calibri', size: 10, bold: bIdx === 1, color: { argb: 'FF1E293B' } };
+            cell.alignment = { horizontal: bIdx === 1 ? 'left' : 'center', vertical: 'middle' };
+            cell.border = thinBorder;
+          });
+
+          const schoolDocs = filteredBiasDocs.filter(d => d.sekolah && d.sekolah.toUpperCase() === schName.toUpperCase());
+          let cPtr = 5;
+          const sasLCols = [], sasPCols = [], capLCols = [], capPCols = [], doCols = [];
+
+          activeSlots.forEach(slot => {
+            const matchedDocs = schoolDocs.filter(d =>
+              (slot.kelas === 'ALL' || String(d.kelas).trim() === slot.kelas) &&
+              String(d.jenis_vaksin || '').toUpperCase() === slot.vaksin.toUpperCase()
+            );
+
+            let sasL = 0, sasP = 0, capL = 0, capP = 0, doVal = 0;
+            matchedDocs.forEach(md => {
+              const dt = md.data || {};
+              sasL += Number(dt.Sasaran_L || 0);
+              sasP += Number(dt.Sasaran_P || 0);
+              capL += Number(dt.Capaian_L || 0);
+              capP += Number(dt.Capaian_P || 0);
+              doVal += Number(dt.DropOut || 0);
+            });
+
+            const lSasL = ws1.getColumn(cPtr).letter;
+            const lSasP = ws1.getColumn(cPtr + 1).letter;
+            const lSasJml = ws1.getColumn(cPtr + 2).letter;
+            const lCapL = ws1.getColumn(cPtr + 3).letter;
+            const lCapP = ws1.getColumn(cPtr + 4).letter;
+            const lCapTot = ws1.getColumn(cPtr + 5).letter;
+            const lPct = ws1.getColumn(cPtr + 6).letter;
+            const lDo = ws1.getColumn(cPtr + 7).letter;
+
+            sasLCols.push(`${lSasL}${rNum}`);
+            sasPCols.push(`${lSasP}${rNum}`);
+            capLCols.push(`${lCapL}${rNum}`);
+            capPCols.push(`${lCapP}${rNum}`);
+            doCols.push(`${lDo}${rNum}`);
+
+            const slotCells = [
+              { col: cPtr, val: sasL, bg: zebraArgb, color: 'FF1E293B', bold: false },
+              { col: cPtr + 1, val: sasP, bg: zebraArgb, color: 'FF1E293B', bold: false },
+              { col: cPtr + 2, val: { formula: `SUM(${lSasL}${rNum}:${lSasP}${rNum})` }, bg: 'FFEFF6FF', color: 'FF002B5B', bold: true },
+              { col: cPtr + 3, val: capL, bg: zebraArgb, color: 'FF1E293B', bold: false },
+              { col: cPtr + 4, val: capP, bg: zebraArgb, color: 'FF1E293B', bold: false },
+              { col: cPtr + 5, val: { formula: `SUM(${lCapL}${rNum}:${lCapP}${rNum})` }, bg: (capL + capP) > 0 ? 'FFECFDF5' : zebraArgb, color: (capL + capP) > 0 ? 'FF065F46' : 'FF1E293B', bold: (capL + capP) > 0 },
+              { col: cPtr + 6, val: { formula: `IFERROR(${lCapTot}${rNum}/${lSasJml}${rNum},0)` }, bg: zebraArgb, color: 'FF002B5B', bold: true, fmt: '0.0%' },
+              { col: cPtr + 7, val: doVal, bg: doVal > 0 ? 'FFFEF2F2' : zebraArgb, color: doVal > 0 ? 'FF991B1B' : 'FF64748B', bold: doVal > 0 }
+            ];
+
+            slotCells.forEach(sc => {
+              const cell = row.getCell(sc.col);
+              cell.value = sc.val;
+              cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: sc.bg } };
+              cell.font = { name: 'Calibri', size: 10, bold: sc.bold, color: { argb: sc.color } };
+              cell.alignment = { horizontal: 'center', vertical: 'middle' };
+              cell.border = thinBorder;
+              if (sc.fmt) cell.numFmt = sc.fmt;
+            });
+
+            cPtr += 8;
+          });
+
+          // Kolom Rekap Total Sekolah di Ujung Kanan
+          const sLtr0 = ws1.getColumn(sumStartCol).letter;
+          const sLtr1 = ws1.getColumn(sumStartCol + 1).letter;
+          const sLtr2 = ws1.getColumn(sumStartCol + 2).letter;
+          const sLtr3 = ws1.getColumn(sumStartCol + 3).letter;
+          const sLtr4 = ws1.getColumn(sumStartCol + 4).letter;
+          const sLtr5 = ws1.getColumn(sumStartCol + 5).letter;
+          const sLtr6 = ws1.getColumn(sumStartCol + 6).letter;
+          const sLtr7 = ws1.getColumn(sumStartCol + 7).letter;
+
+          const rightSummaryDefs = [
+            { col: sumStartCol, val: { formula: sasLCols.join('+') || '0' }, bg: 'FFEFF6FF', color: 'FF002B5B', bold: true },
+            { col: sumStartCol + 1, val: { formula: sasPCols.join('+') || '0' }, bg: 'FFEFF6FF', color: 'FF002B5B', bold: true },
+            { col: sumStartCol + 2, val: { formula: `SUM(${sLtr0}${rNum}:${sLtr1}${rNum})` }, bg: 'FFDBEAFE', color: 'FF002B5B', bold: true },
+            { col: sumStartCol + 3, val: { formula: capLCols.join('+') || '0' }, bg: 'FFECFDF5', color: 'FF065F46', bold: true },
+            { col: sumStartCol + 4, val: { formula: capPCols.join('+') || '0' }, bg: 'FFECFDF5', color: 'FF065F46', bold: true },
+            { col: sumStartCol + 5, val: { formula: `SUM(${sLtr3}${rNum}:${sLtr4}${rNum})` }, bg: 'FFD1FAE5', color: 'FF065F46', bold: true },
+            { col: sumStartCol + 6, val: { formula: `IFERROR(${sLtr5}${rNum}/${sLtr2}${rNum},0)` }, bg: 'FFF8FAFC', color: 'FF002B5B', bold: true, fmt: '0.0%' },
+            { col: sumStartCol + 7, val: { formula: doCols.join('+') || '0' }, bg: 'FFFEF2F2', color: 'FF991B1B', bold: true }
+          ];
+
+          rightSummaryDefs.forEach(rs => {
+            const cell = row.getCell(rs.col);
+            cell.value = rs.val;
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: rs.bg } };
+            cell.font = { name: 'Calibri', size: 10, bold: rs.bold, color: { argb: rs.color } };
+            cell.alignment = { horizontal: 'center', vertical: 'middle' };
+            cell.border = thinBorder;
+            if (rs.fmt) cell.numFmt = rs.fmt;
+          });
+        });
+
+        // Baris Total Keseluruhan di Bawah Tabel Sheet 1
+        const lastSchoolRow = 6 + schoolList.length;
+        const totRowNum1 = lastSchoolRow + 1;
+        const totRow1 = ws1.getRow(totRowNum1);
+        totRow1.height = 23;
+        ws1.mergeCells(`A${totRowNum1}:D${totRowNum1}`);
+        for (let c = 1; c <= 4; c++) {
+          const cell = totRow1.getCell(c);
+          cell.value = 'TOTAL KESELURUHAN';
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE2E8F0' } };
+          cell.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FF002B5B' } };
+          cell.alignment = { horizontal: 'center', vertical: 'middle' };
+          cell.border = totalBorder;
+        }
+
+        for (let c = 5; c <= sumEndCol; c++) {
+          const cell = totRow1.getCell(c);
+          const ltr = ws1.getColumn(c).letter;
+          const relOffset = (c - 5) % 8;
+          if (relOffset === 6) {
+            const totCapLtr = ws1.getColumn(c - 1).letter;
+            const totSasLtr = ws1.getColumn(c - 4).letter;
+            cell.value = schoolList.length > 0
+              ? { formula: `IFERROR(${totCapLtr}${totRowNum1}/${totSasLtr}${totRowNum1},0)` }
+              : 0;
+            cell.numFmt = '0.0%';
+          } else {
+            cell.value = schoolList.length > 0
+              ? { formula: `SUM(${ltr}7:${ltr}${lastSchoolRow})` }
+              : 0;
+          }
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE2E8F0' } };
+          cell.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FF002B5B' } };
+          cell.alignment = { horizontal: 'center', vertical: 'middle' };
+          cell.border = totalBorder;
+        }
+
+        ws1.getColumn(1).width = 5;
+        ws1.getColumn(2).width = 33;
+        ws1.getColumn(3).width = 10;
+        ws1.getColumn(4).width = 17;
+        for (let c = 5; c <= sumEndCol; c++) {
+          const relOffset = (c - 5) % 8;
+          ws1.getColumn(c).width = relOffset === 6 ? 10.5 : 7.5;
+        }
+
+        // =====================================================================
+        // SHEET 2: RINCIAN TRANSAKSI KEGIATAN BIAS
+        // =====================================================================
+        const ws2 = workbook.addWorksheet('Rincian Kegiatan BIAS', {
+          views: [{ state: 'frozen', xSplit: 3, ySplit: 4 }]
+        });
+
+        ws2.mergeCells('A1:P1');
+        ws2.getCell('A1').value = 'RINCIAN PELAKSANAAN IMUNISASI BIAS PER KELAS — PUSKESMAS MELATA';
+        ws2.getCell('A1').font = { name: 'Calibri', size: 13, bold: true, color: { argb: 'FF002B5B' } };
+        ws2.getRow(1).height = 22;
+
+        ws2.mergeCells('A2:P2');
+        ws2.getCell('A2').value = `Periode: ${monthNameStr} ${yearLabelStr} | Wilayah: ${desaLabelStr} | Filter: ${antigenLabelStr}`;
+        ws2.getCell('A2').font = { name: 'Calibri', size: 10, color: { argb: 'FF475569' } };
+        ws2.getRow(2).height = 17;
+        ws2.getRow(3).height = 8;
+
+        const headersS2 = [
+          'No.', 'Tgl Pelaksanaan', 'Nama Sekolah', 'Jenjang', 'Desa / Wilayah',
+          'Kelas', 'Jenis Vaksin', 'Sasaran (L)', 'Sasaran (P)', 'Jml Sasaran',
+          'Penerima Vaksin (L)', 'Penerima Vaksin (P)', 'Total Penerima Vaksin',
+          'Capaian (%)', 'Drop Out', 'Petugas Input'
+        ];
+        const r4s2 = ws2.getRow(4);
+        r4s2.height = 25;
+        headersS2.forEach((hText, idx) => {
+          const cell = r4s2.getCell(idx + 1);
+          cell.value = hText;
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: (idx >= 10 && idx <= 12) ? 'FF0D9488' : 'FF002B5B' }
+          };
+          cell.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
+          cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+          cell.border = thinBorder;
+        });
+
+        const sortedBiasDocs = [...filteredBiasDocs].sort((a, b) => {
+          const tComp = String(a.tanggal || '').localeCompare(String(b.tanggal || ''));
+          if (tComp !== 0) return tComp;
+          return String(a.sekolah || '').localeCompare(String(b.sekolah || ''));
+        });
+
+        sortedBiasDocs.forEach((d, idx) => {
+          const rNum = 5 + idx;
+          const row = ws2.getRow(rNum);
+          row.height = 20;
+          const zebraArgb = (rNum % 2 === 0) ? 'FFF8FAFC' : 'FFFFFFFF';
+          const dt = d.data || {};
+          const sasL = Number(dt.Sasaran_L || 0);
+          const sasP = Number(dt.Sasaran_P || 0);
+          const capL = Number(dt.Capaian_L || 0);
+          const capP = Number(dt.Capaian_P || 0);
+          const doVal = Number(dt.DropOut || 0);
+
+          const vals = [
+            idx + 1,
+            d.tanggal || '-',
+            d.sekolah || '-',
+            SCHOOL_DATA[d.sekolah] || 'SD',
+            d.desa || '-',
+            `Kelas ${d.kelas || '-'}`,
+            d.jenis_vaksin || '-',
+            sasL,
+            sasP,
+            { formula: `SUM(H${rNum}:I${rNum})` },
+            capL,
+            capP,
+            { formula: `SUM(K${rNum}:L${rNum})` },
+            { formula: `IFERROR(M${rNum}/J${rNum},0)` },
+            doVal,
+            d.last_updated_by || '-'
+          ];
+
+          vals.forEach((v, cIdx) => {
+            const cell = row.getCell(cIdx + 1);
+            cell.value = v;
+            let bg = zebraArgb;
+            let clr = 'FF1E293B';
+            let isBold = (cIdx === 2 || cIdx === 6);
+            if (cIdx === 9) { bg = 'FFEFF6FF'; clr = 'FF002B5B'; isBold = true; }
+            if (cIdx === 12) { bg = 'FFECFDF5'; clr = 'FF065F46'; isBold = true; }
+            if (cIdx === 13) { clr = 'FF002B5B'; isBold = true; cell.numFmt = '0.0%'; }
+            if (cIdx === 14 && doVal > 0) { bg = 'FFFEF2F2'; clr = 'FF991B1B'; isBold = true; }
+
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } };
+            cell.font = { name: 'Calibri', size: 10, bold: isBold, color: { argb: clr } };
+            cell.alignment = { horizontal: cIdx === 2 ? 'left' : 'center', vertical: 'middle' };
+            cell.border = thinBorder;
+          });
+        });
+
+        const lastRowS2 = 4 + sortedBiasDocs.length;
+        const totRowS2Num = lastRowS2 + 1;
+        const totRowS2 = ws2.getRow(totRowS2Num);
+        totRowS2.height = 23;
+        ws2.mergeCells(`A${totRowS2Num}:G${totRowS2Num}`);
+        for (let c = 1; c <= 7; c++) {
+          const cell = totRowS2.getCell(c);
+          cell.value = 'TOTAL KEGIATAN BIAS TERFILTER';
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE2E8F0' } };
+          cell.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FF002B5B' } };
+          cell.alignment = { horizontal: 'center', vertical: 'middle' };
+          cell.border = totalBorder;
+        }
+        [8, 9, 10, 11, 12, 13, 14, 15, 16].forEach(c => {
+          const cell = totRowS2.getCell(c);
+          const ltr = ws2.getColumn(c).letter;
+          if (c === 14) {
+            cell.value = sortedBiasDocs.length > 0 ? { formula: `IFERROR(M${totRowS2Num}/J${totRowS2Num},0)` } : 0;
+            cell.numFmt = '0.0%';
+          } else if (c === 16) {
+            cell.value = '-';
+          } else {
+            cell.value = sortedBiasDocs.length > 0 ? { formula: `SUM(${ltr}5:${ltr}${lastRowS2})` } : 0;
+          }
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE2E8F0' } };
+          cell.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FF002B5B' } };
+          cell.alignment = { horizontal: 'center', vertical: 'middle' };
+          cell.border = totalBorder;
+        });
+
+        const widthsS2 = [5, 15, 32, 10, 17, 11, 13, 11, 11, 12, 14, 14, 15, 12, 10, 18];
+        widthsS2.forEach((w, i) => { ws2.getColumn(i + 1).width = w; });
+
+        // =====================================================================
+        // SHEET 3: REKAP BIAS PER DESA & LOGISTIK KEMASAN
+        // =====================================================================
+        const ws3 = workbook.addWorksheet('Rekap Desa & Logistik BIAS', {
+          views: [{ state: 'frozen', xSplit: 3, ySplit: 5 }]
+        });
+
+        ws3.mergeCells('A1:W1');
+        ws3.getCell('A1').value = 'REKAPITULASI PENERIMA VAKSIN & LOGISTIK BIAS PER DESA — PUSKESMAS MELATA';
+        ws3.getCell('A1').font = { name: 'Calibri', size: 13, bold: true, color: { argb: 'FF002B5B' } };
+        ws3.getRow(1).height = 22;
+
+        ws3.mergeCells('A2:W2');
+        ws3.getCell('A2').value = `Periode: ${monthNameStr} ${yearLabelStr} | Wilayah: ${desaLabelStr}`;
+        ws3.getCell('A2').font = { name: 'Calibri', size: 10, color: { argb: 'FF475569' } };
+        ws3.getRow(2).height = 17;
+        ws3.getRow(3).height = 8;
+
+        const r4s3 = ws3.getRow(4);
+        const r5s3 = ws3.getRow(5);
+        r4s3.height = 22;
+        r5s3.height = 20;
+
+        ['No.', 'Desa / Kelurahan', 'Kategori Wilayah'].forEach((hText, idx) => {
+          const cNum = idx + 1;
+          const ltr = ws3.getColumn(cNum).letter;
+          ws3.mergeCells(`${ltr}4:${ltr}5`);
+          [4, 5].forEach(rIdx => {
+            const c = ws3.getRow(rIdx).getCell(cNum);
+            c.value = hText;
+            c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF002B5B' } };
+            c.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
+            c.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+            c.border = thinBorder;
+          });
+        });
+
+        const biasAntigensS3 = ['MR', 'DT', 'Td', 'HPV'];
+        let cPtr3 = 4;
+        biasAntigensS3.forEach(vName => {
+          ws3.mergeCells(`${ws3.getColumn(cPtr3).letter}4:${ws3.getColumn(cPtr3 + 3).letter}4`);
+          for (let c = cPtr3; c <= cPtr3 + 3; c++) {
+            const cell4 = r4s3.getCell(c);
+            cell4.value = `BIAS ${vName}`;
+            cell4.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF002B5B' } };
+            cell4.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
+            cell4.alignment = { horizontal: 'center', vertical: 'middle' };
+            cell4.border = thinBorder;
+          }
+          ['Divaksin (L)', 'Divaksin (P)', 'Total', 'Est. Vial/Pcs'].forEach((sub, sIdx) => {
+            const cell5 = r5s3.getCell(cPtr3 + sIdx);
+            cell5.value = sub;
+            cell5.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: sIdx === 3 ? 'FF0F4C81' : 'FF0D9488' } };
+            cell5.font = { name: 'Calibri', size: 9, bold: true, color: { argb: 'FFFFFFFF' } };
+            cell5.alignment = { horizontal: 'center', vertical: 'middle' };
+            cell5.border = thinBorder;
+          });
+          cPtr3 += 4;
+        });
+
+        // Total Keseluruhan BIAS per Desa (4 kolom)
+        ws3.mergeCells(`${ws3.getColumn(cPtr3).letter}4:${ws3.getColumn(cPtr3 + 3).letter}4`);
+        for (let c = cPtr3; c <= cPtr3 + 3; c++) {
+          const cell4 = r4s3.getCell(c);
+          cell4.value = 'TOTAL BIAS WILAYAH';
+          cell4.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF002B5B' } };
+          cell4.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
+          cell4.alignment = { horizontal: 'center', vertical: 'middle' };
+          cell4.border = thinBorder;
+        }
+        ['Total (L)', 'Total (P)', 'Total Divaksin', 'Total Drop Out'].forEach((sub, sIdx) => {
+          const cell5 = r5s3.getCell(cPtr3 + sIdx);
+          cell5.value = sub;
+          cell5.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1E3A8A' } };
+          cell5.font = { name: 'Calibri', size: 9, bold: true, color: { argb: 'FFFFFFFF' } };
+          cell5.alignment = { horizontal: 'center', vertical: 'middle' };
+          cell5.border = thinBorder;
+        });
+
+        const desaListS3 = desaSel === 'ALL' ? ALL_DESA_LIST : [desaSel];
+        desaListS3.forEach((dName, idx) => {
+          const rNum = 6 + idx;
+          const row = ws3.getRow(rNum);
+          row.height = 20;
+          const zebraArgb = (rNum % 2 === 0) ? 'FFF8FAFC' : 'FFFFFFFF';
+          const katWil = DESA_DALAM_WILAYAH.includes(dName) ? 'Dalam Wilayah' : 'Luar Wilayah';
+
+          [idx + 1, dName, katWil].forEach((val, bIdx) => {
+            const cell = row.getCell(bIdx + 1);
+            cell.value = val;
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: zebraArgb } };
+            cell.font = { name: 'Calibri', size: 10, bold: bIdx === 1, color: { argb: 'FF1E293B' } };
+            cell.alignment = { horizontal: bIdx === 1 ? 'left' : 'center', vertical: 'middle' };
+            cell.border = thinBorder;
+          });
+
+          const desaDocs = filteredBiasDocs.filter(d => (d.desa || '').toLowerCase() === dName.toLowerCase());
+          let colP = 4;
+          const lCols = [], pCols = [];
+          let totDoDesa = 0;
+
+          desaDocs.forEach(dd => { totDoDesa += Number((dd.data || {}).DropOut || 0); });
+
+          biasAntigensS3.forEach(vName => {
+            const vDocs = desaDocs.filter(d => String(d.jenis_vaksin || '').toUpperCase() === vName.toUpperCase());
+            let cL = 0, cP = 0;
+            vDocs.forEach(vd => {
+              cL += Number((vd.data || {}).Capaian_L || 0);
+              cP += Number((vd.data || {}).Capaian_P || 0);
+            });
+            const grpCfg = ANTIGEN_GROUPS.find(g => g.group_key.toUpperCase().includes(vName.toUpperCase()));
+            const dosePerVial = grpCfg ? (grpCfg.doses_per_vial || 1) : 1;
+            const estVial = Math.ceil((cL + cP) / dosePerVial);
+
+            const ltrL = ws3.getColumn(colP).letter;
+            const ltrP = ws3.getColumn(colP + 1).letter;
+            lCols.push(`${ltrL}${rNum}`);
+            pCols.push(`${ltrP}${rNum}`);
+
+            [
+              { col: colP, val: cL, bg: zebraArgb, bold: false, clr: 'FF1E293B' },
+              { col: colP + 1, val: cP, bg: zebraArgb, bold: false, clr: 'FF1E293B' },
+              { col: colP + 2, val: { formula: `SUM(${ltrL}${rNum}:${ltrP}${rNum})` }, bg: (cL + cP) > 0 ? 'FFECFDF5' : zebraArgb, bold: (cL + cP) > 0, clr: (cL + cP) > 0 ? 'FF065F46' : 'FF1E293B' },
+              { col: colP + 3, val: estVial, bg: 'FFEFF6FF', bold: estVial > 0, clr: 'FF002B5B' }
+            ].forEach(sc => {
+              const cell = row.getCell(sc.col);
+              cell.value = sc.val;
+              cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: sc.bg } };
+              cell.font = { name: 'Calibri', size: 10, bold: sc.bold, color: { argb: sc.clr } };
+              cell.alignment = { horizontal: 'center', vertical: 'middle' };
+              cell.border = thinBorder;
+            });
+
+            colP += 4;
+          });
+
+          const tLtr0 = ws3.getColumn(colP).letter;
+          const tLtr1 = ws3.getColumn(colP + 1).letter;
+          [
+            { col: colP, val: { formula: lCols.join('+') }, bg: 'FFECFDF5', bold: true, clr: 'FF065F46' },
+            { col: colP + 1, val: { formula: pCols.join('+') }, bg: 'FFECFDF5', bold: true, clr: 'FF065F46' },
+            { col: colP + 2, val: { formula: `SUM(${tLtr0}${rNum}:${tLtr1}${rNum})` }, bg: 'FFD1FAE5', bold: true, clr: 'FF065F46' },
+            { col: colP + 3, val: totDoDesa, bg: totDoDesa > 0 ? 'FFFEF2F2' : zebraArgb, bold: totDoDesa > 0, clr: totDoDesa > 0 ? 'FF991B1B' : 'FF64748B' }
+          ].forEach(sc => {
+            const cell = row.getCell(sc.col);
+            cell.value = sc.val;
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: sc.bg } };
+            cell.font = { name: 'Calibri', size: 10, bold: sc.bold, color: { argb: sc.clr } };
+            cell.alignment = { horizontal: 'center', vertical: 'middle' };
+            cell.border = thinBorder;
+          });
+        });
+
+        const lastDesaRow3 = 5 + desaListS3.length;
+        const totRowS3Num = lastDesaRow3 + 1;
+        const totRowS3 = ws3.getRow(totRowS3Num);
+        totRowS3.height = 23;
+        ws3.mergeCells(`A${totRowS3Num}:C${totRowS3Num}`);
+        for (let c = 1; c <= 3; c++) {
+          const cell = totRowS3.getCell(c);
+          cell.value = 'TOTAL KESELURUHAN WILAYAH';
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE2E8F0' } };
+          cell.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FF002B5B' } };
+          cell.alignment = { horizontal: 'center', vertical: 'middle' };
+          cell.border = totalBorder;
+        }
+        for (let c = 4; c <= 23; c++) {
+          const cell = totRowS3.getCell(c);
+          const ltr = ws3.getColumn(c).letter;
+          cell.value = { formula: `SUM(${ltr}6:${ltr}${lastDesaRow3})` };
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE2E8F0' } };
+          cell.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FF002B5B' } };
+          cell.alignment = { horizontal: 'center', vertical: 'middle' };
+          cell.border = totalBorder;
+        }
+
+        ws3.getColumn(1).width = 5;
+        ws3.getColumn(2).width = 19;
+        ws3.getColumn(3).width = 16;
+        for (let c = 4; c <= 23; c++) {
+          ws3.getColumn(c).width = 11;
+        }
+
+        // Unduh file Excel BIAS (.xlsx)
+        const safeAntigenTag = antigenSel === 'ALL' ? 'SemuaAntigen' : antigenSel.replace(/[^a-zA-Z0-9]/g, '');
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], {
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        });
+        const downloadUrl = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.download = `Laporan_BIAS_Puskesmas_Melata_${desaSel}_${safeAntigenTag}_${bln}_${thn}.xlsx`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(downloadUrl);
+      } catch (err) {
+        alert('Gagal download Excel BIAS: ' + err.message);
+      }
+    }
+
     // =========================================================================
     // EKSPOR EXCEL 4 SHEET TERFORMAT LENGKAP (SESUAI TEMPLATE XLS & FREEZE PANES)
     // =========================================================================
@@ -5460,6 +6238,11 @@ window.selectFromLiveSearch = function(encodedJson) {
       const katSel = sourceTab === 'admin'
         ? 'ALL'
         : document.getElementById('filter_kategori').value;
+
+      if (katSel === 'BIAS') {
+        await exportBiasKumulatifExcel({ thn, bln, desaSel, antigenSel });
+        return;
+      }
 
       const monthNameStr = BULAN_NAME_MAP[bln] || bln;
       const yearLabelStr = thn === 'ALL' ? 'Semua Tahun' : thn;

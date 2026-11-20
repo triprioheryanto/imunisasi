@@ -502,15 +502,172 @@
     .cert-back-table th, .cert-back-table td { border: 1px solid #002244; padding: 5px 8px; text-align: left; }
     .cert-back-table th { background: #003366; color: #FFFFFF; font-family: 'Cinzel', serif; font-weight: 700; text-align: center; letter-spacing: 0.5px; }
 
+    /* =========================================================
+       DESAIN LEMBAR CETAK MASSAL KARTU DOMPET & STIKER BUKU KIA
+       ========================================================= */
+    .qr-batch-sheets-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 18px;
+      padding: 10px 0;
+    }
+    .qr-print-sheet {
+      background: #FFFFFF;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+      box-sizing: border-box;
+      display: grid;
+      position: relative;
+      overflow: hidden;
+      page-break-after: always;
+      break-after: page;
+    }
+    .qr-print-sheet:last-child {
+      page-break-after: auto;
+      break-after: auto;
+    }
+    /* Ukuran Kertas A4 (210 x 297 mm) & F4 (215 x 330 mm) */
+    .qr-print-sheet.paper-a4 { width: 210mm; height: 296mm; padding: 7mm 8mm; }
+    .qr-print-sheet.paper-f4 { width: 215mm; height: 329mm; padding: 7mm 9mm; }
+
+    /* Grid Format 1: Kartu Dompet (A4 = 2x5 = 10 kartu | F4 = 2x6 = 12 kartu) */
+    .qr-print-sheet.paper-a4.format-wallet { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(5, 1fr); gap: 4mm; }
+    .qr-print-sheet.paper-f4.format-wallet { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(6, 1fr); gap: 3.5mm; }
+
+    /* Grid Format 2: Stiker Kecil Buku KIA (A4 = 3x8 = 24 stiker | F4 = 3x9 = 27 stiker) */
+    .qr-print-sheet.paper-a4.format-kia { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(8, 1fr); gap: 2.5mm; }
+    .qr-print-sheet.paper-f4.format-kia { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(9, 1fr); gap: 2.5mm; }
+
+    /* Tampilan Kartu Dompet Proper */
+    .qr-wallet-card {
+      border: 1.5px solid #002B5B;
+      outline: 1px dashed #94A3B8;
+      outline-offset: 1.5px;
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: #FFFFFF;
+      box-sizing: border-box;
+    }
+    .qr-wallet-head {
+      background: linear-gradient(135deg, #001F3F, #002B5B);
+      color: #FFFFFF;
+      padding: 3.5px 8px;
+      border-bottom: 2px solid #D4AF37;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .qr-wallet-body {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 8px;
+      flex: 1;
+    }
+    .qr-wallet-qr {
+      width: 26mm;
+      height: 26mm;
+      padding: 2px;
+      border: 1.5px solid #0F172A;
+      border-radius: 5px;
+      background: #FFFFFF;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .qr-wallet-foot {
+      background: #F8FAFC;
+      border-top: 1px dashed #CBD5E1;
+      padding: 2.5px 8px;
+      font-size: 6.2pt;
+      color: #334155;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    /* Tampilan Stiker Kecil Buku KIA */
+    .qr-kia-sticker {
+      border: 1.2px dashed #64748B;
+      border-radius: 6px;
+      padding: 3.5px 5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #FFFFFF;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+    .qr-kia-qr {
+      width: 22mm;
+      height: 22mm;
+      padding: 1.5px;
+      border: 1px solid #0F172A;
+      border-radius: 4px;
+      background: #FFFFFF;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .qr-wallet-qr img, .qr-kia-qr img {
+      width: 100% !important;
+      height: 100% !important;
+      display: block !important;
+      object-fit: contain;
+    }
+    .qr-wallet-qr canvas, .qr-kia-qr canvas {
+      display: none !important;
+    }
+
     @media print {
-      body:not(.printing-qr) * { visibility: hidden; }
-      body:not(.printing-qr) #certificatePrintArea, body:not(.printing-qr) #certificatePrintArea * { visibility: visible; }
-      body:not(.printing-qr) #certificatePrintArea { position: absolute; left: 0; top: 0; width: 297mm; margin: 0; padding: 0; }
+      body:not(.printing-qr):not(.printing-batch-qr) * { visibility: hidden; }
+      body:not(.printing-qr):not(.printing-batch-qr) #certificatePrintArea,
+      body:not(.printing-qr):not(.printing-batch-qr) #certificatePrintArea * { visibility: visible; }
+      body:not(.printing-qr):not(.printing-batch-qr) #certificatePrintArea { position: absolute; left: 0; top: 0; width: 297mm; margin: 0; padding: 0; }
       .certificate-page-a4-landscape { box-shadow: none !important; margin: 0 !important; width: 297mm !important; height: 210mm !important; page-break-after: always !important; page-break-inside: avoid !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
 
       body.printing-qr * { visibility: hidden; }
       body.printing-qr #qrCardPrintableArea, body.printing-qr #qrCardPrintableArea * { visibility: visible; }
       body.printing-qr #qrCardPrintableArea { position: fixed; left: 50%; top: 20px; transform: translateX(-50%); width: 420px; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+      body.printing-batch-qr * { visibility: hidden !important; }
+      body.printing-batch-qr #batchQrPrintModal,
+      body.printing-batch-qr #batchQrSheetsContainer,
+      body.printing-batch-qr #batchQrSheetsContainer * { visibility: visible !important; }
+      body.printing-batch-qr #batchQrPrintModal {
+        position: static !important;
+        inset: auto !important;
+        display: block !important;
+        background: #FFFFFF !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        overflow: visible !important;
+        backdrop-filter: none !important;
+      }
+      body.printing-batch-qr #batchQrModalBox {
+        box-shadow: none !important;
+        max-width: none !important;
+        max-height: none !important;
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        overflow: visible !important;
+        background: #FFFFFF !important;
+      }
+      body.printing-batch-qr .qr-batch-sheets-wrapper {
+        padding: 0 !important;
+        gap: 0 !important;
+      }
+      body.printing-batch-qr .qr-print-sheet {
+        box-shadow: none !important;
+        margin: 0 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
       .no-print { display: none !important; }
     }
 
@@ -954,9 +1111,37 @@
       </div>
 
       <div class="actions no-print" style="justify-content:center; margin-top:14px;">
-        <button type="button" class="btn btn-primary" onclick="printQrCardNow()"><i class="fas fa-print"></i> Cetak / Simpan PDF (1 Lembar)</button>
+        <button type="button" class="btn btn-primary" onclick="printQrCardNow()"><i class="fas fa-print"></i> Cetak 1 Kartu</button>
+        <button type="button" class="btn btn-success" onclick="addCurrentQrToBatchAndOpen()"><i class="fas fa-layer-group"></i> + Antrekan Cetak Massal</button>
         <button type="button" class="btn btn-info" onclick="previewPublicFeedFromCurrentQr()"><i class="fas fa-eye"></i> Simulasi Scan QR</button>
       </div>
+    </div>
+  </div>
+
+  <!-- MODAL PREVIEW & CETAK MASSAL KARTU QR DOMPET / STIKER BUKU KIA (A4 & F4) -->
+  <div id="batchQrPrintModal" class="modal-overlay" style="display:none; z-index:2600;">
+    <div id="batchQrModalBox" style="background:#E2E8F0; padding:18px; border-radius:16px; max-width:960px; width:98%; max-height:94vh; overflow-y:auto; box-shadow:0 25px 50px rgba(0,0,0,0.35);">
+      <div class="no-print" style="background:#FFFFFF; padding:14px 16px; border-radius:12px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-bottom:3px solid var(--primary);">
+        <div>
+          <h3 style="margin:0; color:var(--accent); font-size:1.05rem;">
+            <i class="fas fa-print" style="color:var(--primary);"></i> Preview Lembar Cetak QR (<span id="batchPreviewHeaderInfo">-</span>)
+          </h3>
+          <div style="font-size:0.78rem; color:var(--muted); margin-top:3px;" id="batchPreviewSubInfo">
+            Pastikan ukuran kertas pada dialog print browser sesuai pilihan (A4 atau F4/Folio) &amp; skala 100%.
+          </div>
+        </div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button type="button" class="btn btn-primary" onclick="printBatchQrSheetsNow()">
+            <i class="fas fa-print"></i> Cetak / Simpan PDF Sekarang
+          </button>
+          <button type="button" class="btn btn-ghost" onclick="closeBatchQrPrintModal()">
+            <i class="fas fa-times"></i> Tutup Preview
+          </button>
+        </div>
+      </div>
+
+      <!-- AREA LEMBAR KERTAS SIAP CETAK -->
+      <div id="batchQrSheetsContainer" class="qr-batch-sheets-wrapper"></div>
     </div>
   </div>
 
@@ -1809,6 +1994,101 @@
         <div class="actions" style="justify-content:flex-start;">
           <button type="button" class="btn btn-warning" onclick="generateAndShowCertificate()"><i class="fas fa-file-invoice"></i> Tampilkan Sertifikat A4</button>
           <button type="button" class="btn btn-info" onclick="openQrModalFromAdminSelect()"><i class="fas fa-qrcode"></i> Cetak Kartu QR Sasaran</button>
+        </div>
+      </div>
+      <!-- KARTU CETAK MASSAL / PILIHAN KARTU QR DOMPET & STIKER BUKU KIA (A4 / F4) -->
+      <div class="card" id="cardBatchQrPrinter" style="background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%); border: 1.5px solid #86EFAC;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:6px;">
+          <h2 style="margin:0; color:#065F46;"><i class="fas fa-id-badge" style="color:#059669;"></i> Cetak Massal / Pilihan Kartu QR (A4 &amp; F4)</h2>
+          <span id="batchQrCapacityBadge" style="background:#065F46; color:#FFFFFF; font-size:0.75rem; font-weight:800; padding:5px 12px; border-radius:20px;">
+            Kapasitas: 10 Kartu / Lembar A4
+          </span>
+        </div>
+        <p class="lead" style="font-size:0.82rem; color:#1E293B; margin-bottom:12px;">
+          Pilih ukuran kertas, format kartu (<strong>Kartu Dompet</strong> atau <strong>Stiker Kecil Buku KIA</strong>), lalu centang anak mana saja yang ingin dicetak (cocok untuk cetak banyak sekaligus maupun cetak ulang anak yang baru diperbarui identitasnya).
+        </p>
+
+        <!-- PENGATURAN KERTAS & FORMAT KARTU -->
+        <div class="grid" style="background:#FFFFFF; padding:12px 14px; border-radius:12px; border:1px solid #BBF7D0; margin-bottom:12px;">
+          <div class="form-group" style="margin-bottom:0;">
+            <label><i class="fas fa-file"></i> 1. Pilih Ukuran Kertas</label>
+            <select id="batch_qr_paper_size" onchange="updateBatchQrPaperInfo()">
+              <option value="A4">Kertas A4 (210 x 297 mm)</option>
+              <option value="F4">Kertas F4 / Folio (215 x 330 mm)</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label><i class="fas fa-clone"></i> 2. Pilih Format &amp; Ukuran Kartu</label>
+            <select id="batch_qr_card_format" onchange="updateBatchQrPaperInfo()">
+              <option value="wallet">Format 1: Kartu Dompet Proper (A4: 10 Kartu | F4: 12 Kartu)</option>
+              <option value="kia">Format 2: Stiker Kecil Buku KIA (A4: 24 Stiker | F4: 27 Stiker)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- FILTER DESA & PENCARIAN NAMA ANAK -->
+        <div class="grid" style="margin-bottom:10px;">
+          <div class="form-group" style="margin-bottom:0;">
+            <label><i class="fas fa-map-marker-alt"></i> Filter Desa</label>
+            <select id="batch_qr_filter_desa" onchange="renderBatchQrCandidateList()">
+              <option value="ALL">-- Semua Desa --</option>
+              <option value="Melata">Melata</option><option value="Nanuah">Nanuah</option><option value="Topalan">Topalan</option>
+              <option value="Batu Ampar">Batu Ampar</option><option value="Lubuk Hiju">Lubuk Hiju</option><option value="Bukit Makmur">Bukit Makmur</option>
+              <option value="Bukit Raya">Bukit Raya</option><option value="Modang Mas">Modang Mas</option><option value="Mukti Manunggal">Mukti Manunggal</option>
+              <option value="Sumber Jaya">Sumber Jaya</option><option value="Bukit Harum">Bukit Harum</option><option value="PT. TSA">PT. TSA</option><option value="PT. SHS">PT. SHS</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label><i class="fas fa-search"></i> Cari Nama Anak / Orang Tua</label>
+            <input type="text" id="batch_qr_search_input" oninput="renderBatchQrCandidateList()" placeholder="Ketik nama anak untuk memilih yang di-update...">
+          </div>
+        </div>
+
+        <!-- TOMBOL BANTU SELEKSI -->
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button type="button" class="btn btn-info" onclick="selectAllVisibleBatchQr()" style="padding:6px 11px; font-size:0.76rem;">
+              <i class="fas fa-check-double"></i> Centang Semua Tampil
+            </button>
+            <button type="button" class="btn btn-warning" onclick="fillOneSheetBatchQr()" style="padding:6px 11px; font-size:0.76rem;">
+              <i class="fas fa-magic"></i> Isi Pas 1 Lembar Penuh
+            </button>
+            <button type="button" class="btn btn-ghost" onclick="clearBatchQrSelection()" style="padding:6px 11px; font-size:0.76rem; background:#FFF;">
+              <i class="fas fa-eraser"></i> Kosongkan Pilihan
+            </button>
+          </div>
+          <div id="batchQrSelectionCounter" style="font-size:0.82rem; font-weight:800; color:#065F46;">
+            Terpilih: 0 anak (0 lembar)
+          </div>
+        </div>
+
+        <!-- DAFTAR CHECKLIST ANAK -->
+        <div class="table-container" style="max-height:270px; overflow-y:auto; margin-top:0; border-color:#86EFAC;">
+          <table class="kohort-table" id="tblBatchQrCandidates" style="font-size:0.78rem;">
+            <thead>
+              <tr>
+                <th style="width:45px;">Pilih</th>
+                <th>Nama Anak</th>
+                <th>Tgl Lahir</th>
+                <th>L/P</th>
+                <th>Orang Tua / Ibu</th>
+                <th>Desa</th>
+                <th>Alamat / RT</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td colspan="7" style="text-align:center; color:var(--muted);">Memuat daftar bayi &amp; anak...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- RINGKASAN CHIP ANAK TERPILIH & TOMBOL CETAK -->
+        <div id="batchQrSelectedChips" style="display:flex; flex-wrap:wrap; gap:6px; margin-top:10px;"></div>
+
+        <div class="actions" style="justify-content:flex-start; margin-top:12px;">
+          <button type="button" class="btn btn-success" onclick="openBatchQrPrintPreview()" style="font-size:0.88rem; padding:11px 18px;">
+            <i class="fas fa-print"></i> Preview &amp; Cetak Kartu QR Terpilih
+          </button>
         </div>
       </div>
 
@@ -2905,6 +3185,310 @@
       document.getElementById('qrPrintModal').style.display = 'none';
       renderPublicQrFeedModal(currentQrChildData);
     };
+  // =========================================================================
+    // CETAK MASSAL & PILIHAN KARTU QR DOMPET / STIKER BUKU KIA (A4 & F4)
+    // =========================================================================
+    const selectedBatchQrMap = new Map();
+    let dynamicPagePrintStyleEl = null;
+
+    function getChildUniqueKey(d) {
+      return d.id || `${d.desa}_${d.nama_anak}_${d.tgl_lahir}`.replace(/[\s\/]/g, '_').toLowerCase();
+    }
+
+    function getBatchQrLayoutSpec() {
+      const paper = document.getElementById('batch_qr_paper_size')?.value || 'A4';
+      const format = document.getElementById('batch_qr_card_format')?.value || 'wallet';
+      if (format === 'kia') {
+        return {
+          paper,
+          format,
+          perSheet: paper === 'F4' ? 27 : 24,
+          labelFormat: 'Stiker Kecil Buku KIA',
+          pageSizeCss: paper === 'F4' ? '215mm 330mm' : '210mm 297mm'
+        };
+      }
+      return {
+        paper,
+        format,
+        perSheet: paper === 'F4' ? 12 : 10,
+        labelFormat: 'Kartu Dompet Proper',
+        pageSizeCss: paper === 'F4' ? '215mm 330mm' : '210mm 297mm'
+      };
+    }
+
+    function getEligibleBatchQrChildren() {
+      const uniqueMap = new Map();
+      cachedGlobalKohortData.forEach(d => {
+        if (d.peran === 'Catin' || d.peran === 'Bumil') return;
+        if (typeof isWilayahDiizinkan === 'function' && !isWilayahDiizinkan(d.desa)) return;
+        const key = getChildUniqueKey(d);
+        uniqueMap.set(key, d);
+      });
+      return Array.from(uniqueMap.values()).sort((a, b) => {
+        const dComp = String(a.desa || '').localeCompare(String(b.desa || ''));
+        if (dComp !== 0) return dComp;
+        return String(a.nama_anak || '').localeCompare(String(b.nama_anak || ''));
+      });
+    }
+
+    window.updateBatchQrPaperInfo = function() {
+      const spec = getBatchQrLayoutSpec();
+      const totalSelected = selectedBatchQrMap.size;
+      const totalSheets = totalSelected > 0 ? Math.ceil(totalSelected / spec.perSheet) : 0;
+      const unitLabel = spec.format === 'kia' ? 'Stiker' : 'Kartu';
+
+      const badge = document.getElementById('batchQrCapacityBadge');
+      if (badge) {
+        badge.textContent = `Kapasitas: ${spec.perSheet} ${unitLabel} / Lembar ${spec.paper}`;
+      }
+
+      const counterEl = document.getElementById('batchQrSelectionCounter');
+      if (counterEl) {
+        const sisaSlot = totalSelected > 0 ? (totalSheets * spec.perSheet) - totalSelected : spec.perSheet;
+        counterEl.textContent = `Terpilih: ${totalSelected} anak (${totalSheets} lembar ${spec.paper}${totalSelected > 0 ? `, sisa ${sisaSlot} slot kosong` : ''})`;
+      }
+
+      const chipsContainer = document.getElementById('batchQrSelectedChips');
+      if (chipsContainer) {
+        if (totalSelected === 0) {
+          chipsContainer.innerHTML = '';
+        } else {
+          chipsContainer.innerHTML = Array.from(selectedBatchQrMap.entries()).map(([key, item]) => `
+            <span style="display:inline-flex; align-items:center; gap:6px; background:#FFFFFF; border:1px solid #10B981; color:#065F46; padding:4px 9px; border-radius:20px; font-size:0.74rem; font-weight:700;">
+              <i class="fas fa-qrcode" style="color:#059669;"></i> ${item.nama_anak} (${item.desa || '-'})
+              <button type="button" onclick="removeBatchQrChild('${key}')" style="border:0; background:transparent; color:#DC2626; font-weight:900; cursor:pointer; padding:0 2px;" title="Hapus dari daftar cetak">&times;</button>
+            </span>
+          `).join('');
+        }
+      }
+    };
+
+    window.renderBatchQrCandidateList = async function() {
+      const tbody = document.querySelector('#tblBatchQrCandidates tbody');
+      if (!tbody) return;
+
+      if (cachedGlobalKohortData.length === 0) {
+        await refreshCacheGlobalData();
+      }
+
+      const desaFilter = (document.getElementById('batch_qr_filter_desa')?.value || 'ALL').trim().toLowerCase();
+      const searchQ = (document.getElementById('batch_qr_search_input')?.value || '').trim().toLowerCase();
+      const allChildren = getEligibleBatchQrChildren();
+
+      const filtered = allChildren.filter(d => {
+        const matchDesa = desaFilter === 'all' || (d.desa && d.desa.toLowerCase() === desaFilter);
+        const matchText = !searchQ || `${d.nama_anak || ''} ${d.nama_ibu || ''} ${d.alamat_rt || ''}`.toLowerCase().includes(searchQ);
+        return matchDesa && matchText;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:var(--muted);">Tidak ada data bayi/anak yang cocok dengan filter.</td></tr>';
+        updateBatchQrPaperInfo();
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(d => {
+        const key = getChildUniqueKey(d);
+        const isChecked = selectedBatchQrMap.has(key);
+        const encoded = encodeURIComponent(JSON.stringify(d));
+        return `
+          <tr style="${isChecked ? 'background:#ECFDF5;' : ''}">
+            <td>
+              <input type="checkbox" class="chk-batch-qr-item" data-key="${key}" data-json="${encoded}" ${isChecked ? 'checked' : ''} onchange="toggleSelectBatchChild(this)" style="width:17px; height:17px; accent-color:#059669; cursor:pointer;">
+            </td>
+            <td style="text-align:left; font-weight:800; color:var(--accent);">${d.nama_anak || '-'}</td>
+            <td>${d.tgl_lahir || '-'}</td>
+            <td>${d.jk || '-'}</td>
+            <td style="text-align:left;">${d.nama_ibu || '-'}</td>
+            <td>${d.desa || '-'}</td>
+            <td style="text-align:left;">${d.alamat_rt || '-'}</td>
+          </tr>
+        `;
+      }).join('');
+
+      updateBatchQrPaperInfo();
+    };
+
+    window.toggleSelectBatchChild = function(checkboxEl) {
+      const key = checkboxEl.getAttribute('data-key');
+      const data = JSON.parse(decodeURIComponent(checkboxEl.getAttribute('data-json')));
+      if (checkboxEl.checked) {
+        selectedBatchQrMap.set(key, data);
+        checkboxEl.closest('tr').style.background = '#ECFDF5';
+      } else {
+        selectedBatchQrMap.delete(key);
+        checkboxEl.closest('tr').style.background = '';
+      }
+      updateBatchQrPaperInfo();
+    };
+
+    window.removeBatchQrChild = function(key) {
+      selectedBatchQrMap.delete(key);
+      renderBatchQrCandidateList();
+    };
+
+    window.selectAllVisibleBatchQr = function() {
+      document.querySelectorAll('.chk-batch-qr-item').forEach(cb => {
+        if (!cb.checked) {
+          cb.checked = true;
+          const key = cb.getAttribute('data-key');
+          const data = JSON.parse(decodeURIComponent(cb.getAttribute('data-json')));
+          selectedBatchQrMap.set(key, data);
+          cb.closest('tr').style.background = '#ECFDF5';
+        }
+      });
+      updateBatchQrPaperInfo();
+    };
+
+    window.fillOneSheetBatchQr = function() {
+      const spec = getBatchQrLayoutSpec();
+      const checkboxes = Array.from(document.querySelectorAll('.chk-batch-qr-item'));
+      for (const cb of checkboxes) {
+        if (selectedBatchQrMap.size >= spec.perSheet) break;
+        if (!cb.checked) {
+          cb.checked = true;
+          const key = cb.getAttribute('data-key');
+          const data = JSON.parse(decodeURIComponent(cb.getAttribute('data-json')));
+          selectedBatchQrMap.set(key, data);
+          cb.closest('tr').style.background = '#ECFDF5';
+        }
+      }
+      updateBatchQrPaperInfo();
+    };
+
+    window.clearBatchQrSelection = function() {
+      selectedBatchQrMap.clear();
+      renderBatchQrCandidateList();
+    };
+
+    window.addCurrentQrToBatchAndOpen = function() {
+      if (!currentQrChildData) return;
+      const key = getChildUniqueKey(currentQrChildData);
+      selectedBatchQrMap.set(key, currentQrChildData);
+      closeQrPrintModal();
+
+      const adminTabBtn = document.querySelector('.tab[data-tab="admin"]');
+      if (adminTabBtn) adminTabBtn.click();
+      setTimeout(() => {
+        renderBatchQrCandidateList();
+        smoothScrollToId('cardBatchQrPrinter');
+      }, 120);
+    };
+
+    window.openBatchQrPrintPreview = function() {
+      if (selectedBatchQrMap.size === 0) {
+        return alert("⚠️ Centang minimal 1 anak terlebih dahulu pada tabel di atas!");
+      }
+
+      const spec = getBatchQrLayoutSpec();
+      const selectedList = Array.from(selectedBatchQrMap.values());
+      const container = document.getElementById('batchQrSheetsContainer');
+      container.innerHTML = '';
+
+      const baseUrl = getPublicQrBaseUrl();
+      const separator = baseUrl.includes('?') ? '&' : '?';
+      const totalSheets = Math.ceil(selectedList.length / spec.perSheet);
+
+      document.getElementById('batchPreviewHeaderInfo').textContent =
+        `${selectedList.length} Anak • ${spec.labelFormat} • Kertas ${spec.paper} (${totalSheets} Lembar)`;
+
+      for (let sheetIdx = 0; sheetIdx < totalSheets; sheetIdx++) {
+        const sliceItems = selectedList.slice(sheetIdx * spec.perSheet, (sheetIdx + 1) * spec.perSheet);
+        const sheetEl = document.createElement('div');
+        sheetEl.className = `qr-print-sheet paper-${spec.paper.toLowerCase()} format-${spec.format}`;
+
+        sliceItems.forEach((data, itemIdx) => {
+          const childDocId = getChildUniqueKey(data);
+          const qrUrl = `${baseUrl}${separator}id=${encodeURIComponent(childDocId)}#id=${encodeURIComponent(childDocId)}&n=${encodeURIComponent(data.nama_anak || '')}&t=${encodeURIComponent(data.tgl_lahir || '')}&g=${encodeURIComponent(data.jk || 'L')}&o=${encodeURIComponent(data.nama_ibu || '')}&d=${encodeURIComponent(data.desa || '')}`;
+          const qrDomId = `batch_qr_code_${sheetIdx}_${itemIdx}`;
+
+          const cardEl = document.createElement('div');
+          if (spec.format === 'kia') {
+            cardEl.className = 'qr-kia-sticker';
+            cardEl.innerHTML = `
+              <div class="qr-kia-qr" id="${qrDomId}"></div>
+              <div style="flex:1; min-width:0; line-height:1.25; color:#0F172A;">
+                <div style="font-size:5.8pt; font-weight:800; color:#002B5B; letter-spacing:0.3px;">BUKU KIA • PKM MELATA</div>
+                <div style="font-size:7.6pt; font-weight:900; color:#000; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:1px 0;">${(data.nama_anak || '-').toUpperCase()}</div>
+                <div style="font-size:6.4pt; color:#334155;">TTL: <strong>${data.tgl_lahir || '-'}</strong> (${data.jk || '-'})</div>
+                <div style="font-size:6.3pt; color:#334155; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Ibu: <strong>${data.nama_ibu || '-'}</strong></div>
+                <div style="font-size:6.2pt; color:#065F46; font-weight:700;">Ds. ${data.desa || '-'}</div>
+              </div>
+            `;
+          } else {
+            cardEl.className = 'qr-wallet-card';
+            cardEl.innerHTML = `
+              <div class="qr-wallet-head">
+                <div>
+                  <div style="font-size:5.6pt; letter-spacing:0.6px; opacity:0.9; font-weight:700;">PUSKESMAS MELATA</div>
+                  <div style="font-size:7.4pt; font-weight:800;">KARTU IMUNISASI DIGITAL</div>
+                </div>
+                <i class="fas fa-shield-virus" style="font-size:10pt; color:#D4AF37;"></i>
+              </div>
+              <div class="qr-wallet-body">
+                <div class="qr-wallet-qr" id="${qrDomId}"></div>
+                <div style="flex:1; min-width:0; font-size:6.9pt; line-height:1.35; color:#1E293B;">
+                  <div style="font-weight:900; font-size:8.2pt; color:#002B5B; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${(data.nama_anak || '-').toUpperCase()}</div>
+                  <div>Lahir: <strong>${data.tgl_lahir || '-'}</strong> (${data.jk || '-'})</div>
+                  <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Ortu: <strong>${data.nama_ibu || '-'}</strong></div>
+                  <div style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Ds. <strong>${data.desa || '-'}</strong>${data.alamat_rt ? ' (' + data.alamat_rt + ')' : ''}</div>
+                </div>
+              </div>
+              <div class="qr-wallet-foot">
+                Scan QR dengan kamera HP untuk jadwal vaksin &amp; status imunisasi
+              </div>
+            `;
+          }
+
+          sheetEl.appendChild(cardEl);
+
+          setTimeout(() => {
+            const qrTarget = document.getElementById(qrDomId);
+            if (qrTarget) {
+              new QRCode(qrTarget, {
+                text: qrUrl,
+                width: 160,
+                height: 160,
+                colorDark: "#000000",
+                colorLight: "#FFFFFF",
+                correctLevel: QRCode.CorrectLevel.M
+              });
+            }
+          }, 20);
+        });
+
+        container.appendChild(sheetEl);
+      }
+
+      document.getElementById('batchQrPrintModal').style.display = 'flex';
+    };
+
+    window.printBatchQrSheetsNow = function() {
+      const spec = getBatchQrLayoutSpec();
+      if (!dynamicPagePrintStyleEl) {
+        dynamicPagePrintStyleEl = document.createElement('style');
+        dynamicPagePrintStyleEl.id = 'dynamic-batch-qr-page-style';
+        document.head.appendChild(dynamicPagePrintStyleEl);
+      }
+      dynamicPagePrintStyleEl.textContent = `@page { size: ${spec.pageSizeCss}; margin: 0; }`;
+
+      document.body.classList.remove('printing-qr');
+      document.body.classList.add('printing-batch-qr');
+      window.print();
+      setTimeout(() => {
+        document.body.classList.remove('printing-batch-qr');
+        if (dynamicPagePrintStyleEl) dynamicPagePrintStyleEl.textContent = '';
+      }, 600);
+    };
+
+    window.closeBatchQrPrintModal = function() {
+      document.getElementById('batchQrPrintModal').style.display = 'none';
+    };
+
+    // Muat otomatis daftar anak saat membuka Tab Admin & Kontrol
+    document.querySelector('.tab[data-tab="admin"]')?.addEventListener('click', () => {
+      renderBatchQrCandidateList();
+    });
 
     // =========================================================================
     // PREVIEW & CETAK SERTIFIKAT A4 LANDSCAPE

@@ -2926,34 +2926,86 @@
       if (btnBackQr) btnBackQr.style.display = 'none';
     };
 
+    function buildCompactChildQrUrl(data) {
+      const childDocId = data.id || `${data.desa}_${data.nama_anak}_${data.tgl_lahir}`.replace(/[\s\/]/g, '_').toLowerCase();
+      const baseUrl = getPublicQrBaseUrl();
+      const separator = baseUrl.includes('?') ? '&' : '?';
+      return `${baseUrl}${separator}id=${encodeURIComponent(childDocId)}`;
+    }
+
+    function findChildOfflineOrMemory(queryOrId) {
+      if (!queryOrId) return null;
+      const needle = String(queryOrId).trim().toLowerCase();
+      const pool = [];
+      if (Array.isArray(cachedGlobalKohortData) && cachedGlobalKohortData.length > 0) {
+        pool.push(...cachedGlobalKohortData);
+      }
+      try {
+        const savedAll = JSON.parse(localStorage.getItem('pkm_cached_all_kohort') || '[]');
+        if (Array.isArray(savedAll)) pool.push(...savedAll);
+      } catch (e) {}
+      try {
+        const offlineQ = JSON.parse(localStorage.getItem('pkm_offline_queue') || '[]');
+        if (Array.isArray(offlineQ)) pool.push(...offlineQ);
+      } catch (e) {}
+
+      return pool.find(item => {
+        if (!item) return false;
+        const genId = `${item.desa || ''}_${item.nama_anak || ''}_${item.tgl_lahir || ''}`.replace(/[\s\/]/g, '_').toLowerCase();
+        const itemId = String(item.id || '').toLowerCase();
+        return itemId === needle || genId === needle || itemId.endsWith(needle) || genId.endsWith(needle);
+      }) || null;
+    }
+
+    function parseChildFallbackFromId(childIdParam) {
+      if (!childIdParam) return null;
+      const clean = decodeURIComponent(String(childIdParam)).trim();
+      const dateMatch = clean.match(/(\d{4}-\d{2}-\d{2})$/);
+      const tglLahir = dateMatch ? dateMatch[1] : '';
+      let withoutDate = dateMatch ? clean.slice(0, dateMatch.index).replace(/_+$/, '') : clean;
+
+      let matchedDesa = '';
+      for (const d of ALL_DESA_LIST) {
+        const desaSlug = d.replace(/[\s\/.]/g, '_').toLowerCase();
+        if (withoutDate.toLowerCase().startsWith(desaSlug + '_')) {
+          matchedDesa = d;
+          withoutDate = withoutDate.slice(desaSlug.length + 1);
+          break;
+        }
+      }
+
+      const namaAnak = withoutDate
+        .split('_')
+        .filter(Boolean)
+        .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(' ');
+
+      if (!namaAnak) return null;
+      return {
+        id: clean,
+        nama_anak: namaAnak,
+        tgl_lahir: tglLahir,
+        jk: 'L',
+        nama_ibu: '-',
+        desa: matchedDesa || '-'
+      };
+    }
+
     async function checkIncomingQrUrlAndOpenFeed() {
       const urlParams = new URLSearchParams(window.location.search);
       const hashStr = window.location.hash || '';
       const hashParams = new URLSearchParams(hashStr.startsWith('#') ? hashStr.substring(1) : hashStr);
 
-let childIdParam = qParams.get('id') || hParams.get('id');
-const scannedShortCode = qParams.get('q') || hParams.get('q');
-if (!childIdParam && scannedShortCode) {
-  const matchedShort = findChildOfflineOrMemory(scannedShortCode);
-  if (matchedShort && matchedShort.id) childIdParam = matchedShort.id;
-}
-      if (typeof openChildFeedModal === 'function') openChildFeedModal(matched);
-      else if (typeof showPublicChildCard === 'function') showPublicChildCard(matched);
-      return;
-    }
-    if (attempt < 8) {
-      setTimeout(() => tryOpenShortId(attempt + 1), 350);
-    } else {
-      alert(`Data QR "${shortIdParam.toUpperCase()}" belum tersimpan di perangkat ini. Nyalakan internet 1x untuk menyinkronkan data.`);
-    }
-  };
-  tryOpenShortId();
-  return;
-}
+      let childIdParam = urlParams.get('id') || hashParams.get('id') || '';
+      const scannedShortCode = urlParams.get('q') || hashParams.get('q') || '';
+      if (!childIdParam && scannedShortCode) {
+        const matchedShort = findChildOfflineOrMemory(scannedShortCode);
+        childIdParam = (matchedShort && matchedShort.id) ? matchedShort.id : scannedShortCode;
+      }
+
       const compactParam = hashParams.get('kia') || hashParams.get('p') || urlParams.get('p');
       const legacyQrParam = urlParams.get('qr') || hashParams.get('qr');
 
-      // Ambil identitas dasar ringkas dari hash jika ada (agar tetap instan meski jaringan lambat)
       const hashNama = hashParams.get('n') || urlParams.get('n');
       const hashTgl = hashParams.get('t') || urlParams.get('t');
       const hashJk = hashParams.get('g') || urlParams.get('g') || 'L';
@@ -2972,7 +3024,7 @@ if (!childIdParam && scannedShortCode) {
         try {
           const decoded = decodeLegacyQrPayload(legacyQrParam);
           childObj = {
-            id: decoded.i || '',
+            id: decoded.i || childIdParam,
             nama_anak: decoded.n || '-',
             tgl_lahir: decoded.t || '',
             jk: decoded.g || 'L',
@@ -2980,18 +3032,18 @@ if (!childIdParam && scannedShortCode) {
             desa: decoded.d || '-'
           };
         } catch (e) { console.warn("Legacy QR decode skip:", e); }
-} else if (hashNama) {
-  childObj = {
-    id: childIdParam || '',
-    nama_anak: hashNama,
-    tgl_lahir: hashTgl || '',
-    jk: hashJk,
-    nama_ibu: hashIbu || '-',
-    desa: hashDesa || '-'
-  };
-} else if (childIdParam) {
-  childObj = findChildOfflineOrMemory(childIdParam) || parseChildFallbackFromId(childIdParam);
-}
+      } else if (hashNama) {
+        childObj = {
+          id: childIdParam || '',
+          nama_anak: hashNama,
+          tgl_lahir: hashTgl || '',
+          jk: hashJk,
+          nama_ibu: hashIbu || '-',
+          desa: hashDesa || '-'
+        };
+      } else if (childIdParam) {
+        childObj = findChildOfflineOrMemory(childIdParam) || parseChildFallbackFromId(childIdParam);
+      }
 
       if (childObj) {
         currentQrChildData = childObj;
@@ -3062,18 +3114,13 @@ if (!childIdParam && scannedShortCode) {
       try {
         const data = typeof encodedJson === 'string' ? JSON.parse(decodeURIComponent(encodedJson)) : encodedJson;
         currentQrChildData = data;
-
+        
         document.getElementById('qr_card_nama').textContent = (data.nama_anak || '-').toUpperCase();
         document.getElementById('qr_card_ttl').textContent = data.tgl_lahir || '-';
         document.getElementById('qr_card_ortu').textContent = data.nama_ibu || '-';
         document.getElementById('qr_card_desa').textContent = `Desa ${data.desa || '-'}${data.alamat_rt ? ' (' + data.alamat_rt + ')' : ''}`;
 
-        const childDocId = data.id || `${data.desa}_${data.nama_anak}_${data.tgl_lahir}`.replace(/[\s\/]/g, '_').toLowerCase();
-        const baseUrl = getPublicQrBaseUrl();
-        const separator = baseUrl.includes('?') ? '&' : '?';
-        // Tautan ringkas membawa ID + identitas dasar agar ringan dicetak & langsung siap untuk input cepat
-        const qrUrl = `${baseUrl}${separator}id=${encodeURIComponent(childDocId)}#id=${encodeURIComponent(childDocId)}&n=${encodeURIComponent(data.nama_anak || '')}&t=${encodeURIComponent(data.tgl_lahir || '')}&g=${encodeURIComponent(data.jk || 'L')}&o=${encodeURIComponent(data.nama_ibu || '')}&d=${encodeURIComponent(data.desa || '')}`;
-
+        const qrUrl = buildCompactChildQrUrl(data);
         const clickableLinkEl = document.getElementById('qr_url_clickable_link');
         if (clickableLinkEl) {
           clickableLinkEl.href = qrUrl;
@@ -4500,6 +4547,12 @@ window.goToEdit = function(encodedJson) {
           const snap = await getDocs(collection(db, COL_KOHORT));
           cachedGlobalKohortData = [];
           snap.forEach(d => cachedGlobalKohortData.push({ id: d.id, ...d.data() }));
+          try {
+            localStorage.setItem('pkm_cached_all_kohort', JSON.stringify(cachedGlobalKohortData));
+          } catch (storageErr) {}
+        } else if (cachedGlobalKohortData.length === 0) {
+          const savedAll = JSON.parse(localStorage.getItem('pkm_cached_all_kohort') || '[]');
+          if (Array.isArray(savedAll)) cachedGlobalKohortData = savedAll;
         }
       } catch (e) { console.error("Error Caching Data:", e); }
       updateInputAchievementCards();

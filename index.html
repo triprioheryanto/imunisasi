@@ -1,3 +1,222 @@
+    // =========================================================================
+    // TAB 5: PERHITUNGAN CAPAIAN, IDL (<12 BLN), & IBL (<24 BLN) STANDAR KEMENKES
+    // =========================================================================
+    async function loadCapanTabContent() {
+      const thn = document.getElementById('cap_filter_tahun').value;
+      const bln = document.getElementById('cap_filter_bulan').value;
+      const cBayi = document.getElementById('containerCapaianBayiBaduta');
+      const cIDL = document.getElementById('containerTabelIDL');
+      const cIBL = document.getElementById('containerTabelIBL');
+      const cBIAS = document.getElementById('containerCapaianBIAS');
+
+      [cBayi, cIDL, cIBL, cBIAS].forEach(c => {
+        if (c) c.innerHTML = '<p class="muted" style="text-align:center; padding:15px;"><i class="fas fa-spinner fa-spin"></i> Menghitung data capaian sesuai standar Kemenkes...</p>';
+      });
+
+      try {
+        const snapTarget = await getDocs(collection(db, COL_TARGET));
+        const targetMap = new Map();
+        snapTarget.forEach(d => {
+          const t = d.data();
+          if (t.tahun === thn && t.desa) targetMap.set(t.desa.toLowerCase(), t);
+        });
+
+        const snapKohort = await getDocs(collection(db, COL_KOHORT));
+        const kohortDocs = [];
+        snapKohort.forEach(d => kohortDocs.push(d.data()));
+
+        const exactCounts = {};
+        const kumulatifCounts = {};
+        VAKSIN_ANAK_KEYS.forEach(v => {
+          exactCounts[v] = { L: 0, P: 0, Total: 0 };
+          kumulatifCounts[v] = { L: 0, P: 0, Total: 0 };
+        });
+
+        kohortDocs.forEach(d => {
+          const jk = d.jk === 'L' ? 'L' : 'P';
+          VAKSIN_ANAK_KEYS.forEach(vKey => {
+            const fieldKey = `vaksin_${vKey.replace(/[\s\(\)<>-]/g, '_')}`;
+            const vDate = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
+            if (isVaccineGivenExactMonth(vDate, thn, bln)) {
+              exactCounts[vKey][jk]++;
+              exactCounts[vKey].Total++;
+            }
+            if (isVaccineGivenUpToMonth(vDate, thn, bln)) {
+              kumulatifCounts[vKey][jk]++;
+              kumulatifCounts[vKey].Total++;
+            }
+          });
+        });
+
+        const monthLabel = bln === 'ALL' ? 'Semua Bulan' : `Bulan ${BULAN_NAME_MAP[bln] || bln}`;
+        let htmlBayi = `<table class="kohort-table"><thead><tr><th rowspan="2">Kategori</th><th rowspan="2">Nama Antigen</th><th colspan="3">Dosis ${bln === 'ALL' ? 'Semua Bulan' : BULAN_NAME_MAP[bln] || bln}</th><th colspan="3">Kumulatif s/d ${bln === 'ALL' ? 'Semua Bulan' : BULAN_NAME_MAP[bln] || bln}</th></tr><tr><th>L</th><th>P</th><th>Total</th><th>L</th><th>P</th><th>Total</th></tr></thead><tbody>`;
+        VAKSIN_ANAK_KEYS.forEach((vKey, idx) => {
+          const kat = idx <= 18 ? "Imunisasi Bayi" : "Booster Baduta (PCV3, DPT4 & MR2)";
+          const ex = exactCounts[vKey];
+          const kum = kumulatifCounts[vKey];
+          htmlBayi += `<tr><td style="text-align:left;">${kat}</td><td style="font-weight:700; text-align:left;">${vKey}</td><td>${ex.L}</td><td>${ex.P}</td><td style="font-weight:800; color:var(--primary);">${ex.Total}</td><td>${kum.L}</td><td>${kum.P}</td><td style="font-weight:800; color:var(--accent);">${kum.Total}</td></tr>`;
+        });
+        htmlBayi += `</tbody></table>`;
+        cBayi.innerHTML = htmlBayi;
+
+        // Rekap IDL (< 12 bulan) & IBL (< 24 bulan) per Desa sesuai standar Kemenkes
+        const idlDesaMap = {};
+        const iblDesaMap = {};
+        ALL_DESA_LIST.forEach(d => {
+          idlDesaMap[d.toLowerCase()] = { desa: d, countIDL_L: 0, countIDL_P: 0, countCatchUp: 0 };
+          iblDesaMap[d.toLowerCase()] = { desa: d, countIBL_L: 0, countIBL_P: 0 };
+        });
+
+        kohortDocs.forEach(d => {
+          const evalRes = evaluateKemenkesIdlIbl(d, (vDate) => isVaccineGivenUpToMonth(vDate, thn, bln));
+          const desaKey = (d.desa || '').toLowerCase();
+          const jk = d.jk === 'L' ? 'L' : 'P';
+
+          if (idlDesaMap[desaKey]) {
+            if (evalRes.isIdlValid) {
+              if (jk === 'L') idlDesaMap[desaKey].countIDL_L++;
+              else idlDesaMap[desaKey].countIDL_P++;
+            } else if (evalRes.isCatchUpIdl) {
+              idlDesaMap[desaKey].countCatchUp++;
+            }
+          }
+
+          if (iblDesaMap[desaKey] && evalRes.isIblValid) {
+            if (jk === 'L') iblDesaMap[desaKey].countIBL_L++;
+            else iblDesaMap[desaKey].countIBL_P++;
+          }
+        });
+
+        // RENDER TABEL 2: IDL (< 12 BULAN) + INFORMASI KEJAR (>= 12 BULAN)
+        let totalDalamIDL_L = 0, totalDalamIDL_P = 0, totalDalamTarget = 0, totalDalamCatchUp = 0;
+        let totalLuarIDL_L = 0, totalLuarIDL_P = 0, totalLuarTarget = 0, totalLuarCatchUp = 0;
+        let htmlIDL = `<table class="kohort-table"><thead><tr><th rowspan="2">Kategori</th><th rowspan="2">Desa</th><th rowspan="2">Target Bayi</th><th colspan="3">Bayi IDL Valid (&lt;12 Bln s/d ${monthLabel})</th><th rowspan="2">Capaian IDL (%)</th><th rowspan="2" title="Anak usia &ge;12 bulan yang melengkapi imunisasi dasar (Imunisasi Kejar)">Kejar (&ge;12 Bln)</th></tr><tr><th>L</th><th>P</th><th>Total</th></tr></thead><tbody><tr style="background:#E0F2FE; font-weight:700;"><td colspan="8" style="text-align:left; color:var(--accent);">A. DALAM WILAYAH</td></tr>`;
+
+        DESA_DALAM_WILAYAH.forEach(dName => {
+          const item = idlDesaMap[dName.toLowerCase()];
+          const targetObj = targetMap.get(dName.toLowerCase());
+          const targetBayi = targetObj ? (targetObj.target_bayi || 0) : 0;
+          const countIDL_L = item ? item.countIDL_L : 0;
+          const countIDL_P = item ? item.countIDL_P : 0;
+          const countCatchUp = item ? item.countCatchUp : 0;
+          const countIDL_Total = countIDL_L + countIDL_P;
+          const persen = targetBayi > 0 ? ((countIDL_Total / targetBayi) * 100).toFixed(1) : "0.0";
+          totalDalamIDL_L += countIDL_L;
+          totalDalamIDL_P += countIDL_P;
+          totalDalamTarget += targetBayi;
+          totalDalamCatchUp += countCatchUp;
+          htmlIDL += `<tr><td>Dalam Wilayah</td><td style="text-align:left; font-weight:700;">Desa ${dName}</td><td>${targetBayi}</td><td>${countIDL_L}</td><td>${countIDL_P}</td><td style="font-weight:800; color:var(--success);">${countIDL_Total}</td><td style="font-weight:800; color:var(--accent);">${persen}%</td><td style="color:#B45309; font-weight:600;">${countCatchUp}</td></tr>`;
+        });
+
+        const sumDalamIDL = totalDalamIDL_L + totalDalamIDL_P;
+        const persenDalam = totalDalamTarget > 0 ? ((sumDalamIDL / totalDalamTarget) * 100).toFixed(1) : "0.0";
+        htmlIDL += `<tr style="background:#F1F5F9; font-weight:bold;"><td colspan="2" style="text-align:left; color:var(--accent);">SUBTOTAL DALAM WILAYAH:</td><td>${totalDalamTarget}</td><td>${totalDalamIDL_L}</td><td>${totalDalamIDL_P}</td><td style="color:var(--success); font-size:0.9rem;">${sumDalamIDL}</td><td style="color:var(--primary); font-size:0.9rem;">${persenDalam}%</td><td style="color:#B45309;">${totalDalamCatchUp}</td></tr><tr style="background:#FEF3C7; font-weight:700;"><td colspan="8" style="text-align:left; color:#92400E;">B. LUAR WILAYAH</td></tr>`;
+
+        DESA_LUAR_WILAYAH.forEach(dName => {
+          const item = idlDesaMap[dName.toLowerCase()];
+          const targetObj = targetMap.get(dName.toLowerCase());
+          const targetBayi = targetObj ? (targetObj.target_bayi || 0) : 0;
+          const countIDL_L = item ? item.countIDL_L : 0;
+          const countIDL_P = item ? item.countIDL_P : 0;
+          const countCatchUp = item ? item.countCatchUp : 0;
+          const countIDL_Total = countIDL_L + countIDL_P;
+          const persen = targetBayi > 0 ? ((countIDL_Total / targetBayi) * 100).toFixed(1) : "0.0";
+          totalLuarIDL_L += countIDL_L;
+          totalLuarIDL_P += countIDL_P;
+          totalLuarTarget += targetBayi;
+          totalLuarCatchUp += countCatchUp;
+          htmlIDL += `<tr><td>Luar Wilayah</td><td style="text-align:left; font-weight:700;">${dName}</td><td>${targetBayi}</td><td>${countIDL_L}</td><td>${countIDL_P}</td><td style="font-weight:800; color:var(--success);">${countIDL_Total}</td><td style="font-weight:800; color:var(--accent);">${persen}%</td><td style="color:#B45309; font-weight:600;">${countCatchUp}</td></tr>`;
+        });
+
+        const sumLuarIDL = totalLuarIDL_L + totalLuarIDL_P;
+        const persenLuar = totalLuarTarget > 0 ? ((sumLuarIDL / totalLuarTarget) * 100).toFixed(1) : "0.0";
+        const grandTotalIDL = sumDalamIDL + sumLuarIDL;
+        const grandTotalTarget = totalDalamTarget + totalLuarTarget;
+        const grandTotalCatchUp = totalDalamCatchUp + totalLuarCatchUp;
+        const grandPersen = grandTotalTarget > 0 ? ((grandTotalIDL / grandTotalTarget) * 100).toFixed(1) : "0.0";
+
+        htmlIDL += `<tr style="background:#F1F5F9; font-weight:bold;"><td colspan="2" style="text-align:left; color:#92400E;">SUBTOTAL LUAR WILAYAH:</td><td>${totalLuarTarget}</td><td>${totalLuarIDL_L}</td><td>${totalLuarIDL_P}</td><td style="color:var(--success); font-size:0.9rem;">${sumLuarIDL}</td><td style="color:var(--primary); font-size:0.9rem;">${persenLuar}%</td><td style="color:#B45309;">${totalLuarCatchUp}</td></tr></tbody><tfoot><tr style="background:#E2E8F0; font-weight:bold;"><td colspan="2" style="text-align:left; color:var(--accent);">TOTAL KESELURUHAN:</td><td>${grandTotalTarget}</td><td>${totalDalamIDL_L + totalLuarIDL_L}</td><td>${totalDalamIDL_P + totalLuarIDL_P}</td><td style="font-weight:800; color:var(--success); font-size:0.95rem;">${grandTotalIDL}</td><td style="font-weight:800; color:var(--primary); font-size:0.95rem;">${grandPersen}%</td><td style="color:#B45309;">${grandTotalCatchUp}</td></tr></tfoot></table>`;
+        cIDL.innerHTML = htmlIDL;
+
+        // RENDER TABEL 3: IBL (IMUNISASI BADUTA LENGKAP < 24 BULAN)
+        if (cIBL) {
+          let totalDalamIBL_L = 0, totalDalamIBL_P = 0, totalDalamTargetBaduta = 0;
+          let totalLuarIBL_L = 0, totalLuarIBL_P = 0, totalLuarTargetBaduta = 0;
+          let htmlIBL = `<table class="kohort-table"><thead><tr><th rowspan="2">Kategori</th><th rowspan="2">Desa</th><th rowspan="2">Target Baduta</th><th colspan="3">Baduta IBL Valid (s/d ${monthLabel})</th><th rowspan="2">Capaian IBL (%)</th></tr><tr><th>L</th><th>P</th><th>Total</th></tr></thead><tbody><tr style="background:#CCFBF1; font-weight:700;"><td colspan="7" style="text-align:left; color:#0F766E;">A. DALAM WILAYAH</td></tr>`;
+
+          DESA_DALAM_WILAYAH.forEach(dName => {
+            const item = iblDesaMap[dName.toLowerCase()];
+            const targetObj = targetMap.get(dName.toLowerCase());
+            const targetBaduta = targetObj ? (targetObj.target_baduta || 0) : 0;
+            const countIBL_L = item ? item.countIBL_L : 0;
+            const countIBL_P = item ? item.countIBL_P : 0;
+            const countIBL_Total = countIBL_L + countIBL_P;
+            const persen = targetBaduta > 0 ? ((countIBL_Total / targetBaduta) * 100).toFixed(1) : "0.0";
+            totalDalamIBL_L += countIBL_L;
+            totalDalamIBL_P += countIBL_P;
+            totalDalamTargetBaduta += targetBaduta;
+            htmlIBL += `<tr><td>Dalam Wilayah</td><td style="text-align:left; font-weight:700;">Desa ${dName}</td><td>${targetBaduta}</td><td>${countIBL_L}</td><td>${countIBL_P}</td><td style="font-weight:800; color:#0D9488;">${countIBL_Total}</td><td style="font-weight:800; color:var(--accent);">${persen}%</td></tr>`;
+          });
+
+          const sumDalamIBL = totalDalamIBL_L + totalDalamIBL_P;
+          const persenDalamIBL = totalDalamTargetBaduta > 0 ? ((sumDalamIBL / totalDalamTargetBaduta) * 100).toFixed(1) : "0.0";
+          htmlIBL += `<tr style="background:#F1F5F9; font-weight:bold;"><td colspan="2" style="text-align:left; color:#0F766E;">SUBTOTAL DALAM WILAYAH:</td><td>${totalDalamTargetBaduta}</td><td>${totalDalamIBL_L}</td><td>${totalDalamIBL_P}</td><td style="color:#0D9488; font-size:0.9rem;">${sumDalamIBL}</td><td style="color:var(--primary); font-size:0.9rem;">${persenDalamIBL}%</td></tr><tr style="background:#FEF3C7; font-weight:700;"><td colspan="7" style="text-align:left; color:#92400E;">B. LUAR WILAYAH</td></tr>`;
+
+          DESA_LUAR_WILAYAH.forEach(dName => {
+            const item = iblDesaMap[dName.toLowerCase()];
+            const targetObj = targetMap.get(dName.toLowerCase());
+            const targetBaduta = targetObj ? (targetObj.target_baduta || 0) : 0;
+            const countIBL_L = item ? item.countIBL_L : 0;
+            const countIBL_P = item ? item.countIBL_P : 0;
+            const countIBL_Total = countIBL_L + countIBL_P;
+            const persen = targetBaduta > 0 ? ((countIBL_Total / targetBaduta) * 100).toFixed(1) : "0.0";
+            totalLuarIBL_L += countIBL_L;
+            totalLuarIBL_P += countIBL_P;
+            totalLuarTargetBaduta += targetBaduta;
+            htmlIBL += `<tr><td>Luar Wilayah</td><td style="text-align:left; font-weight:700;">${dName}</td><td>${targetBaduta}</td><td>${countIBL_L}</td><td>${countIBL_P}</td><td style="font-weight:800; color:#0D9488;">${countIBL_Total}</td><td style="font-weight:800; color:var(--accent);">${persen}%</td></tr>`;
+          });
+
+          const sumLuarIBL = totalLuarIBL_L + totalLuarIBL_P;
+          const persenLuarIBL = totalLuarTargetBaduta > 0 ? ((sumLuarIBL / totalLuarTargetBaduta) * 100).toFixed(1) : "0.0";
+          const grandTotalIBL = sumDalamIBL + sumLuarIBL;
+          const grandTotalTargetBaduta = totalDalamTargetBaduta + totalLuarTargetBaduta;
+          const grandPersenIBL = grandTotalTargetBaduta > 0 ? ((grandTotalIBL / grandTotalTargetBaduta) * 100).toFixed(1) : "0.0";
+
+          htmlIBL += `<tr style="background:#F1F5F9; font-weight:bold;"><td colspan="2" style="text-align:left; color:#92400E;">SUBTOTAL LUAR WILAYAH:</td><td>${totalLuarTargetBaduta}</td><td>${totalLuarIBL_L}</td><td>${totalLuarIBL_P}</td><td style="color:#0D9488; font-size:0.9rem;">${sumLuarIBL}</td><td style="color:var(--primary); font-size:0.9rem;">${persenLuarIBL}%</td></tr></tbody><tfoot><tr style="background:#E2E8F0; font-weight:bold;"><td colspan="2" style="text-align:left; color:var(--accent);">TOTAL KESELURUHAN:</td><td>${grandTotalTargetBaduta}</td><td>${totalDalamIBL_L + totalLuarIBL_L}</td><td>${totalDalamIBL_P + totalLuarIBL_P}</td><td style="font-weight:800; color:#0D9488; font-size:0.95rem;">${grandTotalIBL}</td><td style="font-weight:800; color:var(--primary); font-size:0.95rem;">${grandPersenIBL}%</td></tr></tfoot></table>`;
+          cIBL.innerHTML = htmlIBL;
+        }
+
+        const snapBias = await getDocs(collection(db, COL_BIAS));
+        const biasExact = { MR: { L: 0, P: 0 }, DT: { L: 0, P: 0 }, Td: { L: 0, P: 0 }, HPV: { L: 0, P: 0 } };
+        const biasKumulatif = { MR: { L: 0, P: 0 }, DT: { L: 0, P: 0 }, Td: { L: 0, P: 0 }, HPV: { L: 0, P: 0 } };
+
+        snapBias.forEach(docSnap => {
+          const b = docSnap.data();
+          const capL = b.data?.Capaian_L || 0;
+          const capP = b.data?.Capaian_P || 0;
+          if (isVaccineGivenExactMonth(b.tanggal, thn, bln) && biasExact[b.jenis_vaksin]) {
+            biasExact[b.jenis_vaksin].L += capL;
+            biasExact[b.jenis_vaksin].P += capP;
+          }
+          if (isVaccineGivenUpToMonth(b.tanggal, thn, bln) && biasKumulatif[b.jenis_vaksin]) {
+            biasKumulatif[b.jenis_vaksin].L += capL;
+            biasKumulatif[b.jenis_vaksin].P += capP;
+          }
+        });
+
+        let htmlBIAS = `<table class="kohort-table"><thead><tr><th rowspan="2">Jenis Vaksin BIAS</th><th colspan="3">Siswa Diberikan (${monthLabel})</th><th colspan="3">Kumulatif Siswa (s/d ${monthLabel})</th></tr><tr><th>L</th><th>P</th><th>Total</th><th>L</th><th>P</th><th>Total</th></tr></thead><tbody>`;
+        ['MR', 'DT', 'Td', 'HPV'].forEach(vk => {
+          const ex = biasExact[vk];
+          const kum = biasKumulatif[vk];
+          htmlBIAS += `<tr><td style="font-weight:700; text-align:left;">BIAS ${vk}</td><td>${ex.L}</td><td>${ex.P}</td><td style="font-weight:800; color:var(--primary);">${ex.L + ex.P}</td><td>${kum.L}</td><td>${kum.P}</td><td style="font-weight:800; color:var(--accent);">${kum.L + kum.P}</td></tr>`;
+        });
+        htmlBIAS += `</tbody></table>`;
+        cBIAS.innerHTML = htmlBIAS;
+      } catch (err) {
+        alert("Error Capaian: " + err.message);
+      }
+    }
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -1340,12 +1559,12 @@
         <div><strong>INFORMASI SISTEM:</strong> Data tersimpan lokal saat offline dan otomatis sinkron ke Cloud saat terhubung internet.</div>
       </div>
       
-<!-- RINGKASAN CAPAIAN & DROP OUT IMUNISASI (SEBELUM PENCARIAN ANAK) -->
+<!-- RINGKASAN CAPAIAN & DROP OUT IMUNISASI (SEBELUM PENCARIAN ANAK - STANDAR KEMENKES) -->
       <div id="inputAchievementSection" class="input-kpi-wrapper">
         <div class="input-kpi-header">
           <div class="input-kpi-title">
             <i class="fas fa-chart-pie" style="color: var(--primary);"></i>
-            <span>Ringkasan Capaian &amp; Drop Out Imunisasi</span>
+            <span>Ringkasan Kohort &amp; Drop Out Imunisasi (Standar Kemenkes)</span>
           </div>
           <span id="kpiScopeBadge" class="input-kpi-scope">Wilayah Puskesmas Melata (Semua Desa)</span>
         </div>
@@ -1354,7 +1573,7 @@
           <!-- 1. JUMLAH BAYI/ANAK TERDAFTAR -->
           <div class="kpi-card-item kpi-blue">
             <div class="kpi-top-row">
-              <span class="kpi-label">Bayi / Anak Terdaftar</span>
+              <span class="kpi-label">Sasaran Terdaftar<br><small style="font-weight:500;">(Kohort Aktif)</small></span>
               <span class="kpi-icon-box"><i class="fas fa-children"></i></span>
             </div>
             <div>
@@ -1373,30 +1592,30 @@
             </div>
           </div>
 
-          <!-- 2. CAPAIAN IDL -->
+          <!-- 2. CAPAIAN IDL (USIA < 12 BULAN) -->
           <div class="kpi-card-item kpi-green">
             <div class="kpi-top-row">
-              <span class="kpi-label">Capaian IDL<br><small style="font-weight:500;">(Dasar Lengkap)</small></span>
+              <span class="kpi-label">Capaian IDL<br><small style="font-weight:500;">(Kohort 9&ndash;11 Bln, &lt;12 Bln)</small></span>
               <span class="kpi-icon-box"><i class="fas fa-shield-heart"></i></span>
             </div>
             <div>
               <div id="kpiIdlVal" class="kpi-main-value">0.0%</div>
-              <div id="kpiIdlSub" class="kpi-sub-info">0 dari 0 anak</div>
+              <div id="kpiIdlSub" class="kpi-sub-info">0 dari 0 kohort bayi</div>
               <div class="kpi-progress-track">
                 <div id="kpiIdlBar" class="kpi-progress-fill" style="width: 0%; background: #10B981;"></div>
               </div>
             </div>
           </div>
 
-          <!-- 3. CAPAIAN IBL -->
+          <!-- 3. CAPAIAN IBL (BADUTA 18-23 BULAN) -->
           <div class="kpi-card-item kpi-teal">
             <div class="kpi-top-row">
-              <span class="kpi-label">Capaian IBL<br><small style="font-weight:500;">(Baduta Lengkap)</small></span>
+              <span class="kpi-label">Capaian IBL<br><small style="font-weight:500;">(Kohort Baduta 18&ndash;23 Bln)</small></span>
               <span class="kpi-icon-box"><i class="fas fa-award"></i></span>
             </div>
             <div>
               <div id="kpiIblVal" class="kpi-main-value">0.0%</div>
-              <div id="kpiIblSub" class="kpi-sub-info">0 dari 0 anak</div>
+              <div id="kpiIblSub" class="kpi-sub-info">0 dari 0 kohort baduta</div>
               <div class="kpi-progress-track">
                 <div id="kpiIblBar" class="kpi-progress-fill" style="width: 0%; background: #0D9488;"></div>
               </div>
@@ -1757,93 +1976,17 @@
         </div>
         <!-- Navigasi Cepat Smooth Scroll untuk Data Panjang Catch Up -->
         <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; padding-top:10px; border-top:1px dashed var(--border-color);">
-          <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardCatchup1')" style="padding:5px 10px; font-size:0.75rem;"><i class="fas fa-arrow-down"></i> 1. Bayi &lt;1 Thn</button>
-          <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardCatchup2')" style="padding:5px 10px; font-size:0.75rem;"><i class="fas fa-arrow-down"></i> 2. Risiko DO</button>
-          <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardCatchup3')" style="padding:5px 10px; font-size:0.75rem;"><i class="fas fa-arrow-down"></i> 3. Booster Baduta</button>
-          <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardCatchup4')" style="padding:5px 10px; font-size:0.75rem;"><i class="fas fa-arrow-down"></i> 4. Catin &amp; Bumil</button>
-        </div>
-        <div class="actions">
-          <button class="btn btn-primary" id="btnApplyCatchUp"><i class="fas fa-calculator"></i> Analisis Catch Up</button>
-          <button class="btn btn-success" id="btnDownloadCatchUpExcel"><i class="fas fa-file-excel"></i> Download Excel (.xlsx)</button>
-        </div>
-      </div>
-      <div class="card" id="cardCatchup1"><h3><i class="fas fa-baby"></i> 1. Catch Up Usia &lt; 1 Tahun (Bayi)</h3><div id="panel_bayi_container" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Analisis Catch Up untuk memuat data.</p></div></div>
-      <div class="card" id="cardCatchup2"><h3><i class="fas fa-link"></i> 2. Risiko Drop Out Antigen Berkesinambungan</h3><div id="panel_berkesinambungan_container" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Analisis Catch Up untuk memuat data.</p></div></div>
-      <div class="card" id="cardCatchup3"><h3><i class="fas fa-child"></i> 3. Catch Up Usia 18 Bln - 3 Thn (Booster)</h3><div id="panel_baduta_container" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Analisis Catch Up untuk memuat data.</p></div></div>
-      <div class="card" id="cardCatchup4"><h3><i class="fas fa-female"></i> 4. Catch Up Td Catin &amp; Ibu Hamil</h3><div id="panel_dewasa_container" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Analisis Catch Up untuk memuat data.</p></div></div>
-    </section>
-    
-    <!-- TAB 4: KUMULATIF -->
-    <section id="kumulatif" class="tab-panel" style="display:none">
-      <div class="card">
-        <h3><i class="fas fa-filter"></i> Filter Laporan Kumulatif &amp; Ekspor Spesifik</h3>
-        <div class="grid">
-          <div class="form-group"><label>Tahun</label><select id="filter_tahun"><option value="2026">2026</option><option value="2025">2025</option><option value="ALL">-- Semua Tahun --</option></select></div>
-          <div class="form-group">
-            <label>Bulan Spesifik</label>
-            <select id="filter_bulan">
-              <option value="ALL">-- Semua Bulan --</option>
-              <option value="01">Januari (01)</option><option value="02">Februari (02)</option><option value="03">Maret (03)</option>
-              <option value="04">April (04)</option><option value="05">Mei (05)</option><option value="06">Juni (06)</option>
-              <option value="07">Juli (07)</option><option value="08">Agustus (08)</option><option value="09">September (09)</option>
-              <option value="10">Oktober (10)</option><option value="11">November (11)</option><option value="12">Desember (12)</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Opsi Seleksi Kategori</label>
-            <select id="filter_kategori">
-              <option value="BAYI_0_24">Bayi Usia 0 - 24 Bulan (Sampai MR2)</option><option value="IMUNISASI_BAYI">Imunisasi Dasar Bayi (0 - 12 Bulan)</option>
-              <option value="BADUTA">Imunisasi Lanjutan Baduta (MR2 &amp; DPT4)</option><option value="BIAS">BIAS (Anak Sekolah)</option>
-              <option value="CATIN">Td Catin</option><option value="BUMIL">Td Ibu Hamil</option>
-            </select>
-          </div>
-          <div class="form-group"><label>Filter Antigen Spesifik</label><select id="filter_antigen_spesifik"><option value="ALL">-- Semua Antigen --</option></select></div>
-          <div class="form-group full-width">
-            <label>Desa</label>
-            <select id="filter_desa">
-              <option value="ALL">-- Semua Desa --</option><option value="Melata">Melata</option><option value="Nanuah">Nanuah</option><option value="Topalan">Topalan</option>
-              <option value="Batu Ampar">Batu Ampar</option><option value="Lubuk Hiju">Lubuk Hiju</option><option value="Bukit Makmur">Bukit Makmur</option>
-              <option value="Bukit Raya">Bukit Raya</option><option value="Modang Mas">Modang Mas</option><option value="Mukti Manunggal">Mukti Manunggal</option>
-              <option value="Sumber Jaya">Sumber Jaya</option><option value="Bukit Harum">Bukit Harum</option><option value="PT. TSA">PT. TSA</option><option value="PT. SHS">PT. SHS</option>
-            </select>
-          </div>
-        </div>
-        <div class="actions">
-          <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardReviewKumulatif')"><i class="fas fa-arrow-down"></i> Ke Tabel Hasil</button>
-          <button class="btn btn-primary" id="btnApplyFilter"><i class="fas fa-search"></i> Hitung Laporan</button>
-          <button class="btn btn-success" id="btnDownloadExcelFilter"><i class="fas fa-file-excel"></i> Download Excel (Sesuai Filter)</button>
-        </div>
-      </div>
-      <div class="card" id="cardReviewKumulatif"><h3><i class="fas fa-list-alt"></i> Hasil Rekapitulasi Matriks</h3><div id="reviewContainer" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Hitung Laporan untuk memuat data.</p></div></div>
-    </section>
-
-    <!-- TAB 5: CAPAIAN -->
-    <section id="capaian" class="tab-panel" style="display:none">
-      <div class="card">
-        <h3><i class="fas fa-filter"></i> Filter Capaian</h3>
-        <div class="grid">
-          <div class="form-group"><label>Tahun</label><select id="cap_filter_tahun"><option value="2026">2026</option><option value="2025">2025</option></select></div>
-          <div class="form-group">
-            <label>Bulan Spesifik</label>
-            <select id="cap_filter_bulan">
-              <option value="ALL">-- Semua Bulan (Tahunan) --</option>
-              <option value="01">Januari (01)</option><option value="02">Februari (02)</option><option value="03">Maret (03)</option>
-              <option value="04">April (04)</option><option value="05">Mei (05)</option><option value="06">Juni (06)</option>
-              <option value="07">Juli (07)</option><option value="08">Agustus (08)</option><option value="09">September (09)</option>
-              <option value="10">Oktober (10)</option><option value="11">November (11)</option><option value="12">Desember (12)</option>
-            </select>
-          </div>
-        </div>
-        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; padding-top:10px; border-top:1px dashed var(--border-color);">
           <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardCapaian1')" style="padding:5px 10px; font-size:0.75rem;"><i class="fas fa-arrow-down"></i> 1. Bayi &amp; Baduta</button>
-          <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardCapaian2')" style="padding:5px 10px; font-size:0.75rem;"><i class="fas fa-arrow-down"></i> 2. Tabel IDL</button>
-          <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardCapaian3')" style="padding:5px 10px; font-size:0.75rem;"><i class="fas fa-arrow-down"></i> 3. Capaian BIAS</button>
+          <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardCapaian2')" style="padding:5px 10px; font-size:0.75rem;"><i class="fas fa-arrow-down"></i> 2. Tabel IDL (&lt;12 Bln)</button>
+          <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardCapaian2b')" style="padding:5px 10px; font-size:0.75rem;"><i class="fas fa-arrow-down"></i> 3. Tabel IBL (Baduta)</button>
+          <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardCapaian3')" style="padding:5px 10px; font-size:0.75rem;"><i class="fas fa-arrow-down"></i> 4. Capaian BIAS</button>
         </div>
-        <div class="actions"><button class="btn btn-primary" id="btnHitungCapaian"><i class="fas fa-chart-pie"></i> Hitung Capaian &amp; IDL</button></div>
+        <div class="actions"><button class="btn btn-primary" id="btnHitungCapaian"><i class="fas fa-chart-pie"></i> Hitung Capaian, IDL &amp; IBL</button></div>
       </div>
-      <div class="card" id="cardCapaian1"><h3><i class="fas fa-baby"></i> 1. Capaian Bayi &amp; Baduta</h3><div id="containerCapaianBayiBaduta" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Hitung Capaian.</p></div></div>
-      <div class="card" id="cardCapaian2"><h3><i class="fas fa-certificate" style="color:var(--success)"></i> 2. Imunisasi Dasar Lengkap (IDL)</h3><div id="containerTabelIDL" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Hitung Capaian.</p></div></div>
-      <div class="card" id="cardCapaian3"><h3><i class="fas fa-school" style="color:var(--info)"></i> 3. Capaian BIAS</h3><div id="containerCapaianBIAS" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Hitung Capaian.</p></div></div>
+      <div class="card" id="cardCapaian1"><h3><i class="fas fa-baby"></i> 1. Capaian Per Antigen (Bayi &amp; Baduta)</h3><div id="containerCapaianBayiBaduta" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Hitung Capaian.</p></div></div>
+      <div class="card" id="cardCapaian2"><h3><i class="fas fa-certificate" style="color:var(--success)"></i> 2. Imunisasi Dasar Lengkap (IDL &mdash; Selesai Usia &lt; 12 Bulan)</h3><div id="containerTabelIDL" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Hitung Capaian.</p></div></div>
+      <div class="card" id="cardCapaian2b"><h3><i class="fas fa-award" style="color:#0D9488"></i> 3. Imunisasi Baduta Lengkap (IBL &mdash; Selesai Usia &lt; 24 Bulan)</h3><div id="containerTabelIBL" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Hitung Capaian.</p></div></div>
+      <div class="card" id="cardCapaian3"><h3><i class="fas fa-school" style="color:var(--info)"></i> 4. Capaian BIAS</h3><div id="containerCapaianBIAS" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Hitung Capaian.</p></div></div>
     </section>
 <!-- TAB 6: ADMIN & KONTROL -->
     <section id="admin" class="tab-panel" style="display:none">
@@ -4588,10 +4731,83 @@ window.goToEdit = function(encodedJson) {
     }
 
     // =========================================================================
-    // HITUNG & TAMPILKAN 5 KARTU CAPAIAN PWS DI HALAMAN INPUT
+    // HELPER STANDAR KEMENKES: HITUNG USIA SAAT VAKSIN & STATUS IDL / IBL
+    // =========================================================================
+    function getAgeInMonthsAtDate(tglLahirStr, targetDateStr) {
+      if (!tglLahirStr || !targetDateStr) return null;
+      const birth = new Date(String(tglLahirStr).trim().substring(0, 10));
+      const target = new Date(String(targetDateStr).trim().substring(0, 10));
+      if (isNaN(birth.getTime()) || isNaN(target.getTime())) return null;
+      let months = (target.getFullYear() - birth.getFullYear()) * 12 + (target.getMonth() - birth.getMonth());
+      if (target.getDate() < birth.getDate()) months -= 1;
+      return Math.max(0, months);
+    }
+
+    function getLatestVaccineDate(datesArr) {
+      let latest = null;
+      datesArr.forEach(dt => {
+        if (!dt || dt === '-') return;
+        const clean = String(dt).trim().substring(0, 10);
+        if (!latest || clean > latest) latest = clean;
+      });
+      return latest;
+    }
+
+    // Evaluasi status IDL (< 12 bulan) & IBL (< 24 bulan) sesuai Juknis Kemenkes RI
+    function evaluateKemenkesIdlIbl(d, dateFilterFn = null) {
+      const getVal = (vk) => {
+        const fieldKey = `vaksin_${vk.replace(/[\s\(\)<>-]/g, '_')}`;
+        const vDate = d[fieldKey] || (d.jenis_imunisasi === vk ? d.tanggal_pelayanan : null);
+        if (!vDate || vDate === '-') return null;
+        if (typeof dateFilterFn === 'function') {
+          return dateFilterFn(vDate) ? String(vDate).trim().substring(0, 10) : null;
+        }
+        return String(vDate).trim().substring(0, 10);
+      };
+
+      const dHb0 = getVal("HBO (<24 Jam)") || getVal("HBO (1-7 Hari)");
+      const dBcg = getVal("BCG");
+      const dDpt3 = getVal("DPT-HB-Hib3");
+      const dOpv4 = getVal("OPV4");
+      const dIpv1 = getVal("IPV1");
+      const dMr1 = getVal("Campak Rubela-1");
+      const dDpt4 = getVal("DPT-HB-Hib4");
+      const dMr2 = getVal("Campak Rubela-2");
+
+      const hasAllIdlAntigens = Boolean(dHb0 && dBcg && dDpt3 && dOpv4 && dIpv1 && dMr1);
+      let isIdlValid = false;
+      let isCatchUpIdl = false;
+
+      if (hasAllIdlAntigens) {
+        const idlCompletionDate = getLatestVaccineDate([dHb0, dBcg, dDpt3, dOpv4, dIpv1, dMr1]);
+        const ageAtIdl = getAgeInMonthsAtDate(d.tgl_lahir, idlCompletionDate);
+        // Sesuai Kemenkes: IDL hanya valid jika selesai sebelum usia 12 bulan (0-11 bulan)
+        if (ageAtIdl === null || ageAtIdl < 12) {
+          isIdlValid = true;
+        } else {
+          isCatchUpIdl = true; // Selesai >= 12 bulan masuk kategori Imunisasi Kejar (Catch-up)
+        }
+      }
+
+      const hasAllIblAntigens = Boolean(hasAllIdlAntigens && dDpt4 && dMr2);
+      let isIblValid = false;
+
+      if (hasAllIblAntigens) {
+        const iblCompletionDate = getLatestVaccineDate([dHb0, dBcg, dDpt3, dOpv4, dIpv1, dMr1, dDpt4, dMr2]);
+        const ageAtIbl = getAgeInMonthsAtDate(d.tgl_lahir, iblCompletionDate);
+        // Sesuai Kemenkes: IBL valid jika selesai sebelum usia 24 bulan (12-23 bulan)
+        if (ageAtIbl === null || ageAtIbl < 24) {
+          isIblValid = true;
+        }
+      }
+
+      return { isIdlValid, isCatchUpIdl, isIblValid };
+    }
+
+    // =========================================================================
+    // HITUNG & TAMPILKAN KARTU CAPAIAN PWS DI HALAMAN INPUT (SELARAS KEMENKES)
     // =========================================================================
     function updateInputAchievementCards() {
-      // Gabungkan data cache Cloud + antrean offline (jika ada) tanpa duplikasi ID
       const combinedMap = new Map();
       cachedGlobalKohortData.forEach(item => {
         const key = item.id || `${item.desa}_${item.nama_anak}_${item.tgl_lahir}`.toLowerCase();
@@ -4605,7 +4821,6 @@ window.goToEdit = function(encodedJson) {
 
       const selectedDesa = (document.getElementById('search_desa_anak')?.value || '').trim();
 
-      // Filter hanya sasaran Bayi/Anak (kecualikan Catin & Bumil) serta hormati wilayah kerja user
       const anakList = Array.from(combinedMap.values()).filter(d => {
         if (d.peran === 'Catin' || d.peran === 'Bumil') return false;
         if (typeof isWilayahDiizinkan === 'function' && !isWilayahDiizinkan(d.desa)) return false;
@@ -4624,14 +4839,13 @@ window.goToEdit = function(encodedJson) {
         }
       }
 
-      // Helper pembaca status antigen sesuai format field Firestore di aplikasi ini
       const hasVax = (d, vk) => {
         const fieldKey = `vaksin_${vk.replace(/[\s\(\)<>-]/g, '_')}`;
         const val = d[fieldKey] || (d.jenis_imunisasi === vk ? d.tanggal_pelayanan : null);
         return Boolean(val && val !== '-');
       };
 
-     const now = new Date();
+      const now = new Date();
       const curYear = now.getFullYear();
       const curMonth = now.getMonth() + 1;
       const namaBulanId = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
@@ -4654,14 +4868,20 @@ window.goToEdit = function(encodedJson) {
       const totalAnak = anakList.length;
       let countAnakBulanIni = 0;
       let countDosisBulanIni = 0;
+
+      // Filter kohort usia sesuai standar PWS Kemenkes agar denominator akurat
+      let kohortIdlDenom = 0; // Bayi usia 9 - 11 bulan (sudah masuk jadwal MR1)
       let countIdl = 0;
+
+      let kohortIblDenom = 0; // Baduta usia 18 - 23 bulan (sudah masuk jadwal DPT4 & MR2)
       let countIbl = 0;
+
+      // Drop Out dihitung pada kohort bayi tahun berjalan / usia >= 9 bulan agar bayi baru lahir tidak bias
       let countDpt1 = 0;
       let countDpt3 = 0;
       let countMr1 = 0;
 
       anakList.forEach(d => {
-        // Hitung apakah anak mendapat vaksin pada bulan & tahun berjalan
         let dosisAnakBulanIni = 0;
         Object.keys(d).forEach(k => {
           if (k.startsWith('vaksin_') && isBulanIni(d[k])) {
@@ -4676,35 +4896,37 @@ window.goToEdit = function(encodedJson) {
           countDosisBulanIni += dosisAnakBulanIni;
         }
 
-        const hasHb0 = hasVax(d, "HBO (<24 Jam)") || hasVax(d, "HBO (1-7 Hari)");
-        const hasBcg = hasVax(d, "BCG");
-        const hasDpt1 = hasVax(d, "DPT-HB-Hib1");
-        const hasDpt3 = hasVax(d, "DPT-HB-Hib3");
-        const hasOpv4 = hasVax(d, "OPV4");
-        const hasIpv1 = hasVax(d, "IPV1");
-        const hasMr1 = hasVax(d, "Campak Rubela-1");
-        const hasDpt4 = hasVax(d, "DPT-HB-Hib4");
-        const hasMr2 = hasVax(d, "Campak Rubela-2");
+        const ageNow = d.tgl_lahir ? getAgeInMonthsAtDate(d.tgl_lahir, now.toISOString().split('T')[0]) : null;
+        const evalStatus = evaluateKemenkesIdlIbl(d);
 
-        // Kriteria IDL & IBL identik dengan Tab Capaian & Pop-up KIA Digital
-        const isIdl = hasHb0 && hasBcg && hasDpt3 && hasOpv4 && hasIpv1 && hasMr1;
-        const isIbl = isIdl && hasDpt4 && hasMr2;
+        // Kohort IDL: Bayi usia 9 - 11 bulan
+        if (ageNow !== null && ageNow >= 9 && ageNow <= 11) {
+          kohortIdlDenom++;
+          if (evalStatus.isIdlValid) countIdl++;
+        }
 
-        if (hasDpt1) countDpt1++;
-        if (hasDpt3) countDpt3++;
-        if (hasMr1) countMr1++;
-        if (isIdl) countIdl++;
-        if (isIbl) countIbl++;
+        // Kohort IBL: Baduta usia 18 - 23 bulan
+        if (ageNow !== null && ageNow >= 18 && ageNow <= 23) {
+          kohortIblDenom++;
+          if (evalStatus.isIblValid) countIbl++;
+        }
+
+        // Hitung DO pada kohort anak yang sudah melewati usia jadwal dasar (>= 9 bulan s/d 23 bulan)
+        if (ageNow === null || (ageNow >= 9 && ageNow <= 23)) {
+          if (hasVax(d, "DPT-HB-Hib1")) countDpt1++;
+          if (hasVax(d, "DPT-HB-Hib3")) countDpt3++;
+          if (hasVax(d, "Campak Rubela-1")) countMr1++;
+        }
       });
 
-      const pctIdl = totalAnak > 0 ? ((countIdl / totalAnak) * 100).toFixed(1) : '0.0';
-      const pctIbl = totalAnak > 0 ? ((countIbl / totalAnak) * 100).toFixed(1) : '0.0';
+      const pctIdl = kohortIdlDenom > 0 ? ((countIdl / kohortIdlDenom) * 100).toFixed(1) : '0.0';
+      const pctIbl = kohortIblDenom > 0 ? ((countIbl / kohortIblDenom) * 100).toFixed(1) : '0.0';
 
-      const gapDpt = countDpt1 - countDpt3;
-      const doDptPct = countDpt1 > 0 ? ((gapDpt / countDpt1) * 100).toFixed(1) : '0.0';
+      const gapDpt = Math.max(0, countDpt1 - countDpt3);
+      const doDptPct = countDpt1 > 0 ? (((countDpt1 - countDpt3) / countDpt1) * 100).toFixed(1) : '0.0';
 
-      const gapMr = countDpt1 - countMr1;
-      const doMrPct = countDpt1 > 0 ? ((gapMr / countDpt1) * 100).toFixed(1) : '0.0';
+      const gapMr = Math.max(0, countDpt1 - countMr1);
+      const doMrPct = countDpt1 > 0 ? (((countDpt1 - countMr1) / countDpt1) * 100).toFixed(1) : '0.0';
 
       // Render Kartu 1: Total Bayi/Anak Terdaftar
       const elTotal = document.getElementById('kpiTotalAnakVal');
@@ -4724,20 +4946,20 @@ window.goToEdit = function(encodedJson) {
       if (elBulanVal) elBulanVal.textContent = countAnakBulanIni.toLocaleString('id-ID');
       if (elBulanSub) elBulanSub.textContent = `Total ${countDosisBulanIni.toLocaleString('id-ID')} dosis diberikan`;
 
-      // Render Kartu 2: Capaian IDL
+      // Render Kartu 2: Capaian IDL (Kohort 9-11 Bulan)
       const elIdl = document.getElementById('kpiIdlVal');
       const elIdlSub = document.getElementById('kpiIdlSub');
       const elIdlBar = document.getElementById('kpiIdlBar');
       if (elIdl) elIdl.textContent = `${pctIdl}%`;
-      if (elIdlSub) elIdlSub.textContent = `${countIdl} dari ${totalAnak} anak`;
+      if (elIdlSub) elIdlSub.textContent = `${countIdl} dari ${kohortIdlDenom} bayi (9–11 bln)`;
       if (elIdlBar) elIdlBar.style.width = `${Math.min(100, Math.max(0, parseFloat(pctIdl)))}%`;
 
-      // Render Kartu 3: Capaian IBL
+      // Render Kartu 3: Capaian IBL (Kohort 18-23 Bulan)
       const elIbl = document.getElementById('kpiIblVal');
       const elIblSub = document.getElementById('kpiIblSub');
       const elIblBar = document.getElementById('kpiIblBar');
       if (elIbl) elIbl.textContent = `${pctIbl}%`;
-      if (elIblSub) elIblSub.textContent = `${countIbl} dari ${totalAnak} anak`;
+      if (elIblSub) elIblSub.textContent = `${countIbl} dari ${kohortIblDenom} baduta (18–23 bln)`;
       if (elIblBar) elIblBar.style.width = `${Math.min(100, Math.max(0, parseFloat(pctIbl)))}%`;
 
       // Render Kartu 4: Drop Out DPT-HB-Hib (DPT 1 -> DPT 3)
@@ -7417,13 +7639,8 @@ window.selectFromLiveSearch = function(encodedJson) {
           });
 
           desaDocs.forEach(d => {
-            const getV = (vk) => {
-              const fKey = `vaksin_${vk.replace(/[\s\(\)<>-]/g, '_')}`;
-              const dt = d[fKey] || (d.jenis_imunisasi === vk ? d.tanggal_pelayanan : null);
-              return isVaccineGivenUpToMonth(dt, thn, bln) ? dt : null;
-            };
-            const hasHb0 = Boolean(getV('HBO (<24 Jam)') || getV('HBO (1-7 Hari)'));
-            if (hasHb0 && getV('BCG') && getV('DPT-HB-Hib3') && getV('OPV4') && getV('IPV1') && getV('Campak Rubela-1')) {
+            const evalRes = evaluateKemenkesIdlIbl(d, (dt) => isVaccineGivenUpToMonth(dt, thn, bln));
+            if (evalRes.isIdlValid) {
               idlCount++;
             }
           });

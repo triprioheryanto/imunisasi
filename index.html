@@ -4435,7 +4435,6 @@ window.goToEdit = function(encodedJson) {
       if (target === 'admin' && !isCurrentUserAdmin()) {
         return alert("🔒 Akses Ditolak: Menu Admin, Download/Cetak Sertifikat, dan Kartu Imunisasi hanya boleh diakses oleh Admin.");
       }
-      const target = e.currentTarget.getAttribute('data-tab');
       document.querySelectorAll('.app-nav-tabs .tab').forEach(t => t.classList.remove('active'));
       e.currentTarget.classList.add('active');
       document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
@@ -4829,7 +4828,7 @@ window.goToEdit = function(encodedJson) {
           if (notFoundBox) notFoundBox.style.display = 'flex';
         } else {
           if (notFoundBox) notFoundBox.style.display = 'none';
-          resultsDiv.innerHTML = matches.map(item => {
+         resultsDiv.innerHTML = matches.map(item => {
             const safeRegex = new RegExp(`(${rawQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
             const highlightedName = item.nama_anak.replace(safeRegex, '<span class="highlight-text">$1</span>');
             const encodedItem = encodeURIComponent(JSON.stringify(item));
@@ -4839,8 +4838,7 @@ window.goToEdit = function(encodedJson) {
                   <div style="font-weight:800; color:var(--accent);">${highlightedName} <span style="font-weight:normal; font-size:0.75rem; color:var(--muted);">(${item.desa || '-'})</span></div>
                   <div style="font-size:0.75rem; color:#475569;"><i class="fas fa-calendar-alt"></i> Lahir: <strong>${item.tgl_lahir || '-'}</strong> | <i class="fas fa-female"></i> Ortu/Ibu: <strong>${item.nama_ibu || '-'}</strong></div>
                 </div>
-                // Pada liveSearchResults & tblRecentAnak:
-<button type="button" class="btn btn-info" onclick="openChildQrAction('${jsonString}')" style="padding:3px 7px; font-size:0.72rem;" title="Lihat QR Mini / Kartu Imunisasi"><i class="fas fa-qrcode"></i> QR</button>
+                <button type="button" class="btn btn-info" onclick="openChildQrAction('${encodedItem}')" style="padding:3px 7px; font-size:0.72rem;" title="Lihat QR Mini / Kartu Imunisasi"><i class="fas fa-qrcode"></i> QR</button>
               </div>
             `;
           }).join('');

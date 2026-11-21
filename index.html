@@ -1174,11 +1174,17 @@
       </div>
 
       <div style="padding:18px 20px;">
-        <!-- IDENTITAS ANAK -->
-        <div style="background:#F8FAFC; border:1px solid var(--border-color); border-radius:12px; padding:12px 14px; margin-bottom:12px;">
-          <div style="font-size:1.06rem; font-weight:800; color:var(--accent);" id="feed_nama_anak">Memuat data anak...</div>
-          <div style="font-size:0.8rem; color:#475569; margin-top:3px;" id="feed_ttl_desa">-</div>
-          <div style="font-size:0.78rem; color:var(--muted); margin-top:2px;" id="feed_ortu">-</div>
+       <!-- IDENTITAS ANAK + QR MINI -->
+        <div style="background:#F8FAFC; border:1px solid var(--border-color); border-radius:12px; padding:12px 14px; margin-bottom:12px; display:flex; align-items:center; justify-content:space-between; gap:12px;">
+          <div style="flex:1; min-width:0;">
+            <div style="font-size:1.06rem; font-weight:800; color:var(--accent);" id="feed_nama_anak">Memuat data anak...</div>
+            <div style="font-size:0.8rem; color:#475569; margin-top:3px;" id="feed_ttl_desa">-</div>
+            <div style="font-size:0.78rem; color:var(--muted); margin-top:2px;" id="feed_ortu">-</div>
+          </div>
+          <div id="feedMiniQrWrapper" style="background:#FFFFFF; padding:6px; border:1.5px solid #002B5B; border-radius:8px; flex-shrink:0; text-align:center;">
+            <div id="feedMiniQrCanvas"></div>
+            <div style="font-size:0.6rem; font-weight:800; color:#002B5B; margin-top:2px; letter-spacing:0.4px;">QR MINI</div>
+          </div>
         </div>
 
         <!-- JADWAL VAKSINASI IDEAL BERIKUTNYA -->
@@ -2666,6 +2672,23 @@
       document.getElementById('feed_nama_anak').textContent = (childData.nama_anak || '-').toUpperCase();
       document.getElementById('feed_ttl_desa').innerHTML = `Lahir: <strong>${childData.tgl_lahir || '-'}</strong> (Usia ${evalRes.ageMonths} Bulan) &bull; Desa <strong>${childData.desa || '-'}</strong>`;
       document.getElementById('feed_ortu').innerHTML = `Orang Tua / Ibu: <strong>${childData.nama_ibu || '-'}</strong>`;
+      // Render QR Mini (hanya tampilan layar, tanpa tombol cetak/download)
+      const miniQrBox = document.getElementById('feedMiniQrCanvas');
+      if (miniQrBox && typeof QRCode === 'function') {
+        miniQrBox.innerHTML = '';
+        const childDocId = childData.id || `${childData.desa}_${childData.nama_anak}_${childData.tgl_lahir}`.replace(/[\s\/]/g, '_').toLowerCase();
+        const baseUrl = getPublicQrBaseUrl();
+        const sep = baseUrl.includes('?') ? '&' : '?';
+        const miniQrUrl = `${baseUrl}${sep}id=${encodeURIComponent(childDocId)}#id=${encodeURIComponent(childDocId)}&n=${encodeURIComponent(childData.nama_anak || '')}&t=${encodeURIComponent(childData.tgl_lahir || '')}&g=${encodeURIComponent(childData.jk || 'L')}&o=${encodeURIComponent(childData.nama_ibu || '')}&d=${encodeURIComponent(childData.desa || '')}`;
+        new QRCode(miniQrBox, {
+          text: miniQrUrl,
+          width: 78,
+          height: 78,
+          colorDark: "#000000",
+          colorLight: "#FFFFFF",
+          correctLevel: QRCode.CorrectLevel.L
+        });
+      }
 
       document.getElementById('feed_progress_text').textContent = `${evalRes.pct}% (${evalRes.completedCount}/${evalRes.totalTargetCount} Dosis)`;
       document.getElementById('feed_progress_bar').style.width = `${evalRes.pct}%`;
@@ -2857,7 +2880,7 @@
 
       currentQrChildData = childData;
       const btnQrForm = document.getElementById('btnCetakQrFromForm');
-      if (btnQrForm) btnQrForm.style.display = 'inline-flex';
+      if (btnQrForm) btnQrForm.style.display = isCurrentUserAdmin() ? 'inline-flex' : 'none';
 
       const cardForm = document.getElementById('cardFormUtama');
       if (cardForm) {
@@ -4409,6 +4432,10 @@ window.goToEdit = function(encodedJson) {
 
     window.switchTab = function(e) {
       const target = e.currentTarget.getAttribute('data-tab');
+      if (target === 'admin' && !isCurrentUserAdmin()) {
+        return alert("🔒 Akses Ditolak: Menu Admin, Download/Cetak Sertifikat, dan Kartu Imunisasi hanya boleh diakses oleh Admin.");
+      }
+      const target = e.currentTarget.getAttribute('data-tab');
       document.querySelectorAll('.app-nav-tabs .tab').forEach(t => t.classList.remove('active'));
       e.currentTarget.classList.add('active');
       document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
@@ -4812,9 +4839,8 @@ window.goToEdit = function(encodedJson) {
                   <div style="font-weight:800; color:var(--accent);">${highlightedName} <span style="font-weight:normal; font-size:0.75rem; color:var(--muted);">(${item.desa || '-'})</span></div>
                   <div style="font-size:0.75rem; color:#475569;"><i class="fas fa-calendar-alt"></i> Lahir: <strong>${item.tgl_lahir || '-'}</strong> | <i class="fas fa-female"></i> Ortu/Ibu: <strong>${item.nama_ibu || '-'}</strong></div>
                 </div>
-                <button type="button" class="btn btn-info" onclick="openQrPrintModal('${encodedItem}')" style="padding:4px 8px; font-size:0.72rem;" title="Cetak Kartu QR">
-                  <i class="fas fa-qrcode"></i> QR
-                </button>
+                // Pada liveSearchResults & tblRecentAnak:
+<button type="button" class="btn btn-info" onclick="openChildQrAction('${jsonString}')" style="padding:3px 7px; font-size:0.72rem;" title="Lihat QR Mini / Kartu Imunisasi"><i class="fas fa-qrcode"></i> QR</button>
               </div>
             `;
           }).join('');
@@ -5326,7 +5352,25 @@ window.selectFromLiveSearch = function(encodedJson) {
    // =========================================================================
     // STATE PERAN, WILAYAH KERJA & LOG PENGGUNA
     // =========================================================================
-    let activeUserRole = localStorage.getItem('pkm_active_role') || 'admin';
+    // Ubah baris default activeUserRole menjadi:
+    let activeUserRole = localStorage.getItem('pkm_active_role') || 'petugas';
+
+    function isCurrentUserAdmin() {
+      return (
+        (activePetugasName && activePetugasName.toLowerCase() === AUTH_ADMIN_USER) ||
+        activeUserRole === 'admin'
+      );
+    }
+
+    // Pemisah aksi tombol QR: Admin buka modal Cetak Kartu QR, Pengguna Biasa buka QR Mini
+    window.openChildQrAction = function(encodedJson) {
+      const data = typeof encodedJson === 'string' ? JSON.parse(decodeURIComponent(encodedJson)) : encodedJson;
+      if (isCurrentUserAdmin()) {
+        openQrPrintModal(data);
+      } else {
+        renderPublicQrFeedModal(data);
+      }
+    };
     let activeUserWilayah = localStorage.getItem('pkm_active_wilayah') || 'SEMUA';
     let USER_ACTIVITY_LOGS = [];
 
@@ -5527,6 +5571,25 @@ window.selectFromLiveSearch = function(encodedJson) {
       renderUserManagementTable();
       await loadLogAktivitasFromCloud();
       terapkanBatasanAksesUser();
+      const isAdmin = isCurrentUserAdmin();
+      let styleNonAdmin = document.getElementById('styleBatasanNonAdmin');
+      if (!isAdmin) {
+        if (!styleNonAdmin) {
+          styleNonAdmin = document.createElement('style');
+          styleNonAdmin.id = 'styleBatasanNonAdmin';
+          document.head.appendChild(styleNonAdmin);
+        }
+        styleNonAdmin.textContent = `
+          /* Sembunyikan Tab Admin, Cetak/Download Sertifikat & Kartu Imunisasi untuk Non-Admin */
+          [data-tab="admin"], #admin, #btnCetakQrFromForm,
+          #qrPrintModal, #batchQrPrintModal, #certificatePrintArea,
+          #panelManajemenUser, .btn-hapus-sasaran, .admin-only {
+            display: none !important;
+          }
+        `;
+      } else if (styleNonAdmin) {
+        styleNonAdmin.remove();
+      }
     }
 
     window.togglePanelManajemenUser = function() {

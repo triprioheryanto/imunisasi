@@ -4828,7 +4828,7 @@ window.goToEdit = function(encodedJson) {
           if (notFoundBox) notFoundBox.style.display = 'flex';
         } else {
           if (notFoundBox) notFoundBox.style.display = 'none';
-         resultsDiv.innerHTML = matches.map(item => {
+        resultsDiv.innerHTML = matches.map(item => {
             const safeRegex = new RegExp(`(${rawQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
             const highlightedName = item.nama_anak.replace(safeRegex, '<span class="highlight-text">$1</span>');
             const encodedItem = encodeURIComponent(JSON.stringify(item));

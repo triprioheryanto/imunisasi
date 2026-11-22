@@ -1755,7 +1755,84 @@
             </select>
           </div>
         </div>
-        <!-- Navigasi Cepat Smooth Scroll untuk Data Panjang Catch Up -->
+        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; padding-top:10px; border-top:1px dashed var(--border-color);">
+          <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardCatchup1')" style="padding:5px 10px; font-size:0.75rem;"><i class="fas fa-arrow-down"></i> 1. Bayi &lt;1 Thn</button>
+          <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardCatchup2')" style="padding:5px 10px; font-size:0.75rem;"><i class="fas fa-arrow-down"></i> 2. Risiko DO</button>
+          <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardCatchup3')" style="padding:5px 10px; font-size:0.75rem;"><i class="fas fa-arrow-down"></i> 3. Booster Baduta</button>
+          <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardCatchup4')" style="padding:5px 10px; font-size:0.75rem;"><i class="fas fa-arrow-down"></i> 4. Catin &amp; Bumil</button>
+        </div>
+        <div class="actions">
+          <button class="btn btn-primary" id="btnApplyCatchUp"><i class="fas fa-calculator"></i> Analisis Catch Up</button>
+          <button class="btn btn-success" id="btnDownloadCatchUpExcel"><i class="fas fa-file-excel"></i> Download Excel (.xlsx)</button>
+        </div>
+      </div>
+      <div class="card" id="cardCatchup1"><h3><i class="fas fa-baby"></i> 1. Catch Up Usia &lt; 1 Tahun (Bayi)</h3><div id="panel_bayi_container" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Analisis Catch Up untuk memuat data.</p></div></div>
+      <div class="card" id="cardCatchup2"><h3><i class="fas fa-link"></i> 2. Risiko Drop Out Antigen Berkesinambungan</h3><div id="panel_berkesinambungan_container" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Analisis Catch Up untuk memuat data.</p></div></div>
+      <div class="card" id="cardCatchup3"><h3><i class="fas fa-child"></i> 3. Catch Up Usia 18 Bln - 3 Thn (Booster)</h3><div id="panel_baduta_container" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Analisis Catch Up untuk memuat data.</p></div></div>
+      <div class="card" id="cardCatchup4"><h3><i class="fas fa-female"></i> 4. Catch Up Td Catin &amp; Ibu Hamil</h3><div id="panel_dewasa_container" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Analisis Catch Up untuk memuat data.</p></div></div>
+    </section>
+
+    <!-- TAB 4: KUMULATIF -->
+    <section id="kumulatif" class="tab-panel" style="display:none">
+      <div class="card">
+        <h3><i class="fas fa-filter"></i> Filter Laporan Kumulatif &amp; Ekspor Spesifik</h3>
+        <div class="grid">
+          <div class="form-group"><label>Tahun</label><select id="filter_tahun"><option value="2026">2026</option><option value="2025">2025</option><option value="ALL">-- Semua Tahun --</option></select></div>
+          <div class="form-group">
+            <label>Bulan Spesifik</label>
+            <select id="filter_bulan">
+              <option value="ALL">-- Semua Bulan --</option>
+              <option value="01">Januari (01)</option><option value="02">Februari (02)</option><option value="03">Maret (03)</option>
+              <option value="04">April (04)</option><option value="05">Mei (05)</option><option value="06">Juni (06)</option>
+              <option value="07">Juli (07)</option><option value="08">Agustus (08)</option><option value="09">September (09)</option>
+              <option value="10">Oktober (10)</option><option value="11">November (11)</option><option value="12">Desember (12)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Opsi Seleksi Kategori</label>
+            <select id="filter_kategori">
+              <option value="BAYI_0_24">Bayi Usia 0 - 24 Bulan (Sampai MR2)</option><option value="IMUNISASI_BAYI">Imunisasi Dasar Bayi (0 - 12 Bulan)</option>
+              <option value="BADUTA">Imunisasi Lanjutan Baduta (MR2 &amp; DPT4)</option><option value="BIAS">BIAS (Anak Sekolah)</option>
+              <option value="CATIN">Td Catin</option><option value="BUMIL">Td Ibu Hamil</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Filter Antigen Spesifik</label><select id="filter_antigen_spesifik"><option value="ALL">-- Semua Antigen --</option></select></div>
+          <div class="form-group full-width">
+            <label>Desa</label>
+            <select id="filter_desa">
+              <option value="ALL">-- Semua Desa --</option><option value="Melata">Melata</option><option value="Nanuah">Nanuah</option><option value="Topalan">Topalan</option>
+              <option value="Batu Ampar">Batu Ampar</option><option value="Lubuk Hiju">Lubuk Hiju</option><option value="Bukit Makmur">Bukit Makmur</option>
+              <option value="Bukit Raya">Bukit Raya</option><option value="Modang Mas">Modang Mas</option><option value="Mukti Manunggal">Mukti Manunggal</option>
+              <option value="Sumber Jaya">Sumber Jaya</option><option value="Bukit Harum">Bukit Harum</option><option value="PT. TSA">PT. TSA</option><option value="PT. SHS">PT. SHS</option>
+            </select>
+          </div>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardReviewKumulatif')"><i class="fas fa-arrow-down"></i> Ke Tabel Hasil</button>
+          <button class="btn btn-primary" id="btnApplyFilter"><i class="fas fa-search"></i> Hitung Laporan</button>
+          <button class="btn btn-success" id="btnDownloadExcelFilter"><i class="fas fa-file-excel"></i> Download Excel (Sesuai Filter)</button>
+        </div>
+      </div>
+      <div class="card" id="cardReviewKumulatif"><h3><i class="fas fa-list-alt"></i> Hasil Rekapitulasi Matriks</h3><div id="reviewContainer" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Hitung Laporan untuk memuat data.</p></div></div>
+    </section>
+
+    <!-- TAB 5: CAPAIAN -->
+    <section id="capaian" class="tab-panel" style="display:none">
+      <div class="card">
+        <h3><i class="fas fa-filter"></i> Filter Capaian</h3>
+        <div class="grid">
+          <div class="form-group"><label>Tahun</label><select id="cap_filter_tahun"><option value="2026">2026</option><option value="2025">2025</option></select></div>
+          <div class="form-group">
+            <label>Bulan Spesifik</label>
+            <select id="cap_filter_bulan">
+              <option value="ALL">-- Semua Bulan (Tahunan) --</option>
+              <option value="01">Januari (01)</option><option value="02">Februari (02)</option><option value="03">Maret (03)</option>
+              <option value="04">April (04)</option><option value="05">Mei (05)</option><option value="06">Juni (06)</option>
+              <option value="07">Juli (07)</option><option value="08">Agustus (08)</option><option value="09">September (09)</option>
+              <option value="10">Oktober (10)</option><option value="11">November (11)</option><option value="12">Desember (12)</option>
+            </select>
+          </div>
+        </div>
         <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; padding-top:10px; border-top:1px dashed var(--border-color);">
           <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardCapaian1')" style="padding:5px 10px; font-size:0.75rem;"><i class="fas fa-arrow-down"></i> 1. Bayi &amp; Baduta</button>
           <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardCapaian2')" style="padding:5px 10px; font-size:0.75rem;"><i class="fas fa-arrow-down"></i> 2. Tabel IDL (&lt;12 Bln)</button>
@@ -1768,6 +1845,7 @@
       <div class="card" id="cardCapaian2"><h3><i class="fas fa-certificate" style="color:var(--success)"></i> 2. Imunisasi Dasar Lengkap (IDL &mdash; Selesai Usia &lt; 12 Bulan)</h3><div id="containerTabelIDL" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Hitung Capaian.</p></div></div>
       <div class="card" id="cardCapaian2b"><h3><i class="fas fa-award" style="color:#0D9488"></i> 3. Imunisasi Baduta Lengkap (IBL &mdash; Selesai Usia &lt; 24 Bulan)</h3><div id="containerTabelIBL" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Hitung Capaian.</p></div></div>
       <div class="card" id="cardCapaian3"><h3><i class="fas fa-school" style="color:var(--info)"></i> 4. Capaian BIAS</h3><div id="containerCapaianBIAS" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Hitung Capaian.</p></div></div>
+    </section>
 <!-- TAB 6: ADMIN & KONTROL -->
     <section id="admin" class="tab-panel" style="display:none">
       <div class="card" style="background:linear-gradient(135deg, #FFF5F5 0%, #FFE4E6 100%); border:1.5px solid #FDA4AF;">
@@ -5266,7 +5344,7 @@ window.selectFromLiveSearch = function(encodedJson) {
       }
     }
 
-    window.hapusTrans = async function(docId) {
+window.hapusTrans = async function(docId) {
       if (!activePetugasName) {
         document.getElementById('loginModal').style.display = 'flex';
         return alert("Silakan login terlebih dahulu!");
@@ -5275,14 +5353,9 @@ window.selectFromLiveSearch = function(encodedJson) {
         if (navigator.onLine && docId !== 'offline') await deleteDoc(doc(db, COL_KOHORT, docId));
         refreshCacheGlobalData();
         loadRecentTransactions();
-        } catch (err) {
-        tbodyAnak.innerHTML = `<tr><td colspan="32" style="color:red;">Error: ${err.message}</td></tr>`;
-        tbodyDewasa.innerHTML = `<tr><td colspan="17" style="color:red;">Error: ${err.message}</td></tr>`;
-      }
-    }
-    window.loadRecentTransactions = loadRecentTransactions;
       }
     };
+    window.loadRecentTransactions = loadRecentTransactions;
 
     // =========================================================================
     // PENGATURAN ADMIN: TARGET SASARAN & PRIORITAS POP-UP IMUNISASI QR

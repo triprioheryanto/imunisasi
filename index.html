@@ -1740,7 +1740,7 @@
       </div>
     </section>
 
-    <!-- TAB 3: CATCH UP -->
+<!-- TAB 3: CATCH UP -->
     <section id="catchup" class="tab-panel" style="display:none">
       <div class="card">
         <h3><i class="fas fa-filter"></i> Filter Catch Up Wilayah</h3>
@@ -1755,21 +1755,64 @@
             </select>
           </div>
         </div>
-        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; padding-top:10px; border-top:1px dashed var(--border-color);">
-          <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardCatchup1')" style="padding:5px 10px; font-size:0.75rem;"><i class="fas fa-arrow-down"></i> 1. Bayi &lt;1 Thn</button>
-          <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardCatchup2')" style="padding:5px 10px; font-size:0.75rem;"><i class="fas fa-arrow-down"></i> 2. Risiko DO</button>
-          <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardCatchup3')" style="padding:5px 10px; font-size:0.75rem;"><i class="fas fa-arrow-down"></i> 3. Booster Baduta</button>
-          <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardCatchup4')" style="padding:5px 10px; font-size:0.75rem;"><i class="fas fa-arrow-down"></i> 4. Catin &amp; Bumil</button>
+
+        <div style="margin-top:8px; padding-top:10px; border-top:1px dashed var(--border-color);">
+          <div style="font-size:0.75rem; color:var(--muted); margin-bottom:6px; font-weight:600;">
+            <i class="fas fa-hand-pointer"></i> Klik kategori di bawah untuk membuka atau menutup tabelnya:
+          </div>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button type="button" id="btnToggleCatchup1" class="btn btn-ghost" onclick="toggleCatchupCard(1)" style="padding:6px 11px; font-size:0.76rem;">
+              <i class="fas fa-eye"></i> 1. Bayi &lt;1 Thn <span id="badgeCatchupCount1" style="background:#E2E8F0; color:#0F172A; padding:1px 6px; border-radius:10px; font-size:0.7rem; font-weight:800;">0</span>
+            </button>
+            <button type="button" id="btnToggleCatchup2" class="btn btn-ghost" onclick="toggleCatchupCard(2)" style="padding:6px 11px; font-size:0.76rem;">
+              <i class="fas fa-eye"></i> 2. Risiko DO <span id="badgeCatchupCount2" style="background:#E2E8F0; color:#0F172A; padding:1px 6px; border-radius:10px; font-size:0.7rem; font-weight:800;">0</span>
+            </button>
+            <button type="button" id="btnToggleCatchup3" class="btn btn-ghost" onclick="toggleCatchupCard(3)" style="padding:6px 11px; font-size:0.76rem;">
+              <i class="fas fa-eye"></i> 3. Booster Baduta <span id="badgeCatchupCount3" style="background:#E2E8F0; color:#0F172A; padding:1px 6px; border-radius:10px; font-size:0.7rem; font-weight:800;">0</span>
+            </button>
+            <button type="button" id="btnToggleCatchup4" class="btn btn-ghost" onclick="toggleCatchupCard(4)" style="padding:6px 11px; font-size:0.76rem;">
+              <i class="fas fa-eye"></i> 4. Catin &amp; Bumil <span id="badgeCatchupCount4" style="background:#E2E8F0; color:#0F172A; padding:1px 6px; border-radius:10px; font-size:0.7rem; font-weight:800;">0</span>
+            </button>
+          </div>
         </div>
+
         <div class="actions">
           <button class="btn btn-primary" id="btnApplyCatchUp"><i class="fas fa-calculator"></i> Analisis Catch Up</button>
           <button class="btn btn-success" id="btnDownloadCatchUpExcel"><i class="fas fa-file-excel"></i> Download Excel (.xlsx)</button>
         </div>
       </div>
-      <div class="card" id="cardCatchup1"><h3><i class="fas fa-baby"></i> 1. Catch Up Usia &lt; 1 Tahun (Bayi)</h3><div id="panel_bayi_container" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Analisis Catch Up untuk memuat data.</p></div></div>
-      <div class="card" id="cardCatchup2"><h3><i class="fas fa-link"></i> 2. Risiko Drop Out Antigen Berkesinambungan</h3><div id="panel_berkesinambungan_container" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Analisis Catch Up untuk memuat data.</p></div></div>
-      <div class="card" id="cardCatchup3"><h3><i class="fas fa-child"></i> 3. Catch Up Usia 18 Bln - 3 Thn (Booster)</h3><div id="panel_baduta_container" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Analisis Catch Up untuk memuat data.</p></div></div>
-      <div class="card" id="cardCatchup4"><h3><i class="fas fa-female"></i> 4. Catch Up Td Catin &amp; Ibu Hamil</h3><div id="panel_dewasa_container" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Analisis Catch Up untuk memuat data.</p></div></div>
+
+      <div class="card" id="cardCatchup1" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px;">
+          <h3 style="margin:0;"><i class="fas fa-baby"></i> 1. Catch Up Usia &lt; 1 Tahun (Bayi)</h3>
+          <button type="button" class="btn btn-ghost" onclick="toggleCatchupCard(1, false)" style="padding:4px 10px; font-size:0.75rem;"><i class="fas fa-times"></i> Tutup</button>
+        </div>
+        <div id="panel_bayi_container" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Memuat data...</p></div>
+      </div>
+
+      <div class="card" id="cardCatchup2" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px;">
+          <h3 style="margin:0;"><i class="fas fa-link"></i> 2. Risiko Drop Out Antigen Berkesinambungan</h3>
+          <button type="button" class="btn btn-ghost" onclick="toggleCatchupCard(2, false)" style="padding:4px 10px; font-size:0.75rem;"><i class="fas fa-times"></i> Tutup</button>
+        </div>
+        <div id="panel_berkesinambungan_container" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Memuat data...</p></div>
+      </div>
+
+      <div class="card" id="cardCatchup3" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px;">
+          <h3 style="margin:0;"><i class="fas fa-child"></i> 3. Catch Up Usia 18 Bln - 3 Thn (Booster)</h3>
+          <button type="button" class="btn btn-ghost" onclick="toggleCatchupCard(3, false)" style="padding:4px 10px; font-size:0.75rem;"><i class="fas fa-times"></i> Tutup</button>
+        </div>
+        <div id="panel_baduta_container" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Memuat data...</p></div>
+      </div>
+
+      <div class="card" id="cardCatchup4" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px;">
+          <h3 style="margin:0;"><i class="fas fa-female"></i> 4. Catch Up Td Catin &amp; Ibu Hamil</h3>
+          <button type="button" class="btn btn-ghost" onclick="toggleCatchupCard(4, false)" style="padding:4px 10px; font-size:0.75rem;"><i class="fas fa-times"></i> Tutup</button>
+        </div>
+        <div id="panel_dewasa_container" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Memuat data...</p></div>
+      </div>
     </section>
 
     <!-- TAB 4: KUMULATIF -->
@@ -4442,7 +4485,10 @@ window.goToEdit = function(encodedJson) {
       const targetPanel = document.getElementById(target);
       if (targetPanel) targetPanel.style.display = 'block';
       if (target === 'imunisasi') loadRecentTransactions();
-      if (target === 'catchup') loadCatchUpAnalysis();
+      if (target === 'catchup') {
+        closeAllCatchupCards();
+        loadCatchUpAnalysis();
+      }
       if (target === 'capaian') loadCapanTabContent();
       if (target === 'admin') {
         renderUserManagementTable();
@@ -4534,6 +4580,10 @@ window.goToEdit = function(encodedJson) {
       bindEvent('btnApplyFilter', 'click', loadReviewDetail);
       bindEvent('btnDownloadExcelFilter', 'click', () => downloadExcelFiltered('kumulatif'));
       bindEvent('btnApplyCatchUp', 'click', loadCatchUpAnalysis);
+      bindEvent('catchup_filter_desa', 'change', () => {
+        catchUpDataLoadedForDesa = null;
+        loadCatchUpAnalysis();
+      });
       bindEvent('btnDownloadCatchUpExcel', 'click', downloadCatchUpExcel);
       bindEvent('btnHitungCapaian', 'click', loadCapanTabContent);
       bindEvent('formTargetSasaran', 'submit', handleSaveTargetSasaran);
@@ -6060,7 +6110,39 @@ window.hapusTrans = async function(docId) {
       if (delayMonths === 3) return { style: "background-color: #FB923C; color: #FFFFFF; font-weight: 800; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem;", label: "Telat 3 Bln (Tinggi)" };
       return { style: "background-color: #EF4444; color: #FFFFFF; font-weight: 800; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem;", label: `Telat ${delayMonths} Bln (Drop Out Heavy)` };
     }
+let catchUpDataLoadedForDesa = null;
 
+    window.toggleCatchupCard = async function(cardNum, forceState = null) {
+      const card = document.getElementById(`cardCatchup${cardNum}`);
+      const btn = document.getElementById(`btnToggleCatchup${cardNum}`);
+      if (!card || !btn) return;
+
+      const isCurrentlyVisible = card.style.display !== 'none';
+      const shouldShow = forceState !== null ? forceState : !isCurrentlyVisible;
+
+      if (shouldShow) {
+        const desaSel = document.getElementById('catchup_filter_desa')?.value || 'ALL';
+        if (catchUpDataLoadedForDesa !== desaSel) {
+          await loadCatchUpAnalysis();
+        }
+        card.style.display = 'block';
+        btn.classList.remove('btn-ghost');
+        btn.classList.add('btn-info');
+        const iconEl = btn.querySelector('i');
+        if (iconEl) iconEl.className = 'fas fa-eye-slash';
+        setTimeout(() => smoothScrollToId(`cardCatchup${cardNum}`), 60);
+      } else {
+        card.style.display = 'none';
+        btn.classList.remove('btn-info');
+        btn.classList.add('btn-ghost');
+        const iconEl = btn.querySelector('i');
+        if (iconEl) iconEl.className = 'fas fa-eye';
+      }
+    };
+
+    window.closeAllCatchupCards = function() {
+      [1, 2, 3, 4].forEach(num => toggleCatchupCard(num, false));
+    };
     async function loadCatchUpAnalysis() {
       const desaSel = document.getElementById('catchup_filter_desa').value;
       const today = new Date();
@@ -6195,7 +6277,16 @@ window.hapusTrans = async function(docId) {
         alert("Error Catch Up: " + err.message);
       }
     }
-
+catchUpDataLoadedForDesa = desaSel;
+        const counts = [listBayi.length, listBerkesinambungan.length, listBaduta.length, listDewasa.length];
+        counts.forEach((cnt, idx) => {
+          const badge = document.getElementById(`badgeCatchupCount${idx + 1}`);
+          if (badge) {
+            badge.textContent = cnt;
+            badge.style.background = cnt > 0 ? '#FEE2E2' : '#E2E8F0';
+            badge.style.color = cnt > 0 ? '#991B1B' : '#0F172A';
+          }
+        });
     async function downloadCatchUpExcel() {
       const desaSel = document.getElementById('catchup_filter_desa').value;
       const today = new Date();

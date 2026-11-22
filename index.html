@@ -879,6 +879,32 @@
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 }
+    /* SUB-TOMBOL NAVIGASI PANEL ADMIN */
+    .admin-sub-btn {
+      background: #FFFFFF;
+      border: 1.5px solid #CBD5E1;
+      color: #1E293B;
+      padding: 8px 13px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .admin-sub-btn:hover {
+      background: #F8FAFC;
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+    .admin-sub-btn.active {
+      background: #EFF6FF;
+      border-color: var(--accent);
+      color: var(--accent);
+      box-shadow: 0 4px 12px rgba(0, 43, 91, 0.14);
+    }
   </style>
 </head>
 <body>
@@ -1956,31 +1982,49 @@
 <!-- TAB 6: ADMIN & KONTROL -->
     <section id="admin" class="tab-panel" style="display:none">
       <div class="card" style="background:linear-gradient(135deg, #FFF5F5 0%, #FFE4E6 100%); border:1.5px solid #FDA4AF;">
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-          <div>
-            <h2 style="margin:0;"><i class="fas fa-user-shield" style="color:var(--danger)"></i> Panel Kontrol &amp; Administrasi Sistem</h2>
-            <p class="lead" style="margin:4px 0 0 0;">Pusat kendali pengguna, cetak sertifikat &amp; kartu QR, ekspor-impor terfilter, target sasaran, serta logika urutan prioritas pop-up QR.</p>
+        <div>
+          <h2 style="margin:0;"><i class="fas fa-user-shield" style="color:var(--danger)"></i> Panel Kontrol &amp; Administrasi Sistem</h2>
+          <p class="lead" style="margin:4px 0 0 0;">Pilih salah satu menu administrasi di bawah ini untuk membuka fitur yang diperlukan.</p>
+        </div>
+
+        <div style="margin-top:12px; padding-top:12px; border-top:1px dashed #FDA4AF;">
+          <div style="font-size:0.75rem; color:#881337; margin-bottom:8px; font-weight:700;">
+            <i class="fas fa-hand-pointer"></i> Klik sub-tombol di bawah untuk membuka atau menutup fitur admin:
           </div>
-          <div style="display:flex; gap:6px; flex-wrap:wrap;">
-            <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardAdminExportImport')" style="padding:5px 10px; font-size:0.75rem; background:#FFF;"><i class="fas fa-arrow-down"></i> Ekspor/Impor</button>
-            <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardAdminSettings')" style="padding:5px 10px; font-size:0.75rem; background:#FFF;"><i class="fas fa-arrow-down"></i> Pengaturan Prioritas QR</button>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button type="button" id="btnAdminSub_users" class="admin-sub-btn" onclick="toggleAdminSubPanel('users')">
+              <i class="fas fa-users-cog" style="color:#2563EB; font-size:0.95rem;"></i>
+              <span>Manajemen Pengguna</span>
+            </button>
+            <button type="button" id="btnAdminSub_qr" class="admin-sub-btn" onclick="toggleAdminSubPanel('qr')">
+              <i class="fas fa-qrcode" style="color:#059669; font-size:0.95rem;"></i>
+              <span>Cetak Kartu QR &amp; Sertifikat</span>
+            </button>
+            <button type="button" id="btnAdminSub_export" class="admin-sub-btn" onclick="toggleAdminSubPanel('export')">
+              <i class="fas fa-database" style="color:#7C3AED; font-size:0.95rem;"></i>
+              <span>Ekspor &amp; Impor Data</span>
+            </button>
+            <button type="button" id="btnAdminSub_settings" class="admin-sub-btn" onclick="toggleAdminSubPanel('settings')">
+              <i class="fas fa-sliders" style="color:#D97706; font-size:0.95rem;"></i>
+              <span>Target, Kemasan &amp; Prioritas QR</span>
+            </button>
           </div>
         </div>
       </div>
 
-      <!-- KARTU MANAJEMEN PENGGUNA (KHUSUS ADMIN) -->
-      <div class="card" id="cardAdminUsers" style="background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%); border: 1.5px solid #93C5FD;">
+      <!-- 1. KARTU MANAJEMEN PENGGUNA (KHUSUS ADMIN) -->
+      <div class="card" id="cardAdminUsers" style="display:none; background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%); border: 1.5px solid #93C5FD;">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
           <div>
-            <h2 style="margin:0; color:var(--accent);"><i class="fas fa-users-cog" style="color:var(--info);"></i> Manajemen Pengguna (Petugas &amp; Kader)</h2>
+            <h2 style="margin:0; color:var(--accent);"><i class="fas fa-users-cog" style="color:#2563EB;"></i> Manajemen Pengguna (Petugas &amp; Kader)</h2>
             <p class="lead" style="font-size:0.82rem; margin:4px 0 0 0;">Tambah, ubah password, atau hapus akun petugas/kader yang berhak menginput data imunisasi.</p>
           </div>
-          <button type="button" class="btn btn-info" onclick="togglePanelManajemenUser()" style="padding:7px 13px; font-size:0.8rem;">
-            <i class="fas fa-user-plus"></i> Buka / Tutup Kelola Pengguna
+          <button type="button" class="btn btn-ghost" onclick="toggleAdminSubPanel('users', false)" style="background:#FFF; padding:5px 10px; font-size:0.75rem;">
+            <i class="fas fa-times"></i> Tutup
           </button>
         </div>
 
-      <div id="panelManajemenUser" style="display:none; margin-top:14px; border-top:1px dashed #93C5FD; padding-top:14px;">
+        <div id="panelManajemenUser" style="display:block; margin-top:14px; border-top:1px dashed #93C5FD; padding-top:14px;">
           <!-- BAGIAN 1: FORM TAMBAH / EDIT PENGGUNA -->
           <form id="formManajemenUser" style="background:#FFFFFF; padding:14px; border-radius:12px; border:1px solid #BFDBFE; margin-bottom:14px;">
             <input type="hidden" id="usr_edit_index" value="-1">
@@ -2033,7 +2077,7 @@
             </label>
           </div>
 
-          <!-- BAGIAN 2: TABEL DAFTAR PENGGUNA (7 KOLOM) -->
+          <!-- BAGIAN 2: TABEL DAFTAR PENGGUNA -->
           <div class="table-container" style="margin-top:0;">
             <table class="kohort-table" id="tblManajemenUser">
               <thead>
@@ -2085,14 +2129,19 @@
           </div>
         </div>
       </div>
-      
-      <!-- KARTU CETAK MASSAL / PILIHAN KARTU QR & SERTIFIKAT IMUNISASI (A4 & F4) -->
-      <div class="card" id="cardBatchQrPrinter" style="background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%); border: 1.5px solid #86EFAC;">
+
+      <!-- 2. KARTU CETAK MASSAL / PILIHAN KARTU QR & SERTIFIKAT IMUNISASI (A4 & F4) -->
+      <div class="card" id="cardBatchQrPrinter" style="display:none; background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%); border: 1.5px solid #86EFAC;">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:6px;">
           <h2 style="margin:0; color:#065F46;"><i class="fas fa-id-badge" style="color:#059669;"></i> Cetak Kartu QR &amp; Sertifikat Imunisasi (A4 &amp; F4)</h2>
-          <span id="batchQrCapacityBadge" style="background:#065F46; color:#FFFFFF; font-size:0.75rem; font-weight:800; padding:5px 12px; border-radius:20px;">
-            Kapasitas QR: 10 Kartu / Lembar A4
-          </span>
+          <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+            <span id="batchQrCapacityBadge" style="background:#065F46; color:#FFFFFF; font-size:0.75rem; font-weight:800; padding:5px 12px; border-radius:20px;">
+              Kapasitas QR: 10 Kartu / Lembar A4
+            </span>
+            <button type="button" class="btn btn-ghost" onclick="toggleAdminSubPanel('qr', false)" style="background:#FFF; padding:5px 10px; font-size:0.75rem;">
+              <i class="fas fa-times"></i> Tutup
+            </button>
+          </div>
         </div>
         <p class="lead" style="font-size:0.82rem; color:#1E293B; margin-bottom:12px;">
           Filter desa atau cari nama anak, lalu klik tombol <strong>Sertifikat</strong> pada baris anak untuk cetak satuan, atau <strong>centang beberapa anak</strong> untuk cetak <strong>Kartu QR (Dompet / Stiker KIA)</strong> maupun <strong>Sertifikat Imunisasi A4 Landscape</strong> secara massal.
@@ -2186,7 +2235,7 @@
         </div>
       </div>
 
-      <!-- AREA PRINTER SERTIFIKAT A4 LANDSCAPE (MENDUKUNG 1 MAUPUN BANYAK ANAK TERPILIH) -->
+      <!-- AREA PRINTER SERTIFIKAT A4 LANDSCAPE -->
       <div id="certificatePrintArea" style="display:none; margin-bottom:30px;">
         <div class="card no-print" style="background:#FFFBEB; border:1.5px solid #F59E0B; padding:12px 16px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
           <div style="font-size:0.85rem; font-weight:800; color:#92400E;">
@@ -2206,10 +2255,13 @@
         </div>
       </div>
 
-      <!-- EKSPOR & IMPOR DATA -->
-      <div class="grid" id="cardAdminExportImport">
+      <!-- 3. EKSPOR & IMPOR DATA -->
+      <div class="grid" id="cardAdminExportImport" style="display:none;">
         <div class="card">
-          <h3><i class="fas fa-file-export" style="color:var(--info)"></i> Ekspor Data Spesifik (Filter Ketat)</h3>
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:6px;">
+            <h3 style="margin:0;"><i class="fas fa-file-export" style="color:#7C3AED;"></i> Ekspor Data Spesifik (Filter Ketat)</h3>
+            <button type="button" class="btn btn-ghost" onclick="toggleAdminSubPanel('export', false)" style="padding:4px 9px; font-size:0.74rem;"><i class="fas fa-times"></i> Tutup</button>
+          </div>
           <p style="font-size:0.8rem; color:var(--muted);">Hasil ekspor menghitung tepat sesuai Tahun, Bulan, Desa, dan Antigen yang dipilih.</p>
           <div class="form-group">
             <label>Pilih Desa</label>
@@ -2246,7 +2298,10 @@
         </div>
 
         <div class="card">
-          <h3><i class="fas fa-upload" style="color:var(--primary)"></i> Import Database Ke Cloud</h3>
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:6px;">
+            <h3 style="margin:0;"><i class="fas fa-upload" style="color:var(--primary)"></i> Import Database Ke Cloud</h3>
+            <button type="button" class="btn btn-ghost" onclick="toggleAdminSubPanel('export', false)" style="padding:4px 9px; font-size:0.74rem;"><i class="fas fa-times"></i> Tutup</button>
+          </div>
           <p style="font-size:0.8rem; color:var(--muted);">Unggah file JSON/CSV untuk memperbarui basis data server.</p>
           <div class="form-group"><label>Pilih File (.json / .csv)</label><input type="file" id="importFile" accept=".json,.csv" multiple></div>
           <div id="importStatus" class="small" style="margin-top:6px;"></div>
@@ -2254,17 +2309,19 @@
         </div>
       </div>
 
-      <!-- PENGATURAN ADMIN: TARGET SASARAN, KEMASAN VAKSIN, & LOGIKA URUTAN PRIORITAS POP-UP QR -->
-      <div class="card" id="cardAdminSettings" style="background:#FFFBEB; border:1.5px solid #FCD34D;">
+      <!-- 4. PENGATURAN ADMIN: TARGET SASARAN, KEMASAN VAKSIN, & LOGIKA URUTAN PRIORITAS POP-UP QR -->
+      <div class="card" id="cardAdminSettings" style="display:none; background:#FFFBEB; border:1.5px solid #FCD34D;">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
           <div>
-            <h3 style="margin:0; color:#92400E; font-size:0.98rem;"><i class="fas fa-sliders"></i> Pengaturan Target Sasaran, Logistik &amp; Urutan Prioritas Pop-Up QR</h3>
-            <span style="font-size:0.76rem; color:#B45309;">Khusus akun Admin untuk menyesuaikan urutan rekomendasi jadwal vaksin QR sesuai stok lapangan.</span>
+            <h3 style="margin:0; color:#92400E; font-size:0.98rem;"><i class="fas fa-sliders" style="color:#D97706;"></i> Pengaturan Target Sasaran, Logistik &amp; Urutan Prioritas Pop-Up QR</h3>
+            <span style="font-size:0.76rem; color:#B45309;">Sesuaikan target wilayah, aturan kemasan vial, dan urutan rekomendasi jadwal vaksin QR sesuai stok lapangan.</span>
           </div>
-          <button class="btn btn-warning" onclick="toggleFormAdminSasaran()" style="padding:6px 12px; font-size:0.8rem;"><i class="fas fa-user-lock"></i> Buka / Tutup Pengaturan</button>
+          <button type="button" class="btn btn-ghost" onclick="toggleAdminSubPanel('settings', false)" style="background:#FFF; padding:5px 10px; font-size:0.75rem;">
+            <i class="fas fa-times"></i> Tutup
+          </button>
         </div>
 
-        <div id="panelAdminPengaturan" style="display:none; margin-top:14px; border-top:1px dashed #FCD34D; padding-top:14px;">
+        <div id="panelAdminPengaturan" style="display:block; margin-top:14px; border-top:1px dashed #FCD34D; padding-top:14px;">
           <!-- BAGIAN 1: TARGET SASARAN -->
           <h4 style="color:#92400E; margin-bottom:8px;"><i class="fas fa-bullseye"></i> 1. Form Target Sasaran Wilayah</h4>
           <form id="formTargetSasaran">
@@ -3514,8 +3571,7 @@
       const adminTabBtn = document.querySelector('.tab[data-tab="admin"]');
       if (adminTabBtn) adminTabBtn.click();
       setTimeout(() => {
-        renderBatchQrCandidateList();
-        smoothScrollToId('cardBatchQrPrinter');
+        toggleAdminSubPanel('qr', true);
       }, 120);
     };
 
@@ -4537,7 +4593,94 @@ window.goToEdit = function(encodedJson) {
      document.getElementById('loginModal').style.display = 'flex';
    }
  };
+// =========================================================================
+    // KONTROL SUB-TOMBOL PANEL ADMIN (AGAR TIDAK MENUMPUK KE BAWAH)
+    // =========================================================================
+    const ADMIN_SUB_PANELS = {
+      users: { elId: 'cardAdminUsers', displayType: 'block' },
+      qr: { elId: 'cardBatchQrPrinter', displayType: 'block' },
+      export: { elId: 'cardAdminExportImport', displayType: 'grid' },
+      settings: { elId: 'cardAdminSettings', displayType: 'block' }
+    };
 
+    window.closeAllAdminSubPanels = function() {
+      Object.entries(ADMIN_SUB_PANELS).forEach(([key, cfg]) => {
+        const panel = document.getElementById(cfg.elId);
+        const btn = document.getElementById(`btnAdminSub_${key}`);
+        if (panel) panel.style.display = 'none';
+        if (btn) btn.classList.remove('active');
+      });
+      const certArea = document.getElementById('certificatePrintArea');
+      if (certArea) certArea.style.display = 'none';
+    };
+
+    window.toggleAdminSubPanel = function(panelKey, forceState = null) {
+      if (!isCurrentUserAdmin()) {
+        return alert("🔒 Akses Ditolak: Fitur ini hanya dapat diakses oleh Admin.");
+      }
+      const cfg = ADMIN_SUB_PANELS[panelKey];
+      if (!cfg) return;
+
+      const targetEl = document.getElementById(cfg.elId);
+      const targetBtn = document.getElementById(`btnAdminSub_${panelKey}`);
+      if (!targetEl) return;
+
+      const isCurrentlyOpen = targetEl.style.display !== 'none';
+      const shouldOpen = forceState !== null ? forceState : !isCurrentlyOpen;
+
+      closeAllAdminSubPanels();
+
+      if (shouldOpen) {
+        targetEl.style.display = cfg.displayType;
+        if (targetBtn) targetBtn.classList.add('active');
+
+        if (panelKey === 'users') {
+          const innerUser = document.getElementById('panelManajemenUser');
+          if (innerUser) innerUser.style.display = 'block';
+          renderUserManagementTable();
+          loadLogAktivitasFromCloud();
+        } else if (panelKey === 'qr') {
+          renderBatchQrCandidateList();
+        } else if (panelKey === 'settings') {
+          const innerSet = document.getElementById('panelAdminPengaturan');
+          if (innerSet) innerSet.style.display = 'block';
+        }
+
+        setTimeout(() => smoothScrollToId(cfg.elId), 60);
+      }
+    };
+
+    window.switchTab = function(e) {
+      const target = e.currentTarget.getAttribute('data-tab');
+      if (target === 'admin' && !isCurrentUserAdmin()) {
+        return alert("🔒 Akses Ditolak: Menu Admin, Download/Cetak Sertifikat, dan Kartu Imunisasi hanya boleh diakses oleh Admin.");
+      }
+      document.querySelectorAll('.app-nav-tabs .tab').forEach(t => t.classList.remove('active'));
+      e.currentTarget.classList.add('active');
+      document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
+      const targetPanel = document.getElementById(target);
+      if (targetPanel) targetPanel.style.display = 'block';
+      if (target === 'imunisasi') loadRecentTransactions();
+      if (target === 'catchup') {
+        closeAllCatchupCards();
+        loadCatchUpAnalysis();
+      }
+      if (target === 'kumulatif') {
+        toggleKumulatifCard(false);
+        loadReviewDetail();
+      }
+      if (target === 'capaian') {
+        closeAllCapaianCards();
+        loadCapanTabContent();
+      }
+      if (target === 'admin') {
+        closeAllAdminSubPanels();
+        renderUserManagementTable();
+        renderBatchQrCandidateList();
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+  
     window.switchTab = function(e) {
       const target = e.currentTarget.getAttribute('data-tab');
       if (target === 'admin' && !isCurrentUserAdmin()) {

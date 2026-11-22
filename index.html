@@ -1877,10 +1877,10 @@
       </div>
     </section>
 
-    <!-- TAB 5: CAPAIAN -->
+<!-- TAB 5: CAPAIAN -->
     <section id="capaian" class="tab-panel" style="display:none">
       <div class="card">
-        <h3><i class="fas fa-filter"></i> Filter Capaian</h3>
+        <h3><i class="fas fa-filter"></i> Filter Capaian &amp; Laporan PWS</h3>
         <div class="grid">
           <div class="form-group"><label>Tahun</label><select id="cap_filter_tahun"><option value="2026">2026</option><option value="2025">2025</option></select></div>
           <div class="form-group">
@@ -1904,18 +1904,21 @@
               <i class="fas fa-eye"></i> 1. Bayi &amp; Baduta <span id="badgeCapaianCount1" style="background:#E2E8F0; color:#0F172A; padding:1px 6px; border-radius:10px; font-size:0.7rem; font-weight:800;">0 Dosis</span>
             </button>
             <button type="button" id="btnToggleCapaian2" class="btn btn-ghost" onclick="toggleCapaianCard('2')" style="padding:6px 11px; font-size:0.76rem;">
-              <i class="fas fa-eye"></i> 2. Tabel IDL (&lt;12 Bln) <span id="badgeCapaianCount2" style="background:#E2E8F0; color:#0F172A; padding:1px 6px; border-radius:10px; font-size:0.7rem; font-weight:800;">0.0%</span>
+              <i class="fas fa-eye"></i> 2. Tabel IDL (9&ndash;11 Bln) <span id="badgeCapaianCount2" style="background:#E2E8F0; color:#0F172A; padding:1px 6px; border-radius:10px; font-size:0.7rem; font-weight:800;">0.0%</span>
             </button>
             <button type="button" id="btnToggleCapaian2b" class="btn btn-ghost" onclick="toggleCapaianCard('2b')" style="padding:6px 11px; font-size:0.76rem;">
-              <i class="fas fa-eye"></i> 3. Tabel IBL (Baduta) <span id="badgeCapaianCount2b" style="background:#E2E8F0; color:#0F172A; padding:1px 6px; border-radius:10px; font-size:0.7rem; font-weight:800;">0.0%</span>
+              <i class="fas fa-eye"></i> 3. Tabel IBL (18&ndash;23 Bln) <span id="badgeCapaianCount2b" style="background:#E2E8F0; color:#0F172A; padding:1px 6px; border-radius:10px; font-size:0.7rem; font-weight:800;">0.0%</span>
             </button>
             <button type="button" id="btnToggleCapaian3" class="btn btn-ghost" onclick="toggleCapaianCard('3')" style="padding:6px 11px; font-size:0.76rem;">
-              <i class="fas fa-eye"></i> 4. Capaian BIAS <span id="badgeCapaianCount3" style="background:#E2E8F0; color:#0F172A; padding:1px 6px; border-radius:10px; font-size:0.7rem; font-weight:800;">0 Siswa</span>
+              <i class="fas fa-eye"></i> 4. Capaian BIAS (%) <span id="badgeCapaianCount3" style="background:#E2E8F0; color:#0F172A; padding:1px 6px; border-radius:10px; font-size:0.7rem; font-weight:800;">0.0%</span>
             </button>
           </div>
         </div>
 
-        <div class="actions"><button class="btn btn-primary" id="btnHitungCapaian"><i class="fas fa-chart-pie"></i> Hitung Capaian, IDL &amp; IBL</button></div>
+        <div class="actions">
+          <button type="button" class="btn btn-primary" id="btnHitungCapaian"><i class="fas fa-chart-pie"></i> Hitung Capaian, IDL, IBL &amp; BIAS</button>
+          <button type="button" class="btn btn-success" id="btnDownloadCapaianExcel" onclick="downloadCapaianExcel()"><i class="fas fa-file-excel"></i> Download Laporan Capaian (.xlsx)</button>
+        </div>
       </div>
 
       <div class="card" id="cardCapaian1" style="display:none;">
@@ -1928,7 +1931,7 @@
 
       <div class="card" id="cardCapaian2" style="display:none;">
         <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px;">
-          <h3 style="margin:0;"><i class="fas fa-certificate" style="color:var(--success)"></i> 2. Imunisasi Dasar Lengkap (IDL &mdash; Selesai Usia &lt; 12 Bulan)</h3>
+          <h3 style="margin:0;"><i class="fas fa-certificate" style="color:var(--success)"></i> 2. Imunisasi Dasar Lengkap (IDL &mdash; Kohort 9&ndash;11 Bln, Selesai &lt;12 Bln)</h3>
           <button type="button" class="btn btn-ghost" onclick="toggleCapaianCard('2', false)" style="padding:4px 10px; font-size:0.75rem;"><i class="fas fa-times"></i> Tutup</button>
         </div>
         <div id="containerTabelIDL" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Hitung Capaian.</p></div>
@@ -1936,7 +1939,7 @@
 
       <div class="card" id="cardCapaian2b" style="display:none;">
         <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px;">
-          <h3 style="margin:0;"><i class="fas fa-award" style="color:#0D9488"></i> 3. Imunisasi Baduta Lengkap (IBL &mdash; Selesai Usia &lt; 24 Bulan)</h3>
+          <h3 style="margin:0;"><i class="fas fa-award" style="color:#0D9488"></i> 3. Imunisasi Baduta Lengkap (IBL &mdash; Kohort 18&ndash;23 Bln, Selesai &lt;24 Bln)</h3>
           <button type="button" class="btn btn-ghost" onclick="toggleCapaianCard('2b', false)" style="padding:4px 10px; font-size:0.75rem;"><i class="fas fa-times"></i> Tutup</button>
         </div>
         <div id="containerTabelIBL" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Hitung Capaian.</p></div>
@@ -1944,7 +1947,7 @@
 
       <div class="card" id="cardCapaian3" style="display:none;">
         <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px;">
-          <h3 style="margin:0;"><i class="fas fa-school" style="color:var(--info)"></i> 4. Capaian BIAS</h3>
+          <h3 style="margin:0;"><i class="fas fa-school" style="color:var(--info)"></i> 4. Capaian BIAS &amp; Persentase (%)</h3>
           <button type="button" class="btn btn-ghost" onclick="toggleCapaianCard('3', false)" style="padding:4px 10px; font-size:0.75rem;"><i class="fas fa-times"></i> Tutup</button>
         </div>
         <div id="containerCapaianBIAS" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Hitung Capaian.</p></div>
@@ -5970,9 +5973,27 @@ window.hapusTrans = async function(docId) {
     };
   
    // =========================================================================
-    // TAB 5: PERHITUNGAN CAPAIAN, IDL (<12 BLN), & IBL (<24 BLN) STANDAR KEMENKES
+    // TAB 5: PERHITUNGAN CAPAIAN, IDL (9-11 BLN), IBL (18-23 BLN) & BIAS (%)
     // =========================================================================
     let capaianLoadedForPeriod = null;
+    let lastCapaianReportSnapshot = null;
+
+    function getCapaianReferenceDateStr(thn, bln) {
+      const now = new Date();
+      const todayStr = now.toISOString().split('T')[0];
+      const curYearStr = String(now.getFullYear());
+
+      if (!thn || thn === 'ALL') return todayStr;
+      if (bln && bln !== 'ALL') {
+        const y = parseInt(thn, 10);
+        const m = parseInt(bln, 10);
+        const lastDay = new Date(y, m, 0).getDate();
+        const endOfMonthStr = `${thn}-${bln}-${String(lastDay).padStart(2, '0')}`;
+        return endOfMonthStr > todayStr ? todayStr : endOfMonthStr;
+      }
+      if (thn === curYearStr) return todayStr;
+      return `${thn}-12-31`;
+    }
 
     window.toggleCapaianCard = async function(cardKey, forceState = null) {
       const card = document.getElementById(`cardCapaian${cardKey}`);
@@ -6026,10 +6047,29 @@ window.hapusTrans = async function(docId) {
           if (t.tahun === thn && t.desa) targetMap.set(t.desa.toLowerCase(), t);
         });
 
+        // Gabungkan data Cloud + Antrean Offline (selaras dengan kartu Tab Input)
+        const combinedMap = new Map();
         const snapKohort = await getDocs(collection(db, COL_KOHORT));
-        const kohortDocs = [];
-        snapKohort.forEach(d => kohortDocs.push(d.data()));
+        snapKohort.forEach(d => {
+          const dt = d.data();
+          const key = d.id || `${dt.desa}_${dt.nama_anak}_${dt.tgl_lahir}`.toLowerCase();
+          combinedMap.set(key, dt);
+        });
+        const offlineQueue = JSON.parse(localStorage.getItem('pkm_offline_queue') || '[]');
+        offlineQueue.forEach(item => {
+          const key = item.id || `${item.desa}_${item.nama_anak}_${item.tgl_lahir}`.toLowerCase();
+          combinedMap.set(key, { ...(combinedMap.get(key) || {}), ...item });
+        });
 
+        const kohortDocs = Array.from(combinedMap.values()).filter(d => {
+          if (d.peran === 'Catin' || d.peran === 'Bumil') return false;
+          if (typeof isWilayahDiizinkan === 'function' && !isWilayahDiizinkan(d.desa)) return false;
+          return true;
+        });
+
+        const refDateStr = getCapaianReferenceDateStr(thn, bln);
+
+        // 1. HITUNG CAPAIAN ANTIGEN BAYI & BADUTA
         const exactCounts = {};
         const kumulatifCounts = {};
         VAKSIN_ANAK_KEYS.forEach(v => {
@@ -6056,7 +6096,6 @@ window.hapusTrans = async function(docId) {
         const monthLabel = bln === 'ALL' ? 'Semua Bulan' : `Bulan ${BULAN_NAME_MAP[bln] || bln}`;
         const shortMonth = bln === 'ALL' ? 'Semua Bulan' : (BULAN_NAME_MAP[bln] || bln);
 
-        // TABEL 1: CAPAIAN ANTIGEN BAYI & BADUTA
         let htmlBayi = `<table class="kohort-table"><thead><tr><th rowspan="2">Kategori</th><th rowspan="2">Nama Antigen</th><th colspan="3">Dosis ${shortMonth}</th><th colspan="3">Kumulatif s/d ${shortMonth}</th></tr><tr><th>L</th><th>P</th><th>Total</th><th>L</th><th>P</th><th>Total</th></tr></thead><tbody>`;
         VAKSIN_ANAK_KEYS.forEach((vKey, idx) => {
           const kat = idx <= 18 ? "Imunisasi Bayi" : "Booster Baduta (MR2 & DPT4)";
@@ -6067,172 +6106,472 @@ window.hapusTrans = async function(docId) {
         htmlBayi += `</tbody></table>`;
         if (cBayi) cBayi.innerHTML = htmlBayi;
 
-        // Rekap IDL (< 12 bulan) & IBL (< 24 bulan) per Desa sesuai standar Kemenkes
+        // 2 & 3. REKAP IDL (KOHORT 9-11 BLN, SELESAI <12 BLN) & IBL (KOHORT 18-23 BLN, SELESAI <24 BLN)
         const idlDesaMap = {};
         const iblDesaMap = {};
         ALL_DESA_LIST.forEach(d => {
-          idlDesaMap[d.toLowerCase()] = { desa: d, countIDL_L: 0, countIDL_P: 0, countCatchUp: 0 };
-          iblDesaMap[d.toLowerCase()] = { desa: d, countIBL_L: 0, countIBL_P: 0 };
+          idlDesaMap[d.toLowerCase()] = { desa: d, kohortIDL: 0, countIDL_L: 0, countIDL_P: 0, countCatchUp: 0 };
+          iblDesaMap[d.toLowerCase()] = { desa: d, kohortIBL: 0, countIBL_L: 0, countIBL_P: 0 };
         });
 
         kohortDocs.forEach(d => {
-          const evalRes = evaluateKemenkesIdlIbl(d, (vDate) => isVaccineGivenUpToMonth(vDate, thn, bln));
           const desaKey = (d.desa || '').toLowerCase();
+          if (!idlDesaMap[desaKey]) return;
           const jk = d.jk === 'L' ? 'L' : 'P';
+          const ageAtRef = d.tgl_lahir ? getAgeInMonthsAtDate(d.tgl_lahir, refDateStr) : null;
+          const evalRes = evaluateKemenkesIdlIbl(d, (vDate) => isVaccineGivenUpToMonth(vDate, thn, bln));
 
-          if (idlDesaMap[desaKey]) {
+          // Kohort IDL: Bayi usia 9 - 11 bulan (identik dengan logika kartu Tab Input)
+          if (ageAtRef !== null && ageAtRef >= 9 && ageAtRef <= 11) {
+            idlDesaMap[desaKey].kohortIDL++;
             if (evalRes.isIdlValid) {
               if (jk === 'L') idlDesaMap[desaKey].countIDL_L++;
               else idlDesaMap[desaKey].countIDL_P++;
-            } else if (evalRes.isCatchUpIdl) {
-              idlDesaMap[desaKey].countCatchUp++;
             }
           }
 
-          if (iblDesaMap[desaKey] && evalRes.isIblValid) {
-            if (jk === 'L') iblDesaMap[desaKey].countIBL_L++;
-            else iblDesaMap[desaKey].countIBL_P++;
+          // Imunisasi Kejar (>= 12 bulan) dicatat terpisah agar tidak mencemari IDL murni
+          if (evalRes.isCatchUpIdl) {
+            idlDesaMap[desaKey].countCatchUp++;
+          }
+
+          // Kohort IBL: Baduta usia 18 - 23 bulan (identik dengan logika kartu Tab Input)
+          if (ageAtRef !== null && ageAtRef >= 18 && ageAtRef <= 23) {
+            iblDesaMap[desaKey].kohortIBL++;
+            if (evalRes.isIblValid) {
+              if (jk === 'L') iblDesaMap[desaKey].countIBL_L++;
+              else iblDesaMap[desaKey].countIBL_P++;
+            }
           }
         });
 
-        // TABEL 2: IDL (< 12 BULAN) + INFORMASI KEJAR (>= 12 BULAN)
-        let totalDalamIDL_L = 0, totalDalamIDL_P = 0, totalDalamTarget = 0, totalDalamCatchUp = 0;
-        let totalLuarIDL_L = 0, totalLuarIDL_P = 0, totalLuarTarget = 0, totalLuarCatchUp = 0;
-        let htmlIDL = `<table class="kohort-table"><thead><tr><th rowspan="2">Kategori</th><th rowspan="2">Desa</th><th rowspan="2">Target Bayi</th><th colspan="3">Bayi IDL Valid (&lt;12 Bln s/d ${monthLabel})</th><th rowspan="2">Capaian IDL (%)</th><th rowspan="2">Kejar (&ge;12 Bln)</th></tr><tr><th>L</th><th>P</th><th>Total</th></tr></thead><tbody><tr style="background:#E0F2FE; font-weight:700;"><td colspan="8" style="text-align:left; color:var(--accent);">A. DALAM WILAYAH</td></tr>`;
+        // RENDER TABEL 2: IDL (Keluarkan PT. TSA & PT. SHS dari pembagi capaian Puskesmas)
+        let totalDalamIDL_L = 0, totalDalamIDL_P = 0, totalDalamKohortIDL = 0, totalDalamTarget = 0, totalDalamCatchUp = 0;
+        let totalLuarIDL_L = 0, totalLuarIDL_P = 0, totalLuarKohortIDL = 0, totalLuarCatchUp = 0;
 
+        let htmlIDL = `<div style="padding:8px 12px; background:#F0FDF4; border-bottom:1px solid #BBF7D0; font-size:0.78rem; color:#065F46;">
+          <i class="fas fa-info-circle"></i> <strong>Standar Kemenkes:</strong> Menghitung bayi kohort usia <strong>9&ndash;11 bulan</strong> yang lengkap antigen dasar sebelum usia 12 bulan. Perusahaan luar wilayah (<strong>PT. TSA &amp; PT. SHS</strong>) <u>dikeluarkan dari pembagi</u> capaian Puskesmas karena di luar target yang ditetapkan.
+        </div>
+        <table class="kohort-table"><thead>
+          <tr>
+            <th rowspan="2">Kategori</th>
+            <th rowspan="2">Desa / Wilayah</th>
+            <th rowspan="2">Target Ditetapkan</th>
+            <th rowspan="2">Kohort Bayi<br>(9&ndash;11 Bln)</th>
+            <th colspan="3">Bayi IDL Valid (&lt;12 Bln s/d ${monthLabel})</th>
+            <th rowspan="2">Capaian IDL<br>(% Kohort)</th>
+            <th rowspan="2">Capaian vs<br>Target (%)</th>
+            <th rowspan="2">Kejar<br>(&ge;12 Bln)</th>
+          </tr>
+          <tr><th>L</th><th>P</th><th>Total</th></tr>
+        </thead><tbody>
+        <tr style="background:#E0F2FE; font-weight:700;"><td colspan="10" style="text-align:left; color:var(--accent);">A. DALAM WILAYAH (11 DESA SASARAN TETAP PUSKESMAS MELATA)</td></tr>`;
+
+        const idlRowsDalam = [];
         DESA_DALAM_WILAYAH.forEach(dName => {
           const item = idlDesaMap[dName.toLowerCase()];
           const targetObj = targetMap.get(dName.toLowerCase());
           const targetBayi = targetObj ? (targetObj.target_bayi || 0) : 0;
+          const kohortBayi = item ? item.kohortIDL : 0;
           const countIDL_L = item ? item.countIDL_L : 0;
           const countIDL_P = item ? item.countIDL_P : 0;
           const countCatchUp = item ? item.countCatchUp : 0;
           const countIDL_Total = countIDL_L + countIDL_P;
-          const persen = targetBayi > 0 ? ((countIDL_Total / targetBayi) * 100).toFixed(1) : "0.0";
+
+          const persenKohort = kohortBayi > 0 ? ((countIDL_Total / kohortBayi) * 100).toFixed(1) : "0.0";
+          const persenTarget = targetBayi > 0 ? ((countIDL_Total / targetBayi) * 100).toFixed(1) : "0.0";
+
           totalDalamIDL_L += countIDL_L;
           totalDalamIDL_P += countIDL_P;
+          totalDalamKohortIDL += kohortBayi;
           totalDalamTarget += targetBayi;
           totalDalamCatchUp += countCatchUp;
-          htmlIDL += `<tr><td>Dalam Wilayah</td><td style="text-align:left; font-weight:700;">Desa ${dName}</td><td>${targetBayi}</td><td>${countIDL_L}</td><td>${countIDL_P}</td><td style="font-weight:800; color:var(--success);">${countIDL_Total}</td><td style="font-weight:800; color:var(--accent);">${persen}%</td><td style="font-weight:700; color:#D97706;">${countCatchUp}</td></tr>`;
+
+          idlRowsDalam.push({
+            desa: dName, targetBayi, kohortBayi, countIDL_L, countIDL_P, countIDL_Total,
+            persenKohort, persenTarget, countCatchUp
+          });
+
+          htmlIDL += `<tr>
+            <td>Dalam Wilayah</td>
+            <td style="text-align:left; font-weight:700;">Desa ${dName}</td>
+            <td>${targetBayi}</td>
+            <td style="font-weight:700; color:#1D4ED8;">${kohortBayi}</td>
+            <td>${countIDL_L}</td>
+            <td>${countIDL_P}</td>
+            <td style="font-weight:800; color:var(--success);">${countIDL_Total}</td>
+            <td style="font-weight:800; color:var(--accent);">${persenKohort}%</td>
+            <td style="font-weight:700; color:#475569;">${targetBayi > 0 ? persenTarget + '%' : '-'}</td>
+            <td style="font-weight:700; color:#D97706;">${countCatchUp}</td>
+          </tr>`;
         });
 
         const sumDalamIDL = totalDalamIDL_L + totalDalamIDL_P;
-        const persenDalam = totalDalamTarget > 0 ? ((sumDalamIDL / totalDalamTarget) * 100).toFixed(1) : "0.0";
-        htmlIDL += `<tr style="background:#F1F5F9; font-weight:bold;"><td colspan="2" style="text-align:left; color:var(--accent);">SUBTOTAL DALAM WILAYAH:</td><td>${totalDalamTarget}</td><td>${totalDalamIDL_L}</td><td>${totalDalamIDL_P}</td><td style="color:var(--success); font-size:0.9rem;">${sumDalamIDL}</td><td style="color:var(--primary); font-size:0.9rem;">${persenDalam}%</td><td style="color:#D97706;">${totalDalamCatchUp}</td></tr><tr style="background:#FEF3C7; font-weight:700;"><td colspan="8" style="text-align:left; color:#92400E;">B. LUAR WILAYAH</td></tr>`;
+        const persenDalamKohort = totalDalamKohortIDL > 0 ? ((sumDalamIDL / totalDalamKohortIDL) * 100).toFixed(1) : "0.0";
+        const persenDalamTarget = totalDalamTarget > 0 ? ((sumDalamIDL / totalDalamTarget) * 100).toFixed(1) : "0.0";
 
+        htmlIDL += `<tr style="background:#F1F5F9; font-weight:bold;">
+          <td colspan="2" style="text-align:left; color:var(--accent);">SUBTOTAL DALAM WILAYAH (PEMBAGI RESMI):</td>
+          <td>${totalDalamTarget}</td>
+          <td style="color:#1D4ED8;">${totalDalamKohortIDL}</td>
+          <td>${totalDalamIDL_L}</td>
+          <td>${totalDalamIDL_P}</td>
+          <td style="color:var(--success); font-size:0.9rem;">${sumDalamIDL}</td>
+          <td style="color:var(--primary); font-size:0.92rem;">${persenDalamKohort}%</td>
+          <td style="color:var(--accent);">${totalDalamTarget > 0 ? persenDalamTarget + '%' : '-'}</td>
+          <td style="color:#D97706;">${totalDalamCatchUp}</td>
+        </tr>
+        <tr style="background:#FEF3C7; font-weight:700;"><td colspan="10" style="text-align:left; color:#92400E;">B. LUAR WILAYAH (PERUSAHAAN — DIKELUARKAN DARI PEMBAGI &amp; TARGET PUSKESMAS)</td></tr>`;
+
+        const idlRowsLuar = [];
         DESA_LUAR_WILAYAH.forEach(dName => {
           const item = idlDesaMap[dName.toLowerCase()];
-          const targetObj = targetMap.get(dName.toLowerCase());
-          const targetBayi = targetObj ? (targetObj.target_bayi || 0) : 0;
+          const kohortBayi = item ? item.kohortIDL : 0;
           const countIDL_L = item ? item.countIDL_L : 0;
           const countIDL_P = item ? item.countIDL_P : 0;
           const countCatchUp = item ? item.countCatchUp : 0;
           const countIDL_Total = countIDL_L + countIDL_P;
-          const persen = targetBayi > 0 ? ((countIDL_Total / targetBayi) * 100).toFixed(1) : "0.0";
+
           totalLuarIDL_L += countIDL_L;
           totalLuarIDL_P += countIDL_P;
-          totalLuarTarget += targetBayi;
+          totalLuarKohortIDL += kohortBayi;
           totalLuarCatchUp += countCatchUp;
-          htmlIDL += `<tr><td>Luar Wilayah</td><td style="text-align:left; font-weight:700;">${dName}</td><td>${targetBayi}</td><td>${countIDL_L}</td><td>${countIDL_P}</td><td style="font-weight:800; color:var(--success);">${countIDL_Total}</td><td style="font-weight:800; color:var(--accent);">${persen}%</td><td style="font-weight:700; color:#D97706;">${countCatchUp}</td></tr>`;
+
+          idlRowsLuar.push({
+            desa: dName, targetBayi: 0, kohortBayi, countIDL_L, countIDL_P, countIDL_Total, countCatchUp
+          });
+
+          htmlIDL += `<tr>
+            <td>Luar Wilayah</td>
+            <td style="text-align:left; font-weight:700;">${dName}</td>
+            <td style="color:#94A3B8; font-style:italic;">Di luar target</td>
+            <td style="color:#64748B;">${kohortBayi}</td>
+            <td>${countIDL_L}</td>
+            <td>${countIDL_P}</td>
+            <td style="font-weight:800; color:var(--success);">${countIDL_Total}</td>
+            <td style="color:#94A3B8; font-style:italic;">Di luar pembagi</td>
+            <td style="color:#94A3B8; font-style:italic;">Di luar pembagi</td>
+            <td style="font-weight:700; color:#D97706;">${countCatchUp}</td>
+          </tr>`;
         });
 
         const sumLuarIDL = totalLuarIDL_L + totalLuarIDL_P;
-        const persenLuar = totalLuarTarget > 0 ? ((sumLuarIDL / totalLuarTarget) * 100).toFixed(1) : "0.0";
+        const grandTotalIDL_L = totalDalamIDL_L + totalLuarIDL_L;
+        const grandTotalIDL_P = totalDalamIDL_P + totalLuarIDL_P;
         const grandTotalIDL = sumDalamIDL + sumLuarIDL;
-        const grandTotalTarget = totalDalamTarget + totalLuarTarget;
         const grandTotalCatchUp = totalDalamCatchUp + totalLuarCatchUp;
-        const grandPersen = grandTotalTarget > 0 ? ((grandTotalIDL / grandTotalTarget) * 100).toFixed(1) : "0.0";
 
-        htmlIDL += `<tr style="background:#F1F5F9; font-weight:bold;"><td colspan="2" style="text-align:left; color:#92400E;">SUBTOTAL LUAR WILAYAH:</td><td>${totalLuarTarget}</td><td>${totalLuarIDL_L}</td><td>${totalLuarIDL_P}</td><td style="color:var(--success); font-size:0.9rem;">${sumLuarIDL}</td><td style="color:var(--primary); font-size:0.9rem;">${persenLuar}%</td><td style="color:#D97706;">${totalLuarCatchUp}</td></tr></tbody><tfoot><tr style="background:#E2E8F0; font-weight:bold;"><td colspan="2" style="text-align:left; color:var(--accent);">TOTAL KESELURUHAN:</td><td>${grandTotalTarget}</td><td>${totalDalamIDL_L + totalLuarIDL_L}</td><td>${totalDalamIDL_P + totalLuarIDL_P}</td><td style="font-weight:800; color:var(--success); font-size:0.95rem;">${grandTotalIDL}</td><td style="font-weight:800; color:var(--primary); font-size:0.95rem;">${grandPersen}%</td><td style="font-weight:800; color:#D97706; font-size:0.95rem;">${grandTotalCatchUp}</td></tr></tfoot></table>`;
+        // Pembagi Puskesmas HANYA Dalam Wilayah (PT. TSA & PT. SHS dikeluarkan!)
+        const grandPersenKohortPuskesmas = totalDalamKohortIDL > 0 ? ((sumDalamIDL / totalDalamKohortIDL) * 100).toFixed(1) : "0.0";
+        const grandPersenTargetPuskesmas = totalDalamTarget > 0 ? ((sumDalamIDL / totalDalamTarget) * 100).toFixed(1) : "0.0";
+
+        htmlIDL += `<tr style="background:#F1F5F9; font-weight:bold;">
+          <td colspan="2" style="text-align:left; color:#92400E;">SUBTOTAL LUAR WILAYAH (NON-PEMBAGI):</td>
+          <td style="color:#94A3B8;">0</td>
+          <td style="color:#64748B;">${totalLuarKohortIDL}</td>
+          <td>${totalLuarIDL_L}</td>
+          <td>${totalLuarIDL_P}</td>
+          <td style="color:var(--success); font-size:0.9rem;">${sumLuarIDL}</td>
+          <td style="color:#94A3B8; font-style:italic;">-</td>
+          <td style="color:#94A3B8; font-style:italic;">-</td>
+          <td style="color:#D97706;">${totalLuarCatchUp}</td>
+        </tr></tbody>
+        <tfoot>
+          <tr style="background:#E2E8F0; font-weight:bold;">
+            <td colspan="2" style="text-align:left; color:var(--accent);">CAPAIAN PUSKESMAS (PEMBAGI: DALAM WILAYAH):</td>
+            <td>${totalDalamTarget}</td>
+            <td style="color:#1D4ED8;">${totalDalamKohortIDL}</td>
+            <td>${grandTotalIDL_L}</td>
+            <td>${grandTotalIDL_P}</td>
+            <td style="font-weight:800; color:var(--success); font-size:0.95rem;">${grandTotalIDL} <small style="font-weight:600; color:#475569;">(${sumDalamIDL} dlm)</small></td>
+            <td style="font-weight:800; color:var(--primary); font-size:0.95rem;">${grandPersenKohortPuskesmas}%</td>
+            <td style="font-weight:800; color:var(--accent); font-size:0.9rem;">${totalDalamTarget > 0 ? grandPersenTargetPuskesmas + '%' : '-'}</td>
+            <td style="font-weight:800; color:#D97706; font-size:0.95rem;">${grandTotalCatchUp}</td>
+          </tr>
+        </tfoot></table>`;
         if (cIDL) cIDL.innerHTML = htmlIDL;
 
-       // TABEL 3: IBL (IMUNISASI BADUTA LENGKAP < 24 BULAN)
-        let grandPersenIBL = "0.0";
-        if (cIBL) {
-          let totalDalamIBL_L = 0, totalDalamIBL_P = 0, totalDalamTargetBaduta = 0;
-          let totalLuarIBL_L = 0, totalLuarIBL_P = 0, totalLuarTargetBaduta = 0;
+        // RENDER TABEL 3: IBL (KOHORT 18-23 BLN, SELESAI <24 BLN, PEMBAGI DALAM WILAYAH)
+        let totalDalamIBL_L = 0, totalDalamIBL_P = 0, totalDalamKohortIBL = 0, totalDalamTargetBaduta = 0;
+        let totalLuarIBL_L = 0, totalLuarIBL_P = 0, totalLuarKohortIBL = 0;
+        const iblRowsDalam = [];
+        const iblRowsLuar = [];
 
-          let htmlIBL = `<table class="kohort-table"><thead><tr><th rowspan="2">Kategori</th><th rowspan="2">Desa</th><th rowspan="2">Target Baduta</th><th colspan="3">Baduta IBL Valid (s/d ${monthLabel})</th><th rowspan="2">Capaian IBL (%)</th></tr><tr><th>L</th><th>P</th><th>Total</th></tr></thead><tbody><tr style="background:#CCFBF1; font-weight:700;"><td colspan="7" style="text-align:left; color:#0F766E;">A. DALAM WILAYAH</td></tr>`;
+        let htmlIBL = `<div style="padding:8px 12px; background:#F0FDFA; border-bottom:1px solid #99F6E4; font-size:0.78rem; color:#115E59;">
+          <i class="fas fa-info-circle"></i> <strong>Standar Kemenkes:</strong> Menghitung baduta kohort usia <strong>18&ndash;23 bulan</strong> yang lengkap IDL + DPT-HB-Hib4 + MR2 sebelum usia 24 bulan (selaras dengan kartu Tab Input). Pembagi Puskesmas hanya menghitung 11 desa dalam wilayah.
+        </div>
+        <table class="kohort-table"><thead>
+          <tr>
+            <th rowspan="2">Kategori</th>
+            <th rowspan="2">Desa / Wilayah</th>
+            <th rowspan="2">Target Baduta</th>
+            <th rowspan="2">Kohort Baduta<br>(18&ndash;23 Bln)</th>
+            <th colspan="3">Baduta IBL Valid (&lt;24 Bln s/d ${monthLabel})</th>
+            <th rowspan="2">Capaian IBL<br>(% Kohort)</th>
+            <th rowspan="2">Capaian vs<br>Target (%)</th>
+          </tr>
+          <tr><th>L</th><th>P</th><th>Total</th></tr>
+        </thead><tbody>
+        <tr style="background:#CCFBF1; font-weight:700;"><td colspan="9" style="text-align:left; color:#0F766E;">A. DALAM WILAYAH (11 DESA SASARAN TETAP PUSKESMAS MELATA)</td></tr>`;
 
-          DESA_DALAM_WILAYAH.forEach(dName => {
-            const item = iblDesaMap[dName.toLowerCase()];
-            const targetObj = targetMap.get(dName.toLowerCase());
-            const targetBaduta = targetObj ? (targetObj.target_baduta || 0) : 0;
-            const countIBL_L = item ? item.countIBL_L : 0;
-            const countIBL_P = item ? item.countIBL_P : 0;
-            const countIBL_Total = countIBL_L + countIBL_P;
-            const persen = targetBaduta > 0 ? ((countIBL_Total / targetBaduta) * 100).toFixed(1) : "0.0";
-            totalDalamIBL_L += countIBL_L;
-            totalDalamIBL_P += countIBL_P;
-            totalDalamTargetBaduta += targetBaduta;
-            htmlIBL += `<tr><td>Dalam Wilayah</td><td style="text-align:left; font-weight:700;">Desa ${dName}</td><td>${targetBaduta}</td><td>${countIBL_L}</td><td>${countIBL_P}</td><td style="font-weight:800; color:#0D9488;">${countIBL_Total}</td><td style="font-weight:800; color:var(--accent);">${persen}%</td></tr>`;
+        DESA_DALAM_WILAYAH.forEach(dName => {
+          const item = iblDesaMap[dName.toLowerCase()];
+          const targetObj = targetMap.get(dName.toLowerCase());
+          const targetBaduta = targetObj ? (targetObj.target_baduta || 0) : 0;
+          const kohortBaduta = item ? item.kohortIBL : 0;
+          const countIBL_L = item ? item.countIBL_L : 0;
+          const countIBL_P = item ? item.countIBL_P : 0;
+          const countIBL_Total = countIBL_L + countIBL_P;
+
+          const persenKohort = kohortBaduta > 0 ? ((countIBL_Total / kohortBaduta) * 100).toFixed(1) : "0.0";
+          const persenTarget = targetBaduta > 0 ? ((countIBL_Total / targetBaduta) * 100).toFixed(1) : "0.0";
+
+          totalDalamIBL_L += countIBL_L;
+          totalDalamIBL_P += countIBL_P;
+          totalDalamKohortIBL += kohortBaduta;
+          totalDalamTargetBaduta += targetBaduta;
+
+          iblRowsDalam.push({
+            desa: dName, targetBaduta, kohortBaduta, countIBL_L, countIBL_P, countIBL_Total, persenKohort, persenTarget
           });
 
-          const sumDalamIBL = totalDalamIBL_L + totalDalamIBL_P;
-          const persenDalamIBL = totalDalamTargetBaduta > 0 ? ((sumDalamIBL / totalDalamTargetBaduta) * 100).toFixed(1) : "0.0";
-          htmlIBL += `<tr style="background:#F1F5F9; font-weight:bold;"><td colspan="2" style="text-align:left; color:#0F766E;">SUBTOTAL DALAM WILAYAH:</td><td>${totalDalamTargetBaduta}</td><td>${totalDalamIBL_L}</td><td>${totalDalamIBL_P}</td><td style="color:#0D9488; font-size:0.9rem;">${sumDalamIBL}</td><td style="color:var(--primary); font-size:0.9rem;">${persenDalamIBL}%</td></tr><tr style="background:#FEF3C7; font-weight:700;"><td colspan="7" style="text-align:left; color:#92400E;">B. LUAR WILAYAH</td></tr>`;
+          htmlIBL += `<tr>
+            <td>Dalam Wilayah</td>
+            <td style="text-align:left; font-weight:700;">Desa ${dName}</td>
+            <td>${targetBaduta}</td>
+            <td style="font-weight:700; color:#0F766E;">${kohortBaduta}</td>
+            <td>${countIBL_L}</td>
+            <td>${countIBL_P}</td>
+            <td style="font-weight:800; color:#0D9488;">${countIBL_Total}</td>
+            <td style="font-weight:800; color:var(--accent);">${persenKohort}%</td>
+            <td style="font-weight:700; color:#475569;">${targetBaduta > 0 ? persenTarget + '%' : '-'}</td>
+          </tr>`;
+        });
 
-          DESA_LUAR_WILAYAH.forEach(dName => {
-            const item = iblDesaMap[dName.toLowerCase()];
-            const targetObj = targetMap.get(dName.toLowerCase());
-            const targetBaduta = targetObj ? (targetObj.target_baduta || 0) : 0;
-            const countIBL_L = item ? item.countIBL_L : 0;
-            const countIBL_P = item ? item.countIBL_P : 0;
-            const countIBL_Total = countIBL_L + countIBL_P;
-            const persen = targetBaduta > 0 ? ((countIBL_Total / targetBaduta) * 100).toFixed(1) : "0.0";
-            totalLuarIBL_L += countIBL_L;
-            totalLuarIBL_P += countIBL_P;
-            totalLuarTargetBaduta += targetBaduta;
-            htmlIBL += `<tr><td>Luar Wilayah</td><td style="text-align:left; font-weight:700;">${dName}</td><td>${targetBaduta}</td><td>${countIBL_L}</td><td>${countIBL_P}</td><td style="font-weight:800; color:#0D9488;">${countIBL_Total}</td><td style="font-weight:800; color:var(--accent);">${persen}%</td></tr>`;
+        const sumDalamIBL = totalDalamIBL_L + totalDalamIBL_P;
+        const persenDalamKohortIBL = totalDalamKohortIBL > 0 ? ((sumDalamIBL / totalDalamKohortIBL) * 100).toFixed(1) : "0.0";
+        const persenDalamTargetIBL = totalDalamTargetBaduta > 0 ? ((sumDalamIBL / totalDalamTargetBaduta) * 100).toFixed(1) : "0.0";
+
+        htmlIBL += `<tr style="background:#F1F5F9; font-weight:bold;">
+          <td colspan="2" style="text-align:left; color:#0F766E;">SUBTOTAL DALAM WILAYAH (PEMBAGI RESMI):</td>
+          <td>${totalDalamTargetBaduta}</td>
+          <td style="color:#0F766E;">${totalDalamKohortIBL}</td>
+          <td>${totalDalamIBL_L}</td>
+          <td>${totalDalamIBL_P}</td>
+          <td style="color:#0D9488; font-size:0.9rem;">${sumDalamIBL}</td>
+          <td style="color:var(--primary); font-size:0.92rem;">${persenDalamKohortIBL}%</td>
+          <td style="color:var(--accent);">${totalDalamTargetBaduta > 0 ? persenDalamTargetIBL + '%' : '-'}</td>
+        </tr>
+        <tr style="background:#FEF3C7; font-weight:700;"><td colspan="9" style="text-align:left; color:#92400E;">B. LUAR WILAYAH (PERUSAHAAN — DIKELUARKAN DARI PEMBAGI &amp; TARGET PUSKESMAS)</td></tr>`;
+
+        DESA_LUAR_WILAYAH.forEach(dName => {
+          const item = iblDesaMap[dName.toLowerCase()];
+          const kohortBaduta = item ? item.kohortIBL : 0;
+          const countIBL_L = item ? item.countIBL_L : 0;
+          const countIBL_P = item ? item.countIBL_P : 0;
+          const countIBL_Total = countIBL_L + countIBL_P;
+
+          totalLuarIBL_L += countIBL_L;
+          totalLuarIBL_P += countIBL_P;
+          totalLuarKohortIBL += kohortBaduta;
+
+          iblRowsLuar.push({
+            desa: dName, targetBaduta: 0, kohortBaduta, countIBL_L, countIBL_P, countIBL_Total
           });
 
-          const sumLuarIBL = totalLuarIBL_L + totalLuarIBL_P;
-          const persenLuarIBL = totalLuarTargetBaduta > 0 ? ((sumLuarIBL / totalLuarTargetBaduta) * 100).toFixed(1) : "0.0";
-          const grandTotalIBL = sumDalamIBL + sumLuarIBL;
-          const grandTotalTargetBaduta = totalDalamTargetBaduta + totalLuarTargetBaduta;
-          grandPersenIBL = grandTotalTargetBaduta > 0 ? ((grandTotalIBL / grandTotalTargetBaduta) * 100).toFixed(1) : "0.0";
+          htmlIBL += `<tr>
+            <td>Luar Wilayah</td>
+            <td style="text-align:left; font-weight:700;">${dName}</td>
+            <td style="color:#94A3B8; font-style:italic;">Di luar target</td>
+            <td style="color:#64748B;">${kohortBaduta}</td>
+            <td>${countIBL_L}</td>
+            <td>${countIBL_P}</td>
+            <td style="font-weight:800; color:#0D9488;">${countIBL_Total}</td>
+            <td style="color:#94A3B8; font-style:italic;">Di luar pembagi</td>
+            <td style="color:#94A3B8; font-style:italic;">Di luar pembagi</td>
+          </tr>`;
+        });
 
-          htmlIBL += `<tr style="background:#F1F5F9; font-weight:bold;"><td colspan="2" style="text-align:left; color:#92400E;">SUBTOTAL LUAR WILAYAH:</td><td>${totalLuarTargetBaduta}</td><td>${totalLuarIBL_L}</td><td>${totalLuarIBL_P}</td><td style="color:#0D9488; font-size:0.9rem;">${sumLuarIBL}</td><td style="color:var(--primary); font-size:0.9rem;">${persenLuarIBL}%</td></tr></tbody><tfoot><tr style="background:#E2E8F0; font-weight:bold;"><td colspan="2" style="text-align:left; color:var(--accent);">TOTAL KESELURUHAN:</td><td>${grandTotalTargetBaduta}</td><td>${totalDalamIBL_L + totalLuarIBL_L}</td><td>${totalDalamIBL_P + totalLuarIBL_P}</td><td style="font-weight:800; color:#0D9488; font-size:0.95rem;">${grandTotalIBL}</td><td style="font-weight:800; color:var(--primary); font-size:0.95rem;">${grandPersenIBL}%</td></tr></tfoot></table>`;
-          cIBL.innerHTML = htmlIBL;
-        }
+        const sumLuarIBL = totalLuarIBL_L + totalLuarIBL_P;
+        const grandTotalIBL_L = totalDalamIBL_L + totalLuarIBL_L;
+        const grandTotalIBL_P = totalDalamIBL_P + totalLuarIBL_P;
+        const grandTotalIBL = sumDalamIBL + sumLuarIBL;
+        const grandPersenKohortIBL = totalDalamKohortIBL > 0 ? ((sumDalamIBL / totalDalamKohortIBL) * 100).toFixed(1) : "0.0";
+        const grandPersenTargetIBL = totalDalamTargetBaduta > 0 ? ((sumDalamIBL / totalDalamTargetBaduta) * 100).toFixed(1) : "0.0";
 
-        // TABEL 4: BIAS
+        htmlIBL += `<tr style="background:#F1F5F9; font-weight:bold;">
+          <td colspan="2" style="text-align:left; color:#92400E;">SUBTOTAL LUAR WILAYAH (NON-PEMBAGI):</td>
+          <td style="color:#94A3B8;">0</td>
+          <td style="color:#64748B;">${totalLuarKohortIBL}</td>
+          <td>${totalLuarIBL_L}</td>
+          <td>${totalLuarIBL_P}</td>
+          <td style="color:#0D9488; font-size:0.9rem;">${sumLuarIBL}</td>
+          <td style="color:#94A3B8; font-style:italic;">-</td>
+          <td style="color:#94A3B8; font-style:italic;">-</td>
+        </tr></tbody>
+        <tfoot>
+          <tr style="background:#E2E8F0; font-weight:bold;">
+            <td colspan="2" style="text-align:left; color:var(--accent);">CAPAIAN PUSKESMAS (PEMBAGI: DALAM WILAYAH):</td>
+            <td>${totalDalamTargetBaduta}</td>
+            <td style="color:#0F766E;">${totalDalamKohortIBL}</td>
+            <td>${grandTotalIBL_L}</td>
+            <td>${grandTotalIBL_P}</td>
+            <td style="font-weight:800; color:#0D9488; font-size:0.95rem;">${grandTotalIBL} <small style="font-weight:600; color:#475569;">(${sumDalamIBL} dlm)</small></td>
+            <td style="font-weight:800; color:var(--primary); font-size:0.95rem;">${grandPersenKohortIBL}%</td>
+            <td style="font-weight:800; color:var(--accent); font-size:0.9rem;">${totalDalamTargetBaduta > 0 ? grandPersenTargetIBL + '%' : '-'}</td>
+          </tr>
+        </tfoot></table>`;
+        if (cIBL) cIBL.innerHTML = htmlIBL;
+
+        // 4. TABEL BIAS DENGAN PERSENTASE (%)
         const snapBias = await getDocs(collection(db, COL_BIAS));
-        const biasExact = { MR: { L: 0, P: 0 }, DT: { L: 0, P: 0 }, Td: { L: 0, P: 0 }, HPV: { L: 0, P: 0 } };
-        const biasKumulatif = { MR: { L: 0, P: 0 }, DT: { L: 0, P: 0 }, Td: { L: 0, P: 0 }, HPV: { L: 0, P: 0 } };
+        const biasSummary = {
+          MR: { sasL: 0, sasP: 0, exL: 0, exP: 0, kumL: 0, kumP: 0, doVal: 0 },
+          DT: { sasL: 0, sasP: 0, exL: 0, exP: 0, kumL: 0, kumP: 0, doVal: 0 },
+          Td: { sasL: 0, sasP: 0, exL: 0, exP: 0, kumL: 0, kumP: 0, doVal: 0 },
+          HPV: { sasL: 0, sasP: 0, exL: 0, exP: 0, kumL: 0, kumP: 0, doVal: 0 }
+        };
+        const biasSchoolRows = [];
 
         snapBias.forEach(docSnap => {
           const b = docSnap.data();
-          const capL = b.data?.Capaian_L || 0;
-          const capP = b.data?.Capaian_P || 0;
-          if (isVaccineGivenExactMonth(b.tanggal, thn, bln) && biasExact[b.jenis_vaksin]) {
-            biasExact[b.jenis_vaksin].L += capL;
-            biasExact[b.jenis_vaksin].P += capP;
+          const vk = b.jenis_vaksin;
+          if (!biasSummary[vk]) return;
+
+          const dt = b.data || {};
+          const sasL = Number(dt.Sasaran_L || 0);
+          const sasP = Number(dt.Sasaran_P || 0);
+          const capL = Number(dt.Capaian_L || 0);
+          const capP = Number(dt.Capaian_P || 0);
+          const doVal = Number(dt.DropOut || 0);
+
+          if (isVaccineGivenExactMonth(b.tanggal, thn, bln)) {
+            biasSummary[vk].exL += capL;
+            biasSummary[vk].exP += capP;
           }
-          if (isVaccineGivenUpToMonth(b.tanggal, thn, bln) && biasKumulatif[b.jenis_vaksin]) {
-            biasKumulatif[b.jenis_vaksin].L += capL;
-            biasKumulatif[b.jenis_vaksin].P += capP;
+          if (isVaccineGivenUpToMonth(b.tanggal, thn, bln)) {
+            biasSummary[vk].sasL += sasL;
+            biasSummary[vk].sasP += sasP;
+            biasSummary[vk].kumL += capL;
+            biasSummary[vk].kumP += capP;
+            biasSummary[vk].doVal += doVal;
+
+            biasSchoolRows.push({
+              sekolah: b.sekolah || '-',
+              jenjang: SCHOOL_DATA[b.sekolah] || 'SD',
+              desa: SCHOOL_DESA_MAP[b.sekolah] || 'Melata',
+              kelas: b.kelas || '-',
+              jenis_vaksin: vk,
+              tanggal: b.tanggal || '-',
+              sasL, sasP,
+              sasTotal: sasL + sasP,
+              capL, capP,
+              capTotal: capL + capP,
+              persen: (sasL + sasP) > 0 ? (((capL + capP) / (sasL + sasP)) * 100).toFixed(1) : '0.0',
+              doVal
+            });
           }
         });
 
-        let htmlBIAS = `<table class="kohort-table"><thead><tr><th rowspan="2">Jenis Vaksin BIAS</th><th colspan="3">Siswa Diberikan (${monthLabel})</th><th colspan="3">Kumulatif Siswa (s/d ${monthLabel})</th></tr><tr><th>L</th><th>P</th><th>Total</th><th>L</th><th>P</th><th>Total</th></tr></thead><tbody>`;
+        let sumBiasSasL = 0, sumBiasSasP = 0, sumBiasExL = 0, sumBiasExP = 0, sumBiasKumL = 0, sumBiasKumP = 0, sumBiasDo = 0;
+
+        let htmlBIAS = `<table class="kohort-table"><thead>
+          <tr>
+            <th rowspan="2">Jenis Vaksin BIAS</th>
+            <th colspan="3">Sasaran Siswa Terdaftar</th>
+            <th colspan="4">Capaian ${monthLabel}</th>
+            <th colspan="4">Kumulatif s/d ${monthLabel}</th>
+            <th rowspan="2">Drop Out</th>
+          </tr>
+          <tr>
+            <th>L</th><th>P</th><th>Total</th>
+            <th>L</th><th>P</th><th>Total</th><th>Capaian (%)</th>
+            <th>L</th><th>P</th><th>Total</th><th>Capaian (%)</th>
+          </tr>
+        </thead><tbody>`;
+
         ['MR', 'DT', 'Td', 'HPV'].forEach(vk => {
-          const ex = biasExact[vk];
-          const kum = biasKumulatif[vk];
-          htmlBIAS += `<tr><td style="font-weight:700; text-align:left;">BIAS ${vk}</td><td>${ex.L}</td><td>${ex.P}</td><td style="font-weight:800; color:var(--primary);">${ex.L + ex.P}</td><td>${kum.L}</td><td>${kum.P}</td><td style="font-weight:800; color:var(--accent);">${kum.L + kum.P}</td></tr>`;
+          const item = biasSummary[vk];
+          const sasTot = item.sasL + item.sasP;
+          const exTot = item.exL + item.exP;
+          const kumTot = item.kumL + item.kumP;
+          const pctEx = sasTot > 0 ? ((exTot / sasTot) * 100).toFixed(1) : '0.0';
+          const pctKum = sasTot > 0 ? ((kumTot / sasTot) * 100).toFixed(1) : '0.0';
+
+          sumBiasSasL += item.sasL;
+          sumBiasSasP += item.sasP;
+          sumBiasExL += item.exL;
+          sumBiasExP += item.exP;
+          sumBiasKumL += item.kumL;
+          sumBiasKumP += item.kumP;
+          sumBiasDo += item.doVal;
+
+          htmlBIAS += `<tr>
+            <td style="font-weight:700; text-align:left;">BIAS ${vk}</td>
+            <td>${item.sasL}</td>
+            <td>${item.sasP}</td>
+            <td style="font-weight:700; color:#1D4ED8;">${sasTot}</td>
+            <td>${item.exL}</td>
+            <td>${item.exP}</td>
+            <td style="font-weight:800; color:var(--primary);">${exTot}</td>
+            <td style="font-weight:700; color:#475569;">${pctEx}%</td>
+            <td>${item.kumL}</td>
+            <td>${item.kumP}</td>
+            <td style="font-weight:800; color:var(--success);">${kumTot}</td>
+            <td style="font-weight:800; color:var(--accent);">${pctKum}%</td>
+            <td style="font-weight:700; color:${item.doVal > 0 ? 'var(--danger)' : '#64748B'};">${item.doVal}</td>
+          </tr>`;
         });
-        htmlBIAS += `</tbody></table>`;
+
+        const grandBiasSas = sumBiasSasL + sumBiasSasP;
+        const grandBiasEx = sumBiasExL + sumBiasExP;
+        const grandBiasKum = sumBiasKumL + sumBiasKumP;
+        const grandBiasPctEx = grandBiasSas > 0 ? ((grandBiasEx / grandBiasSas) * 100).toFixed(1) : '0.0';
+        const grandBiasPctKum = grandBiasSas > 0 ? ((grandBiasKum / grandBiasSas) * 100).toFixed(1) : '0.0';
+
+        htmlBIAS += `</tbody><tfoot>
+          <tr style="background:#E2E8F0; font-weight:bold;">
+            <td style="text-align:left; color:var(--accent);">TOTAL CAPAIAN BIAS:</td>
+            <td>${sumBiasSasL}</td>
+            <td>${sumBiasSasP}</td>
+            <td style="color:#1D4ED8;">${grandBiasSas}</td>
+            <td>${sumBiasExL}</td>
+            <td>${sumBiasExP}</td>
+            <td style="color:var(--primary);">${grandBiasEx}</td>
+            <td style="color:#475569;">${grandBiasPctEx}%</td>
+            <td>${sumBiasKumL}</td>
+            <td>${sumBiasKumP}</td>
+            <td style="color:var(--success); font-size:0.95rem;">${grandBiasKum}</td>
+            <td style="color:var(--accent); font-size:0.95rem;">${grandBiasPctKum}%</td>
+            <td style="color:var(--danger);">${sumBiasDo}</td>
+          </tr>
+        </tfoot></table>`;
         if (cBIAS) cBIAS.innerHTML = htmlBIAS;
+
+        // Simpan snapshot hasil hitung agar siap langsung diunduh ke Excel multi-sheet
+        lastCapaianReportSnapshot = {
+          thn,
+          bln,
+          monthLabel,
+          shortMonth,
+          exactCounts,
+          kumulatifCounts,
+          idlRowsDalam,
+          idlRowsLuar,
+          iblRowsDalam,
+          iblRowsLuar,
+          biasSummary,
+          biasSchoolRows
+        };
 
         capaianLoadedForPeriod = `${thn}_${bln}`;
         const totalDosisBayiBaduta = VAKSIN_ANAK_KEYS.reduce((acc, vk) => acc + (kumulatifCounts[vk]?.Total || 0), 0);
-        const totalSiswaBias = ['MR', 'DT', 'Td', 'HPV'].reduce((acc, vk) => acc + biasKumulatif[vk].L + biasKumulatif[vk].P, 0);
 
         const badgeMap = [
           { id: 'badgeCapaianCount1', text: `${totalDosisBayiBaduta} Dosis`, active: totalDosisBayiBaduta > 0 },
-          { id: 'badgeCapaianCount2', text: `${grandPersen}%`, active: parseFloat(grandPersen) > 0 },
-          { id: 'badgeCapaianCount2b', text: `${grandPersenIBL}%`, active: parseFloat(grandPersenIBL) > 0 },
-          { id: 'badgeCapaianCount3', text: `${totalSiswaBias} Siswa`, active: totalSiswaBias > 0 }
+          { id: 'badgeCapaianCount2', text: `${grandPersenKohortPuskesmas}%`, active: parseFloat(grandPersenKohortPuskesmas) > 0 },
+          { id: 'badgeCapaianCount2b', text: `${grandPersenKohortIBL}%`, active: parseFloat(grandPersenKohortIBL) > 0 },
+          { id: 'badgeCapaianCount3', text: `${grandBiasPctKum}% (${grandBiasKum})`, active: grandBiasKum > 0 }
         ];
         badgeMap.forEach(item => {
           const bEl = document.getElementById(item.id);
@@ -6246,6 +6585,854 @@ window.hapusTrans = async function(docId) {
         alert("Error Capaian: " + err.message);
       }
     }
+
+    // =========================================================================
+    // DOWNLOAD LAPORAN CAPAIAN (.XLSX MULTI-SHEET SELARAS TEMPLATE KUMULATIF)
+    // =========================================================================
+    window.downloadCapaianExcel = async function() {
+      const btn = document.getElementById('btnDownloadCapaianExcel');
+      const origHtml = btn ? btn.innerHTML : '';
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyiapkan File Excel...';
+      }
+
+      try {
+        const thn = document.getElementById('cap_filter_tahun').value;
+        const bln = document.getElementById('cap_filter_bulan').value;
+        if (!lastCapaianReportSnapshot || capaianLoadedForPeriod !== `${thn}_${bln}`) {
+          await loadCapanTabContent();
+        }
+        const snap = lastCapaianReportSnapshot;
+        if (!snap) throw new Error("Data capaian belum tersedia.");
+
+        const ExcelJSLib = await ensureExcelJSReady();
+        const workbook = new ExcelJSLib.Workbook();
+        workbook.creator = 'Sistem Register Imunisasi Puskesmas Melata';
+        workbook.created = new Date();
+
+        const thinBorder = {
+          top: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+          left: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+          bottom: { style: 'thin', color: { argb: 'FFCBD5E1' } },
+          right: { style: 'thin', color: { argb: 'FFCBD5E1' } }
+        };
+        const totalBorder = {
+          top: { style: 'medium', color: { argb: 'FF002B5B' } },
+          bottom: { style: 'double', color: { argb: 'FF002B5B' } },
+          left: { style: 'thin', color: { argb: 'FF94A3B8' } },
+          right: { style: 'thin', color: { argb: 'FF94A3B8' } }
+        };
+
+        const styleTitleBlock = (ws, maxColLetter, titleText, subtitleText) => {
+          ws.mergeCells(`A1:${maxColLetter}1`);
+          ws.getCell('A1').value = titleText;
+          ws.getCell('A1').font = { name: 'Calibri', size: 13, bold: true, color: { argb: 'FF002B5B' } };
+          ws.getRow(1).height = 22;
+
+          ws.mergeCells(`A2:${maxColLetter}2`);
+          ws.getCell('A2').value = subtitleText;
+          ws.getCell('A2').font = { name: 'Calibri', size: 10, color: { argb: 'FF475569' } };
+          ws.getRow(2).height = 17;
+          ws.getRow(3).height = 8;
+        };
+
+        const autoFitColumns = (ws, minW = 10, maxW = 36) => {
+          ws.columns.forEach(col => {
+            let maxLen = minW;
+            col.eachCell({ includeEmpty: false }, cell => {
+              if (cell.row <= 3) return;
+              const v = cell.value;
+              if (v && typeof v === 'object' && v.formula) return;
+              const len = String(v || '').length;
+              if (len + 3 > maxLen) maxLen = Math.min(maxW, len + 3);
+            });
+            col.width = maxLen;
+          });
+        };
+
+        // =====================================================================
+        // SHEET 1: CAPAIAN ANTIGEN BAYI & BADUTA
+        // =====================================================================
+        const ws1 = workbook.addWorksheet('Capaian Antigen Bayi-Baduta', {
+          views: [{ state: 'frozen', xSplit: 3, ySplit: 5 }]
+        });
+        styleTitleBlock(
+          ws1, 'L',
+          'LAPORAN CAPAIAN IMUNISASI PER ANTIGEN (BAYI & BADUTA) — PUSKESMAS MELATA',
+          `Periode: ${snap.monthLabel} Tahun ${snap.thn} | Sumber: Kohort Imunisasi Puskesmas Melata`
+        );
+
+        const r4_1 = ws1.getRow(4);
+        const r5_1 = ws1.getRow(5);
+        r4_1.height = 22;
+        r5_1.height = 19;
+
+        [
+          { col: 'A', text: 'No.' },
+          { col: 'B', text: 'Kategori Sasaran' },
+          { col: 'C', text: 'Nama Antigen' },
+          { col: 'D', text: 'Kemasan / Vial' }
+        ].forEach((h, i) => {
+          ws1.mergeCells(`${h.col}4:${h.col}5`);
+          [4, 5].forEach(rIdx => {
+            const c = ws1.getRow(rIdx).getCell(i + 1);
+            c.value = h.text;
+            c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF002B5B' } };
+            c.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
+            c.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+            c.border = thinBorder;
+          });
+        });
+
+        ws1.mergeCells('E4:H4');
+        ['E', 'F', 'G', 'H'].forEach(colL => {
+          const c = r4_1.getCell(colL);
+          c.value = `Capaian Dosis (${snap.shortMonth})`;
+          c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0F4C81' } };
+          c.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
+          c.alignment = { horizontal: 'center', vertical: 'middle' };
+          c.border = thinBorder;
+        });
+
+        ws1.mergeCells('I4:L4');
+        ['I', 'J', 'K', 'L'].forEach(colL => {
+          const c = r4_1.getCell(colL);
+          c.value = `Kumulatif s/d ${snap.shortMonth} ${snap.thn}`;
+          c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0D9488' } };
+          c.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
+          c.alignment = { horizontal: 'center', vertical: 'middle' };
+          c.border = thinBorder;
+        });
+
+        ['L', 'P', 'Total', 'Est. Vial', 'L', 'P', 'Total', 'Est. Vial'].forEach((sub, idx) => {
+          const c = r5_1.getCell(5 + idx);
+          c.value = sub;
+          c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: idx < 4 ? 'FF1D4ED8' : 'FF0F766E' } };
+          c.font = { name: 'Calibri', size: 9, bold: true, color: { argb: 'FFFFFFFF' } };
+          c.alignment = { horizontal: 'center', vertical: 'middle' };
+          c.border = thinBorder;
+        });
+
+        VAKSIN_ANAK_KEYS.forEach((vKey, idx) => {
+          const rNum = 6 + idx;
+          const row = ws1.getRow(rNum);
+          row.height = 19;
+          const zebra = rNum % 2 === 0 ? 'FFF8FAFC' : 'FFFFFFFF';
+          const kat = idx <= 18 ? 'Imunisasi Bayi (0-12 Bln)' : 'Booster Baduta (12-24 Bln)';
+          const grpObj = ANTIGEN_GROUPS.find(g => g.group_key === getGroupKey(vKey));
+          const dosePerVial = grpObj ? grpObj.doses_per_vial : 1;
+          const kemasanLbl = grpObj ? grpObj.kemasan : '1 Dosis/Vial';
+          const ex = snap.exactCounts[vKey];
+          const kum = snap.kumulatifCounts[vKey];
+
+          const rowVals = [
+            idx + 1,
+            kat,
+            vKey,
+            kemasanLbl,
+            ex.L,
+            ex.P,
+            { formula: `SUM(E${rNum}:F${rNum})` },
+            { formula: `ROUNDUP(G${rNum}/${dosePerVial},0)` },
+            kum.L,
+            kum.P,
+            { formula: `SUM(I${rNum}:J${rNum})` },
+            { formula: `ROUNDUP(K${rNum}/${dosePerVial},0)` }
+          ];
+
+          rowVals.forEach((val, cIdx) => {
+            const cell = row.getCell(cIdx + 1);
+            cell.value = val;
+            let bg = zebra;
+            let fg = 'FF1E293B';
+            let isBold = cIdx === 2;
+            if (cIdx === 6) { bg = 'FFEFF6FF'; fg = 'FF002B5B'; isBold = true; }
+            if (cIdx === 10) { bg = 'FFECFDF5'; fg = 'FF065F46'; isBold = true; }
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } };
+            cell.font = { name: 'Calibri', size: 10, bold: isBold, color: { argb: fg } };
+            cell.alignment = { horizontal: (cIdx === 1 || cIdx === 2) ? 'left' : 'center', vertical: 'middle' };
+            cell.border = thinBorder;
+            if (cIdx >= 4) cell.numFmt = '#,##0';
+          });
+        });
+
+        const lastVaxRow = 5 + VAKSIN_ANAK_KEYS.length;
+        const totRow1 = ws1.getRow(lastVaxRow + 1);
+        totRow1.height = 22;
+        ws1.mergeCells(`A${lastVaxRow + 1}:D${lastVaxRow + 1}`);
+        totRow1.getCell(1).value = 'TOTAL KESELURUHAN DOSIS & LOGISTIK VIAL';
+        ['E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'].forEach((colL, idx) => {
+          totRow1.getCell(5 + idx).value = { formula: `SUM(${colL}6:${colL}${lastVaxRow})` };
+        });
+        for (let c = 1; c <= 12; c++) {
+          const cell = totRow1.getCell(c);
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE2E8F0' } };
+          cell.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FF002B5B' } };
+          cell.alignment = { horizontal: c <= 4 ? 'left' : 'center', vertical: 'middle' };
+          cell.border = totalBorder;
+          if (c >= 5) cell.numFmt = '#,##0';
+        }
+        autoFitColumns(ws1);
+
+        // =====================================================================
+        // SHEET 2: CAPAIAN IDL (KOHORT 9-11 BLN, SELESAI <12 BLN, NON-PEMBAGI LUAR WILAYAH)
+        // =====================================================================
+        const ws2 = workbook.addWorksheet('Capaian IDL (<12 Bln)', {
+          views: [{ state: 'frozen', xSplit: 3, ySplit: 5 }]
+        });
+        styleTitleBlock(
+          ws2, 'K',
+          'CAPAIAN IMUNISASI DASAR LENGKAP (IDL — STANDAR KEMENKES) — PUSKESMAS MELATA',
+          `Periode: s/d ${snap.monthLabel} ${snap.thn} | Kohort Bayi 9-11 Bln (Selesai <12 Bln) | Catatan: PT. TSA & PT. SHS di luar target & pembagi Puskesmas`
+        );
+
+        const r4_2 = ws2.getRow(4);
+        const r5_2 = ws2.getRow(5);
+        r4_2.height = 22;
+        r5_2.height = 19;
+
+        [
+          { col: 'A', text: 'No.' },
+          { col: 'B', text: 'Kategori Wilayah' },
+          { col: 'C', text: 'Desa / Perusahaan' },
+          { col: 'D', text: 'Target Ditetapkan' },
+          { col: 'E', text: 'Kohort Bayi (9-11 Bln)' }
+        ].forEach((h, i) => {
+          ws2.mergeCells(`${h.col}4:${h.col}5`);
+          [4, 5].forEach(rIdx => {
+            const c = ws2.getRow(rIdx).getCell(i + 1);
+            c.value = h.text;
+            c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF002B5B' } };
+            c.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
+            c.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+            c.border = thinBorder;
+          });
+        });
+
+        ws2.mergeCells('F4:H4');
+        ['F', 'G', 'H'].forEach(colL => {
+          const c = r4_2.getCell(colL);
+          c.value = `Bayi IDL Valid (<12 Bln s/d ${snap.shortMonth})`;
+          c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0D9488' } };
+          c.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
+          c.alignment = { horizontal: 'center', vertical: 'middle' };
+          c.border = thinBorder;
+        });
+        ['L', 'P', 'Total'].forEach((sub, idx) => {
+          const c = r5_2.getCell(6 + idx);
+          c.value = sub;
+          c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0F766E' } };
+          c.font = { name: 'Calibri', size: 9, bold: true, color: { argb: 'FFFFFFFF' } };
+          c.alignment = { horizontal: 'center', vertical: 'middle' };
+          c.border = thinBorder;
+        });
+
+        [
+          { col: 'I', text: 'Capaian IDL (% Kohort)' },
+          { col: 'J', text: 'Capaian vs Target (%)' },
+          { col: 'K', text: 'Kejar (>=12 Bln)' }
+        ].forEach((h, i) => {
+          ws2.mergeCells(`${h.col}4:${h.col}5`);
+          [4, 5].forEach(rIdx => {
+            const c = ws2.getRow(rIdx).getCell(9 + i);
+            c.value = h.text;
+            c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1E3A8A' } };
+            c.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
+            c.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+            c.border = thinBorder;
+          });
+        });
+
+        let curR2 = 6;
+        // Subheader A. Dalam Wilayah
+        ws2.mergeCells(`A${curR2}:K${curR2}`);
+        for (let c = 1; c <= 11; c++) {
+          const cell = ws2.getRow(curR2).getCell(c);
+          cell.value = 'A. DALAM WILAYAH (11 DESA SASARAN TETAP PUSKESMAS MELATA)';
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE0F2FE' } };
+          cell.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FF002B5B' } };
+          cell.border = thinBorder;
+        }
+        curR2++;
+
+        const startDalamIdlRow = curR2;
+        snap.idlRowsDalam.forEach((r, idx) => {
+          const row = ws2.getRow(curR2);
+          row.height = 19;
+          const zebra = curR2 % 2 === 0 ? 'FFF8FAFC' : 'FFFFFFFF';
+          const vals = [
+            idx + 1,
+            'Dalam Wilayah',
+            `Desa ${r.desa}`,
+            r.targetBayi,
+            r.kohortBayi,
+            r.countIDL_L,
+            r.countIDL_P,
+            { formula: `SUM(F${curR2}:G${curR2})` },
+            { formula: `IFERROR(H${curR2}/E${curR2},0)` },
+            { formula: `IFERROR(H${curR2}/D${curR2},0)` },
+            r.countCatchUp
+          ];
+          vals.forEach((v, cIdx) => {
+            const cell = row.getCell(cIdx + 1);
+            cell.value = v;
+            let bg = zebra;
+            let fg = 'FF1E293B';
+            let bold = cIdx === 2;
+            if (cIdx === 7) { bg = 'FFECFDF5'; fg = 'FF065F46'; bold = true; }
+            if (cIdx === 8) { bg = 'FFEFF6FF'; fg = 'FF002B5B'; bold = true; }
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } };
+            cell.font = { name: 'Calibri', size: 10, bold, color: { argb: fg } };
+            cell.alignment = { horizontal: (cIdx === 1 || cIdx === 2) ? 'left' : 'center', vertical: 'middle' };
+            cell.border = thinBorder;
+            if (cIdx === 8 || cIdx === 9) cell.numFmt = '0.0%';
+            else if (cIdx >= 3) cell.numFmt = '#,##0';
+          });
+          curR2++;
+        });
+        const endDalamIdlRow = curR2 - 1;
+
+        // Subtotal Dalam Wilayah
+        const subDalamIdlRow = curR2;
+        ws2.getRow(subDalamIdlRow).height = 21;
+        ws2.mergeCells(`A${subDalamIdlRow}:C${subDalamIdlRow}`);
+        ws2.getRow(subDalamIdlRow).getCell(1).value = 'SUBTOTAL DALAM WILAYAH (PEMBAGI RESMI PUSKESMAS)';
+        ws2.getRow(subDalamIdlRow).getCell(4).value = { formula: `SUM(D${startDalamIdlRow}:D${endDalamIdlRow})` };
+        ws2.getRow(subDalamIdlRow).getCell(5).value = { formula: `SUM(E${startDalamIdlRow}:E${endDalamIdlRow})` };
+        ws2.getRow(subDalamIdlRow).getCell(6).value = { formula: `SUM(F${startDalamIdlRow}:F${endDalamIdlRow})` };
+        ws2.getRow(subDalamIdlRow).getCell(7).value = { formula: `SUM(G${startDalamIdlRow}:G${endDalamIdlRow})` };
+        ws2.getRow(subDalamIdlRow).getCell(8).value = { formula: `SUM(H${startDalamIdlRow}:H${endDalamIdlRow})` };
+        ws2.getRow(subDalamIdlRow).getCell(9).value = { formula: `IFERROR(H${subDalamIdlRow}/E${subDalamIdlRow},0)` };
+        ws2.getRow(subDalamIdlRow).getCell(10).value = { formula: `IFERROR(H${subDalamIdlRow}/D${subDalamIdlRow},0)` };
+        ws2.getRow(subDalamIdlRow).getCell(11).value = { formula: `SUM(K${startDalamIdlRow}:K${endDalamIdlRow})` };
+        for (let c = 1; c <= 11; c++) {
+          const cell = ws2.getRow(subDalamIdlRow).getCell(c);
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFDBEAFE' } };
+          cell.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FF002B5B' } };
+          cell.alignment = { horizontal: c <= 3 ? 'left' : 'center', vertical: 'middle' };
+          cell.border = totalBorder;
+          if (c === 9 || c === 10) cell.numFmt = '0.0%';
+          else if (c >= 4) cell.numFmt = '#,##0';
+        }
+        curR2++;
+
+        // Subheader B. Luar Wilayah
+        ws2.mergeCells(`A${curR2}:K${curR2}`);
+        for (let c = 1; c <= 11; c++) {
+          const cell = ws2.getRow(curR2).getCell(c);
+          cell.value = 'B. LUAR WILAYAH (PERUSAHAAN — DIKELUARKAN DARI TARGET & PEMBAGI PUSKESMAS)';
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEF3C7' } };
+          cell.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FF92400E' } };
+          cell.border = thinBorder;
+        }
+        curR2++;
+
+        const startLuarIdlRow = curR2;
+        snap.idlRowsLuar.forEach((r, idx) => {
+          const row = ws2.getRow(curR2);
+          row.height = 19;
+          const vals = [
+            idx + 1,
+            'Luar Wilayah',
+            r.desa,
+            0,
+            r.kohortBayi,
+            r.countIDL_L,
+            r.countIDL_P,
+            { formula: `SUM(F${curR2}:G${curR2})` },
+            'Di luar pembagi',
+            'Di luar target',
+            r.countCatchUp
+          ];
+          vals.forEach((v, cIdx) => {
+            const cell = row.getCell(cIdx + 1);
+            cell.value = v;
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } };
+            cell.font = { name: 'Calibri', size: 10, bold: cIdx === 2, italic: (cIdx === 8 || cIdx === 9), color: { argb: (cIdx === 8 || cIdx === 9) ? 'FF64748B' : 'FF1E293B' } };
+            cell.alignment = { horizontal: (cIdx === 1 || cIdx === 2) ? 'left' : 'center', vertical: 'middle' };
+            cell.border = thinBorder;
+            if (cIdx >= 3 && cIdx <= 7) cell.numFmt = '#,##0';
+            if (cIdx === 10) cell.numFmt = '#,##0';
+          });
+          curR2++;
+        });
+        const endLuarIdlRow = curR2 - 1;
+
+        // Subtotal Luar Wilayah
+        const subLuarIdlRow = curR2;
+        ws2.getRow(subLuarIdlRow).height = 20;
+        ws2.mergeCells(`A${subLuarIdlRow}:C${subLuarIdlRow}`);
+        ws2.getRow(subLuarIdlRow).getCell(1).value = 'SUBTOTAL LUAR WILAYAH (NON-PEMBAGI)';
+        ws2.getRow(subLuarIdlRow).getCell(4).value = 0;
+        ws2.getRow(subLuarIdlRow).getCell(5).value = { formula: `SUM(E${startLuarIdlRow}:E${endLuarIdlRow})` };
+        ws2.getRow(subLuarIdlRow).getCell(6).value = { formula: `SUM(F${startLuarIdlRow}:F${endLuarIdlRow})` };
+        ws2.getRow(subLuarIdlRow).getCell(7).value = { formula: `SUM(G${startLuarIdlRow}:G${endLuarIdlRow})` };
+        ws2.getRow(subLuarIdlRow).getCell(8).value = { formula: `SUM(H${startLuarIdlRow}:H${endLuarIdlRow})` };
+        ws2.getRow(subLuarIdlRow).getCell(9).value = '-';
+        ws2.getRow(subLuarIdlRow).getCell(10).value = '-';
+        ws2.getRow(subLuarIdlRow).getCell(11).value = { formula: `SUM(K${startLuarIdlRow}:K${endLuarIdlRow})` };
+        for (let c = 1; c <= 11; c++) {
+          const cell = ws2.getRow(subLuarIdlRow).getCell(c);
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF1F5F9' } };
+          cell.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FF92400E' } };
+          cell.alignment = { horizontal: c <= 3 ? 'left' : 'center', vertical: 'middle' };
+          cell.border = thinBorder;
+        }
+        curR2++;
+
+        // Grand Total Puskesmas (Pembagi HANYA Dalam Wilayah: H_subDalam / E_subDalam)
+        const grandIdlRow = curR2;
+        ws2.getRow(grandIdlRow).height = 23;
+        ws2.mergeCells(`A${grandIdlRow}:C${grandIdlRow}`);
+        ws2.getRow(grandIdlRow).getCell(1).value = 'CAPAIAN AKHIR PUSKESMAS (PEMBAGI: HANYA DALAM WILAYAH)';
+        ws2.getRow(grandIdlRow).getCell(4).value = { formula: `D${subDalamIdlRow}` };
+        ws2.getRow(grandIdlRow).getCell(5).value = { formula: `E${subDalamIdlRow}` };
+        ws2.getRow(grandIdlRow).getCell(6).value = { formula: `F${subDalamIdlRow}+F${subLuarIdlRow}` };
+        ws2.getRow(grandIdlRow).getCell(7).value = { formula: `G${subDalamIdlRow}+G${subLuarIdlRow}` };
+        ws2.getRow(grandIdlRow).getCell(8).value = { formula: `H${subDalamIdlRow}+H${subLuarIdlRow}` };
+        ws2.getRow(grandIdlRow).getCell(9).value = { formula: `IFERROR(H${subDalamIdlRow}/E${subDalamIdlRow},0)` };
+        ws2.getRow(grandIdlRow).getCell(10).value = { formula: `IFERROR(H${subDalamIdlRow}/D${subDalamIdlRow},0)` };
+        ws2.getRow(grandIdlRow).getCell(11).value = { formula: `K${subDalamIdlRow}+K${subLuarIdlRow}` };
+        for (let c = 1; c <= 11; c++) {
+          const cell = ws2.getRow(grandIdlRow).getCell(c);
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE2E8F0' } };
+          cell.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FF002B5B' } };
+          cell.alignment = { horizontal: c <= 3 ? 'left' : 'center', vertical: 'middle' };
+          cell.border = totalBorder;
+          if (c === 9 || c === 10) cell.numFmt = '0.0%';
+          else if (c >= 4) cell.numFmt = '#,##0';
+        }
+        autoFitColumns(ws2);
+
+        // =====================================================================
+        // SHEET 3: CAPAIAN IBL BADUTA (KOHORT 18-23 BLN, SELESAI <24 BLN)
+        // =====================================================================
+        const ws3 = workbook.addWorksheet('Capaian IBL (Baduta)', {
+          views: [{ state: 'frozen', xSplit: 3, ySplit: 5 }]
+        });
+        styleTitleBlock(
+          ws3, 'J',
+          'CAPAIAN IMUNISASI BADUTA LENGKAP (IBL — STANDAR KEMENKES) — PUSKESMAS MELATA',
+          `Periode: s/d ${snap.monthLabel} ${snap.thn} | Kohort Baduta 18-23 Bln (Selesai <24 Bln) | Pembagi Puskesmas hanya 11 desa dalam wilayah`
+        );
+
+        const r4_3 = ws3.getRow(4);
+        const r5_3 = ws3.getRow(5);
+        r4_3.height = 22;
+        r5_3.height = 19;
+
+        [
+          { col: 'A', text: 'No.' },
+          { col: 'B', text: 'Kategori Wilayah' },
+          { col: 'C', text: 'Desa / Perusahaan' },
+          { col: 'D', text: 'Target Baduta' },
+          { col: 'E', text: 'Kohort Baduta (18-23 Bln)' }
+        ].forEach((h, i) => {
+          ws3.mergeCells(`${h.col}4:${h.col}5`);
+          [4, 5].forEach(rIdx => {
+            const c = ws3.getRow(rIdx).getCell(i + 1);
+            c.value = h.text;
+            c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF002B5B' } };
+            c.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
+            c.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+            c.border = thinBorder;
+          });
+        });
+
+        ws3.mergeCells('F4:H4');
+        ['F', 'G', 'H'].forEach(colL => {
+          const c = r4_3.getCell(colL);
+          c.value = `Baduta IBL Valid (<24 Bln s/d ${snap.shortMonth})`;
+          c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0D9488' } };
+          c.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
+          c.alignment = { horizontal: 'center', vertical: 'middle' };
+          c.border = thinBorder;
+        });
+        ['L', 'P', 'Total'].forEach((sub, idx) => {
+          const c = r5_3.getCell(6 + idx);
+          c.value = sub;
+          c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0F766E' } };
+          c.font = { name: 'Calibri', size: 9, bold: true, color: { argb: 'FFFFFFFF' } };
+          c.alignment = { horizontal: 'center', vertical: 'middle' };
+          c.border = thinBorder;
+        });
+
+        [
+          { col: 'I', text: 'Capaian IBL (% Kohort)' },
+          { col: 'J', text: 'Capaian vs Target (%)' }
+        ].forEach((h, i) => {
+          ws3.mergeCells(`${h.col}4:${h.col}5`);
+          [4, 5].forEach(rIdx => {
+            const c = ws3.getRow(rIdx).getCell(9 + i);
+            c.value = h.text;
+            c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1E3A8A' } };
+            c.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
+            c.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+            c.border = thinBorder;
+          });
+        });
+
+        let curR3 = 6;
+        ws3.mergeCells(`A${curR3}:J${curR3}`);
+        for (let c = 1; c <= 10; c++) {
+          const cell = ws3.getRow(curR3).getCell(c);
+          cell.value = 'A. DALAM WILAYAH (11 DESA SASARAN TETAP PUSKESMAS MELATA)';
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFCCFBF1' } };
+          cell.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FF0F766E' } };
+          cell.border = thinBorder;
+        }
+        curR3++;
+
+        const startDalamIblRow = curR3;
+        snap.iblRowsDalam.forEach((r, idx) => {
+          const row = ws3.getRow(curR3);
+          row.height = 19;
+          const zebra = curR3 % 2 === 0 ? 'FFF8FAFC' : 'FFFFFFFF';
+          const vals = [
+            idx + 1,
+            'Dalam Wilayah',
+            `Desa ${r.desa}`,
+            r.targetBaduta,
+            r.kohortBaduta,
+            r.countIBL_L,
+            r.countIBL_P,
+            { formula: `SUM(F${curR3}:G${curR3})` },
+            { formula: `IFERROR(H${curR3}/E${curR3},0)` },
+            { formula: `IFERROR(H${curR3}/D${curR3},0)` }
+          ];
+          vals.forEach((v, cIdx) => {
+            const cell = row.getCell(cIdx + 1);
+            cell.value = v;
+            let bg = zebra;
+            let fg = 'FF1E293B';
+            let bold = cIdx === 2;
+            if (cIdx === 7) { bg = 'FFECFDF5'; fg = 'FF065F46'; bold = true; }
+            if (cIdx === 8) { bg = 'FFEFF6FF'; fg = 'FF002B5B'; bold = true; }
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } };
+            cell.font = { name: 'Calibri', size: 10, bold, color: { argb: fg } };
+            cell.alignment = { horizontal: (cIdx === 1 || cIdx === 2) ? 'left' : 'center', vertical: 'middle' };
+            cell.border = thinBorder;
+            if (cIdx === 8 || cIdx === 9) cell.numFmt = '0.0%';
+            else if (cIdx >= 3) cell.numFmt = '#,##0';
+          });
+          curR3++;
+        });
+        const endDalamIblRow = curR3 - 1;
+
+        const subDalamIblRow = curR3;
+        ws3.getRow(subDalamIblRow).height = 21;
+        ws3.mergeCells(`A${subDalamIblRow}:C${subDalamIblRow}`);
+        ws3.getRow(subDalamIblRow).getCell(1).value = 'SUBTOTAL DALAM WILAYAH (PEMBAGI RESMI PUSKESMAS)';
+        ws3.getRow(subDalamIblRow).getCell(4).value = { formula: `SUM(D${startDalamIblRow}:D${endDalamIblRow})` };
+        ws3.getRow(subDalamIblRow).getCell(5).value = { formula: `SUM(E${startDalamIblRow}:E${endDalamIblRow})` };
+        ws3.getRow(subDalamIblRow).getCell(6).value = { formula: `SUM(F${startDalamIblRow}:F${endDalamIblRow})` };
+        ws3.getRow(subDalamIblRow).getCell(7).value = { formula: `SUM(G${startDalamIblRow}:G${endDalamIblRow})` };
+        ws3.getRow(subDalamIblRow).getCell(8).value = { formula: `SUM(H${startDalamIblRow}:H${endDalamIblRow})` };
+        ws3.getRow(subDalamIblRow).getCell(9).value = { formula: `IFERROR(H${subDalamIblRow}/E${subDalamIblRow},0)` };
+        ws3.getRow(subDalamIblRow).getCell(10).value = { formula: `IFERROR(H${subDalamIblRow}/D${subDalamIblRow},0)` };
+        for (let c = 1; c <= 10; c++) {
+          const cell = ws3.getRow(subDalamIblRow).getCell(c);
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFDBEAFE' } };
+          cell.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FF002B5B' } };
+          cell.alignment = { horizontal: c <= 3 ? 'left' : 'center', vertical: 'middle' };
+          cell.border = totalBorder;
+          if (c === 9 || c === 10) cell.numFmt = '0.0%';
+          else if (c >= 4) cell.numFmt = '#,##0';
+        }
+        curR3++;
+
+        ws3.mergeCells(`A${curR3}:J${curR3}`);
+        for (let c = 1; c <= 10; c++) {
+          const cell = ws3.getRow(curR3).getCell(c);
+          cell.value = 'B. LUAR WILAYAH (PERUSAHAAN — DIKELUARKAN DARI TARGET & PEMBAGI PUSKESMAS)';
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEF3C7' } };
+          cell.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FF92400E' } };
+          cell.border = thinBorder;
+        }
+        curR3++;
+
+        const startLuarIblRow = curR3;
+        snap.iblRowsLuar.forEach((r, idx) => {
+          const row = ws3.getRow(curR3);
+          row.height = 19;
+          const vals = [
+            idx + 1,
+            'Luar Wilayah',
+            r.desa,
+            0,
+            r.kohortBaduta,
+            r.countIBL_L,
+            r.countIBL_P,
+            { formula: `SUM(F${curR3}:G${curR3})` },
+            'Di luar pembagi',
+            'Di luar target'
+          ];
+          vals.forEach((v, cIdx) => {
+            const cell = row.getCell(cIdx + 1);
+            cell.value = v;
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFFFF' } };
+            cell.font = { name: 'Calibri', size: 10, bold: cIdx === 2, italic: (cIdx === 8 || cIdx === 9), color: { argb: (cIdx === 8 || cIdx === 9) ? 'FF64748B' : 'FF1E293B' } };
+            cell.alignment = { horizontal: (cIdx === 1 || cIdx === 2) ? 'left' : 'center', vertical: 'middle' };
+            cell.border = thinBorder;
+            if (cIdx >= 3 && cIdx <= 7) cell.numFmt = '#,##0';
+          });
+          curR3++;
+        });
+        const endLuarIblRow = curR3 - 1;
+
+        const subLuarIblRow = curR3;
+        ws3.getRow(subLuarIblRow).height = 20;
+        ws3.mergeCells(`A${subLuarIblRow}:C${subLuarIblRow}`);
+        ws3.getRow(subLuarIblRow).getCell(1).value = 'SUBTOTAL LUAR WILAYAH (NON-PEMBAGI)';
+        ws3.getRow(subLuarIblRow).getCell(4).value = 0;
+        ws3.getRow(subLuarIblRow).getCell(5).value = { formula: `SUM(E${startLuarIblRow}:E${endLuarIblRow})` };
+        ws3.getRow(subLuarIblRow).getCell(6).value = { formula: `SUM(F${startLuarIblRow}:F${endLuarIblRow})` };
+        ws3.getRow(subLuarIblRow).getCell(7).value = { formula: `SUM(G${startLuarIblRow}:G${endLuarIblRow})` };
+        ws3.getRow(subLuarIblRow).getCell(8).value = { formula: `SUM(H${startLuarIblRow}:H${endLuarIblRow})` };
+        ws3.getRow(subLuarIblRow).getCell(9).value = '-';
+        ws3.getRow(subLuarIblRow).getCell(10).value = '-';
+        for (let c = 1; c <= 10; c++) {
+          const cell = ws3.getRow(subLuarIblRow).getCell(c);
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF1F5F9' } };
+          cell.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FF92400E' } };
+          cell.alignment = { horizontal: c <= 3 ? 'left' : 'center', vertical: 'middle' };
+          cell.border = thinBorder;
+        }
+        curR3++;
+
+        const grandIblRow = curR3;
+        ws3.getRow(grandIblRow).height = 23;
+        ws3.mergeCells(`A${grandIblRow}:C${grandIblRow}`);
+        ws3.getRow(grandIblRow).getCell(1).value = 'CAPAIAN AKHIR PUSKESMAS (PEMBAGI: HANYA DALAM WILAYAH)';
+        ws3.getRow(grandIblRow).getCell(4).value = { formula: `D${subDalamIblRow}` };
+        ws3.getRow(grandIblRow).getCell(5).value = { formula: `E${subDalamIblRow}` };
+        ws3.getRow(grandIblRow).getCell(6).value = { formula: `F${subDalamIblRow}+F${subLuarIblRow}` };
+        ws3.getRow(grandIblRow).getCell(7).value = { formula: `G${subDalamIblRow}+G${subLuarIblRow}` };
+        ws3.getRow(grandIblRow).getCell(8).value = { formula: `H${subDalamIblRow}+H${subLuarIblRow}` };
+        ws3.getRow(grandIblRow).getCell(9).value = { formula: `IFERROR(H${subDalamIblRow}/E${subDalamIblRow},0)` };
+        ws3.getRow(grandIblRow).getCell(10).value = { formula: `IFERROR(H${subDalamIblRow}/D${subDalamIblRow},0)` };
+        for (let c = 1; c <= 10; c++) {
+          const cell = ws3.getRow(grandIblRow).getCell(c);
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE2E8F0' } };
+          cell.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FF002B5B' } };
+          cell.alignment = { horizontal: c <= 3 ? 'left' : 'center', vertical: 'middle' };
+          cell.border = totalBorder;
+          if (c === 9 || c === 10) cell.numFmt = '0.0%';
+          else if (c >= 4) cell.numFmt = '#,##0';
+        }
+        autoFitColumns(ws3);
+
+        // =====================================================================
+        // SHEET 4: CAPAIAN BIAS (REKAP ANTIGEN + PERSENTASE & RINCIAN SEKOLAH)
+        // =====================================================================
+        const ws4 = workbook.addWorksheet('Capaian BIAS', {
+          views: [{ state: 'frozen', xSplit: 2, ySplit: 5 }]
+        });
+        styleTitleBlock(
+          ws4, 'N',
+          'LAPORAN CAPAIAN BULAN IMUNISASI ANAK SEKOLAH (BIAS) — PUSKESMAS MELATA',
+          `Periode: s/d ${snap.monthLabel} ${snap.thn} | Rekapitulasi Capaian & Persentase (%) Per Antigen serta Rincian Sekolah`
+        );
+
+        const r4_4 = ws4.getRow(4);
+        const r5_4 = ws4.getRow(5);
+        r4_4.height = 22;
+        r5_4.height = 19;
+
+        [
+          { col: 'A', text: 'No.' },
+          { col: 'B', text: 'Jenis Vaksin BIAS' }
+        ].forEach((h, i) => {
+          ws4.mergeCells(`${h.col}4:${h.col}5`);
+          [4, 5].forEach(rIdx => {
+            const c = ws4.getRow(rIdx).getCell(i + 1);
+            c.value = h.text;
+            c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF002B5B' } };
+            c.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
+            c.alignment = { horizontal: 'center', vertical: 'middle' };
+            c.border = thinBorder;
+          });
+        });
+
+        ws4.mergeCells('C4:E4');
+        ['C', 'D', 'E'].forEach(colL => {
+          const c = r4_4.getCell(colL);
+          c.value = 'Sasaran Siswa Terdaftar';
+          c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0F4C81' } };
+          c.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
+          c.alignment = { horizontal: 'center', vertical: 'middle' };
+          c.border = thinBorder;
+        });
+
+        ws4.mergeCells('F4:I4');
+        ['F', 'G', 'H', 'I'].forEach(colL => {
+          const c = r4_4.getCell(colL);
+          c.value = `Capaian ${snap.shortMonth}`;
+          c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1D4ED8' } };
+          c.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
+          c.alignment = { horizontal: 'center', vertical: 'middle' };
+          c.border = thinBorder;
+        });
+
+        ws4.mergeCells('J4:M4');
+        ['J', 'K', 'L', 'M'].forEach(colL => {
+          const c = r4_4.getCell(colL);
+          c.value = `Kumulatif s/d ${snap.shortMonth} ${snap.thn}`;
+          c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0D9488' } };
+          c.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
+          c.alignment = { horizontal: 'center', vertical: 'middle' };
+          c.border = thinBorder;
+        });
+
+        ws4.mergeCells('N4:N5');
+        [4, 5].forEach(rIdx => {
+          const c = ws4.getRow(rIdx).getCell(14);
+          c.value = 'Drop Out';
+          c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1E3A8A' } };
+          c.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
+          c.alignment = { horizontal: 'center', vertical: 'middle' };
+          c.border = thinBorder;
+        });
+
+        ['L', 'P', 'Total', 'L', 'P', 'Total', 'Capaian (%)', 'L', 'P', 'Total', 'Capaian (%)'].forEach((sub, idx) => {
+          const c = r5_4.getCell(3 + idx);
+          c.value = sub;
+          const bgCol = idx < 3 ? 'FF0F4C81' : (idx < 7 ? 'FF1D4ED8' : 'FF0F766E');
+          c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bgCol } };
+          c.font = { name: 'Calibri', size: 9, bold: true, color: { argb: 'FFFFFFFF' } };
+          c.alignment = { horizontal: 'center', vertical: 'middle' };
+          c.border = thinBorder;
+        });
+
+        ['MR', 'DT', 'Td', 'HPV'].forEach((vk, idx) => {
+          const rNum = 6 + idx;
+          const row = ws4.getRow(rNum);
+          row.height = 19;
+          const zebra = rNum % 2 === 0 ? 'FFF8FAFC' : 'FFFFFFFF';
+          const item = snap.biasSummary[vk];
+          const vals = [
+            idx + 1,
+            `BIAS ${vk}`,
+            item.sasL,
+            item.sasP,
+            { formula: `SUM(C${rNum}:D${rNum})` },
+            item.exL,
+            item.exP,
+            { formula: `SUM(F${rNum}:G${rNum})` },
+            { formula: `IFERROR(H${rNum}/E${rNum},0)` },
+            item.kumL,
+            item.kumP,
+            { formula: `SUM(J${rNum}:K${rNum})` },
+            { formula: `IFERROR(L${rNum}/E${rNum},0)` },
+            item.doVal
+          ];
+          vals.forEach((v, cIdx) => {
+            const cell = row.getCell(cIdx + 1);
+            cell.value = v;
+            let bg = zebra;
+            let fg = 'FF1E293B';
+            let bold = cIdx === 1;
+            if (cIdx === 11) { bg = 'FFECFDF5'; fg = 'FF065F46'; bold = true; }
+            if (cIdx === 12) { bg = 'FFEFF6FF'; fg = 'FF002B5B'; bold = true; }
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bg } };
+            cell.font = { name: 'Calibri', size: 10, bold, color: { argb: fg } };
+            cell.alignment = { horizontal: cIdx === 1 ? 'left' : 'center', vertical: 'middle' };
+            cell.border = thinBorder;
+            if (cIdx === 8 || cIdx === 12) cell.numFmt = '0.0%';
+            else if (cIdx >= 2) cell.numFmt = '#,##0';
+          });
+        });
+
+        const totBiasRow = ws4.getRow(10);
+        totBiasRow.height = 22;
+        ws4.mergeCells('A10:B10');
+        totBiasRow.getCell(1).value = 'TOTAL KESELURUHAN CAPAIAN BIAS';
+        totBiasRow.getCell(3).value = { formula: 'SUM(C6:C9)' };
+        totBiasRow.getCell(4).value = { formula: 'SUM(D6:D9)' };
+        totBiasRow.getCell(5).value = { formula: 'SUM(E6:E9)' };
+        totBiasRow.getCell(6).value = { formula: 'SUM(F6:F9)' };
+        totBiasRow.getCell(7).value = { formula: 'SUM(G6:G9)' };
+        totBiasRow.getCell(8).value = { formula: 'SUM(H6:H9)' };
+        totBiasRow.getCell(9).value = { formula: 'IFERROR(H10/E10,0)' };
+        totBiasRow.getCell(10).value = { formula: 'SUM(J6:J9)' };
+        totBiasRow.getCell(11).value = { formula: 'SUM(K6:K9)' };
+        totBiasRow.getCell(12).value = { formula: 'SUM(L6:L9)' };
+        totBiasRow.getCell(13).value = { formula: 'IFERROR(L10/E10,0)' };
+        totBiasRow.getCell(14).value = { formula: 'SUM(N6:N9)' };
+        for (let c = 1; c <= 14; c++) {
+          const cell = totBiasRow.getCell(c);
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE2E8F0' } };
+          cell.font = { name: 'Calibri', size: 10, bold: true, color: { argb: 'FF002B5B' } };
+          cell.alignment = { horizontal: c <= 2 ? 'left' : 'center', vertical: 'middle' };
+          cell.border = totalBorder;
+          if (c === 9 || c === 13) cell.numFmt = '0.0%';
+          else if (c >= 3) cell.numFmt = '#,##0';
+        }
+
+        // Tabel Rincian Per Sekolah di bawah Rekap BIAS (mulai baris 13)
+        if (snap.biasSchoolRows.length > 0) {
+          ws4.mergeCells('A13:N13');
+          ws4.getCell('A13').value = `RINCIAN CAPAIAN BIAS PER SEKOLAH & KELAS (S/D ${snap.monthLabel.toUpperCase()} ${snap.thn})`;
+          ws4.getCell('A13').font = { name: 'Calibri', size: 11, bold: true, color: { argb: 'FF002B5B' } };
+          ws4.getRow(13).height = 20;
+
+          const schHeaders = ['No.', 'Nama Sekolah', 'Jenjang', 'Desa', 'Kelas', 'Vaksin', 'Tanggal', 'Sasaran L', 'Sasaran P', 'Total Sasaran', 'Divaksin L', 'Divaksin P', 'Total Divaksin', 'Capaian (%)'];
+          const r14 = ws4.getRow(14);
+          r14.height = 20;
+          schHeaders.forEach((hText, idx) => {
+            const c = r14.getCell(idx + 1);
+            c.value = hText;
+            c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF002B5B' } };
+            c.font = { name: 'Calibri', size: 9, bold: true, color: { argb: 'FFFFFFFF' } };
+            c.alignment = { horizontal: 'center', vertical: 'middle' };
+            c.border = thinBorder;
+          });
+
+          snap.biasSchoolRows.forEach((sr, idx) => {
+            const rNum = 15 + idx;
+            const row = ws4.getRow(rNum);
+            row.height = 19;
+            const zebra = rNum % 2 === 0 ? 'FFF8FAFC' : 'FFFFFFFF';
+            const vals = [
+              idx + 1, sr.sekolah, sr.jenjang, sr.desa, `Kelas ${sr.kelas}`, sr.jenis_vaksin, sr.tanggal,
+              sr.sasL, sr.sasP, { formula: `SUM(H${rNum}:I${rNum})` },
+              sr.capL, sr.capP, { formula: `SUM(K${rNum}:L${rNum})` },
+              { formula: `IFERROR(M${rNum}/J${rNum},0)` }
+            ];
+            vals.forEach((v, cIdx) => {
+              const cell = row.getCell(cIdx + 1);
+              cell.value = v;
+              cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: cIdx === 12 ? 'FFECFDF5' : zebra } };
+              cell.font = { name: 'Calibri', size: 10, bold: (cIdx === 1 || cIdx === 12 || cIdx === 13), color: { argb: cIdx === 12 ? 'FF065F46' : 'FF1E293B' } };
+              cell.alignment = { horizontal: cIdx === 1 ? 'left' : 'center', vertical: 'middle' };
+              cell.border = thinBorder;
+              if (cIdx === 13) cell.numFmt = '0.0%';
+              else if (cIdx >= 7) cell.numFmt = '#,##0';
+            });
+          });
+        }
+        autoFitColumns(ws4);
+
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Laporan_Capaian_Imunisasi_Puskesmas_Melata_${thn}_${bln}.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } catch (err) {
+        alert("Gagal mengunduh Laporan Capaian (.xlsx): " + err.message);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = origHtml;
+        }
+      }
+    };
    
     // =========================================================================
     // TAB 3: ANALISIS CATCH UP & DOWNLOAD EXCEL CATCH UP

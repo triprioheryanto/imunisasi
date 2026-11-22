@@ -4649,38 +4649,7 @@ window.goToEdit = function(encodedJson) {
         setTimeout(() => smoothScrollToId(cfg.elId), 60);
       }
     };
-
-    window.switchTab = function(e) {
-      const target = e.currentTarget.getAttribute('data-tab');
-      if (target === 'admin' && !isCurrentUserAdmin()) {
-        return alert("🔒 Akses Ditolak: Menu Admin, Download/Cetak Sertifikat, dan Kartu Imunisasi hanya boleh diakses oleh Admin.");
-      }
-      document.querySelectorAll('.app-nav-tabs .tab').forEach(t => t.classList.remove('active'));
-      e.currentTarget.classList.add('active');
-      document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
-      const targetPanel = document.getElementById(target);
-      if (targetPanel) targetPanel.style.display = 'block';
-      if (target === 'imunisasi') loadRecentTransactions();
-      if (target === 'catchup') {
-        closeAllCatchupCards();
-        loadCatchUpAnalysis();
-      }
-      if (target === 'kumulatif') {
-        toggleKumulatifCard(false);
-        loadReviewDetail();
-      }
-      if (target === 'capaian') {
-        closeAllCapaianCards();
-        loadCapanTabContent();
-      }
-      if (target === 'admin') {
-        closeAllAdminSubPanels();
-        renderUserManagementTable();
-        renderBatchQrCandidateList();
-      }
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-  
+    
     window.switchTab = function(e) {
       const target = e.currentTarget.getAttribute('data-tab');
       if (target === 'admin' && !isCurrentUserAdmin()) {
@@ -5620,7 +5589,7 @@ window.selectFromLiveSearch = function(encodedJson) {
               const val = d[fieldKey] || (d.jenis_imunisasi === vKey ? d.tanggal_pelayanan : null);
               vCols += val ? `<td><span class="v-given">${val}</span></td>` : `<td style="color:#CBD5E1;">-</td>`;
             });
-            tr.innerHTML = `<td class="sticky-col-0">${countAnak}</td><td class="sticky-col-1">${d.nama_anak}</td><td class="sticky-col-2">${d.tgl_lahir || '-'}</td><td>${d.jk || '-'}</td><td>${d.nama_ibu || '-'}</td><td>${d.wa_anak || '-'}</td><td>${d.desa || '-'}</td><td>${d.alamat_rt || '-'}</td>${vCols}<td>${petugasKet}</td><td style="display:flex; gap:4px; justify-content:center;"><button class="btn btn-info" onclick="openQrPrintModal('${jsonString}')" style="padding:3px 7px; font-size:0.72rem;" title="Cetak Kartu QR"><i class="fas fa-qrcode"></i> QR</button><button class="btn btn-warning" onclick="editDataSasaran('${jsonString}')" style="padding:3px 6px; font-size:0.72rem;"><i class="fas fa-edit"></i> Edit</button><button class="btn btn-danger" onclick="hapusTrans('${d.id}')" style="padding:3px 6px; font-size:0.72rem;"><i class="fas fa-trash"></i></button></td>`;
+            tr.innerHTML = `<td class="sticky-col-0">${countAnak}</td><td class="sticky-col-1">${d.nama_anak}</td><td class="sticky-col-2">${d.tgl_lahir || '-'}</td><td>${d.jk || '-'}</td><td>${d.nama_ibu || '-'}</td><td>${d.wa_anak || '-'}</td><td>${d.desa || '-'}</td><td>${d.alamat_rt || '-'}</td>${vCols}<td>${petugasKet}</td><td style="display:flex; gap:4px; justify-content:center;"><button class="btn btn-info" onclick="openChildQrAction('${jsonString}')" style="padding:3px 7px; font-size:0.72rem;" title="Cetak Kartu QR"><i class="fas fa-qrcode"></i> QR</button><button class="btn btn-warning" onclick="editDataSasaran('${jsonString}')" style="padding:3px 6px; font-size:0.72rem;"><i class="fas fa-edit"></i> Edit</button><button class="btn btn-danger" onclick="hapusTrans('${d.id}')" style="padding:3px 6px; font-size:0.72rem;"><i class="fas fa-trash"></i></button></td>`;
             tbodyAnak.appendChild(tr);
           }
         });

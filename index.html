@@ -1738,6 +1738,91 @@
     </section>
 <!-- TAB 2: BIAS -->
     <section id="bias" class="tab-panel" style="display:none">
+      <!-- KARTU CAPAIAN BIAS (TAHUN BERJALAN & DINAMIS PER SEKOLAH) -->
+      <div id="biasAchievementSection" class="input-kpi-wrapper">
+        <div class="input-kpi-header">
+          <div class="input-kpi-title">
+            <i class="fas fa-school-flag" style="color: var(--info);"></i>
+            <span>Ringkasan Capaian BIAS (<span id="biasKpiYearLabel">2026</span>)</span>
+          </div>
+          <span id="biasKpiScopeBadge" class="input-kpi-scope">Semua Sekolah Wilayah Puskesmas Melata</span>
+        </div>
+
+        <div class="input-kpi-grid">
+          <!-- 1. SEKOLAH / KELAS TERINPUT -->
+          <div class="kpi-card-item kpi-blue">
+            <div class="kpi-top-row">
+              <span class="kpi-label" id="biasKpiCard1Title">Sekolah Terlapor<br><small style="font-weight:500;">(Tahun Berjalan)</small></span>
+              <span class="kpi-icon-box"><i class="fas fa-building-circle-check"></i></span>
+            </div>
+            <div>
+              <div id="biasKpiSekolahVal" class="kpi-main-value">0 / 23</div>
+              <div id="biasKpiSekolahSub" class="kpi-sub-info">Memuat laporan BIAS...</div>
+              <div class="kpi-progress-track">
+                <div id="biasKpiSekolahBar" class="kpi-progress-fill" style="width: 0%; background: #2563EB;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. CAPAIAN BIAS MR -->
+          <div class="kpi-card-item kpi-green">
+            <div class="kpi-top-row">
+              <span class="kpi-label">Capaian BIAS MR<br><small style="font-weight:500;">(Campak Rubela)</small></span>
+              <span class="kpi-icon-box"><i class="fas fa-shield-virus"></i></span>
+            </div>
+            <div>
+              <div id="biasKpiMrVal" class="kpi-main-value">0.0%</div>
+              <div id="biasKpiMrSub" class="kpi-sub-info">0 dari 0 sasaran siswa</div>
+              <div class="kpi-progress-track">
+                <div id="biasKpiMrBar" class="kpi-progress-fill" style="width: 0%; background: #10B981;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. CAPAIAN BIAS DT -->
+          <div class="kpi-card-item kpi-teal">
+            <div class="kpi-top-row">
+              <span class="kpi-label">Capaian BIAS DT<br><small style="font-weight:500;">(Kelas 1 SD/MI)</small></span>
+              <span class="kpi-icon-box"><i class="fas fa-syringe"></i></span>
+            </div>
+            <div>
+              <div id="biasKpiDtVal" class="kpi-main-value">0.0%</div>
+              <div id="biasKpiDtSub" class="kpi-sub-info">0 dari 0 sasaran siswa</div>
+              <div class="kpi-progress-track">
+                <div id="biasKpiDtBar" class="kpi-progress-fill" style="width: 0%; background: #0D9488;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. CAPAIAN BIAS Td -->
+          <div class="kpi-card-item kpi-orange">
+            <div class="kpi-top-row">
+              <span class="kpi-label">Capaian BIAS Td<br><small style="font-weight:500;">(Kelas 2 &amp; 5 SD/MI)</small></span>
+              <span class="kpi-icon-box"><i class="fas fa-vial-circle-check"></i></span>
+            </div>
+            <div>
+              <div id="biasKpiTdVal" class="kpi-main-value">0.0%</div>
+              <div id="biasKpiTdSub" class="kpi-sub-info">0 dari 0 sasaran siswa</div>
+              <div class="kpi-progress-track">
+                <div id="biasKpiTdBar" class="kpi-progress-fill" style="width: 0%; background: #EA580C;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. CAPAIAN BIAS HPV & DROP OUT -->
+          <div class="kpi-card-item kpi-purple">
+            <div class="kpi-top-row">
+              <span class="kpi-label">Capaian BIAS HPV<br><small style="font-weight:500;">(Siswi Kelas 5 &amp; 6)</small></span>
+              <span class="kpi-icon-box"><i class="fas fa-ribbon"></i></span>
+            </div>
+            <div>
+              <div id="biasKpiHpvVal" class="kpi-main-value">0.0%</div>
+              <div id="biasKpiHpvSub" class="kpi-sub-info">0 dari 0 sasaran siswi</div>
+              <span id="biasKpiDoBadge" class="kpi-badge-status kpi-badge-neutral">DO BIAS: 0 siswa</span>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="card">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:6px;">
           <h2 style="margin:0;"><i class="fas fa-school" style="color:var(--info)"></i> Form BIAS Anak Sekolah</h2>
@@ -5070,13 +5155,20 @@ window.goToEdit = function(encodedJson) {
       const doMrPct = countDpt1 > 0 ? (((countDpt1 - countMr1) / countDpt1) * 100).toFixed(1) : '0.0';
 
       // Render Kartu 1: Total Bayi/Anak Terdaftar
+      const totalArsipAnak = anakList.length;
+      const kohortAktifList = anakList.filter(d => {
+        if (!d.tgl_lahir) return true;
+        const ageNow = getAgeInMonthsAtDate(d.tgl_lahir, now.toISOString().split('T')[0]);
+        return ageNow === null || ageNow <= 23;
+      });
+      const totalAnak = kohortAktifList.length;
       const elTotal = document.getElementById('kpiTotalAnakVal');
       const elTotalSub = document.getElementById('kpiTotalAnakSub');
       if (elTotal) elTotal.textContent = totalAnak.toLocaleString('id-ID');
       if (elTotalSub) {
         elTotalSub.textContent = selectedDesa
-          ? `Sasaran bayi/anak di Desa ${selectedDesa}`
-          : 'Total bayi & anak terdaftar';
+          ? `Kohort 0–23 bln Ds. ${selectedDesa} (Arsip: ${totalArsipAnak})`
+          : `Kohort aktif 0–23 bln (Total arsip: ${totalArsipAnak})`;
       }
 
       // Render Kartu Tambahan: Divaksin Bulan Ini
@@ -5141,6 +5233,134 @@ window.goToEdit = function(encodedJson) {
       }
     }
     window.updateInputAchievementCards = updateInputAchievementCards;
+  // =========================================================================
+    // HITUNG & TAMPILKAN KARTU CAPAIAN BIAS (TAHUN BERJALAN & DINAMIS SEKOLAH)
+    // =========================================================================
+    async function updateBiasAchievementCards() {
+      const curYear = String(new Date().getFullYear());
+      const yearLabelEl = document.getElementById('biasKpiYearLabel');
+      if (yearLabelEl) yearLabelEl.textContent = curYear;
+
+      const selectedSekolah = (document.getElementById('sekolah')?.value || '').trim();
+      const scopeBadge = document.getElementById('biasKpiScopeBadge');
+      if (scopeBadge) {
+        scopeBadge.textContent = selectedSekolah
+          ? `${selectedSekolah} (Tahun ${curYear})`
+          : `Semua Sekolah Wilayah Puskesmas Melata (Tahun ${curYear})`;
+      }
+
+      try {
+        let biasDocs = [];
+        if (navigator.onLine) {
+          const snapBias = await getDocs(collection(db, COL_BIAS));
+          snapBias.forEach(docSnap => biasDocs.push(docSnap.data()));
+          try {
+            localStorage.setItem('pkm_cached_bias_docs', JSON.stringify(biasDocs));
+          } catch (e) {}
+        } else {
+          biasDocs = JSON.parse(localStorage.getItem('pkm_cached_bias_docs') || '[]');
+        }
+
+        // Filter ketat: HANYA Tahun Berjalan & sesuai wilayah kerja user
+        const yearDocs = biasDocs.filter(b => {
+          const tgl = String(b.tanggal || '').trim();
+          if (!tgl.startsWith(curYear)) return false;
+          const desaSekolah = SCHOOL_DESA_MAP[b.sekolah] || '';
+          if (desaSekolah && typeof isWilayahDiizinkan === 'function' && !isWilayahDiizinkan(desaSekolah)) {
+            return false;
+          }
+          if (selectedSekolah && b.sekolah !== selectedSekolah) return false;
+          return true;
+        });
+
+        const stats = {
+          MR: { sas: 0, cap: 0 },
+          DT: { sas: 0, cap: 0 },
+          Td: { sas: 0, cap: 0 },
+          HPV: { sas: 0, cap: 0 }
+        };
+        const reportedSchools = new Set();
+        const reportedClassVax = new Set();
+        let totalDoBias = 0;
+
+        yearDocs.forEach(b => {
+          if (b.sekolah) reportedSchools.add(b.sekolah);
+          reportedClassVax.add(`${b.sekolah}_${b.kelas}_${b.jenis_vaksin}`);
+          const vk = b.jenis_vaksin;
+          const dt = b.data || {};
+          const sas = Number(dt.Sasaran_L || 0) + Number(dt.Sasaran_P || 0);
+          const cap = Number(dt.Capaian_L || 0) + Number(dt.Capaian_P || 0);
+          totalDoBias += Number(dt.DropOut || 0);
+
+          if (stats[vk]) {
+            stats[vk].sas += sas;
+            stats[vk].cap += cap;
+          }
+        });
+
+        // Kartu 1: Sekolah Terlapor (atau Rombel/Laporan Sekolah Terpilih)
+        const allowedSchoolsCount = Object.keys(SCHOOL_DATA).filter(sch => {
+          const d = SCHOOL_DESA_MAP[sch] || '';
+          return typeof isWilayahDiizinkan === 'function' ? isWilayahDiizinkan(d) : true;
+        }).length || Object.keys(SCHOOL_DATA).length;
+
+        const c1Title = document.getElementById('biasKpiCard1Title');
+        const c1Val = document.getElementById('biasKpiSekolahVal');
+        const c1Sub = document.getElementById('biasKpiSekolahSub');
+        const c1Bar = document.getElementById('biasKpiSekolahBar');
+
+        if (selectedSekolah) {
+          if (c1Title) c1Title.innerHTML = `Laporan Sekolah Ini<br><small style="font-weight:500;">(Tahun ${curYear})</small>`;
+          if (c1Val) c1Val.textContent = `${reportedClassVax.size} Entri`;
+          if (c1Sub) c1Sub.textContent = `Desa ${SCHOOL_DESA_MAP[selectedSekolah] || '-'} (${SCHOOL_DATA[selectedSekolah] || '-'})`;
+          if (c1Bar) c1Bar.style.width = reportedClassVax.size > 0 ? '100%' : '0%';
+        } else {
+          const pctSch = allowedSchoolsCount > 0 ? Math.min(100, (reportedSchools.size / allowedSchoolsCount) * 100) : 0;
+          if (c1Title) c1Title.innerHTML = `Sekolah Terlapor<br><small style="font-weight:500;">(Tahun ${curYear})</small>`;
+          if (c1Val) c1Val.textContent = `${reportedSchools.size} / ${allowedSchoolsCount}`;
+          if (c1Sub) c1Sub.textContent = `${reportedClassVax.size} laporan kelas/antigen masuk`;
+          if (c1Bar) c1Bar.style.width = `${pctSch.toFixed(1)}%`;
+        }
+
+        // Helper render antigen MR, DT, Td
+        const renderAntigenCard = (vk, valId, subId, barId, unitWord = 'siswa') => {
+          const { sas, cap } = stats[vk];
+          const pct = sas > 0 ? ((cap / sas) * 100).toFixed(1) : '0.0';
+          const elV = document.getElementById(valId);
+          const elS = document.getElementById(subId);
+          const elB = document.getElementById(barId);
+          if (elV) elV.textContent = `${pct}%`;
+          if (elS) elS.textContent = `${cap.toLocaleString('id-ID')} dari ${sas.toLocaleString('id-ID')} sasaran ${unitWord}`;
+          if (elB) elB.style.width = `${Math.min(100, Math.max(0, parseFloat(pct)))}%`;
+        };
+
+        renderAntigenCard('MR', 'biasKpiMrVal', 'biasKpiMrSub', 'biasKpiMrBar', 'siswa');
+        renderAntigenCard('DT', 'biasKpiDtVal', 'biasKpiDtSub', 'biasKpiDtBar', 'siswa');
+        renderAntigenCard('Td', 'biasKpiTdVal', 'biasKpiTdSub', 'biasKpiTdBar', 'siswa');
+
+        // Kartu 5: HPV & Drop Out BIAS
+        const hpvSas = stats.HPV.sas;
+        const hpvCap = stats.HPV.cap;
+        const hpvPct = hpvSas > 0 ? ((hpvCap / hpvSas) * 100).toFixed(1) : '0.0';
+        const elHpvV = document.getElementById('biasKpiHpvVal');
+        const elHpvS = document.getElementById('biasKpiHpvSub');
+        const elDoBadge = document.getElementById('biasKpiDoBadge');
+        if (elHpvV) elHpvV.textContent = `${hpvPct}%`;
+        if (elHpvS) elHpvS.textContent = `${hpvCap.toLocaleString('id-ID')} dari ${hpvSas.toLocaleString('id-ID')} sasaran siswi`;
+        if (elDoBadge) {
+          if (totalDoBias === 0) {
+            elDoBadge.className = 'kpi-badge-status kpi-badge-safe';
+            elDoBadge.innerHTML = '<i class="fas fa-circle-check"></i> Drop Out BIAS: 0 siswa';
+          } else {
+            elDoBadge.className = 'kpi-badge-status kpi-badge-warn';
+            elDoBadge.innerHTML = `<i class="fas fa-triangle-exclamation"></i> Drop Out BIAS: ${totalDoBias} siswa`;
+          }
+        }
+      } catch (err) {
+        console.warn('Gagal memuat kartu capaian BIAS:', err.message);
+      }
+    }
+    window.updateBiasAchievementCards = updateBiasAchievementCards;
 
     // =========================================================================
     // PENCARIAN SASARAN AWAL & TOMBOL TAMBAH SASARAN (SMOOTH SCROLL)

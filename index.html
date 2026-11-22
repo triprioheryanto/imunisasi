@@ -1815,7 +1815,7 @@
       </div>
     </section>
 
-    <!-- TAB 4: KUMULATIF -->
+   <!-- TAB 4: KUMULATIF -->
     <section id="kumulatif" class="tab-panel" style="display:none">
       <div class="card">
         <h3><i class="fas fa-filter"></i> Filter Laporan Kumulatif &amp; Ekspor Spesifik</h3>
@@ -1850,13 +1850,31 @@
             </select>
           </div>
         </div>
+
+        <div style="margin-top:8px; padding-top:10px; border-top:1px dashed var(--border-color);">
+          <div style="font-size:0.75rem; color:var(--muted); margin-bottom:6px; font-weight:600;">
+            <i class="fas fa-hand-pointer"></i> Klik tombol di bawah untuk membuka atau menutup tabel hasil rekapitulasi:
+          </div>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button type="button" id="btnToggleKumulatif" class="btn btn-ghost" onclick="toggleKumulatifCard()" style="padding:6px 12px; font-size:0.76rem;">
+              <i class="fas fa-eye"></i> Hasil Rekapitulasi Matriks <span id="badgeKumulatifCount" style="background:#E2E8F0; color:#0F172A; padding:1px 7px; border-radius:10px; font-size:0.7rem; font-weight:800;">0 Data</span>
+            </button>
+          </div>
+        </div>
+
         <div class="actions">
-          <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardReviewKumulatif')"><i class="fas fa-arrow-down"></i> Ke Tabel Hasil</button>
           <button class="btn btn-primary" id="btnApplyFilter"><i class="fas fa-search"></i> Hitung Laporan</button>
           <button class="btn btn-success" id="btnDownloadExcelFilter"><i class="fas fa-file-excel"></i> Download Excel (Sesuai Filter)</button>
         </div>
       </div>
-      <div class="card" id="cardReviewKumulatif"><h3><i class="fas fa-list-alt"></i> Hasil Rekapitulasi Matriks</h3><div id="reviewContainer" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Hitung Laporan untuk memuat data.</p></div></div>
+
+      <div class="card" id="cardReviewKumulatif" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px;">
+          <h3 style="margin:0;"><i class="fas fa-list-alt"></i> Hasil Rekapitulasi Matriks</h3>
+          <button type="button" class="btn btn-ghost" onclick="toggleKumulatifCard(false)" style="padding:4px 10px; font-size:0.75rem;"><i class="fas fa-times"></i> Tutup</button>
+        </div>
+        <div id="reviewContainer" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Hitung Laporan untuk memuat data.</p></div>
+      </div>
     </section>
 
     <!-- TAB 5: CAPAIAN -->
@@ -1876,18 +1894,61 @@
             </select>
           </div>
         </div>
-        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; padding-top:10px; border-top:1px dashed var(--border-color);">
-          <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardCapaian1')" style="padding:5px 10px; font-size:0.75rem;"><i class="fas fa-arrow-down"></i> 1. Bayi &amp; Baduta</button>
-          <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardCapaian2')" style="padding:5px 10px; font-size:0.75rem;"><i class="fas fa-arrow-down"></i> 2. Tabel IDL (&lt;12 Bln)</button>
-          <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardCapaian2b')" style="padding:5px 10px; font-size:0.75rem;"><i class="fas fa-arrow-down"></i> 3. Tabel IBL (Baduta)</button>
-          <button type="button" class="btn btn-ghost" onclick="smoothScrollToId('cardCapaian3')" style="padding:5px 10px; font-size:0.75rem;"><i class="fas fa-arrow-down"></i> 4. Capaian BIAS</button>
+
+        <div style="margin-top:8px; padding-top:10px; border-top:1px dashed var(--border-color);">
+          <div style="font-size:0.75rem; color:var(--muted); margin-bottom:6px; font-weight:600;">
+            <i class="fas fa-hand-pointer"></i> Klik kategori di bawah untuk membuka atau menutup tabelnya:
+          </div>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button type="button" id="btnToggleCapaian1" class="btn btn-ghost" onclick="toggleCapaianCard('1')" style="padding:6px 11px; font-size:0.76rem;">
+              <i class="fas fa-eye"></i> 1. Bayi &amp; Baduta <span id="badgeCapaianCount1" style="background:#E2E8F0; color:#0F172A; padding:1px 6px; border-radius:10px; font-size:0.7rem; font-weight:800;">0 Dosis</span>
+            </button>
+            <button type="button" id="btnToggleCapaian2" class="btn btn-ghost" onclick="toggleCapaianCard('2')" style="padding:6px 11px; font-size:0.76rem;">
+              <i class="fas fa-eye"></i> 2. Tabel IDL (&lt;12 Bln) <span id="badgeCapaianCount2" style="background:#E2E8F0; color:#0F172A; padding:1px 6px; border-radius:10px; font-size:0.7rem; font-weight:800;">0.0%</span>
+            </button>
+            <button type="button" id="btnToggleCapaian2b" class="btn btn-ghost" onclick="toggleCapaianCard('2b')" style="padding:6px 11px; font-size:0.76rem;">
+              <i class="fas fa-eye"></i> 3. Tabel IBL (Baduta) <span id="badgeCapaianCount2b" style="background:#E2E8F0; color:#0F172A; padding:1px 6px; border-radius:10px; font-size:0.7rem; font-weight:800;">0.0%</span>
+            </button>
+            <button type="button" id="btnToggleCapaian3" class="btn btn-ghost" onclick="toggleCapaianCard('3')" style="padding:6px 11px; font-size:0.76rem;">
+              <i class="fas fa-eye"></i> 4. Capaian BIAS <span id="badgeCapaianCount3" style="background:#E2E8F0; color:#0F172A; padding:1px 6px; border-radius:10px; font-size:0.7rem; font-weight:800;">0 Siswa</span>
+            </button>
+          </div>
         </div>
+
         <div class="actions"><button class="btn btn-primary" id="btnHitungCapaian"><i class="fas fa-chart-pie"></i> Hitung Capaian, IDL &amp; IBL</button></div>
       </div>
-      <div class="card" id="cardCapaian1"><h3><i class="fas fa-baby"></i> 1. Capaian Per Antigen (Bayi &amp; Baduta)</h3><div id="containerCapaianBayiBaduta" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Hitung Capaian.</p></div></div>
-      <div class="card" id="cardCapaian2"><h3><i class="fas fa-certificate" style="color:var(--success)"></i> 2. Imunisasi Dasar Lengkap (IDL &mdash; Selesai Usia &lt; 12 Bulan)</h3><div id="containerTabelIDL" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Hitung Capaian.</p></div></div>
-      <div class="card" id="cardCapaian2b"><h3><i class="fas fa-award" style="color:#0D9488"></i> 3. Imunisasi Baduta Lengkap (IBL &mdash; Selesai Usia &lt; 24 Bulan)</h3><div id="containerTabelIBL" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Hitung Capaian.</p></div></div>
-      <div class="card" id="cardCapaian3"><h3><i class="fas fa-school" style="color:var(--info)"></i> 4. Capaian BIAS</h3><div id="containerCapaianBIAS" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Hitung Capaian.</p></div></div>
+
+      <div class="card" id="cardCapaian1" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px;">
+          <h3 style="margin:0;"><i class="fas fa-baby"></i> 1. Capaian Per Antigen (Bayi &amp; Baduta)</h3>
+          <button type="button" class="btn btn-ghost" onclick="toggleCapaianCard('1', false)" style="padding:4px 10px; font-size:0.75rem;"><i class="fas fa-times"></i> Tutup</button>
+        </div>
+        <div id="containerCapaianBayiBaduta" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Hitung Capaian.</p></div>
+      </div>
+
+      <div class="card" id="cardCapaian2" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px;">
+          <h3 style="margin:0;"><i class="fas fa-certificate" style="color:var(--success)"></i> 2. Imunisasi Dasar Lengkap (IDL &mdash; Selesai Usia &lt; 12 Bulan)</h3>
+          <button type="button" class="btn btn-ghost" onclick="toggleCapaianCard('2', false)" style="padding:4px 10px; font-size:0.75rem;"><i class="fas fa-times"></i> Tutup</button>
+        </div>
+        <div id="containerTabelIDL" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Hitung Capaian.</p></div>
+      </div>
+
+      <div class="card" id="cardCapaian2b" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px;">
+          <h3 style="margin:0;"><i class="fas fa-award" style="color:#0D9488"></i> 3. Imunisasi Baduta Lengkap (IBL &mdash; Selesai Usia &lt; 24 Bulan)</h3>
+          <button type="button" class="btn btn-ghost" onclick="toggleCapaianCard('2b', false)" style="padding:4px 10px; font-size:0.75rem;"><i class="fas fa-times"></i> Tutup</button>
+        </div>
+        <div id="containerTabelIBL" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Hitung Capaian.</p></div>
+      </div>
+
+      <div class="card" id="cardCapaian3" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px;">
+          <h3 style="margin:0;"><i class="fas fa-school" style="color:var(--info)"></i> 4. Capaian BIAS</h3>
+          <button type="button" class="btn btn-ghost" onclick="toggleCapaianCard('3', false)" style="padding:4px 10px; font-size:0.75rem;"><i class="fas fa-times"></i> Tutup</button>
+        </div>
+        <div id="containerCapaianBIAS" class="table-container"><p class="muted" style="text-align:center; padding:15px;">Klik Hitung Capaian.</p></div>
+      </div>
     </section>
 <!-- TAB 6: ADMIN & KONTROL -->
     <section id="admin" class="tab-panel" style="display:none">
@@ -4489,7 +4550,14 @@ window.goToEdit = function(encodedJson) {
         closeAllCatchupCards();
         loadCatchUpAnalysis();
       }
-      if (target === 'capaian') loadCapanTabContent();
+      if (target === 'kumulatif') {
+        toggleKumulatifCard(false);
+        loadReviewDetail();
+      }
+      if (target === 'capaian') {
+        closeAllCapaianCards();
+        loadCapanTabContent();
+      }
       if (target === 'admin') {
         renderUserManagementTable();
         renderBatchQrCandidateList();
@@ -4577,15 +4645,39 @@ window.goToEdit = function(encodedJson) {
       bindEvent('btnExportDb', 'click', exportDatabase);
       bindEvent('btnStartImport', 'click', startImport);
 
-      bindEvent('btnApplyFilter', 'click', loadReviewDetail);
+      bindEvent('btnApplyFilter', 'click', async () => {
+        await loadReviewDetail();
+        toggleKumulatifCard(true);
+      });
+      ['filter_tahun', 'filter_bulan', 'filter_kategori', 'filter_antigen_spesifik', 'filter_desa'].forEach(fId => {
+        bindEvent(fId, 'change', () => {
+          kumulatifLoadedForKey = null;
+          loadReviewDetail();
+        });
+      });
       bindEvent('btnDownloadExcelFilter', 'click', () => downloadExcelFiltered('kumulatif'));
+
       bindEvent('btnApplyCatchUp', 'click', loadCatchUpAnalysis);
       bindEvent('catchup_filter_desa', 'change', () => {
         catchUpDataLoadedForDesa = null;
         loadCatchUpAnalysis();
       });
       bindEvent('btnDownloadCatchUpExcel', 'click', downloadCatchUpExcel);
-      bindEvent('btnHitungCapaian', 'click', loadCapanTabContent);
+
+      bindEvent('btnHitungCapaian', 'click', async () => {
+        await loadCapanTabContent();
+        const anyOpen = ['1', '2', '2b', '3'].some(k => {
+          const el = document.getElementById(`cardCapaian${k}`);
+          return el && el.style.display !== 'none';
+        });
+        if (!anyOpen) toggleCapaianCard('1', true);
+      });
+      ['cap_filter_tahun', 'cap_filter_bulan'].forEach(cId => {
+        bindEvent(cId, 'change', () => {
+          capaianLoadedForPeriod = null;
+          loadCapanTabContent();
+        });
+      });
       bindEvent('formTargetSasaran', 'submit', handleSaveTargetSasaran);
       bindEvent('formPrioritasQrAdmin', 'submit', handleSavePrioritasQrAdmin);
       bindEvent('formLogikaVaksinAdmin', 'submit', handleSaveLogikaVaksinAdmin);
@@ -5877,9 +5969,43 @@ window.hapusTrans = async function(docId) {
       }
     };
   
-    // =========================================================================
+   // =========================================================================
     // TAB 5: PERHITUNGAN CAPAIAN, IDL (<12 BLN), & IBL (<24 BLN) STANDAR KEMENKES
     // =========================================================================
+    let capaianLoadedForPeriod = null;
+
+    window.toggleCapaianCard = async function(cardKey, forceState = null) {
+      const card = document.getElementById(`cardCapaian${cardKey}`);
+      const btn = document.getElementById(`btnToggleCapaian${cardKey}`);
+      if (!card || !btn) return;
+
+      const isCurrentlyVisible = card.style.display !== 'none';
+      const shouldShow = forceState !== null ? forceState : !isCurrentlyVisible;
+
+      if (shouldShow) {
+        const curPeriod = `${document.getElementById('cap_filter_tahun')?.value || ''}_${document.getElementById('cap_filter_bulan')?.value || ''}`;
+        if (capaianLoadedForPeriod !== curPeriod) {
+          await loadCapanTabContent();
+        }
+        card.style.display = 'block';
+        btn.classList.remove('btn-ghost');
+        btn.classList.add('btn-info');
+        const iconEl = btn.querySelector('i');
+        if (iconEl) iconEl.className = 'fas fa-eye-slash';
+        setTimeout(() => smoothScrollToId(`cardCapaian${cardKey}`), 60);
+      } else {
+        card.style.display = 'none';
+        btn.classList.remove('btn-info');
+        btn.classList.add('btn-ghost');
+        const iconEl = btn.querySelector('i');
+        if (iconEl) iconEl.className = 'fas fa-eye';
+      }
+    };
+
+    window.closeAllCapaianCards = function() {
+      ['1', '2', '2b', '3'].forEach(k => toggleCapaianCard(k, false));
+    };
+
     async function loadCapanTabContent() {
       const thn = document.getElementById('cap_filter_tahun').value;
       const bln = document.getElementById('cap_filter_bulan').value;
@@ -6096,6 +6222,25 @@ window.hapusTrans = async function(docId) {
         });
         htmlBIAS += `</tbody></table>`;
         if (cBIAS) cBIAS.innerHTML = htmlBIAS;
+
+        capaianLoadedForPeriod = `${thn}_${bln}`;
+        const totalDosisBayiBaduta = VAKSIN_ANAK_KEYS.reduce((acc, vk) => acc + (kumulatifCounts[vk]?.Total || 0), 0);
+        const totalSiswaBias = ['MR', 'DT', 'Td', 'HPV'].reduce((acc, vk) => acc + biasKumulatif[vk].L + biasKumulatif[vk].P, 0);
+
+        const badgeMap = [
+          { id: 'badgeCapaianCount1', text: `${totalDosisBayiBaduta} Dosis`, active: totalDosisBayiBaduta > 0 },
+          { id: 'badgeCapaianCount2', text: `${grandPersen}%`, active: parseFloat(grandPersen) > 0 },
+          { id: 'badgeCapaianCount2b', text: `${grandPersenIBL}%`, active: parseFloat(grandPersenIBL) > 0 },
+          { id: 'badgeCapaianCount3', text: `${totalSiswaBias} Siswa`, active: totalSiswaBias > 0 }
+        ];
+        badgeMap.forEach(item => {
+          const bEl = document.getElementById(item.id);
+          if (bEl) {
+            bEl.textContent = item.text;
+            bEl.style.background = item.active ? '#DCFCE7' : '#E2E8F0';
+            bEl.style.color = item.active ? '#065F46' : '#0F172A';
+          }
+        });
       } catch (err) {
         alert("Error Capaian: " + err.message);
       }
@@ -6273,11 +6418,8 @@ let catchUpDataLoadedForDesa = null;
         p2.innerHTML = listBerkesinambungan.length === 0 ? '<p class="muted" style="text-align:center; padding:15px;">Tidak ada sasaran berisiko drop out.</p>' : `<table class="kohort-table"><thead><tr><th class="sticky-col-0">No</th><th>Nama Sasaran</th><th>Usia</th><th>Desa</th><th>Dosis Terakhir</th><th>Tgl Terima</th><th>Tgl Ideal Dosis Lanjutan</th><th>Target Dosis</th><th>Status Keterlambatan</th><th>Aksi</th></tr></thead><tbody>${listBerkesinambungan.map((b, i) => { const badgeInfo = getDropoutColorBadge(b.delayMonths); return `<tr><td class="sticky-col-0">${i + 1}</td><td style="font-weight:700; text-align:left;">${b.nama_anak}</td><td>${b.ageMonths} Bln</td><td>${b.desa}</td><td><span class="v-given">${b.lastDose}</span></td><td>${b.lastDate}</td><td><strong style="color:var(--accent);">${b.idealDate}</strong></td><td style="color:var(--primary); font-weight:800;">${b.antigen}</td><td><span style="${badgeInfo.style}">${badgeInfo.label}</span></td><td><button class="btn btn-warning" onclick="goToEdit('${encodeURIComponent(JSON.stringify(b))}')" style="padding:4px 8px; font-size:0.75rem;"><i class="fas fa-edit"></i> Edit</button></td></tr>`; }).join('')}</tbody></table>`;
         p3.innerHTML = listBaduta.length === 0 ? '<p class="muted" style="text-align:center;">Seluruh anak telah menerima DPT4 &amp; MR2 tepat waktu.</p>' : `<table class="kohort-table"><thead><tr><th class="sticky-col-0">No</th><th>Nama Sasaran</th><th>Usia</th><th>Desa</th><th>Orang Tua</th><th>Target Booster</th><th>Status</th><th>Aksi</th></tr></thead><tbody>${listBaduta.map((b, i) => `<tr><td class="sticky-col-0">${i + 1}</td><td style="font-weight:700;">${b.nama_anak}</td><td>${b.ageMonths} Bln</td><td>${b.desa}</td><td>${b.nama_ibu}</td><td style="font-weight:700; color:var(--accent);">${b.needs}</td><td><span class="${b.urgent.includes('Mendesak') ? 'badge-urgent' : 'badge-warning-custom'}">${b.urgent}</span></td><td><button class="btn btn-warning" onclick="goToEdit('${encodeURIComponent(JSON.stringify(b))}')" style="padding:4px 8px; font-size:0.75rem;"><i class="fas fa-edit"></i> Edit</button></td></tr>`).join('')}</tbody></table>`;
         p4.innerHTML = listDewasa.length === 0 ? '<p class="muted" style="text-align:center;">Semua Catin &amp; Ibu Hamil berstatus Td Lengkap.</p>' : `<table class="kohort-table"><thead><tr><th class="sticky-col-0">No</th><th>Nama Sasaran</th><th>Kategori</th><th>Desa</th><th>Alamat</th><th>Pasangan</th><th>Status Td</th><th>Aksi</th></tr></thead><tbody>${listDewasa.map((b, i) => `<tr><td class="sticky-col-0">${i + 1}</td><td style="font-weight:700;">${b.nama_anak}</td><td>${b.kategori}</td><td>${b.desa}</td><td>${b.alamat_rt}</td><td>${b.nama_ibu}</td><td style="color:var(--danger); font-weight:700;">${b.statusTd}</td><td><button class="btn btn-warning" onclick="goToEdit('${encodeURIComponent(JSON.stringify(b))}')" style="padding:4px 8px; font-size:0.75rem;"><i class="fas fa-edit"></i> Edit</button></td></tr>`).join('')}</tbody></table>`;
-      } catch (err) {
-        alert("Error Catch Up: " + err.message);
-      }
-    }
-catchUpDataLoadedForDesa = desaSel;
+
+        catchUpDataLoadedForDesa = desaSel;
         const counts = [listBayi.length, listBerkesinambungan.length, listBaduta.length, listDewasa.length];
         counts.forEach((cnt, idx) => {
           const badge = document.getElementById(`badgeCatchupCount${idx + 1}`);
@@ -6287,6 +6429,10 @@ catchUpDataLoadedForDesa = desaSel;
             badge.style.color = cnt > 0 ? '#991B1B' : '#0F172A';
           }
         });
+      } catch (err) {
+        alert("Error Catch Up: " + err.message);
+      }
+    }
     async function downloadCatchUpExcel() {
       const desaSel = document.getElementById('catchup_filter_desa').value;
       const today = new Date();
@@ -6351,9 +6497,56 @@ catchUpDataLoadedForDesa = desaSel;
       }
     }
 
-    // =========================================================================
+// =========================================================================
     // TAB 4: REKAPITULASI KUMULATIF (FILTER KETAT BULAN/TAHUN/ANTIGEN/DESA)
     // =========================================================================
+    let kumulatifLoadedForKey = null;
+
+    function getKumulatifFilterKey() {
+      return [
+        document.getElementById('filter_tahun')?.value || '',
+        document.getElementById('filter_bulan')?.value || '',
+        document.getElementById('filter_desa')?.value || '',
+        document.getElementById('filter_kategori')?.value || '',
+        document.getElementById('filter_antigen_spesifik')?.value || ''
+      ].join('_');
+    }
+
+    function updateKumulatifBadge(count, unitLabel = 'Data') {
+      const badge = document.getElementById('badgeKumulatifCount');
+      if (!badge) return;
+      badge.textContent = `${count} ${unitLabel}`;
+      badge.style.background = count > 0 ? '#DCFCE7' : '#E2E8F0';
+      badge.style.color = count > 0 ? '#065F46' : '#0F172A';
+    }
+
+    window.toggleKumulatifCard = async function(forceState = null) {
+      const card = document.getElementById('cardReviewKumulatif');
+      const btn = document.getElementById('btnToggleKumulatif');
+      if (!card || !btn) return;
+
+      const isCurrentlyVisible = card.style.display !== 'none';
+      const shouldShow = forceState !== null ? forceState : !isCurrentlyVisible;
+
+      if (shouldShow) {
+        if (kumulatifLoadedForKey !== getKumulatifFilterKey()) {
+          await loadReviewDetail();
+        }
+        card.style.display = 'block';
+        btn.classList.remove('btn-ghost');
+        btn.classList.add('btn-info');
+        const iconEl = btn.querySelector('i');
+        if (iconEl) iconEl.className = 'fas fa-eye-slash';
+        setTimeout(() => smoothScrollToId('cardReviewKumulatif'), 60);
+      } else {
+        card.style.display = 'none';
+        btn.classList.remove('btn-info');
+        btn.classList.add('btn-ghost');
+        const iconEl = btn.querySelector('i');
+        if (iconEl) iconEl.className = 'fas fa-eye';
+      }
+    };
+
     async function loadReviewDetail() {
       const thn = document.getElementById('filter_tahun').value;
       const bln = document.getElementById('filter_bulan').value;
@@ -6376,8 +6569,10 @@ catchUpDataLoadedForDesa = desaSel;
               biasRows.push({ ...d, desa: schoolDesa });
             }
           });
-          if (biasRows.length === 0) {
+         if (biasRows.length === 0) {
             container.innerHTML = `<p style="text-align:center; padding:15px;">Tidak ada data BIAS pada periode ini.</p>`;
+            updateKumulatifBadge(0, 'Kelas');
+            kumulatifLoadedForKey = getKumulatifFilterKey();
             return;
           }
 
@@ -6444,6 +6639,8 @@ catchUpDataLoadedForDesa = desaSel;
 
         const html = `<div style="margin-bottom:10px; background:#F0F7FF; padding:10px 12px; border-radius:8px; font-size:0.82rem;"><strong>Periode:</strong> ${bln === 'ALL' ? 'Semua Bulan' : 'Bulan ' + BULAN_NAME_MAP[bln]} ${thn === 'ALL' ? 'Semua Tahun' : thn} | <strong>Desa:</strong> ${desaSel === 'ALL' ? 'Semua Desa' : desaSel} | <strong>Kategori:</strong> ${katSel} | <strong>Antigen:</strong> ${filterAntigen === 'ALL' ? 'Semua dalam kategori' : filterAntigen}</div><table class="kohort-table"><thead><tr><th class="sticky-col-0" rowspan="2">No</th><th class="sticky-col-1" rowspan="2">Nama Sasaran</th><th class="sticky-col-2" rowspan="2">Tgl Lahir</th><th rowspan="2">L/P</th><th rowspan="2">Orang Tua/Suami</th><th rowspan="2">WhatsApp</th><th rowspan="2">Desa</th><th colspan="${activeVaccineKeys.length}">Imunisasi Terfilter</th><th rowspan="2">Aksi</th></tr><tr>${headerVColsHtml}</tr></thead><tbody>${rowsHtml || '<tr><td colspan="36" style="text-align:center;">Tidak ada data pada filter ini.</td></tr>'}</tbody><tfoot><tr style="background:#E2E8F0; font-weight:bold;"><td class="sticky-col-1" colspan="7" style="text-align:left; color:var(--accent);">TOTAL DOSIS DIBERIKAN:</td>${totalColsHtml}<td>-</td></tr></tfoot></table>`;
         container.innerHTML = html;
+        updateKumulatifBadge(filteredDocs.length, 'Sasaran');
+        kumulatifLoadedForKey = getKumulatifFilterKey();
       } catch (err) {
         container.innerHTML = `<p style="color:red; text-align:center;">Error: ${err.message}</p>`;
       }

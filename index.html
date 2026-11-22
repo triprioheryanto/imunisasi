@@ -6146,7 +6146,8 @@ window.hapusTrans = async function(docId) {
         htmlIDL += `<tr style="background:#F1F5F9; font-weight:bold;"><td colspan="2" style="text-align:left; color:#92400E;">SUBTOTAL LUAR WILAYAH:</td><td>${totalLuarTarget}</td><td>${totalLuarIDL_L}</td><td>${totalLuarIDL_P}</td><td style="color:var(--success); font-size:0.9rem;">${sumLuarIDL}</td><td style="color:var(--primary); font-size:0.9rem;">${persenLuar}%</td><td style="color:#D97706;">${totalLuarCatchUp}</td></tr></tbody><tfoot><tr style="background:#E2E8F0; font-weight:bold;"><td colspan="2" style="text-align:left; color:var(--accent);">TOTAL KESELURUHAN:</td><td>${grandTotalTarget}</td><td>${totalDalamIDL_L + totalLuarIDL_L}</td><td>${totalDalamIDL_P + totalLuarIDL_P}</td><td style="font-weight:800; color:var(--success); font-size:0.95rem;">${grandTotalIDL}</td><td style="font-weight:800; color:var(--primary); font-size:0.95rem;">${grandPersen}%</td><td style="font-weight:800; color:#D97706; font-size:0.95rem;">${grandTotalCatchUp}</td></tr></tfoot></table>`;
         if (cIDL) cIDL.innerHTML = htmlIDL;
 
-        // TABEL 3: IBL (IMUNISASI BADUTA LENGKAP < 24 BULAN)
+       // TABEL 3: IBL (IMUNISASI BADUTA LENGKAP < 24 BULAN)
+        let grandPersenIBL = "0.0";
         if (cIBL) {
           let totalDalamIBL_L = 0, totalDalamIBL_P = 0, totalDalamTargetBaduta = 0;
           let totalLuarIBL_L = 0, totalLuarIBL_P = 0, totalLuarTargetBaduta = 0;
@@ -6189,7 +6190,7 @@ window.hapusTrans = async function(docId) {
           const persenLuarIBL = totalLuarTargetBaduta > 0 ? ((sumLuarIBL / totalLuarTargetBaduta) * 100).toFixed(1) : "0.0";
           const grandTotalIBL = sumDalamIBL + sumLuarIBL;
           const grandTotalTargetBaduta = totalDalamTargetBaduta + totalLuarTargetBaduta;
-          const grandPersenIBL = grandTotalTargetBaduta > 0 ? ((grandTotalIBL / grandTotalTargetBaduta) * 100).toFixed(1) : "0.0";
+          grandPersenIBL = grandTotalTargetBaduta > 0 ? ((grandTotalIBL / grandTotalTargetBaduta) * 100).toFixed(1) : "0.0";
 
           htmlIBL += `<tr style="background:#F1F5F9; font-weight:bold;"><td colspan="2" style="text-align:left; color:#92400E;">SUBTOTAL LUAR WILAYAH:</td><td>${totalLuarTargetBaduta}</td><td>${totalLuarIBL_L}</td><td>${totalLuarIBL_P}</td><td style="color:#0D9488; font-size:0.9rem;">${sumLuarIBL}</td><td style="color:var(--primary); font-size:0.9rem;">${persenLuarIBL}%</td></tr></tbody><tfoot><tr style="background:#E2E8F0; font-weight:bold;"><td colspan="2" style="text-align:left; color:var(--accent);">TOTAL KESELURUHAN:</td><td>${grandTotalTargetBaduta}</td><td>${totalDalamIBL_L + totalLuarIBL_L}</td><td>${totalDalamIBL_P + totalLuarIBL_P}</td><td style="font-weight:800; color:#0D9488; font-size:0.95rem;">${grandTotalIBL}</td><td style="font-weight:800; color:var(--primary); font-size:0.95rem;">${grandPersenIBL}%</td></tr></tfoot></table>`;
           cIBL.innerHTML = htmlIBL;

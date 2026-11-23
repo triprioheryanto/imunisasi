@@ -905,6 +905,34 @@
       color: var(--accent);
       box-shadow: 0 4px 12px rgba(0, 43, 91, 0.14);
     }
+    /* === PATCH: KOTAK TANGGAL PER JENIS VAKSIN === */
+.vax-date-wrapper {
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+}
+.vaccine-specific-date {
+  width: 100%;
+  font-size: 11px;
+  padding: 3px 6px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background-color: #ffffff;
+  color: #1e293b;
+  cursor: pointer;
+}
+.vaccine-specific-date.has-existing-date {
+  border-color: #10b981;
+  background-color: #ecfdf5;
+  font-weight: 600;
+}
+.vax-auto-badge {
+  font-size: 10px;
+  color: #64748b;
+  white-space: nowrap;
+}
   </style>
 </head>
 <body>
@@ -4336,13 +4364,30 @@ window.goToEdit = function(encodedJson) {
       return (now.getFullYear() - birth.getFullYear()) * 12 + (now.getMonth() - birth.getMonth());
     }
 
-    function calculateIdealVaccineDate(tglLahirStr, offsetMonths, offsetDays = 0) {
-      if (!tglLahirStr) return new Date().toISOString().split('T')[0];
-      const d = new Date(tglLahirStr);
-      if (offsetMonths) d.setMonth(d.getMonth() + offsetMonths);
-      if (offsetDays) d.setDate(d.getDate() + offsetDays);
-      return d.toISOString().split('T')[0];
-    }
+    function calculateIdealVaccineDate(dobString, offsetMonths = 0, offsetDays = 0) {
+  if (!dobString) return '';
+  const parts = dobString.split('-').map(Number);
+  if (parts.length !== 3 || parts.some(isNaN)) return '';
+
+  const [year, month, day] = parts;
+  const totalMonths = (month - 1) + (offsetMonths || 0);
+  const targetYear = year + Math.floor(totalMonths / 12);
+  const targetMonth = ((totalMonths % 12) + 12) % 12;
+
+  // Kunci tanggal maksimal sesuai jumlah hari di bulan target (misal Feb = 28/29)
+  const maxDayInMonth = new Date(targetYear, targetMonth + 1, 0).getDate();
+  const safeDay = Math.min(day, maxDayInMonth);
+
+  const result = new Date(targetYear, targetMonth, safeDay);
+  if (offsetDays) {
+    result.setDate(result.getDate() + offsetDays);
+  }
+
+  const yyyy = result.getFullYear();
+  const mm = String(result.getMonth() + 1).padStart(2, '0');
+  const dd = String(result.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+}
 
     function hasMinInterval4Weeks(prevDateStr, targetDate = new Date()) {
       if (!prevDateStr) return true;
@@ -5240,29 +5285,105 @@ window.selectFromLiveSearch = function(encodedJson) {
       editDataSasaran(encodedJson);
     };
 
-    function setupVaccineAutoFillListeners() {
-      const checkboxes = document.querySelectorAll('input[name="chk_vaksin"]');
-      checkboxes.forEach(cb => {
-        cb.addEventListener('change', (e) => {
-          if (e.target.checked) {
-            const selectedVal = e.target.value;
-            if (selectedVal.includes("TT")) return;
-            if (selectedVal === "BCG") checkCb("HBO (1-7 Hari)");
-            if (["DPT-HB-Hib3", "IPV1", "IPV2"].includes(selectedVal)) {
-              checkCb("HBO (1-7 Hari)");
-              checkCb("BCG");
-            }
-            SERIES_SEQUENCES.forEach(series => {
-              const idx = series.items.findIndex(item => item.key === selectedVal);
-              if (idx > 0) {
-                for (let i = 0; i < idx; i++) checkCb(series.items[i].key);
+    // Helper untuk memunculkan/menyembunyikan kotak tanggal di dalam tombol vaksin
+function syncPerVaccineDateInput(checkbox, existingDate = '') {
+  if (!checkbox) return;
+  const vaxName = checkbox.value || checkbox.dataset.vaccine || '';
+  const container = checkbox.closest('label') || checkbox.parentElement;
+  if (!container) return;
+
+  let wrapper = container.querySelector('.vax-date-wrapper');
+  if (!wrapper) {
+    wrapper = document.createElement('div');
+    wrapper.className = 'vax-date-wrapper';
+    wrapper.innerHTML = `
+      <input type="date" class="vaccine-specific-date" data-vaccine="${vaxName}" title="Pilih tanggal riil (kosongkan untuk tanggal otomatis)">
+      <span class="vax-auto-badge">Auto</span>
+    `;
+    container.appendChild(wrapper);
+
+    // Mencegah klik pada kotak tanggal ikut membatalkan centang tombol vaksin
+    const dateInput = wrapper.querySelector('.vaccine-specific-date');
+    const badge = wrapper.querySelector('.vax-auto-badge');
+    ['click', 'mousedown', 'touchstart'].forEach(evt => {
+      wrapper.addEventListener(evt, e => e.stopPropagation());
+    });
+    dateInput.addEventListener('change', () => {
+      badge.textContent = dateInput.value ? 'Riil' : 'Auto';
+      dateInput.classList.toggle('has-existing-date', Boolean(dateInput.value));
+    });
+  }
+
+  const dateInput = wrapper.querySelector('.vaccine-specific-date');
+  const badge = wrapper.querySelector('.vax-auto-badge');
+
+  if (checkbox.checked) {
+    wrapper.style.display = 'flex';
+    if (existingDate && !dateInput.value) {
+      dateInput.value = existingDate;
+      dateInput.classList.add('has-existing-date');
+      badge.textContent = 'Tersimpan';
+    } else {
+      badge.textContent = dateInput.value ? 'Riil' : 'Auto';
+    }
+  } else {
+    wrapper.style.display = 'none';
+    dateInput.value = '';
+    dateInput.classList.remove('has-existing-date');
+    badge.textContent = 'Auto';
+  }
+}
+
+function setupVaccineAutoFillListeners(existingVaccines = {}) {
+  const checkboxes = document.querySelectorAll('input[type="checkbox"][data-vaccine], #kohortVaccineList input[type="checkbox"]');
+  const getCb = (name) => Array.from(checkboxes).find(cb => (cb.value || cb.dataset.vaccine) === name);
+
+  // Pasang kotak tanggal awal (jika sedang edit data anak lama yang sudah punya tanggal)
+  checkboxes.forEach(cb => {
+    const name = cb.value || cb.dataset.vaccine;
+    syncPerVaccineDateInput(cb, existingVaccines[name] || '');
+
+    cb.addEventListener('change', () => {
+      syncPerVaccineDateInput(cb, existingVaccines[name] || '');
+      if (!cb.checked) return;
+
+      // 1. Cek urutan seri vaksin (DPT, OPV, PCV, Rotavirus, IPV, MR)
+      if (typeof SERIES_SEQUENCES !== 'undefined') {
+        Object.values(SERIES_SEQUENCES).forEach(seqList => {
+          const idx = seqList.findIndex(item => item.name === name);
+          if (idx > 0) {
+            for (let i = 0; i < idx; i++) {
+              const prevCb = getCb(seqList[i].name);
+              if (prevCb && !prevCb.checked) {
+                prevCb.checked = true;
+                syncPerVaccineDateInput(prevCb, existingVaccines[seqList[i].name] || '');
               }
-            });
+            }
           }
         });
-      });
-    }
+      }
 
+      // 2. Prasyarat dasar (HBO & BCG) untuk DPT3, IPV1, IPV2 — tanpa duplikasi HBO
+      const needsBasic = ['DPT-HB-Hib 3', 'IPV 1', 'IPV 2'].includes(name);
+      if (needsBasic) {
+        const hbo24Cb = getCb('HBO (<24 Jam)');
+        const hasHbo24 = (hbo24Cb && hbo24Cb.checked) || Boolean(existingVaccines['HBO (<24 Jam)']);
+        if (!hasHbo24) {
+          const hbo7Cb = getCb('HBO (1-7 Hari)');
+          if (hbo7Cb && !hbo7Cb.checked) {
+            hbo7Cb.checked = true;
+            syncPerVaccineDateInput(hbo7Cb, existingVaccines['HBO (1-7 Hari)'] || '');
+          }
+        }
+        const bcgCb = getCb('BCG');
+        if (bcgCb && !bcgCb.checked) {
+          bcgCb.checked = true;
+          syncPerVaccineDateInput(bcgCb, existingVaccines['BCG'] || '');
+        }
+      }
+    });
+  });
+}
     function handleJkRules() {
       const jk = document.getElementById('reg_jk').value;
       const cbTT2Catin = document.getElementById('cb_tt2_catin');
@@ -5389,6 +5510,26 @@ window.selectFromLiveSearch = function(encodedJson) {
     // =========================================================================
     // SIMPAN REGISTER KOHORT & SINKRONISASI OFFLINE
     // =========================================================================
+function resolveVaccineFinalDate({ vaxName, isHighestDose, serviceDate, dobString, existingDate, offsetMonths = 0, offsetDays = 0 }) {
+  // Prioritas 1: Tanggal spesifik yang dipilih langsung di tombol vaksin
+  const specificInput = document.querySelector(`.vaccine-specific-date[data-vaccine="${vaxName}"]`);
+  if (specificInput && specificInput.value) {
+    return specificInput.value;
+  }
+
+  // Prioritas 2: Tanggal riil lama yang sudah tersimpan di database (jangan ditimpa)
+  if (existingDate) {
+    return existingDate;
+  }
+
+  // Prioritas 3: Dosis tertinggi yang diklik hari ini -> pakai Tgl Pelayanan Dosis
+  if (isHighestDose) {
+    return serviceDate;
+  }
+
+  // Prioritas 4: Dosis sebelumnya yang kosong -> hitung tanggal otomatis dari Tgl Lahir
+  return calculateIdealVaccineDate(dobString, offsetMonths, offsetDays) || serviceDate;
+}
     async function handleSaveKohortMatrix(e) {
       e.preventDefault();
       if (!activePetugasName) {

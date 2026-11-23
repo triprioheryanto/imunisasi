@@ -4914,55 +4914,55 @@ window.goToEdit = function(encodedJson) {
       return latest;
     }
 
-    // Evaluasi status IDL (< 12 bulan) & IBL (< 24 bulan) sesuai Juknis Kemenkes RI
-    function evaluateKemenkesIdlIbl(d, dateFilterFn = null) {
-      const getVal = (vk) => {
-        const fieldKey = `vaksin_${vk.replace(/[\s\(\)<>-]/g, '_')}`;
-        const vDate = d[fieldKey] || (d.jenis_imunisasi === vk ? d.tanggal_pelayanan : null);
-        if (!vDate || vDate === '-') return null;
-        if (typeof dateFilterFn === 'function') {
-          return dateFilterFn(vDate) ? String(vDate).trim().substring(0, 10) : null;
-        }
-        return String(vDate).trim().substring(0, 10);
-      };
-
-      const dHb0 = getVal("HBO (<24 Jam)") || getVal("HBO (1-7 Hari)");
-      const dBcg = getVal("BCG");
-      const dDpt3 = getVal("DPT-HB-Hib3");
-      const dOpv4 = getVal("OPV4");
-      const dIpv1 = getVal("IPV1");
-      const dMr1 = getVal("Campak Rubela-1");
-      const dDpt4 = getVal("DPT-HB-Hib4");
-      const dMr2 = getVal("Campak Rubela-2");
-      const dIpv2 = data["IPV2"] || data["IPV 2"] || "";
-      const hasAllIdlAntigens = Boolean(dHb0 && dBcg && dDpt3 && dOpv4 && dIpv1 && dIpv2 && dMr1);
-      let isIdlValid = false;
-      let isCatchUpIdl = false;
-
-      if (hasAllIdlAntigens) {
-        const idlCompletionDate = getLatestVaccineDate([dHb0, dBcg, dDpt3, dOpv4, dIpv1, dMr1]);
-        const ageAtIdl = getAgeInMonthsAtDate(d.tgl_lahir, idlCompletionDate);
-        if (ageAtIdl === null || ageAtIdl < 12) {
-          isIdlValid = true;
-        } else {
-          isCatchUpIdl = true;
-        }
-      }
-
-      const hasAllIblAntigens = Boolean(hasAllIdlAntigens && dDpt4 && dMr2);
-      let isIblValid = false;
-
-      if (hasAllIblAntigens) {
-        const iblCompletionDate = getLatestVaccineDate([dHb0, dBcg, dDpt3, dOpv4, dIpv1, dMr1, dDpt4, dMr2]);
-        const ageAtIbl = getAgeInMonthsAtDate(d.tgl_lahir, iblCompletionDate);
-        if (ageAtIbl === null || ageAtIbl < 24) {
-          isIblValid = true;
-        }
-      }
-
-      return { isIdlValid, isCatchUpIdl, isIblValid };
+// 1. PERBAIKAN EVALUASI IDL & IBL KEMENKES
+function evaluateKemenkesIdlIbl(d, dateFilterFn = null) {
+  const getVal = (vk) => {
+    const fieldKey = `vaksin_${vk.replace(/[\s\(\)<>-]/g, '_')}`;
+    const vDate = d[fieldKey] || (d.jenis_imunisasi === vk ? d.tanggal_pelayanan : null);
+    if (!vDate || vDate === '-') return null;
+    if (typeof dateFilterFn === 'function') {
+      return dateFilterFn(vDate) ? String(vDate).trim().substring(0, 10) : null;
     }
+    return String(vDate).trim().substring(0, 10);
+  };
 
+  const dHb0 = getVal("HBO (<24 Jam)") || getVal("HBO (1-7 Hari)");
+  const dBcg = getVal("BCG");
+  const dDpt3 = getVal("DPT-HB-Hib3");
+  const dOpv4 = getVal("OPV4");
+  const dIpv1 = getVal("IPV1");
+  const dIpv2 = getVal("IPV2");
+  const dMr1 = getVal("Campak Rubela-1");
+  const dDpt4 = getVal("DPT-HB-Hib4");
+  const dMr2 = getVal("Campak Rubela-2");
+
+  const hasAllIdlAntigens = Boolean(dHb0 && dBcg && dDpt3 && dOpv4 && dIpv1 && dIpv2 && dMr1);
+  let isIdlValid = false;
+  let isCatchUpIdl = false;
+
+  if (hasAllIdlAntigens) {
+    const idlCompletionDate = getLatestVaccineDate([dHb0, dBcg, dDpt3, dOpv4, dIpv1, dIpv2, dMr1]);
+    const ageAtIdl = getAgeInMonthsAtDate(d.tgl_lahir, idlCompletionDate);
+    if (ageAtIdl === null || ageAtIdl < 12) {
+      isIdlValid = true;
+    } else {
+      isCatchUpIdl = true;
+    }
+  }
+
+  const hasAllIblAntigens = Boolean(hasAllIdlAntigens && dDpt4 && dMr2);
+  let isIblValid = false;
+
+  if (hasAllIblAntigens) {
+    const iblCompletionDate = getLatestVaccineDate([dHb0, dBcg, dDpt3, dOpv4, dIpv1, dIpv2, dMr1, dDpt4, dMr2]);
+    const ageAtIbl = getAgeInMonthsAtDate(d.tgl_lahir, iblCompletionDate);
+    if (ageAtIbl === null || ageAtIbl < 24) {
+      isIblValid = true;
+    }
+  }
+
+  return { isIdlValid, isCatchUpIdl, isIblValid };
+}
     // =========================================================================
     // HITUNG & TAMPILKAN KARTU CAPAIAN PWS DI HALAMAN INPUT (SELARAS KEMENKES)
     // =========================================================================
@@ -5334,101 +5334,181 @@ function syncPerVaccineDateInput(checkbox, existingDate = '') {
   }
 }
 
+// 2. PERBAIKAN KOTAK TANGGAL PER VAKSIN & AUTO-FILL DOSIS SEBELUMNYA
 function setupVaccineAutoFillListeners(existingVaccines = {}) {
   const checkboxes = document.querySelectorAll('input[type="checkbox"][name="chk_vaksin"]');
-  const defaultServiceDate = document.getElementById('kohortTglLayanan')?.value || new Date().toISOString().split('T')[0];
 
   checkboxes.forEach(cb => {
     const vaxKey = cb.value;
-    const container = cb.closest('label') || cb.parentElement;
+    const container = cb.closest('.checkbox-item') || cb.parentElement;
 
-    // Buat kotak input tanggal khusus per vaksin jika belum ada
     let dateWrapper = container ? container.querySelector('.vax-date-wrapper') : null;
     if (!dateWrapper && container) {
       dateWrapper = document.createElement('div');
       dateWrapper.className = 'vax-date-wrapper';
-      dateWrapper.style.cssText = 'margin-top:4px; display:none;';
-      dateWrapper.innerHTML = `<input type="date" class="vax-custom-date" data-vax-date="${vaxKey}" style="font-size:11px; padding:2px 4px; border:1px solid #cbd5e1; border-radius:4px; width:100%;">`;
+      dateWrapper.style.display = 'none';
+      dateWrapper.innerHTML = `
+        <input type="date" class="vaccine-specific-date" data-vaccine="${vaxKey}" title="Pilih tanggal riil (kosongkan untuk otomatis)">
+        <span class="vax-auto-badge">Auto</span>
+      `;
       container.appendChild(dateWrapper);
+
+      ['click', 'mousedown', 'touchstart'].forEach(evt => {
+        dateWrapper.addEventListener(evt, e => e.stopPropagation());
+      });
+
+      const inp = dateWrapper.querySelector('.vaccine-specific-date');
+      const bdg = dateWrapper.querySelector('.vax-auto-badge');
+      inp.addEventListener('change', () => {
+        bdg.textContent = inp.value ? 'Riil' : 'Auto';
+        inp.classList.toggle('has-existing-date', Boolean(inp.value));
+      });
     }
 
-    const dateInput = dateWrapper ? dateWrapper.querySelector('.vax-custom-date') : null;
+    const dateInput = dateWrapper ? dateWrapper.querySelector('.vaccine-specific-date') : null;
+    const badge = dateWrapper ? dateWrapper.querySelector('.vax-auto-badge') : null;
     const savedDate = existingVaccines && existingVaccines[vaxKey] ? existingVaccines[vaxKey] : "";
 
-    // Reset status tampilan saat memuat data sasaran baru/lama
     cb.dataset.autoChecked = "";
     if (savedDate) {
       cb.checked = true;
       cb.dataset.existingDate = savedDate;
       if (container) container.classList.add('already-given');
-      if (dateWrapper) dateWrapper.style.display = 'block';
-      if (dateInput) dateInput.value = savedDate;
+      if (dateWrapper) dateWrapper.style.display = 'flex';
+      if (dateInput) {
+        dateInput.value = savedDate;
+        dateInput.classList.add('has-existing-date');
+      }
+      if (badge) badge.textContent = 'Tersimpan';
     } else {
+      cb.checked = false;
       cb.dataset.existingDate = "";
       if (container) container.classList.remove('already-given');
-      if (dateWrapper) dateWrapper.style.display = cb.checked ? 'block' : 'none';
-      if (dateInput && !dateInput.value) dateInput.value = defaultServiceDate;
+      if (dateWrapper) dateWrapper.style.display = 'none';
+      if (dateInput) {
+        dateInput.value = "";
+        dateInput.classList.remove('has-existing-date');
+      }
+      if (badge) badge.textContent = 'Auto';
     }
 
-    // Pasang event listener hanya sekali agar tidak menumpuk
     if (cb.dataset.listenerAttached === "true") return;
     cb.dataset.listenerAttached = "true";
 
     cb.addEventListener('change', function () {
-      const currentTglLayanan = document.getElementById('kohortTglLayanan')?.value || new Date().toISOString().split('T')[0];
-      const ownWrap = (this.closest('label') || this.parentElement)?.querySelector('.vax-date-wrapper');
-      const ownInput = ownWrap ? ownWrap.querySelector('.vax-custom-date') : null;
+      const currentTglLayanan = document.getElementById('reg_tgl_pelayanan')?.value || new Date().toISOString().split('T')[0];
+      const ownWrap = (this.closest('.checkbox-item') || this.parentElement)?.querySelector('.vax-date-wrapper');
+      const ownInput = ownWrap ? ownWrap.querySelector('.vaccine-specific-date') : null;
+      const ownBadge = ownWrap ? ownWrap.querySelector('.vax-auto-badge') : null;
 
       if (this.checked) {
-        if (ownWrap) ownWrap.style.display = 'block';
-        if (ownInput && !ownInput.value) ownInput.value = this.dataset.existingDate || currentTglLayanan;
+        this.dataset.autoChecked = "";
+        if (ownWrap) ownWrap.style.display = 'flex';
+        if (ownInput && !ownInput.value) {
+          ownInput.value = this.dataset.existingDate || currentTglLayanan;
+          ownInput.classList.toggle('has-existing-date', Boolean(ownInput.value));
+        }
+        if (ownBadge) ownBadge.textContent = this.dataset.existingDate ? 'Tersimpan' : 'Riil';
 
-        // 1. Auto-centang dosis sebelumnya dalam seri yang sama (DPT, OPV, PCV, RV, IPV, MR)
+        const autoCheckPrereq = (reqKey) => {
+          const reqCb = document.querySelector(`input[type="checkbox"][name="chk_vaksin"][value="${reqKey}"]`);
+          if (reqCb && !reqCb.checked) {
+            reqCb.checked = true;
+            reqCb.dataset.autoChecked = "true";
+            const reqWrap = (reqCb.closest('.checkbox-item') || reqCb.parentElement)?.querySelector('.vax-date-wrapper');
+            const reqInput = reqWrap ? reqWrap.querySelector('.vaccine-specific-date') : null;
+            const reqBadge = reqWrap ? reqWrap.querySelector('.vax-auto-badge') : null;
+            if (reqWrap) reqWrap.style.display = 'flex';
+            if (reqInput) {
+              reqInput.value = reqCb.dataset.existingDate || "";
+              reqInput.classList.toggle('has-existing-date', Boolean(reqInput.value));
+            }
+            if (reqBadge) reqBadge.textContent = reqCb.dataset.existingDate ? 'Tersimpan' : 'Auto';
+          }
+        };
+
+        // 1. Auto-centang dosis sebelumnya dalam seri yang sama
         if (typeof SERIES_SEQUENCES !== 'undefined' && Array.isArray(SERIES_SEQUENCES)) {
           SERIES_SEQUENCES.forEach(series => {
             if (!series || !Array.isArray(series.items)) return;
             const idx = series.items.findIndex(item => item.key === this.value);
             if (idx > 0) {
               for (let i = 0; i < idx; i++) {
-                const prevKey = series.items[i].key;
-                const prevCb = document.querySelector(`input[type="checkbox"][name="chk_vaksin"][value="${prevKey}"]`);
-                if (prevCb && !prevCb.checked) {
-                  prevCb.checked = true;
-                  prevCb.dataset.autoChecked = "true";
-                  const prevWrap = (prevCb.closest('label') || prevCb.parentElement)?.querySelector('.vax-date-wrapper');
-                  if (prevWrap) prevWrap.style.display = 'block';
-                }
+                autoCheckPrereq(series.items[i].key);
               }
             }
           });
         }
 
-        // 2. Auto-centang imunisasi dasar jika mencentang lanjutan baduta (DPT4 / MR2)
+        // 2. Auto-centang imunisasi dasar jika mencentang DPT4 / MR2
         if (this.value === 'DPT-HB-Hib4' || this.value === 'Campak Rubela-2') {
+          const hasAnyHb0 = document.querySelector('input[name="chk_vaksin"][value="HBO (<24 Jam)"]')?.checked ||
+                            document.querySelector('input[name="chk_vaksin"][value="HBO (1-7 Hari)"]')?.checked;
+          if (!hasAnyHb0) autoCheckPrereq('HBO (<24 Jam)');
+
           const basicPrereqs = [
-            'HB0', 'BCG', 'OPV1',
+            'BCG', 'OPV1',
             'DPT-HB-Hib1', 'OPV2',
             'DPT-HB-Hib2', 'OPV3',
             'DPT-HB-Hib3', 'OPV4', 'IPV1', 'IPV2',
             'Campak Rubela-1'
           ];
-          basicPrereqs.forEach(reqKey => {
-            const reqCb = document.querySelector(`input[type="checkbox"][name="chk_vaksin"][value="${reqKey}"]`);
-            if (reqCb && !reqCb.checked) {
-              reqCb.checked = true;
-              reqCb.dataset.autoChecked = "true";
-              const reqWrap = (reqCb.closest('label') || reqCb.parentElement)?.querySelector('.vax-date-wrapper');
-              if (reqWrap) reqWrap.style.display = 'block';
-            }
-          });
+          basicPrereqs.forEach(reqKey => autoCheckPrereq(reqKey));
         }
       } else {
         this.dataset.autoChecked = "";
         if (ownWrap) ownWrap.style.display = 'none';
+        if (ownInput) {
+          ownInput.value = "";
+          ownInput.classList.remove('has-existing-date');
+        }
+        if (ownBadge) ownBadge.textContent = 'Auto';
       }
     });
   });
 }
+  // 3. PERBAIKAN MEMUAT TANGGAL LAMA SAAT EDIT DATA SASARAN
+window.editDataSasaran = function(dataAnakJson) {
+  try {
+    const data = JSON.parse(decodeURIComponent(dataAnakJson));
+    currentQrChildData = data;
+
+    const cardForm = document.getElementById('cardFormUtama');
+    if (cardForm) cardForm.style.display = 'block';
+
+    const btnQrForm = document.getElementById('btnCetakQrFromForm');
+    if (btnQrForm) btnQrForm.style.display = isCurrentUserAdmin() ? 'inline-flex' : 'none';
+
+    document.getElementById('reg_desa').value = data.desa || "";
+    currentInputDesa = data.desa || "";
+    document.getElementById('reg_kegiatan').value = data.kegiatan || "";
+    document.getElementById('reg_nama_anak').value = data.nama_anak || "";
+    document.getElementById('reg_tgl_lahir').value = data.tgl_lahir || "";
+    document.getElementById('reg_jk').value = data.jk || "";
+    document.getElementById('reg_peran').value = data.peran || "Bayi/Baduta";
+    document.getElementById('reg_nik_anak').value = data.nik_anak && data.nik_anak !== "-" ? data.nik_anak : "";
+    document.getElementById('reg_wa_anak').value = data.wa_anak || "";
+    document.getElementById('reg_nama_ibu').value = data.nama_ibu || "";
+    document.getElementById('reg_nik_ibu').value = data.nik_ibu && data.nik_ibu !== "-" ? data.nik_ibu : "";
+    document.getElementById('reg_alamat').value = data.alamat_rt || "";
+
+    applyPeranUIFilter();
+    handleJkRules();
+
+    const existingVaccinesMap = {};
+    ALL_VAKSIN_KEYS.forEach(vk => {
+      const fieldKey = `vaksin_${vk.replace(/[\s\(\)<>-]/g, '_')}`;
+      const savedVal = data[fieldKey] || (data.jenis_imunisasi === vk ? data.tanggal_pelayanan : null);
+      if (savedVal && savedVal !== '-') existingVaccinesMap[vk] = savedVal;
+    });
+    setupVaccineAutoFillListeners(existingVaccinesMap);
+
+    loadRecentTransactions();
+    setTimeout(() => smoothScrollToId('cardFormUtama'), 80);
+  } catch (e) {
+    console.error("Error Edit:", e);
+  }
+};
     function handleJkRules() {
       const jk = document.getElementById('reg_jk').value;
       const cbTT2Catin = document.getElementById('cb_tt2_catin');
@@ -5606,44 +5686,63 @@ function resolveVaccineFinalDate({ vaxName, isHighestDose, serviceDate, dobStrin
       const vaccineDataUpdate = {};
 
       selectedVaccines.forEach(v => {
-        let isLowerSeriesDose = false;
-        let idealOffsetMonths = 0;
-        let idealOffsetDays = 0;
+  const cbEl = document.querySelector(`input[name="chk_vaksin"][value="${v}"]`);
+  const existingSavedDate = cbEl?.dataset?.existingDate || "";
+  const specificDateEl = document.querySelector(`.vaccine-specific-date[data-vaccine="${v}"]`);
+  const userPickedDate = specificDateEl?.value || "";
+  const fieldKey = `vaksin_${v.replace(/[\s\(\)<>-]/g, '_')}`;
 
-        if (v.includes("TT")) {
-          vaccineDataUpdate[`vaksin_${v.replace(/[\s\(\)<>-]/g, '_')}`] = tglPelayananInput;
-          return;
-        }
-        if (v === "HBO (1-7 Hari)" && (selectedVaccines.includes("BCG") || selectedVaccines.includes("DPT-HB-Hib3") || selectedVaccines.includes("IPV1"))) {
-          if (!selectedVaccines.includes("HBO (<24 Jam)")) {
-            isLowerSeriesDose = true;
-            idealOffsetDays = 1;
-          }
-        } else if (v === "BCG" && (selectedVaccines.includes("DPT-HB-Hib3") || selectedVaccines.includes("IPV1") || selectedVaccines.includes("IPV2"))) {
+  // Prioritas 1: Tanggal spesifik yang dipilih/diubah user pada kotak tanggal vaksin
+  if (userPickedDate) {
+    vaccineDataUpdate[fieldKey] = userPickedDate;
+    return;
+  }
+
+  // Prioritas 2: Tanggal lama yang sudah tersimpan di database (jangan ditimpa)
+  if (existingSavedDate) {
+    vaccineDataUpdate[fieldKey] = existingSavedDate;
+    return;
+  }
+
+  if (v.includes("TT")) {
+    vaccineDataUpdate[fieldKey] = tglPelayananInput;
+    return;
+  }
+
+  // Prioritas 3 & 4: Dosis sebelumnya yang kosong dihitung otomatis dari Tgl Lahir, dosis tertinggi pakai tglPelayananInput
+  let isLowerSeriesDose = false;
+  let idealOffsetMonths = 0;
+  let idealOffsetDays = 0;
+
+  if ((v === "HBO (<24 Jam)" || v === "HBO (1-7 Hari)") &&
+      (selectedVaccines.includes("BCG") || selectedVaccines.includes("DPT-HB-Hib1") || selectedVaccines.includes("DPT-HB-Hib3") || selectedVaccines.includes("IPV1"))) {
+    isLowerSeriesDose = true;
+    idealOffsetDays = v === "HBO (1-7 Hari)" ? 1 : 0;
+  } else if (v === "BCG" && (selectedVaccines.includes("DPT-HB-Hib3") || selectedVaccines.includes("IPV1") || selectedVaccines.includes("IPV2"))) {
+    isLowerSeriesDose = true;
+    idealOffsetMonths = 1;
+  } else {
+    SERIES_SEQUENCES.forEach(series => {
+      const idx = series.items.findIndex(item => item.key === v);
+      if (idx !== -1) {
+        let maxCheckedIdx = -1;
+        series.items.forEach((item, i) => {
+          if (selectedVaccines.includes(item.key)) maxCheckedIdx = i;
+        });
+        if (idx < maxCheckedIdx) {
           isLowerSeriesDose = true;
-          idealOffsetMonths = 1;
-        } else {
-          SERIES_SEQUENCES.forEach(series => {
-            const idx = series.items.findIndex(item => item.key === v);
-            if (idx !== -1) {
-              let maxCheckedIdx = -1;
-              series.items.forEach((item, i) => {
-                if (selectedVaccines.includes(item.key)) maxCheckedIdx = i;
-              });
-              if (idx < maxCheckedIdx) {
-                isLowerSeriesDose = true;
-                idealOffsetMonths = series.items[idx].offsetMonths;
-              }
-            }
-          });
+          idealOffsetMonths = series.items[idx].offsetMonths;
         }
-        const fieldKey = `vaksin_${v.replace(/[\s\(\)<>-]/g, '_')}`;
-        if (isLowerSeriesDose) {
-          vaccineDataUpdate[fieldKey] = calculateIdealVaccineDate(tglLahir, idealOffsetMonths, idealOffsetDays);
-        } else {
-          vaccineDataUpdate[fieldKey] = tglPelayananInput;
-        }
-      });
+      }
+    });
+  }
+
+  if (isLowerSeriesDose) {
+    vaccineDataUpdate[fieldKey] = calculateIdealVaccineDate(tglLahir, idealOffsetMonths, idealOffsetDays) || tglPelayananInput;
+  } else {
+    vaccineDataUpdate[fieldKey] = tglPelayananInput;
+  }
+});
 
       const payload = {
         id: uniqueChildId,

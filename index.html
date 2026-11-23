@@ -3058,20 +3058,16 @@
         if (searchDesaEl) searchDesaEl.value = childData.desa;
       }
 
-      // Centang riwayat vaksin yang sudah diterima sebelumnya
-      document.querySelectorAll('input[name="chk_vaksin"]').forEach(cb => {
-        cb.checked = false;
-        const labelParent = cb.closest('.checkbox-item');
-        if (labelParent) labelParent.classList.remove('already-given');
-
-        const vk = cb.value;
+     // Muat riwayat vaksin lama beserta kotak tanggal tersimpan
+      const existingVaccinesMap = {};
+      ALL_VAKSIN_KEYS.forEach(vk => {
         const fieldKey = `vaksin_${vk.replace(/[\s\(\)<>-]/g, '_')}`;
         const existingDate = childData[fieldKey] || (childData.jenis_imunisasi === vk ? childData.tanggal_pelayanan : null);
         if (existingDate && existingDate !== '-') {
-          cb.checked = true;
-          if (labelParent) labelParent.classList.add('already-given');
+          existingVaccinesMap[vk] = String(existingDate).trim().substring(0, 10);
         }
       });
+      setupVaccineAutoFillListeners(existingVaccinesMap);
 
       currentQrChildData = childData;
       const btnQrForm = document.getElementById('btnCetakQrFromForm');
@@ -4312,6 +4308,9 @@ window.goToEdit = function(encodedJson) {
         const labelParent = cb.closest('.checkbox-item');
         if (labelParent) labelParent.classList.remove('already-given');
       });
+      if (typeof setupVaccineAutoFillListeners === 'function') {
+        setupVaccineAutoFillListeners({});
+      }
       const quickBanner = document.getElementById('quickQrActiveFormBanner');
       if (quickBanner) quickBanner.remove();
       currentQrChildData = null;
@@ -5584,8 +5583,8 @@ window.editDataSasaran = function(dataAnakJson) {
         selectCert.innerHTML = `<option value="">Error: ${err.message}</option>`;
       }
     }
-
-    function fillFormWithSelectedAnak() {
+  
+function fillFormWithSelectedAnak() {
       const val = document.getElementById('select_anak_registered').value;
       if (!val) {
         resetFormRegisterIndividu();
@@ -5593,51 +5592,6 @@ window.editDataSasaran = function(dataAnakJson) {
       }
       editDataSasaran(encodeURIComponent(val));
     }
-
-    window.editDataSasaran = function(dataAnakJson) {
-      try {
-        const data = JSON.parse(decodeURIComponent(dataAnakJson));
-        currentQrChildData = data;
-
-        const cardForm = document.getElementById('cardFormUtama');
-        if (cardForm) cardForm.style.display = 'block';
-
-        const btnQrForm = document.getElementById('btnCetakQrFromForm');
-        if (btnQrForm) btnQrForm.style.display = 'inline-flex';
-
-        document.getElementById('reg_desa').value = data.desa || "";
-        currentInputDesa = data.desa || "";
-        document.getElementById('reg_kegiatan').value = data.kegiatan || "";
-        document.getElementById('reg_nama_anak').value = data.nama_anak || "";
-        document.getElementById('reg_tgl_lahir').value = data.tgl_lahir || "";
-        document.getElementById('reg_jk').value = data.jk || "";
-        document.getElementById('reg_peran').value = data.peran || "Bayi/Baduta";
-        document.getElementById('reg_nik_anak').value = data.nik_anak && data.nik_anak !== "-" ? data.nik_anak : "";
-        document.getElementById('reg_wa_anak').value = data.wa_anak || "";
-        document.getElementById('reg_nama_ibu').value = data.nama_ibu || "";
-        document.getElementById('reg_nik_ibu').value = data.nik_ibu && data.nik_ibu !== "-" ? data.nik_ibu : "";
-        document.getElementById('reg_alamat').value = data.alamat_rt || "";
-
-        applyPeranUIFilter();
-        handleJkRules();
-        document.querySelectorAll('input[name="chk_vaksin"]').forEach(cb => {
-          const existingVaccinesMap = {};
-          if (typeof VAKSIN_ANAK_KEYS !== 'undefined') {
-            VAKSIN_ANAK_KEYS.forEach(vk => {
-              if (data[vk]) existingVaccinesMap[vk] = data[vk];
-             });
-            }
-          setupVaccineAutoFillListeners(existingVaccinesMap);
-          const fieldKey = `vaksin_${cb.value.replace(/[\s\(\)<>-]/g, '_')}`;
-          cb.checked = Boolean(data[fieldKey]);
-        });
-
-        loadRecentTransactions();
-        setTimeout(() => smoothScrollToId('cardFormUtama'), 80);
-      } catch (e) {
-        console.error("Error Edit:", e);
-      }
-    };
 
     // =========================================================================
     // SIMPAN REGISTER KOHORT & SINKRONISASI OFFLINE
